@@ -1,7 +1,12 @@
 package me.matl114.logitech.SlimefunItem.Blocks.MultiBlock;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -18,10 +23,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
 
 public class MultiIOPort extends AbstractTransportor implements MultiBlockPart {
     protected final boolean CONFIG_TO;

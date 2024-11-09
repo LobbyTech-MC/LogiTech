@@ -1,27 +1,56 @@
 package me.matl114.logitech.Utils;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.function.IntFunction;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.AxolotlBucketMeta;
+import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.BlockDataMeta;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.BundleMeta;
+import org.bukkit.inventory.meta.CompassMeta;
+import org.bukkit.inventory.meta.CrossbowMeta;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.FireworkEffectMeta;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.SuspiciousStewMeta;
+import org.bukkit.inventory.meta.TropicalFishBucketMeta;
+
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.core.attributes.DistinctiveItem;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
 import me.matl114.logitech.Utils.Algorithms.DynamicArray;
-
-import me.matl114.logitech.Utils.UtilClass.ItemClass.*;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemCounter;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemGreedyConsumer;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusher;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusherProvider;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemSlotPusher;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.MultiItemStack;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.RandOutItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.Material;
-import org.bukkit.block.BlockState;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.*;
-
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.function.IntFunction;
 
 public class CraftUtils {
     private static final HashSet<Material> COMPLEX_MATERIALS = new HashSet<>(){{

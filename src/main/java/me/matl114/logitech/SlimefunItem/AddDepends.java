@@ -1,6 +1,18 @@
 package me.matl114.logitech.SlimefunItem;
 
-import com.google.common.collect.Multimap;
+import java.lang.reflect.Constructor;
+import java.util.Map;
+import java.util.UUID;
+
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemHandler;
@@ -11,33 +23,17 @@ import io.github.thebusybiscuit.slimefun4.core.SlimefunRegistry;
 import io.github.thebusybiscuit.slimefun4.core.handlers.GlobalItemHandler;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
-import io.github.thebusybiscuit.slimefun4.utils.LoreBuilder;
-import jdk.jshell.execution.Util;
-import me.matl114.logitech.ConfigLoader;
 import me.matl114.logitech.Items.CustomHead;
 import me.matl114.logitech.SlimefunItem.Items.MyVanillaItem;
 import me.matl114.logitech.SlimefunItem.Machines.AutoMachines.AdvanceRecipeCrafter;
 import me.matl114.logitech.SlimefunItem.Machines.ManualMachines.ManualCrafter;
 import me.matl114.logitech.SlimefunItem.Machines.WorkBenchs.BugCrafter;
-import me.matl114.logitech.Utils.*;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ConstItemStack;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.Debug;
+import me.matl114.logitech.Utils.ReflectUtils;
+import me.matl114.logitech.Utils.Settings;
+import me.matl114.logitech.Utils.Utils;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ConstSlimefunItemStack;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * only enable when certain addon are enable

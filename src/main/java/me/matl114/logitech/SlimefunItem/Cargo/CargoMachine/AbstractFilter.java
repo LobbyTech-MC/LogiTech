@@ -1,6 +1,10 @@
 package me.matl114.logitech.SlimefunItem.Cargo.CargoMachine;
 
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -8,24 +12,16 @@ import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.SlimefunItem.Blocks.AbstractBlock;
-import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
-import me.matl114.logitech.Utils.Algorithms.DynamicArray;
 import me.matl114.logitech.Utils.CraftUtils;
 import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.Settings;
 import me.matl114.logitech.Utils.TransportUtils;
+import me.matl114.logitech.Utils.Algorithms.DynamicArray;
 import me.matl114.logitech.Utils.UtilClass.CargoClass.CargoConfigs;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemCounter;
 import me.matl114.logitech.Utils.UtilClass.TickerClass.Ticking;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class AbstractFilter extends AbstractBlock implements Ticking {
     public AbstractFilter(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {

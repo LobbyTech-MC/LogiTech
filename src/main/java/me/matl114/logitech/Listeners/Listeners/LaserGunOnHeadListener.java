@@ -1,17 +1,15 @@
 package me.matl114.logitech.Listeners.Listeners;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import me.matl114.logitech.SlimefunItem.AddSlimefunItems;
-import me.matl114.logitech.SlimefunItem.Items.LaserGun;
-import me.matl114.logitech.Utils.Debug;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import me.matl114.logitech.SlimefunItem.Items.LaserGun;
 
 public class LaserGunOnHeadListener implements Listener {
     @EventHandler

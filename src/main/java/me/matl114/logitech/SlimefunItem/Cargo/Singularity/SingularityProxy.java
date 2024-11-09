@@ -1,23 +1,18 @@
 package me.matl114.logitech.SlimefunItem.Cargo.Singularity;
 
-import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedException;
-import me.matl114.logitech.SlimefunItem.Items.Singularity;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.UtilClass.PdcClass.AbstractStorageType;
-import me.matl114.logitech.Utils.UtilClass.StorageClass.ItemStorageCache;
-import me.matl114.logitech.Utils.UtilClass.StorageClass.LocationProxy;
-import me.matl114.logitech.Utils.UtilClass.StorageClass.StorageType;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedException;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.UtilClass.StorageClass.ItemStorageCache;
+import me.matl114.logitech.Utils.UtilClass.StorageClass.LocationProxy;
+import me.matl114.logitech.Utils.UtilClass.StorageClass.StorageType;
 
 public class SingularityProxy extends StorageType implements LocationProxy {
     public final static NamespacedKey KEY_LOC = AddUtils.getNameKey("cache_loc");

@@ -1,14 +1,13 @@
 package me.matl114.logitech.Listeners.Listeners;
 
-import me.matl114.logitech.Schedule.Task;
+import java.util.HashSet;
+import java.util.function.Consumer;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-
-import java.util.HashSet;
-import java.util.function.Consumer;
 
 public class PlayerQuiteListener implements Listener {
     @EventHandler

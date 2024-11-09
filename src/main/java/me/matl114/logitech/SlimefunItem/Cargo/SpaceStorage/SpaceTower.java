@@ -1,22 +1,10 @@
 package me.matl114.logitech.SlimefunItem.Cargo.SpaceStorage;
 
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.core.networks.energy.EnergyNetComponentType;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
-import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
-import io.github.thebusybiscuit.slimefun4.utils.LoreBuilder;
-import me.matl114.logitech.ConfigLoader;
-import me.matl114.logitech.Schedule.Schedules;
-import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
-import me.matl114.logitech.Utils.*;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,11 +12,28 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.units.qual.C;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
+import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
+import io.github.thebusybiscuit.slimefun4.utils.LoreBuilder;
+import me.matl114.logitech.ConfigLoader;
+import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.Debug;
+import me.matl114.logitech.Utils.MenuUtils;
+import me.matl114.logitech.Utils.Settings;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
 public class SpaceTower extends AbstractMachine {
     protected final int[] INPUT_SLOTS=new int[]{

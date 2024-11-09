@@ -1,17 +1,16 @@
 package me.matl114.logitech.Depends;
 
-import io.github.sefiraat.networks.network.stackcaches.QuantumCache;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import me.matl114.logitech.Utils.Debug;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Map;
+
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.annotation.Nonnull;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import io.github.sefiraat.networks.network.stackcaches.QuantumCache;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import me.matl114.logitech.Utils.Debug;
 
 public class NetWorkQuantumMethod {
     static Method getAmount=null;

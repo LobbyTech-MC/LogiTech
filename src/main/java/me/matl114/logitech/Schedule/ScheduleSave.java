@@ -1,7 +1,5 @@
 package me.matl114.logitech.Schedule;
 
-import me.matl114.logitech.Utils.Debug;
-
 import java.util.HashSet;
 
 public class ScheduleSave {

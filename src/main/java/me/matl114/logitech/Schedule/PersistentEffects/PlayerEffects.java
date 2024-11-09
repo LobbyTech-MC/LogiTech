@@ -1,10 +1,10 @@
 package me.matl114.logitech.Schedule.PersistentEffects;
 
-import me.matl114.logitech.Schedule.ScheduleEffects;
-import me.matl114.logitech.Schedule.Schedules;
+import java.util.function.Function;
+
 import org.bukkit.entity.Player;
 
-import java.util.function.Function;
+import me.matl114.logitech.Schedule.ScheduleEffects;
 
 public class PlayerEffects {
     public final AbstractEffect TYPE;

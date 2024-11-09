@@ -1,16 +1,19 @@
 package me.matl114.logitech;
 
-import com.google.common.base.Charsets;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.Debug;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.file.Files;
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
+import com.google.common.base.Charsets;
+
+import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
+import me.matl114.logitech.Utils.Debug;
 
 public class ConfigLoader {
     public static boolean TESTMODE = MyAddon.testmode();

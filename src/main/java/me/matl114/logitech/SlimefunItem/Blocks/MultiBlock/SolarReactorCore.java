@@ -1,19 +1,46 @@
 package me.matl114.logitech.SlimefunItem.Blocks.MultiBlock;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Random;
+import java.util.Set;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
+import org.bukkit.entity.EnderCrystal;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.BlockVector;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
-import me.matl114.logitech.Schedule.PersistentEffects.CustomEffects;
-import me.matl114.logitech.Schedule.PersistentEffects.PlayerEffects;
 import me.matl114.logitech.Schedule.ScheduleSave;
 import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.Schedule.PersistentEffects.CustomEffects;
+import me.matl114.logitech.Schedule.PersistentEffects.PlayerEffects;
 import me.matl114.logitech.SlimefunItem.AddItem;
-import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.BukkitUtils;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.MenuUtils;
+import me.matl114.logitech.Utils.Settings;
+import me.matl114.logitech.Utils.WorldUtils;
 import me.matl114.logitech.Utils.UtilClass.FunctionalClass.OutputStream;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.AbstractMultiBlockHandler;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
@@ -21,24 +48,6 @@ import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockType;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.SimpleCraftingOperation;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-
-import org.bukkit.block.Block;
-
-
-import org.bukkit.entity.EnderCrystal;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.util.BlockVector;
-
-import java.util.*;
 
 public class SolarReactorCore extends MultiBlockProcessor {
     protected final int[] BORDER=new int[]{1,2,3,5,6,7,13,40,49};

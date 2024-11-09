@@ -1,18 +1,19 @@
 package me.matl114.logitech.Schedule;
 
-import me.matl114.logitech.Schedule.PersistentEffects.AbstractEffect;
-import me.matl114.logitech.Schedule.PersistentEffects.CustomEffects;
-import me.matl114.logitech.Schedule.PersistentEffects.PlayerEffects;
-import me.matl114.logitech.Utils.Debug;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+
 import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
+import me.matl114.logitech.Schedule.PersistentEffects.AbstractEffect;
+import me.matl114.logitech.Schedule.PersistentEffects.CustomEffects;
+import me.matl114.logitech.Schedule.PersistentEffects.PlayerEffects;
 
 public class ScheduleEffects {
     public static AbstractEffect registerEffect(AbstractEffect effect) {

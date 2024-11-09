@@ -1,6 +1,38 @@
 package me.matl114.logitech.Utils;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.Nonnull;
+
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
 import com.google.common.base.Preconditions;
+
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -13,35 +45,21 @@ import io.github.thebusybiscuit.slimefun4.utils.LoreBuilder;
 import me.matl114.logitech.Language;
 import me.matl114.logitech.MyAddon;
 import me.matl114.logitech.SlimefunItem.AddItem;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.*;
 import me.matl114.logitech.Utils.UtilClass.FunctionalClass.LoreDecorator;
 import me.matl114.logitech.Utils.UtilClass.FunctionalClass.StringDecorator;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.AbstractItemStack;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.DisplayItemStack;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.EqProRandomStack;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.EquivalItemStack;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ProbItemStack;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.RandAmountStack;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.RandomItemStack;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import javax.annotation.Nonnull;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class AddUtils {
     public static final String ADDON_NAME="逻辑工艺";

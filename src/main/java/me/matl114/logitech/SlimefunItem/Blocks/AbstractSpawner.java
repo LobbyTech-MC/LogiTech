@@ -1,28 +1,24 @@
 package me.matl114.logitech.SlimefunItem.Blocks;
 
-import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.ItemSetting;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import me.matl114.logitech.SlimefunItem.Items.EntityFeat;
-import me.matl114.logitech.Utils.Debug;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.block.TileState;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemSetting;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import me.matl114.logitech.SlimefunItem.Items.EntityFeat;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 public class AbstractSpawner extends AbstractBlock{
     private final ItemSetting<Boolean> allowSpawnEggs = new ItemSetting<>(this, "allow-spawn-eggs", true);

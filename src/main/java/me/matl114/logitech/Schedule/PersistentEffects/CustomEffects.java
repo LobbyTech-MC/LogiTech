@@ -1,13 +1,11 @@
 package me.matl114.logitech.Schedule.PersistentEffects;
 
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.Debug;
-import org.bukkit.damage.DamageSource;
-import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import me.matl114.logitech.Utils.AddUtils;
 
 public class CustomEffects {
     public static void setup(){
