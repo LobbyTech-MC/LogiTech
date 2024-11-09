@@ -1,15 +1,11 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.Debug;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.units.qual.A;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 public class ProbItemStack extends ItemStack implements MultiItemStack,RandOutItem {
     public Random rand=new Random();
@@ -39,14 +35,13 @@ public class ProbItemStack extends ItemStack implements MultiItemStack,RandOutIt
         return new ItemStack(Material.AIR);
     }
     public ProbItemStack copy(){
-        ProbItemStack stack;
-        stack=(ProbItemStack) super.clone();
-        stack.stack=this.stack;
-        stack.air=this.air;
-        stack.prob=this.prob;
-        stack.stacklist=new ArrayList<>(this.stacklist);
-        stack.problist=new ArrayList<>(this.problist);
-        return stack;
+        ProbItemStack copystack = new ProbItemStack(stack, prob);
+        copystack.stack=this.stack;
+        copystack.air=this.air;
+        copystack.prob=this.prob;
+        copystack.stacklist=new ArrayList<>(this.stacklist);
+        copystack.problist=new ArrayList<>(this.problist);
+        return copystack;
 
     }
     public ItemStack getInstance(){

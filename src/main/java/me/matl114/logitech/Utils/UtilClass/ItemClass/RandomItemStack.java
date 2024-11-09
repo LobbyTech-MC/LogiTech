@@ -1,13 +1,19 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedException;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.Debug;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedException;
 
 public class RandomItemStack extends ItemStack implements MultiItemStack,RandOutItem {
+	protected LinkedHashMap<ItemStack, Integer> itemSettings;
+	
     public Random rand=new Random();
     public ItemStack[] itemList;
     public double[] itemWeight;
@@ -15,6 +21,7 @@ public class RandomItemStack extends ItemStack implements MultiItemStack,RandOut
     public int[] weightSum;
     public RandomItemStack(LinkedHashMap<ItemStack ,Integer> itemSettings) {
         super(itemSettings.keySet().iterator().next());
+        this.itemSettings = itemSettings;
         this.sum=itemSettings.keySet().size();
         this.itemList=new ItemStack[sum];
         this.itemWeight=new double[sum];
@@ -73,8 +80,7 @@ public class RandomItemStack extends ItemStack implements MultiItemStack,RandOut
         return this.itemList[i].clone();
     }
     public RandomItemStack copy(){
-        RandomItemStack stack;
-        stack=(RandomItemStack)super.clone();
+        RandomItemStack stack = new RandomItemStack(itemSettings);
         stack.itemList=Arrays.copyOf(this.itemList,this.itemList.length);
         stack.sum=this.sum;
         stack.weightSum=Arrays.copyOf(this.weightSum,this.weightSum.length);

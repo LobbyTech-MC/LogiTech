@@ -27,8 +27,10 @@ public class EquivalItemStack extends ItemStack implements MultiItemStack ,Equal
         }
     }
     protected int eamount=1;
+	private HashMap<ItemStack, Integer> itemSettings;
     public EquivalItemStack(HashMap<ItemStack ,Integer> itemSettings) {
         super(getFirstMaterial(itemSettings));
+        this.itemSettings = itemSettings;
         this.sum=itemSettings.keySet().size();
         this.itemList=new ItemStack[sum];
         this.counterList=new ItemCounter[sum];
@@ -80,8 +82,7 @@ public class EquivalItemStack extends ItemStack implements MultiItemStack ,Equal
         return itemList[0].clone();
     }
     public EquivalItemStack copy(){
-        EquivalItemStack stack;
-        stack=(EquivalItemStack)super.clone();
+        EquivalItemStack stack = new EquivalItemStack(itemSettings);
         stack.itemList=Arrays.copyOf(this.itemList,this.itemList.length);
         stack.counterList=Arrays.copyOf(this.counterList,this.counterList.length);
         stack.sum=this.sum;

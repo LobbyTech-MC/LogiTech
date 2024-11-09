@@ -83,21 +83,22 @@ public class CraftUtils {
         //add(Material.SHULKER_BOX);
         add(Material.BUNDLE);
     }};
-    public static final ItemStack DEFAULT_ITEMSTACK=new ItemStack(Material.STONE);
+    public static final ItemStack DEFAULT_ITEMSTACK = new ItemStack(Material.STONE);
     public static final ItemMeta NULL_META=(DEFAULT_ITEMSTACK.getItemMeta());
-    public static final Class CRAFTMETAITEMCLASS=NULL_META.getClass();
-    public static final Class ITEMSTACKCLASS=ItemStack.class;
-    public static Class CRAFTITEMSTACKCLASS;
+    public static final Class<? extends ItemMeta> CRAFTMETAITEMCLASS=NULL_META.getClass();
+    public static final Class<ItemStack> ITEMSTACKCLASS=ItemStack.class;
+    public static Class<? extends ItemStack> CRAFTITEMSTACKCLASS;
     public static ItemStack CRAFTITEMSTACK;
     public static Field CRAFTLORE;
     public static Field CRAFTDISPLAYNAME;
     public static Field CRAFTHANDLER;
-    public static Class NMSITEMCLASS;
+    public static Class<? extends Object> NMSITEMCLASS;
     public static Field ITEMSTACKMETA;
     public static boolean INVOKE_SUCCESS;
     public static boolean INVOKE_STACK_SUCCESS;
     static{
         try{
+        	
             CRAFTLORE=CRAFTMETAITEMCLASS.getDeclaredField("lore");
             CRAFTDISPLAYNAME=CRAFTMETAITEMCLASS.getDeclaredField("displayName");
             CRAFTLORE.setAccessible(true);
@@ -125,7 +126,17 @@ public class CraftUtils {
 //            Field[] fields= NMSITEMCLASS.getDeclaredFields();
 //            for(int i=0;i<fields.length;++i){
 //            }
-            ITEMSTACKMETA=DEFAULT_ITEMSTACK.getClass().getDeclaredField("meta");
+            /*
+            Field[] fields= DEFAULT_ITEMSTACK.getClass().getDeclaredFields();
+            for (Field f:fields) {
+            	Debug.logger(f.getName());
+                if(f.getName() == "meta") {
+                	ITEMSTACKMETA=f;
+                }
+            }
+            */
+            
+            ITEMSTACKMETA=DEFAULT_ITEMSTACK.getClass().getDeclaredField("data");
             ITEMSTACKMETA.setAccessible(true);
             INVOKE_STACK_SUCCESS=true;
         }catch (Throwable e){
@@ -1652,7 +1663,7 @@ public class CraftUtils {
             return meta1.getDisplayName().equals(meta2.getDisplayName());
         }
     }
-    private static Class CraftMetaBlockState;
+    private static Class<?> CraftMetaBlockState;
     private static Field blockEntityTag;
     private static boolean hasFailed;
     public static boolean matchBlockStateMetaOnInvoke(BlockStateMeta meta1, BlockStateMeta meta2){

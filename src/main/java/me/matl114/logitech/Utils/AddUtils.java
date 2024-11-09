@@ -566,7 +566,7 @@ public class AddUtils {
                         Arrays.copyOfRange((Object[])k,0,2),Arrays.copyOfRange((Object[])k,2,4)),v);
             }
             else if (k instanceof Pair){
-                try{
+                //try{
 
                 Object[] input=(Object[])((Pair)k).getFirstValue();
                 if(input==null){
@@ -577,9 +577,9 @@ public class AddUtils {
                     output=new Object[]{};
                 }
                 map.put(AddUtils.buildRecipes(input,output),v);
-                }catch (Exception a){
-                    throw new IllegalArgumentException("illegalArguments in recipe Pair, Pair val must be <T extends Object>T[]");
-                }
+                //}catch (Exception a){
+                //    throw new IllegalArgumentException("illegalArguments in recipe Pair, Pair val must be <T extends Object>T[]");
+                //}
             }
         });
         return map;
@@ -725,9 +725,9 @@ public class AddUtils {
             return new RandomItemStack(c);
         }
     public static ItemStack probItemStackFactory(ItemStack it,int prob){
-        if(prob>=100)return it;
+        if(prob>=100)return new CustomItemStack(it);
         prob=prob<0?0:prob;
-        return new ProbItemStack(it,((double)prob)/100 );
+        return new ProbItemStack(new CustomItemStack(it),((double)prob)/100 );
     }
     public static <T extends Object> ItemStack equalItemStackFactory(List<T> list){
         return equalItemStackFactory(list,1);
@@ -926,10 +926,10 @@ public class AddUtils {
     }
     public static ItemStack randAmountItemFactory(ItemStack it,int min,int max){
         if(min<max){
-            return new RandAmountStack(it,min,max);
+            return new RandAmountStack(new CustomItemStack(it),min,max);
         }
         else if(min==max){
-            return it;
+            return new CustomItemStack(it);
         }else {
             throw new IllegalArgumentException("randomAmountStack expects min<max, got %d and %d".formatted(min,max));
         }

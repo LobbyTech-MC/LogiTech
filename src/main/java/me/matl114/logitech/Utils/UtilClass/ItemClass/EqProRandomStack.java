@@ -1,12 +1,10 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import org.bukkit.inventory.ItemStack;
-
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
+
+import org.bukkit.inventory.ItemStack;
 
 public class EqProRandomStack extends RandomItemStack  {
     public Random rand=new Random();
@@ -17,16 +15,17 @@ public class EqProRandomStack extends RandomItemStack  {
            });
         }});
     }
-    public EqProRandomStack copy(){
-        EqProRandomStack stack;
-        stack=(EqProRandomStack) super.copy();
-        return stack;
-
-    }
 
     public EqProRandomStack(LinkedHashMap<ItemStack,Integer> itemSettings) {
         super(itemSettings);
     }
+    
+    public EqProRandomStack copy(){
+        EqProRandomStack stack = new EqProRandomStack(itemSettings);
+        return stack;
+
+    }
+    
     public ItemStack clone(){
         return this.itemList[rand.nextInt(this.sum)].clone();
     }
