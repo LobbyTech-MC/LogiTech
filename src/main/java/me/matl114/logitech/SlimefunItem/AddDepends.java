@@ -169,7 +169,7 @@ public class AddDepends {
                 ReflectUtils.invokeSetRecursively(instance,"recipeOutput",new ConstSlimefunItemStack(it));
                 try{
                     ItemHandler handler=AddHandlers.stopPlacementHandler;
-                    ((Map)ReflectUtils.invokeGetRecursively(instance,Settings.FIELD,"itemHandlers")).put(handler.getIdentifier(),handler);
+                    ((Map<Class<?>, ItemHandler>)ReflectUtils.invokeGetRecursively(instance,Settings.FIELD,"itemHandlers")).put(handler.getIdentifier(),handler);
                     if (handler instanceof GlobalItemHandler) {
                         SlimefunRegistry registry = Slimefun.getRegistry();
                         registry.getGlobalItemHandlers(handler.getIdentifier()).add(handler);
@@ -186,8 +186,8 @@ public class AddDepends {
         }
         try{
             if(hasInfiniteExpansion){
-                Class infinityMobDataClass=SlimefunItem.getById("MOB_SIMULATION_CHAMBER").getClass();
-                Constructor constructor=ReflectUtils.getSuitableConstructor(infinityMobDataClass,
+                Class<? extends SlimefunItem> infinityMobDataClass=SlimefunItem.getById("MOB_SIMULATION_CHAMBER").getClass();
+                Constructor<?> constructor=ReflectUtils.getSuitableConstructor(infinityMobDataClass,
                        ItemGroup.class,SlimefunItemStack.class,RecipeType.class,ItemStack[].class,int.class,int.class);
                 AddItem.INF_MOBSIMULATION.setItemMeta(  AddUtils.addLore(AddItem.INF_MOBSIMULATION, AddUtils.speedDisplay(64),AddUtils.energyPerSecond(800)).getItemMeta());
                 INFINITY_MOBSIMNULATOR=(SlimefunItem) constructor.newInstance(AddGroups.BASIC,AddItem.INF_MOBSIMULATION,INFINITYWORKBENCH_TYPE,
@@ -205,8 +205,8 @@ public class AddDepends {
         }
         try{
             if(hasInfiniteExpansion){
-                Class infinityGeoMiner=SlimefunItem.getById("GEO_QUARRY").getClass();
-                Constructor constructor=ReflectUtils.getSuitableConstructor(infinityGeoMiner,
+                Class<? extends SlimefunItem> infinityGeoMiner=SlimefunItem.getById("GEO_QUARRY").getClass();
+                Constructor<?> constructor=ReflectUtils.getSuitableConstructor(infinityGeoMiner,
                         ItemGroup.class,SlimefunItemStack.class,RecipeType.class,ItemStack[].class);
                 AddItem.INF_GEOQUARRY.setItemMeta( AddUtils.addLore(  AddItem.INF_GEOQUARRY,AddUtils.speedDisplay(64),AddUtils.energyPerSecond(4500)).getItemMeta());
                 INFINITY_GEOQURRY=(SlimefunItem) constructor.newInstance(AddGroups.BASIC,AddItem.INF_GEOQUARRY,INFINITYWORKBENCH_TYPE,
@@ -241,6 +241,6 @@ public class AddDepends {
     public static SlimefunItem INFINITY_MOBSIMNULATOR;
     public static SlimefunItem INFINITY_GEOQURRY;
     public static MyVanillaItem NTW_STORAGE_DISPLAY;
-    public static  Class NETWORKSQUANTUMSTORAGE;
+    public static  Class<?> NETWORKSQUANTUMSTORAGE;
     public static NamespacedKey NTWQUANTUMKEY;
 }
