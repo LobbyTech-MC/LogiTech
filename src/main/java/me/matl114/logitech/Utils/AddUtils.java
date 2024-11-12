@@ -450,7 +450,7 @@ public class AddUtils {
         }else if((result=resolveRandomizedItemStack(stack))!=null){
             return result;
         }else {
-            return new ItemStack(stack);
+            return new CustomItemStack(stack);
         }
     }
     public static ItemStack resolveRandomizedItemStack(ItemStack stack){
@@ -475,6 +475,8 @@ public class AddUtils {
         if(a==null)return null;
         if(a instanceof ItemStack item){
             return  getCopy(item);
+        }else if(a instanceof SlimefunItemStack){
+            return new CustomItemStack((SlimefunItemStack)a);
         }else if(a instanceof SlimefunItem){
             return getCopy(((SlimefunItem) a).getItem());
         }else if(a instanceof  Material){
