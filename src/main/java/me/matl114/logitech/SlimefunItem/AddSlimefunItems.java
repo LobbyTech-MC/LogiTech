@@ -35,6 +35,7 @@ import me.matl114.logitech.SlimefunItem.Cargo.WorkBench.ChipConsumer;
 import me.matl114.logitech.SlimefunItem.Items.*;
 import me.matl114.logitech.SlimefunItem.Machines.AutoMachines.*;
 import me.matl114.logitech.SlimefunItem.Machines.Electrics.*;
+import me.matl114.logitech.SlimefunItem.Machines.FinalFeature;
 import me.matl114.logitech.SlimefunItem.Machines.ManualMachines.FinalManual;
 import me.matl114.logitech.SlimefunItem.Machines.ManualMachines.ManualCrafter;
 import me.matl114.logitech.SlimefunItem.Machines.ManualMachines.ManualMachine;
@@ -1204,14 +1205,14 @@ public class AddSlimefunItems {
                     "PISTON",AddItem.LOGIGATE,"PISTON",
                     "COBALT_PICKAXE","WATER_BUCKET","COBALT_PICKAXE"),16,500,33,
             AddUtils.randItemStackFactory(
-                    mkMp("64COBBLESTONE",72,
-                            "2COAL",7,
-                            "4REDSTONE",6,
-                            "2IRON_INGOT",5,
-                            "8LAPIS_LAZULI",4,
-                            "2GOLD_INGOT",3,
-                            "2DIAMOND",2,
-                            "2EMERALD",1
+                    mkMp("32COBBLESTONE",75,
+                            "2COAL",5,
+                            "2REDSTONE",5,
+                            "IRON_INGOT",5,
+                            "4LAPIS_LAZULI",4,
+                            "GOLD_INGOT",3,
+                            "DIAMOND",2,
+                            "EMERALD",1
                     )
             ))
             .register();
@@ -1229,19 +1230,19 @@ public class AddSlimefunItems {
             }})
             .register();
     public static final SlimefunItem OVERWORLD_MINER=new SMGenerator(AddGroups.GENERATORS, AddItem.OVERWORLD_MINER,RecipeType.ENHANCED_CRAFTING_TABLE,
-            recipe(AddItem.ABSTRACT_INGOT,AddItem.MAGIC_STONE,AddItem.ABSTRACT_INGOT,
+            recipe("REINFORCED_PLATE",AddItem.MAGIC_STONE,"REINFORCED_PLATE",
                     AddItem.UNIQUE,AddItem.LENGINE,AddItem.EXISTE
                     ,AddItem.WORLD_FEAT,AddItem.MAGIC_STONE,AddItem.WORLD_FEAT
             ),12,2_500,400,
             AddUtils.randItemStackFactory(
-                    mkMp("64COBBLESTONE",40,
-                            "4COAL",9,
-                            "4REDSTONE",9,
-                            "4IRON_INGOT",9,
-                            "8LAPIS_LAZULI",9,
-                            "4GOLD_INGOT",9,
-                            "4DIAMOND",8,
-                            "4EMERALD",7
+                    mkMp("32COBBLESTONE",40,
+                            "3COAL",9,
+                            "3REDSTONE",9,
+                            "3IRON_INGOT",9,
+                            "6LAPIS_LAZULI",9,
+                            "3GOLD_INGOT",9,
+                            "3DIAMOND",8,
+                            "3EMERALD",7
                     )
             ))
             .register();
@@ -1253,8 +1254,8 @@ public class AddSlimefunItems {
                   ),10,3_000,600,
             AddUtils.randItemStackFactory(
                     mkMp(
-                            "64NETHERRACK",30,
-                            "10QUARTZ",40,
+                            "32NETHERRACK",30,
+                            "6QUARTZ",40,
                             "16MAGMA_BLOCK",7,
                             "16BLACKSTONE",7,
                             "16BASALT",7,
@@ -1272,9 +1273,9 @@ public class AddSlimefunItems {
             ),8,6_000,1000,
             AddUtils.randItemStackFactory(
                     mkMp(
-                            "64END_STONE",150,
+                            "32END_STONE",150,
                             "10OBSIDIAN",100,
-                            "4CHORUS_FLOWER",30,
+                            "2CHORUS_FLOWER",30,
                             "2SHULKER_SHELL",35,
                             "DRAGON_BREATH",35,
                             setC(AddItem.DIMENSIONAL_SHARD,2),30,
@@ -1462,8 +1463,12 @@ public class AddSlimefunItems {
                     "REDSTONE_BLOCK",setC(AddItem.NOLOGIC,1),AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,setC(AddItem.NOLOGIC,1),"REDSTONE_BLOCK",
                     null,"REDSTONE_BLOCK","REDSTONE_BLOCK","REDSTONE_BLOCK","REDSTONE_BLOCK",null),1,10000,250,
             AddUtils.randItemStackFactory(
-                    mkMp("REDSTONE_TORCH",16,"OBSERVER",16,"PISTON",16,"STICKY_PISTON",16,"REPEATER",16,"COMPARATOR",16,"LEVER",16,"NOTE_BLOCK",16,"REDSTONE_LAMP",16,
-                            AddUtils.randItemStackFactory(mkMp("SLIME_BALL",26,"HONEY_BLOCK",3,"TNT",2,"REDSTONE",1)),16)
+                    mkMp(
+                            AddUtils.randItemStackFactory(mkMp("PISTON",1,"STICKY_PISTON",1,"OBSERVER",1)),1,
+                            AddUtils.randItemStackFactory(mkMp("REDSTONE_TORCH",1,"REPEATER",1,"COMPARATOR",1,"LEVER",1)),1,
+                            AddUtils.randItemStackFactory(mkMp("NOTE_BLOCK",1, "REDSTONE_LAMP",1)),1,
+                            AddUtils.randItemStackFactory(mkMp("DISPENSER",1,"DROPPER",1)),1,
+                            AddUtils.randItemStackFactory(mkMp("SLIME_BALL",1,"HONEY_BLOCK",1,"TNT",1,"REDSTONE",1)),1)
             ))
             .register();
     public static final SlimefunItem TNT_MG=new SMGenerator(AddGroups.VANILLA, AddItem.TNT_MG,RecipeType.ENHANCED_CRAFTING_TABLE,
@@ -1999,8 +2004,8 @@ public class AddSlimefunItems {
             .register();
     public static final SlimefunItem ENHANCED_CRAFT_MANUAL=new ManualCrafter(AddGroups.MANUAL,AddItem.ENHANCED_CRAFT_MANUAL,RecipeType.ENHANCED_CRAFTING_TABLE,
             recipe("COBBLESTONE","COBBLESTONE","COBBLESTONE",
-                    null,"CRAFTING_TABLE",null,
-                    "COBBLESTONE","COBBLESTONE","COBBLESTONE"),0,0,RecipeType.ENHANCED_CRAFTING_TABLE)
+                    "COBBLESTONE","CRAFTING_TABLE","COBBLESTONE",
+                    "COBBLESTONE","REDSTONE","COBBLESTONE"),0,0,RecipeType.ENHANCED_CRAFTING_TABLE)
             .register();
     public static final SlimefunItem GRIND_MANUAL=new ManualCrafter(AddGroups.MANUAL,AddItem.GRIND_MANUAL,RecipeType.ENHANCED_CRAFTING_TABLE,
             recipe(null,AddItem.BUG,null,
@@ -2121,13 +2126,19 @@ public class AddSlimefunItems {
                 List<MachineRecipe> shapedRecipesVanilla=RecipeSupporter.PROVIDED_SHAPED_RECIPES.get(BukkitUtils.VANILLA_CRAFTTABLE);
                 List<MachineRecipe> cardRecipe=new ArrayList<>();
                 cardRecipe.addAll(RecipeSupporter.UNUSTACKABLE_ITEM_RECIPES);
+
                 for(MachineRecipe rp:shapedRecipesVanilla){
                     if(rp.getOutput()[0].getType().getMaxStackSize()==1){
                         cardRecipe.add(MachineRecipeUtils.shapeFrom(-1,rp.getInput(),recipe(REPLACE_CARD.getReplaceCard(rp.getOutput()[0].getType()))));
                     }
                 }
                 return cardRecipe;
-            }).setDisplayRecipes(
+            }){
+        {
+            CRAFT_PROVIDER= FinalFeature.MANUAL_CARD_READER;
+        }
+    }
+            .setDisplayRecipes(
                     Utils.list(
                             AddUtils.getInfoShow("&f配方说明",
                                     "&7你将会在这里的配方中找到所有可以在原版工作台中合成的物品的替代卡配方",
