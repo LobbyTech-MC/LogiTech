@@ -1853,7 +1853,7 @@ public class CraftUtils {
 
         // Potion
         if (metaOne instanceof PotionMeta instanceOne && metaTwo instanceof PotionMeta instanceTwo) {
-            if (!instanceOne.getBasePotionData().equals(instanceTwo.getBasePotionData())) {
+            if (!instanceOne.getBasePotionType().equals(instanceTwo.getBasePotionType())) {
                 return true;
             }
             if (instanceOne.hasCustomEffects() != instanceTwo.hasCustomEffects()) {
