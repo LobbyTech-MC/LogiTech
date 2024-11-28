@@ -785,7 +785,7 @@ public class AddUtils {
     public static ItemStack removeGlow(ItemStack stack){
         //stack.addEnchantment(Enchantment.ARROW_INFINITE, 1);
         ItemMeta meta=stack.getItemMeta();
-        meta.removeEnchant(Enchantment.ARROW_INFINITE);
+        meta.removeEnchant(Enchantment.INFINITY);
         stack.setItemMeta(meta);
         return stack;
     }
