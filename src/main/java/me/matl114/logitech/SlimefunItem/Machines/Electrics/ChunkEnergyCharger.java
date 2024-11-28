@@ -5,6 +5,7 @@ import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import me.matl114.logitech.Listeners.Listeners.SlimefunBlockPlaceLimitListener;
 import me.matl114.logitech.Schedule.Schedules;
 import me.matl114.logitech.SlimefunItem.Interface.ChunkLimit;
 import me.matl114.logitech.Utils.DataCache;
@@ -63,14 +64,27 @@ public class ChunkEnergyCharger extends AbstractEnergyCharger implements ChunkLi
         return !(that instanceof AbstractEnergyMachine);
     }
     public int getMaxChargeAmount(){
-        return 1024;
+        return 114514;
     }
     @Override
     public void onBreak(BlockBreakEvent e, BlockMenu menu) {
         super.onBreak(e, menu);
         onChunkBreak(menu.getLocation(),this);
     }
-
+    public void preRegister(){
+        super.preRegister();
+        SlimefunBlockPlaceLimitListener.registerBlockLimit(this,(event)->{
+            Location loc=event.getBlockPlaced().getLocation();
+            if(!onChunkPlace(loc,this)){
+                onChunkReachLimit(loc,this,(str)-> {
+                    if (event.getPlayer() != null) {
+                        event.getPlayer().sendMessage(str);
+                    }
+                });
+                event.setCancelled(true);
+            }
+        });
+    }
 
 
 

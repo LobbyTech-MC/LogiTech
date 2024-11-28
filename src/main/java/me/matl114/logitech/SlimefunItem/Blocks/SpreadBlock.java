@@ -1,12 +1,20 @@
 package me.matl114.logitech.SlimefunItem.Blocks;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.guide.SlimefunGuideMode;
+import me.matl114.logitech.Listeners.Listeners.SlimefunBlockPlaceLimitListener;
+import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.SlimefunItem.AddItem;
+import me.matl114.logitech.SlimefunItem.AddSlimefunItems;
+import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.UtilClass.TickerClass.Ticking;
+import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -63,7 +71,7 @@ public class SpreadBlock extends AbstractBlock implements Ticking {
     }
     protected Random rand = new Random();
     protected final int LIFE_DEFAULT=13;
-    protected final int ONE_TICK_SPREAD_MAXCNT=2000;
+    protected final int ONE_TICK_SPREAD_MAXCNT=1600;
     protected final int CHANCE_KEEP_MATERIAL=2;
     protected final ConcurrentHashMap<Location, Player> SPREAD_PLAYER=new ConcurrentHashMap<>();
     public Map<Location,Player> getSpreadOwner(){
@@ -100,7 +108,8 @@ public class SpreadBlock extends AbstractBlock implements Ticking {
                             Player player=SPREAD_PLAYER.remove(loc);
                             SPREAD_TICKER.remove(loc);
                             WorldUtils.createSlimefunBlock(loc,player,RESULT,(rand.nextInt(100)<(100-CHANCE_KEEP_MATERIAL))? RESULT_MATERIAL:SPREAD_MATERIAL,true);
-                        }else if(life<0){
+                        }
+                        else if(life<0){
                             SPREAD_TICKER.put(loc, life+rand.nextInt(100)<60?1:0);
                         }
                         else {
@@ -148,6 +157,14 @@ public class SpreadBlock extends AbstractBlock implements Ticking {
         super.preRegister();
         registerTick(this);
         handleBlock(this);
+        SlimefunBlockPlaceLimitListener.registerBlockLimit(this,(event)->{
+            if(!this.SPREAD_TICKER.isEmpty()){
+                event.setCancelled(true);
+                if(event.getPlayer()!=null){
+                    AddUtils.sendMessage(event.getPlayer(),"&c不能同时存在超过1个[%s]&c的扩散进程".formatted(this.getItem().getItemMeta().getDisplayName()));
+                }
+            }
+        });
     }
 
 }

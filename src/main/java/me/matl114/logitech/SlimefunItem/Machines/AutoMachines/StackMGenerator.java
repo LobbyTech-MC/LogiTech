@@ -242,6 +242,11 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
             },20,false,0);
             return;
         }
+        if(mod== Settings.INIT) {
+            //new CraftItemStack instance to trigger slimefun save thread
+            ItemStack rawStack = inv.getItemInSlot(this.MACHINE_SLOT);
+            inv.replaceExistingItem(this.MACHINE_SLOT,rawStack);
+        }
         ItemPusher it=this.MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,this.MACHINE_SLOT);
         int index=MultiCraftType.getRecipeTypeIndex(data);
         DataMenuClickHandler db=this.getDataHolder(block,inv);
@@ -351,7 +356,7 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
                     if(tick>=0){
                         inv.replaceExistingItem(this.PROCESSOR_SLOT,getWorkingItem(tick));
                     }
-                    inv.replaceExistingItem(MINFO_SLOT,getInfoItem(rawCraftLimit,consumption,energy,
+                    inv.replaceExistingItem(MINFO_SLOT,getInfoItem(getCraftLimit(b,inv),consumption,energy,
                             this.efficiency,ItemStackHelper.getDisplayName(inv.getItemInSlot(MACHINE_SLOT))));
                 }
                 progressorCost(b,inv);
@@ -403,7 +408,7 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
             }
             else  {
                 if (hasViewer)
-                    inv.replaceExistingItem(MINFO_SLOT,getInfoOffItem(rawCraftLimit,consumption,energy,
+                    inv.replaceExistingItem(MINFO_SLOT,getInfoOffItem(getCraftLimit(b,inv),consumption,energy,
                         ItemStackHelper.getDisplayName(inv.getItemInSlot(MACHINE_SLOT))));
                 if(tick!=-1){
                     db.setInt(2,-1);

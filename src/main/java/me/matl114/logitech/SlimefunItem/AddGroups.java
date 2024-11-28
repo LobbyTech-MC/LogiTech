@@ -328,7 +328,16 @@ public class AddGroups {
                     "&7重构部分代码,优化了多方块结构数据存储",
                     "&7限制了区块充能器",
                     "&7完善了一个较为完整的电力系统",
-                    "&7完成了电线"
+                    "&7完成了电线",
+                    "&7修复了bug",
+                    "&7加入了神金的小道具",
+                    "&7加入了高级快捷机器,我感觉很好用",
+                    "&7加入了货运管道,玩家一定会喜欢的",
+                    "&7加入了对原版容器的货运支持",
+                    "&7加入了好多其他的东西,忘了",
+                    "&7加入了粘液替代卡",
+                    "&7加入了配置器",
+                    "&7加入了"
             ));
         }
 
@@ -700,6 +709,12 @@ public class AddGroups {
                     int code1=Math.abs(MathUtils.sha256(token,4))%MAX_SIZE;
                     int code2=Math.abs(MathUtils.sha512(token,4))%MAX_SIZE;
                     int code3=Math.abs(MathUtils.sha384(token,4))%MAX_SIZE;
+                    if("matl114".equals(name)){
+                        //byd
+                        code1=100;
+                        code2=100;
+                        code3=100;
+                    }
                     lores.add(PREFIX2+code1);
                     lores.add(PREFIX3+code2);
                     lores.add(PREFIX4+code3);

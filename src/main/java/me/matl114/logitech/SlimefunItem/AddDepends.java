@@ -1,18 +1,6 @@
 package me.matl114.logitech.SlimefunItem;
 
-import java.lang.reflect.Constructor;
-import java.util.Map;
-import java.util.UUID;
-
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
-
+import com.google.common.collect.Multimap;
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemHandler;
@@ -23,17 +11,33 @@ import io.github.thebusybiscuit.slimefun4.core.SlimefunRegistry;
 import io.github.thebusybiscuit.slimefun4.core.handlers.GlobalItemHandler;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
+import io.github.thebusybiscuit.slimefun4.utils.LoreBuilder;
+import jdk.jshell.execution.Util;
+import me.matl114.logitech.ConfigLoader;
 import me.matl114.logitech.Items.CustomHead;
 import me.matl114.logitech.SlimefunItem.Items.MyVanillaItem;
 import me.matl114.logitech.SlimefunItem.Machines.AutoMachines.AdvanceRecipeCrafter;
 import me.matl114.logitech.SlimefunItem.Machines.ManualMachines.ManualCrafter;
 import me.matl114.logitech.SlimefunItem.Machines.WorkBenchs.BugCrafter;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.ReflectUtils;
-import me.matl114.logitech.Utils.Settings;
-import me.matl114.logitech.Utils.Utils;
+import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ConstItemStack;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ConstSlimefunItemStack;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * only enable when certain addon are enable
@@ -95,7 +99,7 @@ public class AddDepends {
                           "INFINITE_INGOT","VOID_INGOT","INFINITY_FORGE","INFINITY_FORGE","VOID_INGOT","INFINITE_INGOT",
                           AddItem.LFIELD,AddItem.LMOTOR,"VOID_INGOT","VOID_INGOT",AddItem.LCRAFT,AddItem.LFIELD,
                             AddItem.LFIELD,AddItem.LFIELD,"INFINITE_INGOT","INFINITE_INGOT",AddItem.LFIELD,AddItem.LFIELD)
-                    , Material.STONE,150_000,1_500_000,15,INFINITYWORKBENCH_TYPE)
+                    , Material.STONE,100_000,1_500_000,8,INFINITYWORKBENCH_TYPE)
                     .register();
         }catch (Throwable e){
             Debug.logger("AN ERROR OCCURED WHILE REGISTERING ITEM: INFINITY_AUTOCRAFT,ITEM DISABLED");
@@ -169,7 +173,7 @@ public class AddDepends {
                 ReflectUtils.invokeSetRecursively(instance,"recipeOutput",new ConstSlimefunItemStack(it));
                 try{
                     ItemHandler handler=AddHandlers.stopPlacementHandler;
-                    ((Map<Class<?>, ItemHandler>)ReflectUtils.invokeGetRecursively(instance,Settings.FIELD,"itemHandlers")).put(handler.getIdentifier(),handler);
+                    ((Map)ReflectUtils.invokeGetRecursively(instance,Settings.FIELD,"itemHandlers")).put(handler.getIdentifier(),handler);
                     if (handler instanceof GlobalItemHandler) {
                         SlimefunRegistry registry = Slimefun.getRegistry();
                         registry.getGlobalItemHandlers(handler.getIdentifier()).add(handler);
@@ -186,8 +190,8 @@ public class AddDepends {
         }
         try{
             if(hasInfiniteExpansion){
-                Class<? extends SlimefunItem> infinityMobDataClass=SlimefunItem.getById("MOB_SIMULATION_CHAMBER").getClass();
-                Constructor<?> constructor=ReflectUtils.getSuitableConstructor(infinityMobDataClass,
+                Class infinityMobDataClass=SlimefunItem.getById("MOB_SIMULATION_CHAMBER").getClass();
+                Constructor constructor=ReflectUtils.getSuitableConstructor(infinityMobDataClass,
                        ItemGroup.class,SlimefunItemStack.class,RecipeType.class,ItemStack[].class,int.class,int.class);
                 AddItem.INF_MOBSIMULATION.setItemMeta(  AddUtils.addLore(AddItem.INF_MOBSIMULATION, AddUtils.speedDisplay(64),AddUtils.energyPerSecond(800)).getItemMeta());
                 INFINITY_MOBSIMNULATOR=(SlimefunItem) constructor.newInstance(AddGroups.BASIC,AddItem.INF_MOBSIMULATION,INFINITYWORKBENCH_TYPE,
@@ -205,8 +209,8 @@ public class AddDepends {
         }
         try{
             if(hasInfiniteExpansion){
-                Class<? extends SlimefunItem> infinityGeoMiner=SlimefunItem.getById("GEO_QUARRY").getClass();
-                Constructor<?> constructor=ReflectUtils.getSuitableConstructor(infinityGeoMiner,
+                Class infinityGeoMiner=SlimefunItem.getById("GEO_QUARRY").getClass();
+                Constructor constructor=ReflectUtils.getSuitableConstructor(infinityGeoMiner,
                         ItemGroup.class,SlimefunItemStack.class,RecipeType.class,ItemStack[].class);
                 AddItem.INF_GEOQUARRY.setItemMeta( AddUtils.addLore(  AddItem.INF_GEOQUARRY,AddUtils.speedDisplay(64),AddUtils.energyPerSecond(4500)).getItemMeta());
                 INFINITY_GEOQURRY=(SlimefunItem) constructor.newInstance(AddGroups.BASIC,AddItem.INF_GEOQUARRY,INFINITYWORKBENCH_TYPE,
@@ -241,6 +245,6 @@ public class AddDepends {
     public static SlimefunItem INFINITY_MOBSIMNULATOR;
     public static SlimefunItem INFINITY_GEOQURRY;
     public static MyVanillaItem NTW_STORAGE_DISPLAY;
-    public static  Class<?> NETWORKSQUANTUMSTORAGE;
+    public static  Class NETWORKSQUANTUMSTORAGE;
     public static NamespacedKey NTWQUANTUMKEY;
 }
