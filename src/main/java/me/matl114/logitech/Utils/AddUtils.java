@@ -62,8 +62,9 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class AddUtils {
-    public static final String ADDON_NAME="逻辑工艺";
+    public static final String ADDON_NAME=Language.getPlaceHolder("PLUGIN");
     public static final String ADDON_ID="LOGITECH";
+    public static final String VERSION=Language.getPlaceHolder("VERSION");
     public static final SlimefunAddon ADDON_INSTANCE=MyAddon.getInstance();
     public static boolean USE_IDDECORATOR=true;
     private static final double SF_TPS = 20.0 / (double) Slimefun.getTickerTask().getTickRate();
@@ -962,5 +963,15 @@ public class AddUtils {
     }
     public static String getDateString(){
         return new SimpleDateFormat("yyyyMMdd").format(new Date());
+    }
+    static NamespacedKey idkey=Slimefun.getItemDataService().getKey();
+    public static ItemStack getWithoutId(ItemStack stack){
+        stack=stack.clone();
+        ItemMeta meta = stack.getItemMeta();
+        if(meta.getPersistentDataContainer().has(idkey)){
+            meta.getPersistentDataContainer().remove(idkey);
+        }
+        stack.setItemMeta(meta);
+        return stack;
     }
 }

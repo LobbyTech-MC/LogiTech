@@ -19,6 +19,8 @@ import org.bukkit.util.Vector;
 
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MultiBlockService {
     //?
@@ -44,14 +46,15 @@ public class MultiBlockService {
         return MB_HOLOGRAM_KEY;
     }
     protected static final String MB_HOLOGRAM_KEY="holo";
-    public static String getStatueKey(){
-        return MB_STATUS_KEY;
-    }
-    protected static final String MB_STATUS_KEY="mb-sta";
-    public static String getUidKey(){
-        return MB_UUID_KEY;
-    }
-    protected static final String MB_UUID_KEY="uuid";
+    //will be deprecated soon
+    //
+    @Deprecated
+    private static final String MB_STATUS_KEY="mb-sta";
+    @Deprecated
+    private static final String MB_UUID_KEY="uuid";
+    //move data key-value to cached status map
+    private static final HashMap<Location, AtomicBoolean> MB_STATUS_MAP=new HashMap<>();
+    private static final HashMap<Location, AtomicInteger> MB_UUID_MAP=new HashMap<>();
     public static final HashMap<String,AbstractMultiBlockHandler> MULTIBLOCK_CACHE = new LinkedHashMap<>();
     public static final HashMap<Location, DisplayGroup> HOLOGRAM_CACHE=new HashMap<>();
     public static final Random rand=new Random();
@@ -341,20 +344,9 @@ public class MultiBlockService {
                     MULTIBLOCK_CACHE.put(newuid,handler2);
                     return true;
                 }else{
-                    if(statusCode>0){//之前还在运行
-                        //为了给loadrequest一个缓冲。
-                        //防止直接返回0直接爆
-                        statusCode=-20;//自动重连20次
-                    }
-                    if(statusCode==-18){
-                        Debug.debug("LOADING PLAN B !");
-                    }
-                    setStatus(loc,statusCode+1);
-                    if(statusCode==-1){
-                        DataCache.setLastUUID(loc,"null");
-                        return false;
-                    }
-                    return true;
+                    //不进行倒计时,
+                    setStatus(loc,-20);
+                    return false;
                 }
             }else {
                 if( handler.acceptCoreRequest()){

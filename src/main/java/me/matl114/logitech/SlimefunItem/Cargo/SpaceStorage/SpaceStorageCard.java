@@ -1,8 +1,14 @@
 package me.matl114.logitech.SlimefunItem.Cargo.SpaceStorage;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
+import me.matl114.logitech.ConfigLoader;
+import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
+import me.matl114.logitech.SlimefunItem.DistinctiveCustomItemStack;
+import me.matl114.logitech.Utils.AddUtils;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,7 +21,7 @@ import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
 import me.matl114.logitech.Utils.AddUtils;
 
-public class SpaceStorageCard extends CustomSlimefunItem {
+public class SpaceStorageCard extends DistinctiveCustomItemStack {
     protected final NamespacedKey KEY_UID= AddUtils.getNameKey("space-st-uid");
     protected final NamespacedKey KEY_STATUS= AddUtils.getNameKey("space-st-status");
     protected final NamespacedKey KEY_INDEX=AddUtils.getNameKey("space-st-index");

@@ -14,6 +14,7 @@ import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
 import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
 import me.matl114.logitech.SlimefunItem.Cargo.Links.HyperLink;
+import me.matl114.logitech.SlimefunItem.DistinctiveCustomItemStack;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.Debug;
@@ -23,13 +24,15 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class HypLink extends CustomSlimefunItem {
+public class HypLink extends DistinctiveCustomItemStack {
     public HypLink(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe,new ArrayList<>());
     }
@@ -67,6 +70,12 @@ public class HypLink extends CustomSlimefunItem {
                             BlockMenu menu = data.getBlockMenu();
                             if (menu != null){
                                 menu.open(event.getPlayer());
+                            }
+                        }else{
+                            BlockState state = loc.getBlock().getState();
+                            if(state instanceof InventoryHolder ivHolder){
+                                //todo do test
+                                event.getPlayer().openInventory(ivHolder.getInventory());
                             }
                         }
                     }else {

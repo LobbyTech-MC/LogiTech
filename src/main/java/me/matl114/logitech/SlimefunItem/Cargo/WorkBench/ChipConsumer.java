@@ -74,9 +74,7 @@ public class ChipConsumer extends AbstractMachine {
             CraftUtils.getConsumer(  AddItem.EXISTE),
             CraftUtils.getConsumer(  AddItem.UNIQUE),
     };
-    public List<MachineRecipe> getMachineRecipes() {
-        return new ArrayList<MachineRecipe>();
-    }
+
     protected Material ChipMaterial=AddItem.CHIP.getType();
 
     public void constructMenu(BlockMenuPreset preset){
@@ -104,7 +102,7 @@ public class ChipConsumer extends AbstractMachine {
                 break;
             }
         }
-        if(index==-1){return;}
+        if(index>=3){return;}
         ItemMeta meta=it.getItemMeta();
         if(ChipCardCode.isConfig(meta)){
             it.setAmount(it.getAmount()-1);

@@ -370,7 +370,7 @@ public class AddSlimefunItems {
                     setC(SlimefunItems.COPPER_INGOT,4),"2SILICON","4ALUMINUM_INGOT"))
             .register();
     public static final SlimefunItem ABSTRACT_INGOT=new MaterialItem(AddGroups.MATERIAL,AddItem.ABSTRACT_INGOT,RecipeType.SMELTERY,
-            recipe(AddItem.TRUE_,AddItem.EXISTE,AddItem.LOGIC,AddItem.NOLOGIC,AddItem.UNIQUE,AddItem.FALSE_))
+            recipe(AddItem.TRUE_,AddItem.EXISTE,AddItem.LOGIC,AddItem.NOLOGIC,AddItem.UNIQUE,AddItem.FALSE_,null,null,null))
             .register().setOutput(setC(AddItem.ABSTRACT_INGOT,4));
     public static final SlimefunItem PALLADIUM_INGOT=new MaterialItem(AddGroups.MATERIAL,AddItem.PALLADIUM_INGOT,RecipeType.NULL,
             AddUtils.formatInfoRecipe(AddItem.SOLAR_REACTOR,Language.get("MultiBlock.SOLAR_REACTOR.Name")),null)
@@ -453,7 +453,7 @@ public class AddSlimefunItems {
     public static final SlimefunItem REDSTONE_ENGINE=new MaterialItem(AddGroups.VANILLA,AddItem.REDSTONE_ENGINE,RecipeType.ENHANCED_CRAFTING_TABLE,
             recipe("TNT","SLIME_BLOCK","ANVIL",
                     "OBSERVER","STICKY_PISTON","STICKY_PISTON",
-                    "REDSTONE_TORCH",AddItem.LOGIGATE,"2REPEATER"),null)
+                    "REDSTONE_TORCH",AddItem.LOGIGATE,"REPEATER"),null)
             .register();
 
     public static final SlimefunItem SAMPLE_HEAD=new AbstractBlock(AddGroups.SPECIAL,AddItem.SAMPLE_HEAD,RecipeType.NULL,
@@ -735,7 +735,6 @@ public class AddSlimefunItems {
         public boolean advanced(){
             return true;
         }
-
     }
             .register();
     public static final  SlimefunItem CONVERTOR=new EMachine(AddGroups.BASIC, AddItem.CONVERTOR,COMMON_TYPE,
@@ -1068,6 +1067,7 @@ public class AddSlimefunItems {
             recipe("NAME_TAG","CRYING_OBSIDIAN","NAME_TAG","AUTO_DISENCHANTER_2","AUTO_ANVIL_2","AUTO_ENCHANTER_2",
                     "ENCHANTING_TABLE","ANVIL","SMITHING_TABLE"), 0,0)
             .register();
+
     public static final  SlimefunItem TNT_GEN=new TntGenerator(AddGroups.VANILLA, AddItem.TNT_GEN,RecipeType.ENHANCED_CRAFTING_TABLE,
             recipe(AddItem.LOGIGATE,"OBSERVER",AddItem.LOGIGATE,"STICKY_PISTON",AddItem.REDSTONE_ENGINE,"STICKY_PISTON",
                     AddItem.LOGIGATE,"NOTE_BLOCK",AddItem.LOGIGATE))
@@ -1202,6 +1202,14 @@ public class AddSlimefunItems {
             .register();
     public static final SlimefunItem SUPERSPONGE_USED=new MaterialItem(AddGroups.FUNCTIONAL,AddItem.SUPERSPONGE_USED,RecipeType.NULL,AddUtils.NULL_RECIPE.clone())
             .register();
+    public static final  SlimefunItem VIRTUAL_EXPLORER=new VirtualExplorer(AddGroups.VANILLA, AddItem.VIRTUAL_EXPLORER,COMMON_TYPE,
+            recipe(null,null,null,null,null,null,
+                    null,"NETHERITE_INGOT","NETHERITE_INGOT","NETHERITE_INGOT","NETHERITE_INGOT",null,
+                    "NETHERITE_INGOT","ELYTRA",AddItem.LSINGULARITY,AddItem.LIOPORT,"ELYTRA","NETHERITE_INGOT",
+                    "NETHERITE_INGOT","COBALT_PICKAXE",AddItem.VIRTUAL_SPACE,AddItem.LSINGULARITY,"COBALT_PICKAXE","NETHERITE_INGOT",
+                    "NETHERITE_INGOT","SLIME_LEGGINGS",AddItem.LPLATE,AddItem.LPLATE,"SLIME_LEGGINGS","NETHERITE_INGOT",
+                    "NETHERITE_INGOT","SLIME_BOOTS","STEEL_THRUSTER","STEEL_THRUSTER","SLIME_BOOTS","NETHERITE_INGOT"), 12_500,1250)
+            .register();
 
     //Material Generators
     public static final SlimefunItem MAGIC_STONE=new SMGenerator(AddGroups.GENERATORS, AddItem.MAGIC_STONE,RecipeType.ENHANCED_CRAFTING_TABLE,
@@ -1233,6 +1241,7 @@ public class AddSlimefunItems {
                 put(mkl(AddItem.LBOOLIZER),mkl(setC(AddItem.LBOOLIZER,1)));
             }})
             .register();
+
     public static final SlimefunItem OVERWORLD_MINER=new SMGenerator(AddGroups.GENERATORS, AddItem.OVERWORLD_MINER,RecipeType.ENHANCED_CRAFTING_TABLE,
             recipe("REINFORCED_PLATE",AddItem.MAGIC_STONE,"REINFORCED_PLATE",
                     AddItem.UNIQUE,AddItem.LENGINE,AddItem.EXISTE
@@ -1471,11 +1480,11 @@ public class AddSlimefunItems {
                     null,"REDSTONE_BLOCK","REDSTONE_BLOCK","REDSTONE_BLOCK","REDSTONE_BLOCK",null),1,10000,250,
             AddUtils.randItemStackFactory(
                     mkMp(
-                            AddUtils.randItemStackFactory(mkMp("PISTON",1,"STICKY_PISTON",1,"OBSERVER",1)),1,
-                            AddUtils.randItemStackFactory(mkMp("REDSTONE_TORCH",1,"REPEATER",1,"COMPARATOR",1,"LEVER",1)),1,
-                            AddUtils.randItemStackFactory(mkMp("NOTE_BLOCK",1, "REDSTONE_LAMP",1)),1,
-                            AddUtils.randItemStackFactory(mkMp("DISPENSER",1,"DROPPER",1)),1,
-                            AddUtils.randItemStackFactory(mkMp("SLIME_BALL",1,"HONEY_BLOCK",1,"TNT",1,"REDSTONE",1)),1)
+                            AddUtils.randItemStackFactory(mkMp("PISTON",1,"STICKY_PISTON",1,"OBSERVER",1,"HOPPER",1,"CHISELED_BOOKSHELF",1,"LIGHT_WEIGHTED_PRESSURE_PLATE",1)),1,
+                            AddUtils.randItemStackFactory(mkMp("REDSTONE_TORCH",1,"REPEATER",1,"COMPARATOR",1,"LEVER",1,"OAK_PRESSURE_PLATE",1,"STONE_PRESSURE_PLATE",1)),1,
+                            AddUtils.randItemStackFactory(mkMp("NOTE_BLOCK",1, "REDSTONE_LAMP",1, "TARGET",1, "REDSTONE_BLOCK",1, "TRIPWIRE_HOOK",1,"JUKEBOX",1 )),1,
+                            AddUtils.randItemStackFactory(mkMp("DISPENSER",1,"DROPPER",1, "DAYLIGHT_DETECTOR",1, "LECTERN",1, "LIGHTNING_ROD",1,"HEAVY_WEIGHTED_PRESSURE_PLATE",1)),1,
+                            AddUtils.randItemStackFactory(mkMp("SLIME_BALL",1,"HONEY_BLOCK",1,"TNT",1,"REDSTONE",1,"OAK_BUTTON",1,"STONE_BUTTON",1,"BELL",1,"TRAPPED_CHEST",1,"COMPOSTER",1)),1)
             ))
             .register();
     public static final SlimefunItem TNT_MG=new SMGenerator(AddGroups.VANILLA, AddItem.TNT_MG,RecipeType.ENHANCED_CRAFTING_TABLE,
@@ -1513,6 +1522,7 @@ public class AddSlimefunItems {
                 put(mkl(Material.PURPLE_CARPET),mkl("32PURPLE_CARPET"));
                 put(mkl(Material.GRAY_CARPET),mkl("32GRAY_CARPET"));
                 put(mkl(Material.LIGHT_GRAY_CARPET),mkl("32LIGHT_GRAY_CARPET"));
+                put(mkl(Material.MOSS_CARPET),mkl("32MOSS_CARPET"));
 
             }})
             .register();
@@ -1525,10 +1535,13 @@ public class AddSlimefunItems {
                     null,"END_STONE",AddItem.LFIELD,AddItem.LFIELD,"END_STONE",null),3,1000,116,
             new LinkedHashMap<>(){{
                 put(mkl("SAND"),mkl("8SAND"));
+                put(mkl("RED_SAND"),mkl("8RED_SAND"));
                 put(mkl("ANVIL"),mkl("ANVIL"));
                 put(mkl("CHIPPED_ANVIL"),mkl("CHIPPED_ANVIL"));
                 put(mkl("DAMAGED_ANVIL"),mkl("DAMAGED_ANVIL"));
                 put(mkl("GRAVEL"),mkl("8GRAVEL"));
+                put(mkl("SNOW"),mkl("4SNOW"));
+                put(mkl("POINTED_DRIPSTONE"),mkl("4POINTED_DRIPSTONE"));
                 put(mkl(Material.BLUE_CONCRETE_POWDER),mkl("32BLUE_CONCRETE_POWDER"));
                 put(mkl(Material.RED_CONCRETE_POWDER),mkl("32RED_CONCRETE_POWDER"));
                 put(mkl(Material.YELLOW_CONCRETE_POWDER),mkl("32YELLOW_CONCRETE_POWDER"));
@@ -1820,9 +1833,9 @@ public class AddSlimefunItems {
                                 setC(AddItem.ATOM_INGOT,128),
                                 AddUtils.randItemStackFactory(
                                         Utils.list(
-                                                AddUtils.randAmountItemFactory(AddItem.PALLADIUM_INGOT,37,43),
-                                                AddUtils.randAmountItemFactory(AddItem.PLATINUM_INGOT,23,40),
-                                                AddUtils.randAmountItemFactory(AddItem.CADMIUM_INGOT,6,45),
+                                                AddUtils.randAmountItemFactory(AddItem.PALLADIUM_INGOT,37,53),
+                                                AddUtils.randAmountItemFactory(AddItem.PLATINUM_INGOT,27,50),
+                                                AddUtils.randAmountItemFactory(AddItem.CADMIUM_INGOT,34,64),
                                                 AddUtils.randAmountItemFactory(AddItem.BISMUTH_INGOT,40,54)
                                         ),
                                         Utils.list(1,1,1,1)
@@ -1844,11 +1857,11 @@ public class AddSlimefunItems {
                         )
 
                     ),8000,
-                    mkP(   mkl(setC(AddItem.BISILVER,3) )  ,
+                    mkP(   mkl(setC(AddItem.BISILVER,2) )  ,
 
                             mkl(
                                     setC(AddItem.ATOM_INGOT,48),
-                                    setC(AddItem.PARADOX,24),
+                                    setC(AddItem.PARADOX,64),
                                     AddUtils.randItemStackFactory(
                                             Utils.list(
                                                     AddUtils.randAmountItemFactory(AddItem.PALLADIUM_INGOT,15,61),
@@ -1875,16 +1888,16 @@ public class AddSlimefunItems {
                             )
 
                     ),10000,
-                    mkP(   mkl(setC(AddItem.PAGOLD,3) )  ,
+                    mkP(   mkl(setC(AddItem.PAGOLD,2) )  ,
 
                             mkl(
                                     setC(AddItem.ATOM_INGOT,48),
-                                    setC(AddItem.PARADOX,24),
+                                    setC(AddItem.PARADOX,64),
                                     AddUtils.randItemStackFactory(
                                             Utils.list(
                                                     AddUtils.randAmountItemFactory(AddItem.PALLADIUM_INGOT,17,43),
                                                     AddUtils.randAmountItemFactory(AddItem.PLATINUM_INGOT,11,36),
-                                                    AddUtils.randAmountItemFactory(AddItem.CADMIUM_INGOT,12,53),
+                                                    AddUtils.randAmountItemFactory(AddItem.CADMIUM_INGOT,15,53),
                                                     AddUtils.randAmountItemFactory(AddItem.BISMUTH_INGOT,23,49)
                                             ),
                                             Utils.list(1,1,1,1)
@@ -1906,11 +1919,11 @@ public class AddSlimefunItems {
                             )
 
                     ),10000,
-                    mkP(   mkl(setC(AddItem.PLATINUM_INGOT,24) )  ,
+                    mkP(   mkl(setC(AddItem.PLATINUM_INGOT,12) )  ,
 
                             mkl(
                                     setC(AddItem.STAR_GOLD_INGOT,128),
-                                    setC(AddItem.PARADOX,32),
+                                    setC(AddItem.PARADOX,64),
                                     AddUtils.randItemStackFactory(
                                             Utils.list(
                                                     AddUtils.randAmountItemFactory(AddItem.PALLADIUM_INGOT,23,53),
@@ -1937,26 +1950,26 @@ public class AddSlimefunItems {
                             )
 
                     ),10000,
-                    mkP(   mkl(setC(AddItem.CADMIUM_INGOT,24) )  ,
+                    mkP(   mkl(setC(AddItem.CADMIUM_INGOT,12) )  ,
 
                             mkl(
                                     setC(AddItem.STAR_GOLD_INGOT,128),
-                                    setC(AddItem.PARADOX,16),
+                                    setC(AddItem.PARADOX,64),
                                     AddUtils.randItemStackFactory(
                                             Utils.list(
                                                     AddUtils.randAmountItemFactory(AddItem.PALLADIUM_INGOT,17,43),
                                                     AddUtils.randAmountItemFactory(AddItem.PLATINUM_INGOT,13,50),
-                                                    AddUtils.randAmountItemFactory(AddItem.CADMIUM_INGOT,6,55),
+                                                    AddUtils.randAmountItemFactory(AddItem.CADMIUM_INGOT,17,55),
                                                     AddUtils.randAmountItemFactory(AddItem.BISMUTH_INGOT,20,34)
                                             ),
                                             Utils.list(1,1,1,1)
                                     ),
                                     AddUtils.randItemStackFactory(
                                             Utils.list(
-                                                    AddUtils.randAmountItemFactory(AddItem.MOLYBDENUM,3,21),
+                                                    AddUtils.randAmountItemFactory(AddItem.MOLYBDENUM,6,21),
                                                     AddUtils.randAmountItemFactory(AddItem.CERIUM,6,17),
                                                     AddUtils.randAmountItemFactory(AddItem.MENDELEVIUM,7,13),
-                                                    AddUtils.randAmountItemFactory(AddItem.DYSPROSIUM,2,31),
+                                                    AddUtils.randAmountItemFactory(AddItem.DYSPROSIUM,7,31),
                                                     AddUtils.randAmountItemFactory(AddItem.MOLYBDENUM,12,14),
                                                     AddUtils.randAmountItemFactory(AddItem.ANTIMONY_INGOT,10,24),
                                                     AddUtils.randAmountItemFactory(AddItem.THALLIUM,7,22),
@@ -2657,6 +2670,7 @@ public class AddSlimefunItems {
                     AddUtils.sendMessage(p,"&c你没有权限在这里使用该道具");
                 }
             }
+            event.cancel();
         }
     }
             .register();
@@ -2736,11 +2750,14 @@ public class AddSlimefunItems {
                            setC(  AddItem.STAR_GOLD_INGOT,64),
                          setC(AddItem.ATOM_INGOT,64),
                             setC(AddItem.LSINGULARITY,64),
-                            AddItem.ANTIMASS,
-                            AddUtils.probItemStackFactory(AddItem.VIRTUAL_SPACE,10)
+                            AddUtils.randItemStackFactory(
+                                    Utils.list(AddItem.HGTLPBBI,AddItem.PDCECDMD,AddItem.ANTIMASS),
+                                    Utils.list(4,4,1)
+                            ),
+                            AddUtils.probItemStackFactory(AddItem.VIRTUAL_SPACE,50)
                     ),
                     Utils.list(
-                            1,1,1,1,1,1
+                            1,1,1,1,2,1
                     )
             ))
             .register();

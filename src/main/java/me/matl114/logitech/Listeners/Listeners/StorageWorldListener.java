@@ -1,5 +1,8 @@
 package me.matl114.logitech.Listeners.Listeners;
 
+import io.github.thebusybiscuit.slimefun4.api.events.SlimefunBlockPlaceEvent;
+import me.matl114.logitech.SlimefunItem.Cargo.SpaceStorage.StorageSpace;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -32,6 +35,12 @@ public class StorageWorldListener implements Listener {
     public void onEntityExplode(EntityExplodeEvent event) {
         if(StorageSpace.ENABLED){
             event.blockList().removeIf((block)->StorageSpace.STORAGE_WORLD==block.getWorld());
+        }
+    }
+    @EventHandler
+    public void onSfBlocPlace(SlimefunBlockPlaceEvent event){
+        if(StorageSpace.ENABLED&& StorageSpace.STORAGE_WORLD==event.getBlockPlaced().getWorld()){
+            event.setCancelled(true);
         }
     }
 

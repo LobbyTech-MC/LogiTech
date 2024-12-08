@@ -1,18 +1,21 @@
+placeholder:
+  PLUGIN: '逻辑工艺'
+  VERSION: 'v1.0.4'
 zh_CN:
   Groups:
     ROOT:
-      Name: '&7&ka&x&5&5&f&f&7&7逻&x&5&5&f&f&9&9辑&x&5&5&f&f&b&b工&x&5&5&f&f&d&d艺&6(正式版 v1.0.3)&7&ka&r'
+      Name: '&7&ka&x&5&5&f&f&7&7逻&x&5&5&f&f&9&9辑&x&5&5&f&f&b&b工&x&5&5&f&f&d&d艺&6(正式版 %VERSION%)&7&ka&r'
       Lore:
         - '&7芜湖起飞'
         - '&7⇨ &a单击启动LogiTech'
     INFO:
-      Name: '&d逻辑工艺 &6版本与说明'
+      Name: '&d%PLUGIN% &6版本与说明'
     MATERIAL:
-      Name: '&d逻辑工艺 &6基础材料'
+      Name: '&d%PLUGIN% &6基础材料'
     ALLMACHINE:
-      Name: '&d逻辑工艺 &6堆叠机器支持列表'
+      Name: '&d%PLUGIN% &6堆叠机器支持列表'
     ALLRECIPE:
-      Name: '&d逻辑工艺 &6合成配方类型大全'
+      Name: '&d%PLUGIN% &6合成配方类型大全'
     URL:
       Name: "&e点击获取附属Github链接"
       Lore:
@@ -26,8 +29,8 @@ zh_CN:
     INFO1:
       Name: "&c&l版本号"
       Lore:
-        - "&7当前逻辑工艺版本："
-        - "&b&mv1.0.4 &6&r正式版"
+        - "&7当前%PLUGIN%版本："
+        - "&b&m%VERSION% &6&r正式版"
         - "&7更多版本,敬请期待!"
     INFO2:
       Name: "&e&l联系我们"
@@ -189,37 +192,37 @@ zh_CN:
         - "&7拥有这类特性的机器通常拥有极致的合成速度来支持此特性"
         - "&7若机器出现问题,请找作者"
     UPDATELOG:
-      Name: '&d逻辑工艺 &6更新日志'
+      Name: '&d%PLUGIN% &6更新日志'
       Lore:
         - '&7我可没有痴呆症'
     MORE2:
       Name: '&6宇宙安全说明'
     BASIC:
-      Name: '&d逻辑工艺 &6基础机器'
+      Name: '&d%PLUGIN% &6基础机器'
     ALLBIGRECIPES:
-      Name: '&d逻辑工艺 &6大型配方表展示'
+      Name: '&d%PLUGIN% &6大型配方表展示'
       Lore:
         - '&7用于查看粘液书中展示不完整的配方'
     CARGO:
-      Name: '&d逻辑工艺 &6货运机器'
+      Name: '&d%PLUGIN% &6货运机器'
     SINGULARITY:
-      Name: '&d逻辑工艺 &6概念奇点工艺'
+      Name: '&d%PLUGIN% &6概念奇点工艺'
     ADVANCED:
-      Name: '&d逻辑工艺 &6进阶机器'
+      Name: '&d%PLUGIN% &6进阶机器'
     BEYOND:
       Name: '&d终章 &6超越领域'
       Lore:
         - '&7Beyond Tech'
     VANILLA:
-      Name: '&d逻辑工艺 &6赤石科技'
+      Name: '&d%PLUGIN% &6赤石科技'
       Lore:
         - '&e哦不...应该是红石科技辣'
     MANUAL:
-      Name: '&d逻辑工艺 &6快捷机器'
+      Name: '&d%PLUGIN% &6快捷机器'
       Lore:
         - '&7懒人福音,好耶'
     SPECIAL:
-      Name: '&d逻辑工艺 &6谜之领域'
+      Name: '&d%PLUGIN% &6谜之领域'
       Lore:
         - '&7这些机器怎么看起来功能怪怪的...'
     TOBECONTINUE:
@@ -227,13 +230,13 @@ zh_CN:
       Lore:
         - "&7仍在开发,敬请期待"
     SPACE:
-      Name: '&d逻辑工艺 &6空间技艺'
+      Name: '&d%PLUGIN% &6空间技艺'
     GENERATORS:
-      Name: '&d逻辑工艺 &6材料生成与转化'
+      Name: '&d%PLUGIN% &6材料生成与转化'
     ENERGY:
-      Name: '&d逻辑工艺 &6电力与能源拓展'
+      Name: '&d%PLUGIN% &6电力与能源拓展'
     FUNCTIONAL:
-      Name: '&d逻辑工艺 &6功能性物品'
+      Name: '&d%PLUGIN% &6功能性物品'
 
   Items:
     BUG:
@@ -454,7 +457,7 @@ zh_CN:
     RADIATION_CLEAR:
       Name: '辐射区域清除器'
       Lore:
-        - '清除附近40格内的辐射区'
+        - '清除附近40格内的辐射中心'
     ANTIMASS_CLEAR:
       Name: '反概念物质清除器'
       Lore:
@@ -942,6 +945,11 @@ zh_CN:
         - '插入对应快捷机器,进程数=插入数量*4'
         - '无序输入,立刻合成'
         - '所有槽位&e支持"终极合成"的特性'
+    VIRTUAL_EXPLORER:
+      Name: '虚拟跑图机'
+      Lore:
+        - '什么...?'
+        - '以后都不用跑图了?'
   Manuals:
     MANUAL_CORE:
       Name: '乱序核心'
@@ -1222,11 +1230,13 @@ zh_CN:
       Lore:
         - '将物品从一组槽位转向另一组...'
         - '可选择邻接的方块作为源方与目标'
+        - '⇨ &a支持与原版容器的货运'
     REMOTE_CARGO:
       Name: '远程传输器'
       Lore:
         - '将物品从一组槽位转向另一组...'
         - '放入超链接以选择方块作为源方与目标'
+        - '⇨ &a支持与原版容器的货运'
     LINE_CARGO:
       Name: '链式传输器'
       Lore:

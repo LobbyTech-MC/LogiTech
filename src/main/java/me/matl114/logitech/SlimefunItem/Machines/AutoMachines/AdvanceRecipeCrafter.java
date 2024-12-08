@@ -48,6 +48,9 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
     protected final ItemStack progressItem;
     protected final RecipeType[] craftType;
     protected final int publicTime;
+    protected final String KEY_CTIME="ct";
+    protected final int CTIME_SLOT=5;
+    protected final ItemStack CTIME_ITEM=new CustomItemStack(Material.CLOCK,"&6自定义进度时间","&7点击输入自定义进度时常");
     public AdvanceRecipeCrafter(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                                 Material processbar, int energyConsumption, int energyBuffer,
                                 LinkedHashMap<Object, Integer> customRecipes)  {
@@ -69,35 +72,34 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         );
     }
     public List<MachineRecipe> getMachineRecipes() {
-        if(this.machineRecipes == null||this.craftType!=null) {
-            if(this.machineRecipes==null) {
-                this.machineRecipes = new ArrayList<>();
-            }
-            if(publicTime==0){
-                if(this.craftType.length<=0){
-                    return new ArrayList<>();
-                }
-                else {
+        if(this.machineRecipes == null||this.machineRecipes.isEmpty()) {
+            this.machineRecipes = new ArrayList<>();
+            if(this.craftType!=null){
+                if(publicTime==0){
+                    if(this.craftType.length<=0){
+                        return new ArrayList<>();
+                    }
+                    else {
 
-                    this.machineRecipes=new ArrayList<>();
-                    for(RecipeType rt : this.craftType){
+                        this.machineRecipes=new ArrayList<>();
+                        for(RecipeType rt : this.craftType){
+                            if(rt!=null){
+                                List<MachineRecipe> rep=RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(rt);
+                                if(rep==null)rep=new ArrayList<>();
+                                this.machineRecipes.addAll(rep);
+                            }
+                        }
+                    }
+                    //reset ticks to ...
+                }else{
+                    //@TODO new MachineRecipe to reset ticks
+                    for(int i=0;i<this.craftType.length;i++){
+                        RecipeType rt = this.craftType[i];
                         if(rt!=null){
                             List<MachineRecipe> rep=RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(rt);
                             if(rep==null)rep=new ArrayList<>();
                             this.machineRecipes.addAll(rep);
                         }
-                    }
-                }
-                //reset ticks to ...
-            }else{
-                //@TODO new MachineRecipe to reset ticks
-                this.machineRecipes=new ArrayList<>();
-                for(int i=0;i<this.craftType.length;i++){
-                    RecipeType rt = this.craftType[i];
-                    if(rt!=null){
-                        List<MachineRecipe> rep=RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(rt);
-                        if(rep==null)rep=new ArrayList<>();
-                        this.machineRecipes.addAll(rep);
                     }
                 }
             }
@@ -140,6 +142,28 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         }
     }
     public void newMenuInstance(BlockMenu menu,Block block){
+        if(publicTime>0){
+            if(menu.getItemInSlot(CTIME_SLOT)==null||menu.getItemInSlot(CTIME_SLOT).getType()!=Material.CLOCK){
+                menu.replaceExistingItem(CTIME_SLOT,CTIME_ITEM);
+
+            }
+            menu.addMenuClickHandler(CTIME_SLOT,((player, i, itemStack, clickAction) -> {
+                AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&a 请输入自定义的进度时长(单位:sf tick)&e(必须>%s)".formatted(String.valueOf(publicTime)));
+                player.closeInventory();
+                AddUtils.asyncWaitPlayerInput(player,(str)->{
+                    try{
+                        int a=Integer.parseInt(str);
+                        assert a>=this.publicTime;
+                        DataCache.setCustomData(menu.getLocation(),KEY_CTIME,a);
+                        menu.replaceExistingItem(CTIME_SLOT,AddUtils.addLore(CTIME_ITEM,"&c当前的自定义进度时长为: &f%s".formatted(String.valueOf(a))));
+                        AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&a 成功设置!");
+                    }catch (Throwable e){
+                        AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&c 这不是有效的进度时常&e(必须>%s)");
+                    }
+                });
+                return false;
+            }));
+        }
         menu.replaceExistingItem(PARSE_SLOT,PARSE_ITEM);
         menu.addMenuClickHandler(PARSE_SLOT,(player, i, itemStack, clickAction)->{
             parseRecipe(menu);
@@ -212,28 +236,23 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         MultiCraftingOperation currentOperation = this.processor.getOperation(b);
         ItemGreedyConsumer[] fastCraft=null;
         if(currentOperation==null){
-            ItemStack tmp=inv.getItemInSlot(RECIPEITEM_SLOT);
-            if(tmp==null||tmp.getType()==Material.AIR){
-                setNowRecordRecipe(inv.getLocation(),-1);
-                updateMenu(inv,b,Settings.RUN);
-            }
             MachineRecipe next=getRecordRecipe(data);
             if(next==null){
-
-                if(inv.hasViewer()){inv.replaceExistingItem(22, MenuUtils.PROCESSOR_NULL);
+                parseRecipe(inv);
+                if(inv.hasViewer()){
+                    updateMenu(inv,b,Settings.RUN);
+                    inv.replaceExistingItem(22, MenuUtils.PROCESSOR_NULL);
                 }
                 return ;
             }
-
             Pair<ItemGreedyConsumer[],ItemGreedyConsumer[]> nextP=CraftUtils.countMultiRecipe(inv,getInputSlots(),
                     getOutputSlots(),next,getCraftLimit(b,inv),CRAFT_PROVIDER);
-
             if (nextP != null) {
 
                     CraftUtils.multiUpdateInputMenu(nextP.getFirstValue(),inv);
                     int ticks=next.getTicks();
                     if(next.getTicks()<0){
-                        ticks=this.publicTime;
+                        ticks=DataCache.getCustomData(data,KEY_CTIME, this.publicTime) ;
                     }
                 if(ticks>0){
 
@@ -255,7 +274,6 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
             CraftUtils.multiUpdateOutputMenu(fastCraft,inv);
         }else if(currentOperation.isFinished()){
             ItemGreedyConsumer[] var4=currentOperation.getResults();
-            int var5 = var4.length;
             CraftUtils.multiForcePush(var4,inv,getOutputSlots(),CRAFT_PROVIDER);
             if(inv.hasViewer()){inv.replaceExistingItem(22, MenuUtils.PROCESSOR_NULL);
             }
@@ -266,8 +284,7 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
                 this.processor.updateProgressBar(inv, 22, currentOperation);
 
             }
-            currentOperation.addProgress(1);
-
+            currentOperation.progress(1);
         }
 
 

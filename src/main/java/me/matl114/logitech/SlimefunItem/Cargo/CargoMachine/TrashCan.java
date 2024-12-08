@@ -1,21 +1,23 @@
 package me.matl114.logitech.SlimefunItem.Cargo.CargoMachine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.SlimefunItem.Blocks.AbstractBlock;
+import me.matl114.logitech.SlimefunItem.Cargo.AbstractCargo;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
+import me.matl114.logitech.Utils.Debug;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class TrashCan extends AbstractMachine {
     protected final int[] INPUT_SLOTS= IntStream.rangeClosed(0, 53).toArray();
@@ -32,9 +34,7 @@ public class TrashCan extends AbstractMachine {
     public void constructMenu(BlockMenuPreset preset){
         preset.setSize(54);
     }
-    public List<MachineRecipe> getMachineRecipes(){
-        return new ArrayList<MachineRecipe>() ;
-    }
+
     public void process(Block b, BlockMenu preset, SlimefunBlockData data){
 
     }

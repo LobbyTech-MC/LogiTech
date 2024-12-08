@@ -11,6 +11,7 @@ import io.github.thebusybiscuit.slimefun4.core.attributes.NotHopperable;
 import io.github.thebusybiscuit.slimefun4.core.networks.energy.EnergyNetComponentType;
 
 import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
+import me.matl114.logitech.SlimefunItem.DistinctiveCustomItemStack;
 import me.matl114.logitech.SlimefunItem.Interface.MenuBlock;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.CraftUtils;
@@ -26,13 +27,17 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
-public abstract  class AbstractMachine extends CustomSlimefunItem implements Ticking, MenuBlock,  EnergyNetComponent, NotHopperable  {
+public abstract  class AbstractMachine extends DistinctiveCustomItemStack implements Ticking, MenuBlock,  EnergyNetComponent, NotHopperable  {
     //我们的目标是 最广的需求 最好的性能 最大的答辩(bushi
     public  List<MachineRecipe> machineRecipes ;
+    protected Supplier<List<MachineRecipe>> machineRecipeSupplier=null;
+
     /**
      * energy stuff
      */
@@ -128,7 +133,18 @@ public abstract  class AbstractMachine extends CustomSlimefunItem implements Tic
      */
     public abstract int[] getOutputSlots();
 
-    public abstract List<MachineRecipe> getMachineRecipes();
+    public List<MachineRecipe> getMachineRecipes(){
+        if(this.machineRecipes==null||this.machineRecipes.isEmpty()){
+            if(this.machineRecipeSupplier!=null){
+                this.machineRecipes=this.machineRecipeSupplier.get();
+
+            }
+            if(this.machineRecipes==null) {
+                this.machineRecipes = new ArrayList<>();
+            }
+        }
+        return this.machineRecipes;
+    }
 
     /**
      * differently get machinerecipes via location and inv

@@ -1,5 +1,6 @@
 package me.matl114.logitech.Utils;
 
+import com.bgsoftware.wildstacker.api.loot.LootTable;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.BlockDataController;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
@@ -12,6 +13,7 @@ import io.github.thebusybiscuit.slimefun4.implementation.tasks.TickerTask;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
 import io.github.thebusybiscuit.slimefun4.utils.tags.SlimefunTag;
+import me.matl114.logitech.Listeners.Events.AttackPermissionTestEvent;
 import me.matl114.logitech.MyAddon;
 import me.matl114.logitech.Schedule.Schedules;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
@@ -33,16 +35,14 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.loot.LootTables;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -56,6 +56,167 @@ public class WorldUtils {
     public static void setAir(Location loc) {
         loc.getBlock().setType(Material.AIR);
     }
+    public static HashMap<Material,Integer> FOOD_LEVELS=new HashMap<>(){{
+        put(Material.MUSHROOM_STEW,6);
+        put(Material.BEEF,3);
+        put(Material.ROTTEN_FLESH,4);
+        put(Material.CHORUS_FRUIT,4);
+        put(Material.BEETROOT,1);
+        put(Material.POTATO,1);
+        put(Material.COD,2);
+        put(Material.GOLDEN_APPLE,4);
+        put(Material.ENCHANTED_GOLDEN_APPLE,4);
+        put(Material.SALMON,2);
+        put(Material.COOKED_COD,5);
+        put(Material.HONEY_BOTTLE,6);
+        put(Material.COOKED_PORKCHOP,8);
+        put(Material.PUMPKIN_PIE,8);
+        put(Material.POISONOUS_POTATO,2);
+        put(Material.RABBIT,3);
+        put(Material.PORKCHOP,3);
+        put(Material.BAKED_POTATO,5);
+        put(Material.BEETROOT_SOUP,6);
+        put(Material.PUFFERFISH,1);
+        put(Material.COOKED_RABBIT,5);
+        put(Material.GLOW_BERRIES,2);
+        put(Material.SUSPICIOUS_STEW,6);
+        put(Material.SWEET_BERRIES,2);
+        put(Material.TROPICAL_FISH,1);
+        put(Material.COOKED_CHICKEN,6);
+        put(Material.BREAD,5);
+        put(Material.GOLDEN_CARROT,6);
+        put(Material.CHICKEN,2);
+        put(Material.MELON_SLICE,2);
+        put(Material.RABBIT_STEW,10);
+        put(Material.APPLE,4);
+        put(Material.CARROT,3);
+        put(Material.COOKED_MUTTON,6);
+        put(Material.COOKED_SALMON,6);
+        put(Material.MUTTON,2);
+        put(Material.SPIDER_EYE,2);
+        put(Material.COOKIE,2);
+        put(Material.DRIED_KELP,1);
+        put(Material.COOKED_BEEF,8);
+    }};
+    public static HashMap<Material,Integer> FOOD_SATURATION_MUL_10=new HashMap<>(){{
+        put(Material.MUSHROOM_STEW,192);
+        put(Material.BEEF,78);
+        put(Material.ROTTEN_FLESH,88);
+        put(Material.CHORUS_FRUIT,104);
+        put(Material.BEETROOT,32);
+        put(Material.POTATO,26);
+        put(Material.COD,44);
+        put(Material.GOLDEN_APPLE,176);
+        put(Material.ENCHANTED_GOLDEN_APPLE,176);
+        put(Material.SALMON,44);
+        put(Material.COOKED_COD,160);
+        put(Material.HONEY_BOTTLE,132);
+        put(Material.COOKED_PORKCHOP,288);
+        put(Material.PUMPKIN_PIE,208);
+        put(Material.POISONOUS_POTATO,52);
+        put(Material.RABBIT,78);
+        put(Material.PORKCHOP,78);
+        put(Material.BAKED_POTATO,160);
+        put(Material.BEETROOT_SOUP,192);
+        put(Material.PUFFERFISH,22);
+        put(Material.COOKED_RABBIT,160);
+        put(Material.GLOW_BERRIES,44);
+        put(Material.SUSPICIOUS_STEW,192);
+        put(Material.SWEET_BERRIES,44);
+        put(Material.TROPICAL_FISH,22);
+        put(Material.COOKED_CHICKEN,192);
+        put(Material.BREAD,160);
+        put(Material.GOLDEN_CARROT,264);
+        put(Material.CHICKEN,52);
+        put(Material.MELON_SLICE,52);
+        put(Material.RABBIT_STEW,320);
+        put(Material.APPLE,104);
+        put(Material.CARROT,96);
+        put(Material.COOKED_MUTTON,216);
+        put(Material.COOKED_SALMON,216);
+        put(Material.MUTTON,52);
+        put(Material.SPIDER_EYE,72);
+        put(Material.COOKIE,44);
+        put(Material.DRIED_KELP,26);
+        put(Material.COOKED_BEEF,288);
+    }};
+    public static List<LootTables> OVERWORLD_STRUCTURE_CHESTS=new ArrayList<>(){{
+        add(LootTables.ABANDONED_MINESHAFT);
+        add(LootTables.BURIED_TREASURE);
+        add(LootTables.DESERT_PYRAMID);
+        add(LootTables.IGLOO_CHEST);
+        add(LootTables.JUNGLE_TEMPLE);
+        add(LootTables.JUNGLE_TEMPLE_DISPENSER);
+        add(LootTables.PILLAGER_OUTPOST);
+        add(LootTables.ANCIENT_CITY);
+        add(LootTables.ANCIENT_CITY_ICE_BOX);
+        add(LootTables.RUINED_PORTAL);
+        try{
+            add(LootTables.TRIAL_CHAMBERS_REWARD);
+            add(LootTables.TRIAL_CHAMBERS_SUPPLY);
+            add(LootTables.TRIAL_CHAMBERS_CORRIDOR);
+            add(LootTables.TRIAL_CHAMBERS_INTERSECTION);
+            add(LootTables.TRIAL_CHAMBERS_INTERSECTION_BARREL);
+            add(LootTables.TRIAL_CHAMBERS_ENTRANCE);
+            add(LootTables.TRIAL_CHAMBERS_CORRIDOR_DISPENSER);
+            add(LootTables.TRIAL_CHAMBERS_CHAMBER_DISPENSER);
+            add(LootTables.TRIAL_CHAMBERS_WATER_DISPENSER);
+            add(LootTables.TRIAL_CHAMBERS_CORRIDOR_POT);
+        }catch (Throwable e){
+            Debug.logger("1.21 LootTable not supported");
+        }
+        add(LootTables.SHIPWRECK_MAP);
+        add(LootTables.SHIPWRECK_SUPPLY);
+        add(LootTables.SHIPWRECK_TREASURE);
+        add(LootTables.SIMPLE_DUNGEON);
+        add(LootTables.SPAWN_BONUS_CHEST);
+        add(LootTables.STRONGHOLD_CORRIDOR);
+        add(LootTables.STRONGHOLD_CROSSING);
+        add(LootTables.STRONGHOLD_LIBRARY);
+        add(LootTables.UNDERWATER_RUIN_BIG);
+        add(LootTables.UNDERWATER_RUIN_SMALL);
+        add(LootTables.VILLAGE_ARMORER);
+        add(LootTables.VILLAGE_BUTCHER);
+        add(LootTables.VILLAGE_CARTOGRAPHER);
+        add(LootTables.VILLAGE_DESERT_HOUSE);
+        add(LootTables.VILLAGE_FISHER);
+        add(LootTables.VILLAGE_FLETCHER);
+        add(LootTables.VILLAGE_MASON);
+        add(LootTables.VILLAGE_PLAINS_HOUSE);
+        add(LootTables.VILLAGE_SAVANNA_HOUSE);
+        add(LootTables.VILLAGE_SHEPHERD);
+        add(LootTables.VILLAGE_SNOWY_HOUSE);
+        add(LootTables.VILLAGE_TAIGA_HOUSE);
+        add(LootTables.VILLAGE_TANNERY);
+        add(LootTables.VILLAGE_TEMPLE);
+        add(LootTables.VILLAGE_TOOLSMITH);
+        add(LootTables.VILLAGE_WEAPONSMITH);
+        add(LootTables.WOODLAND_MANSION);
+        //archaeology
+        add(LootTables.DESERT_WELL_ARCHAEOLOGY);
+        add(LootTables.DESERT_PYRAMID_ARCHAEOLOGY);
+        add(LootTables.TRAIL_RUINS_ARCHAEOLOGY_COMMON);
+        add(LootTables.TRAIL_RUINS_ARCHAEOLOGY_RARE);
+        add(LootTables.OCEAN_RUIN_WARM_ARCHAEOLOGY);
+        add(LootTables.OCEAN_RUIN_COLD_ARCHAEOLOGY);
+        //sniffer
+        add(LootTables.SNIFFER_DIGGING);
+
+    }};
+    public static List<LootTables> NETHER_STRUCTURE_CHESTS=new ArrayList<>(){{
+        add(LootTables.NETHER_BRIDGE);
+        add(LootTables.BASTION_TREASURE);
+        add(LootTables.BASTION_OTHER);
+        add(LootTables.BASTION_BRIDGE);
+        add(LootTables.BASTION_HOGLIN_STABLE);
+        //PIGLING
+        //this need piglin entity
+        add(LootTables.PIGLIN_BARTERING);
+    }};
+    public static List<LootTables> END_STRUCTURE_CHESTS=new ArrayList<>(){{
+        add(LootTables.END_CITY_TREASURE);
+    }};
+
     protected static Class CraftBlockStateClass;
     protected static Field IBlockDataField;
     protected static Field BlockPositionField;
@@ -246,10 +407,10 @@ public class WorldUtils {
         }
         return true;
     }
-    public static boolean testAttackPermission(Player player, Damageable entity){
+    public static boolean testAttackPermission(Player player, Damageable entity,float expectedDamage){
         //entity.damage(0,player);
         try{
-            EntityDamageEvent event=new EntityDamageByEntityEvent(player,entity, EntityDamageEvent.DamageCause.ENTITY_ATTACK,0.0);
+            EntityDamageEvent event=new AttackPermissionTestEvent(player,entity,expectedDamage);
             Bukkit.getPluginManager().callEvent(event);
             if(event.isCancelled()){
                 return false;
