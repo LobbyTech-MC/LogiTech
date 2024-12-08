@@ -1,17 +1,17 @@
 package me.matl114.logitech.SlimefunItem.Cargo;
 
+import java.util.function.Supplier;
+
+import me.matl114.logitech.Depends.NetworksAdaptQuantumStorage;
 import me.matl114.logitech.Depends.NetworksQuantumProxy;
 import me.matl114.logitech.SlimefunItem.AddDepends;
-import me.matl114.logitech.Depends.NetworksAdaptQuantumStorage;
 import me.matl114.logitech.SlimefunItem.AddSlimefunItems;
+import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
 import me.matl114.logitech.SlimefunItem.Cargo.Singularity.SingularityProxy;
 import me.matl114.logitech.SlimefunItem.Cargo.Singularity.SingularityStorage;
-import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.Debug;
 import me.matl114.logitech.Utils.UtilClass.StorageClass.StorageType;
-
-import java.util.function.Supplier;
 
 public class Storages {
     public static void setup(){

@@ -1,12 +1,13 @@
 package me.matl114.logitech.Listeners.Listeners;
 
-import me.matl114.logitech.SlimefunItem.Interface.MenuBlock;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryHolder;
+
+import me.matl114.logitech.SlimefunItem.Interface.MenuBlock;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 public class BlockMenuClickProtectListener implements Listener {
     @EventHandler

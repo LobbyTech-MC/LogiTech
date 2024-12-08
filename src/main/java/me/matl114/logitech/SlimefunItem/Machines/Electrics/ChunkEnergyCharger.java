@@ -1,6 +1,18 @@
 package me.matl114.logitech.SlimefunItem.Machines.Electrics;
 
+import java.util.Collection;
+import java.util.HashMap;
+
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -11,15 +23,6 @@ import me.matl114.logitech.SlimefunItem.Interface.ChunkLimit;
 import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.WorldUtils;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.*;
 
 public class ChunkEnergyCharger extends AbstractEnergyCharger implements ChunkLimit {
 

@@ -1,14 +1,15 @@
 package me.matl114.logitech.Schedule;
 
 
-import lombok.Getter;
-import me.matl114.logitech.Utils.Debug;
+import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.function.Consumer;
+import lombok.Getter;
+import me.matl114.logitech.Utils.Debug;
 
 public class Schedules {
     private static BukkitRunnable autoSaveThread;

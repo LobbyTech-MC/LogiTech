@@ -1,5 +1,7 @@
 package me.matl114.logitech.Depends;
 
+import org.bukkit.Bukkit;
+
 import io.github.mooy1.infinityexpansion.items.blocks.Blocks;
 import io.github.mooy1.infinityexpansion.items.machines.Machines;
 import io.github.mooy1.infinityexpansion.items.mobdata.MobData;
@@ -9,7 +11,6 @@ import me.matl114.logitech.SlimefunItem.AddDepends;
 import me.matl114.logitech.Utils.Debug;
 import me.matl114.logitech.Utils.ReflectUtils;
 import me.matl114.logitech.Utils.Settings;
-import org.bukkit.Bukkit;
 
 public class DependencyInfinity {
     public static void  init(){

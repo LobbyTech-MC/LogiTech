@@ -1,5 +1,15 @@
 package me.matl114.logitech.SlimefunItem.Cargo.WorkBench;
 
+import java.util.LinkedHashMap;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -15,15 +25,6 @@ import me.matl114.logitech.Utils.UtilClass.CargoClass.CargoConfigs;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemCounter;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.LinkedHashMap;
 
 public class CargoConfigurator extends AbstractBlock {
     protected final int[] BORDER=new int[]{

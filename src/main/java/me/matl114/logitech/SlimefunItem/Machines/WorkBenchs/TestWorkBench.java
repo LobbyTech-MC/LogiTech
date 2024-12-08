@@ -1,5 +1,11 @@
 package me.matl114.logitech.SlimefunItem.Machines.WorkBenchs;
 
+import java.util.LinkedHashMap;
+
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -8,11 +14,6 @@ import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractWorkBench;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.LinkedHashMap;
 
 public class TestWorkBench extends AbstractWorkBench {
     protected static final int[] INPUT_SLOT=new int[]{11,12,13,20,21,22,29,30,31};

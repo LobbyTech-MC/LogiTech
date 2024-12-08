@@ -1,5 +1,17 @@
 package me.matl114.logitech.SlimefunItem;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.UUID;
+
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.player.PlayerProfile;
@@ -9,25 +21,25 @@ import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.Items.CustomHead;
 import me.matl114.logitech.Listeners.Listeners.PlayerQuiteListener;
-import me.matl114.logitech.Schedule.PersistentEffects.CustomEffects;
-import me.matl114.logitech.Schedule.PersistentEffects.PlayerEffects;
 import me.matl114.logitech.Schedule.SchedulePostRegister;
 import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.Schedule.PersistentEffects.CustomEffects;
+import me.matl114.logitech.Schedule.PersistentEffects.PlayerEffects;
 import me.matl114.logitech.SlimefunItem.Machines.WorkBenchs.BugCrafter;
-import me.matl114.logitech.Utils.*;
-import me.matl114.logitech.Utils.UtilClass.MenuClass.*;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.MathUtils;
+import me.matl114.logitech.Utils.MenuUtils;
+import me.matl114.logitech.Utils.RecipeSupporter;
+import me.matl114.logitech.Utils.UtilClass.MenuClass.CustomItemGroup;
+import me.matl114.logitech.Utils.UtilClass.MenuClass.CustomMenu;
+import me.matl114.logitech.Utils.UtilClass.MenuClass.DummyItemGroup;
+import me.matl114.logitech.Utils.UtilClass.MenuClass.MenuFactory;
+import me.matl114.logitech.Utils.UtilClass.MenuClass.PlayerHistoryRecord;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.*;
 
 public class AddGroups {
     public static void registerGroups(SlimefunAddon plugin){

@@ -1,6 +1,5 @@
 package me.matl114.logitech.Listeners;
 
-import me.matl114.logitech.Utils.Debug;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -8,6 +7,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+
+import me.matl114.logitech.Utils.Debug;
 
 public class BlockBreakListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST,ignoreCancelled = true)

@@ -1,6 +1,10 @@
 package me.matl114.logitech.SlimefunItem.Machines.AutoMachines;
 
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.bukkit.inventory.ItemStack;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -9,13 +13,7 @@ import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractTransformer;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.MenuUtils;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class MMGenerator extends AbstractTransformer {
     protected final int[] BORDER=new int[]{

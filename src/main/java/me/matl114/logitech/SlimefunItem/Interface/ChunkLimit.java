@@ -1,14 +1,15 @@
 package me.matl114.logitech.SlimefunItem.Interface;
 
+import java.util.HashMap;
+import java.util.function.Consumer;
+
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.BukkitUtils;
 import me.matl114.logitech.Utils.DataCache;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-
-import java.util.HashMap;
-import java.util.function.Consumer;
 
 public interface ChunkLimit {
     public HashMap<Chunk, Location> getRecords();

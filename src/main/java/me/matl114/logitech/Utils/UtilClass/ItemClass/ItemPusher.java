@@ -1,11 +1,11 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import me.matl114.logitech.Utils.Debug;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import javax.annotation.Nonnull;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nonnull;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 /**
  * used to cal num when push item, consume-only, it will not push item when unionSum

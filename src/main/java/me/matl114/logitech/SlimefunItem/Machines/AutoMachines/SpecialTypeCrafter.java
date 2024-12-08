@@ -1,15 +1,16 @@
 package me.matl114.logitech.SlimefunItem.Machines.AutoMachines;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import me.matl114.logitech.Utils.RecipeSupporter;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.HashMap;
-import java.util.HashSet;
 
 public class SpecialTypeCrafter extends SpecialCrafter {
     @Override

@@ -1,6 +1,5 @@
 package me.matl114.logitech.Utils.UtilClass.RecipeClass;
 
-import io.github.thebusybiscuit.slimefun4.core.machines.MachineOperation;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
 
 public class EnergyProviderOperation implements CustomMachineOperation {

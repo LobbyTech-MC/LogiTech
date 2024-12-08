@@ -1,6 +1,7 @@
 package me.matl114.logitech.Utils.Algorithms;
 
-import java.util.*;
+import java.util.AbstractList;
+import java.util.List;
 import java.util.function.Function;
 
 public class DynamicMapper<T,W>  extends AbstractList<T> implements List<T>{

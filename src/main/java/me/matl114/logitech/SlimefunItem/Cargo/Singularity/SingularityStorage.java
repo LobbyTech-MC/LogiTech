@@ -1,19 +1,20 @@
 package me.matl114.logitech.SlimefunItem.Cargo.Singularity;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import me.matl114.logitech.SlimefunItem.Items.Singularity;
-import me.matl114.logitech.Utils.UtilClass.PdcClass.AbstractStorageType;
-import me.matl114.logitech.Utils.UtilClass.StorageClass.StorageType;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.CraftUtils;
-import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import me.matl114.logitech.SlimefunItem.Items.Singularity;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.UtilClass.PdcClass.AbstractStorageType;
+import me.matl114.logitech.Utils.UtilClass.StorageClass.StorageType;
+import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
 
 public class SingularityStorage extends StorageType {
     public SingularityStorage() {

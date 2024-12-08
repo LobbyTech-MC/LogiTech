@@ -1,10 +1,10 @@
 package me.matl114.logitech.Utils.UtilClass.FunctionalClass;
 
-import me.matl114.logitech.Utils.AddUtils;
+import java.util.function.Supplier;
+
 import org.bukkit.entity.Player;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import me.matl114.logitech.Utils.AddUtils;
 
 public interface OutputStream {
     public static OutputStream getPlayerOut(Player player) {

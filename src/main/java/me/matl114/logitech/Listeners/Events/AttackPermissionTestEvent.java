@@ -1,9 +1,10 @@
 package me.matl114.logitech.Listeners.Events;
 
-import lombok.Getter;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+
+import lombok.Getter;
 
 public class AttackPermissionTestEvent extends EntityDamageByEntityEvent {
     //used for electric defense

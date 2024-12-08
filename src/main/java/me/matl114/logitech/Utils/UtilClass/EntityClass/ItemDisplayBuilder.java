@@ -1,7 +1,8 @@
 package me.matl114.logitech.Utils.UtilClass.EntityClass;
 
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.DisplayGroup;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -11,8 +12,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.DisplayGroup;
 
 public class ItemDisplayBuilder extends DisplayBuilder<ItemDisplayBuilder> {
     protected ItemStack itemStack;

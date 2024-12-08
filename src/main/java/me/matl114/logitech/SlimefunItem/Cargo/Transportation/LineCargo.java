@@ -18,6 +18,7 @@ import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.Language;
 import me.matl114.logitech.SlimefunItem.Cargo.AbstractCargo;
 import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.CraftUtils;
 import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.Settings;
 import me.matl114.logitech.Utils.TransportUtils;

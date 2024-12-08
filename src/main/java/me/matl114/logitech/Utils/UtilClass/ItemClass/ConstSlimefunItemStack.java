@@ -1,11 +1,12 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import me.matl114.logitech.Utils.ReflectUtils;
+import java.lang.reflect.Field;
+
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.lang.reflect.Field;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import me.matl114.logitech.Utils.ReflectUtils;
 
 public class ConstSlimefunItemStack extends SlimefunItemStack {
     public SlimefunItemStack data;

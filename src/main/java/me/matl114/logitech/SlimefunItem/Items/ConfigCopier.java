@@ -1,6 +1,18 @@
 package me.matl114.logitech.SlimefunItem.Items;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
 import io.github.thebusybiscuit.slimefun4.api.events.PlayerRightClickEvent;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
@@ -11,21 +23,9 @@ import me.matl114.logitech.SlimefunItem.Interface.DirectionalBlock;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.CraftUtils;
 import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.WorldUtils;
 import me.matl114.logitech.Utils.UtilClass.CargoClass.Directions;
 import me.matl114.logitech.Utils.UtilClass.PdcClass.AbstractStringList;
-import me.matl114.logitech.Utils.WorldUtils;
-import org.bukkit.NamespacedKey;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-
-import javax.swing.text.html.Option;
-import javax.xml.crypto.Data;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 public class ConfigCopier extends CustomProps{
 

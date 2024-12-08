@@ -1,18 +1,19 @@
 package me.matl114.logitech.SlimefunItem.Cargo.Links;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import me.matl114.logitech.SlimefunItem.Items.HypLink;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.CraftUtils;
-import me.matl114.logitech.Utils.DataCache;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import me.matl114.logitech.SlimefunItem.Items.HypLink;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.DataCache;
 
 public class HyperLink {
     public final static String LOC_DISPLAY_PREFIX = AddUtils.resolveColor("&x&E&B&3&3&E&B链接的坐标: &f");

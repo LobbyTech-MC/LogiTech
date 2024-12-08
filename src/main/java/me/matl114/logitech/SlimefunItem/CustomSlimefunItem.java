@@ -1,22 +1,19 @@
 package me.matl114.logitech.SlimefunItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.inventory.ItemStack;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemHandler;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.core.attributes.DistinctiveItem;
 import me.matl114.logitech.SlimefunItem.Interface.RecipeDisplay;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.Debug;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class CustomSlimefunItem extends SlimefunItem implements RecipeDisplay{
     public List<ItemStack> displayedMemory;

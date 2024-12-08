@@ -1,13 +1,26 @@
 package me.matl114.logitech.SlimefunItem.Machines.SpecialMachines;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import javax.annotation.Nullable;
+
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
-import me.matl114.logitech.SlimefunItem.AddItem;
 import me.matl114.logitech.SlimefunItem.Blocks.Laser;
 import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.FinalAltarCore;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
@@ -15,22 +28,12 @@ import me.matl114.logitech.SlimefunItem.Machines.FinalFeature;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.Debug;
 import me.matl114.logitech.Utils.MachineRecipeUtils;
+import me.matl114.logitech.Utils.Utils;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.RandOutItem;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.RandomItemStack;
-import me.matl114.logitech.Utils.Utils;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.units.qual.C;
-
-import javax.annotation.Nullable;
-import javax.crypto.Mac;
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.function.Function;
 
 public class FinalConvertor extends AbstractMachine implements FinalAltarCore.FinalAltarChargable , Laser.LaserChargable {
     final static Material[] ID_TO_MATERIAL;

@@ -1,7 +1,8 @@
 package me.matl114.logitech.Utils.UtilClass.RecipeClass;
 
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import org.bukkit.inventory.ItemStack;
+
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 
 /**
  * shaped and not stack ,should check your code before create this

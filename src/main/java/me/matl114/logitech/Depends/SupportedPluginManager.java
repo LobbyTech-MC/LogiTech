@@ -1,15 +1,16 @@
 package me.matl114.logitech.Depends;
 
 
-import com.bgsoftware.wildstacker.api.WildStackerAPI;
-import com.google.common.base.Preconditions;
-import dev.rosewood.rosestacker.api.RoseStackerAPI;
-import dev.rosewood.rosestacker.stack.StackedItem;
-import io.github.sefiraat.networks.Networks;
-import lombok.Getter;
-import me.matl114.logitech.Schedule.SchedulePostRegister;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Item;
+
+import com.bgsoftware.wildstacker.api.WildStackerAPI;
+import com.google.common.base.Preconditions;
+
+import dev.rosewood.rosestacker.api.RoseStackerAPI;
+import dev.rosewood.rosestacker.stack.StackedItem;
+import lombok.Getter;
+import me.matl114.logitech.Schedule.SchedulePostRegister;
 
 public class SupportedPluginManager {
 

@@ -1,7 +1,5 @@
 package me.matl114.logitech.Utils.UtilClass.FunctionalClass;
 
-import java.util.ArrayList;
-
 public class  Counter<T extends Object> {
     int a;
     T value;

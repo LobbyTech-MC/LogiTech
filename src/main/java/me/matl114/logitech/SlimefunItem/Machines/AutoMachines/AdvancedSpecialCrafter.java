@@ -1,6 +1,19 @@
 package me.matl114.logitech.SlimefunItem.Machines.AutoMachines;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -13,8 +26,14 @@ import me.matl114.logitech.Schedule.Schedules;
 import me.matl114.logitech.SlimefunItem.Interface.MultiCraftType;
 import me.matl114.logitech.SlimefunItem.Interface.RecipeDisplay;
 import me.matl114.logitech.SlimefunItem.Interface.RecipeLock;
-import me.matl114.logitech.SlimefunItem.Machines.*;
-import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.SlimefunItem.Machines.AbstractProcessor;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.Debug;
+import me.matl114.logitech.Utils.MenuUtils;
+import me.matl114.logitech.Utils.RecipeSupporter;
+import me.matl114.logitech.Utils.Settings;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.DisplayItemStack;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.ImportRecipes;
@@ -24,13 +43,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.*;
 //TODO 做这个高级合成机
 public abstract class AdvancedSpecialCrafter extends AbstractProcessor implements RecipeLock, ImportRecipes {
     public List<ItemStack> displayedMemory;

@@ -1,14 +1,8 @@
 package me.matl114.logitech.SlimefunItem.Cargo.SpaceStorage;
 
-import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
-import me.matl114.logitech.ConfigLoader;
-import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
-import me.matl114.logitech.SlimefunItem.DistinctiveCustomItemStack;
-import me.matl114.logitech.Utils.AddUtils;
-import org.bukkit.Location;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -18,7 +12,7 @@ import org.bukkit.persistence.PersistentDataType;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
+import me.matl114.logitech.SlimefunItem.DistinctiveCustomItemStack;
 import me.matl114.logitech.Utils.AddUtils;
 
 public class SpaceStorageCard extends DistinctiveCustomItemStack {

@@ -1,13 +1,13 @@
 package me.matl114.logitech.Utils.UtilClass.StorageClass;
 
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.MathUtils;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import javax.annotation.Nonnull;
+
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.annotation.Nonnull;
+import me.matl114.logitech.Utils.MathUtils;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 public class LocationStorageProxy extends ItemStorageCache{
     Location location;

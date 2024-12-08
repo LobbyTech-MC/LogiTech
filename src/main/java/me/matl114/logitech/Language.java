@@ -1,10 +1,15 @@
 package me.matl114.logitech;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.Debug;
-
-import java.util.*;
 
 public class Language {
     public static final String LANGUAGE_NAMESPACE="zh_CN";

@@ -1,9 +1,5 @@
 package me.matl114.logitech.Utils.UtilClass.RecipeClass;
 
-import io.github.thebusybiscuit.slimefun4.core.machines.MachineOperation;
-import io.github.thebusybiscuit.slimefun4.core.machines.MachineProcessor;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
-
 import java.util.Random;
 
 public class RandomMachineOperation implements CustomMachineOperation {

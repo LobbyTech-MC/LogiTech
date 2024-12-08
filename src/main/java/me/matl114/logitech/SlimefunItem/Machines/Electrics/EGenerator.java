@@ -1,14 +1,14 @@
 package me.matl114.logitech.SlimefunItem.Machines.Electrics;
 
+import java.util.LinkedHashMap;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractEnergyProcessor;
-import me.matl114.logitech.SlimefunItem.Machines.AbstractEnergyProvider;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.LinkedHashMap;
 
 public class EGenerator extends AbstractEnergyProcessor {
     protected final int[] INPUT_SLOT=new int[]{

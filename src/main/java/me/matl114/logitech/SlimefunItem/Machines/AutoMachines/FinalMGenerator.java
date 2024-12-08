@@ -1,16 +1,15 @@
 package me.matl114.logitech.SlimefunItem.Machines.AutoMachines;
 
+import java.util.LinkedHashMap;
+
+import org.bukkit.inventory.ItemStack;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import me.matl114.logitech.SlimefunItem.Machines.FinalFeature;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.Utils;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class FinalMGenerator extends MMGenerator{
     public FinalMGenerator(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,

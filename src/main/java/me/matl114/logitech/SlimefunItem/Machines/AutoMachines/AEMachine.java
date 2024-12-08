@@ -1,5 +1,15 @@
 package me.matl114.logitech.SlimefunItem.Machines.AutoMachines;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.function.Supplier;
+
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -7,25 +17,19 @@ import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.Language;
 import me.matl114.logitech.Schedule.SchedulePostRegister;
-import me.matl114.logitech.Schedule.Schedules;
 import me.matl114.logitech.SlimefunItem.AddItem;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractAdvancedProcessor;
-import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.MachineRecipeUtils;
+import me.matl114.logitech.Utils.MenuUtils;
+import me.matl114.logitech.Utils.RecipeSupporter;
+import me.matl114.logitech.Utils.Settings;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemCounter;
-import me.matl114.logitech.Utils.UtilClass.RecipeClass.StackMachineRecipe;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
 
 public class AEMachine extends AbstractAdvancedProcessor {
     protected final int[] BORDER={

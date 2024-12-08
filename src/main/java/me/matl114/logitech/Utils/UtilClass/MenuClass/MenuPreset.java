@@ -1,9 +1,10 @@
 package me.matl114.logitech.Utils.UtilClass.MenuClass;
 
-import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
+import java.util.HashMap;
+
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 
 public class MenuPreset {
 

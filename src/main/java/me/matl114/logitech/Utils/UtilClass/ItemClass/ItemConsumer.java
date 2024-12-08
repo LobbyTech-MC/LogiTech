@@ -1,16 +1,14 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedException;
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.Settings;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedException;
+import me.matl114.logitech.Utils.Settings;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 public class ItemConsumer extends ItemCounter {
     private List<ItemPusher> targetConsumers;

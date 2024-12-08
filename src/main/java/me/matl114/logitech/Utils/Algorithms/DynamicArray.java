@@ -1,12 +1,9 @@
 package me.matl114.logitech.Utils.Algorithms;
 
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-
 import java.util.AbstractList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
-import java.util.function.Supplier;
 
 public class DynamicArray<T> extends AbstractList<T> implements List<T> {
     private T[] array;

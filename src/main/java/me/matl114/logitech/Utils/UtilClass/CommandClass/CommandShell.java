@@ -1,30 +1,39 @@
 package me.matl114.logitech.Utils.UtilClass.CommandClass;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
-import me.matl114.logitech.Listeners.Listeners.PlayerQuiteListener;
-import me.matl114.logitech.MyAddon;
-import me.matl114.logitech.Schedule.Schedules;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.ReflectUtils;
-import me.matl114.logitech.Utils.UtilClass.FunctionalClass.AsyncResultRunnable;
+import java.io.File;
+import java.io.FileWriter;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
+
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
-import java.io.*;
-import java.lang.reflect.*;
-import java.nio.file.Files;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
+import me.matl114.logitech.MyAddon;
+import me.matl114.logitech.Listeners.Listeners.PlayerQuiteListener;
+import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.Debug;
+import me.matl114.logitech.Utils.ReflectUtils;
+import me.matl114.logitech.Utils.UtilClass.FunctionalClass.AsyncResultRunnable;
 
 public class CommandShell {
     protected static String ROOT_PASSWORD="...";

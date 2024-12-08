@@ -1,9 +1,10 @@
 package me.matl114.logitech.Schedule.PersistentEffects;
 
-import me.matl114.logitech.Schedule.ScheduleEffects;
-import me.matl114.logitech.Utils.AddUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
+
+import me.matl114.logitech.Schedule.ScheduleEffects;
+import me.matl114.logitech.Utils.AddUtils;
 
 public abstract class AbstractEffect {
     String id;

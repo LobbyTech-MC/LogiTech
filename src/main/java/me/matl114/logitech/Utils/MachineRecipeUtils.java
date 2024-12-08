@@ -1,21 +1,29 @@
 package me.matl114.logitech.Utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.multiblocks.MultiBlockMachine;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.*;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.AbstractItemStack;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.DisplayItemStack;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.EqualInItem;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.EquivalItemStack;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemCounter;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.RandOutItem;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.MGeneratorRecipe;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.SequenceMachineRecipe;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.ShapedMachineRecipe;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.StackMachineRecipe;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.*;
-import java.util.function.IntFunction;
-import java.util.function.Supplier;
 
 public class MachineRecipeUtils {
     public static final ItemStack BOTTLE=new ItemStack(Material.GLASS_BOTTLE);

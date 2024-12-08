@@ -1,11 +1,19 @@
 package me.matl114.logitech.Utils.UtilClass.StorageClass;
 
-import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Predicate;
+
+import javax.annotation.Nonnull;
+
+import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import me.matl114.logitech.Schedule.ScheduleSave;
-import me.matl114.logitech.Schedule.Schedules;
-import me.matl114.logitech.SlimefunItem.Cargo.StorageMachines.AbstractIOPort;
 import me.matl114.logitech.SlimefunItem.Cargo.Storages;
+import me.matl114.logitech.SlimefunItem.Cargo.StorageMachines.AbstractIOPort;
 import me.matl114.logitech.Utils.CraftUtils;
 import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.Debug;
@@ -13,14 +21,6 @@ import me.matl114.logitech.Utils.MenuUtils;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemCounter;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemSlotPusher;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Predicate;
 
 /**
  * when you load a storage cache from menu slot......

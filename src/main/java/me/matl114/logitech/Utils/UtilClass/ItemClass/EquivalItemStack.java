@@ -1,11 +1,17 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedException;
-import me.matl114.logitech.Utils.CraftUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedException;
+import me.matl114.logitech.Utils.CraftUtils;
 
 public class EquivalItemStack extends ItemStack implements MultiItemStack ,EqualInItem{
     public ItemStack[] itemList;

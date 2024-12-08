@@ -1,12 +1,13 @@
 package me.matl114.logitech.Utils.UtilClass.StorageClass;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.function.Predicate;
+
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 
 public abstract class StorageType {
     protected StorageType(){

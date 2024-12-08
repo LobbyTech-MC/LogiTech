@@ -1,13 +1,13 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import me.matl114.logitech.Utils.Settings;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.inventory.ItemStack;
-
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
+
+import org.bukkit.inventory.ItemStack;
+
+import me.matl114.logitech.Utils.Settings;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 public interface ItemPusherProvider {
     /**

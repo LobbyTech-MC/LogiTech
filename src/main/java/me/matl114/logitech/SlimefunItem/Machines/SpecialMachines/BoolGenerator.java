@@ -1,6 +1,13 @@
 package me.matl114.logitech.SlimefunItem.Machines.SpecialMachines;
 
+import java.util.ArrayList;
+
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -10,18 +17,18 @@ import me.matl114.logitech.Language;
 import me.matl114.logitech.SlimefunItem.AddItem;
 import me.matl114.logitech.SlimefunItem.AddSlimefunItems;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractProcessor;
-import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.MachineRecipeUtils;
+import me.matl114.logitech.Utils.MenuUtils;
+import me.matl114.logitech.Utils.Settings;
+import me.matl114.logitech.Utils.Utils;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusher;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.SimpleCraftingOperation;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
 
 public class BoolGenerator extends AbstractProcessor {
     protected final int[] BORDER=new int[]{0,  2, 3, 5, 6,  8,9, 17, 18, 20, 21,  23, 24,26};

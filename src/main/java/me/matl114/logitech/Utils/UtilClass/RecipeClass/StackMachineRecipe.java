@@ -1,7 +1,8 @@
 package me.matl114.logitech.Utils.UtilClass.RecipeClass;
 
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import org.bukkit.inventory.ItemStack;
+
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 
 /**
  * unshaped recipe with stacked input ItemStack can be used in most Abstract machines

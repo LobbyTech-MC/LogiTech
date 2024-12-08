@@ -1,17 +1,18 @@
 package me.matl114.logitech.SlimefunItem;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
-import me.matl114.logitech.Items.CustomFireworkStar;
-import me.matl114.logitech.Items.CustomHead;
-import me.matl114.logitech.Language;
-import me.matl114.logitech.Utils.AddUtils;
+import java.util.HashSet;
+
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashSet;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
+import me.matl114.logitech.Language;
+import me.matl114.logitech.Items.CustomFireworkStar;
+import me.matl114.logitech.Items.CustomHead;
+import me.matl114.logitech.Utils.AddUtils;
 
 public class AddItem {
 

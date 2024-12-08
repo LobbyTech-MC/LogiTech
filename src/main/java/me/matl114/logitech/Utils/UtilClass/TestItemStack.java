@@ -1,9 +1,9 @@
 package me.matl114.logitech.Utils.UtilClass;
 
-import com.google.common.base.Preconditions;
-import me.matl114.logitech.Utils.Debug;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+
+import me.matl114.logitech.Utils.Debug;
 
 public class TestItemStack extends ItemStack {
     public TestItemStack( Material type, int amount, short damage,  Byte data) {

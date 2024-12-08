@@ -1,6 +1,8 @@
 package me.matl114.logitech.Depends;
 
 
+import org.bukkit.Bukkit;
+
 import io.github.sefiraat.networks.slimefun.network.NetworkQuantumWorkbench;
 import io.github.sefiraat.networks.utils.Keys;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
@@ -9,7 +11,6 @@ import me.matl114.logitech.SlimefunItem.AddDepends;
 import me.matl114.logitech.Utils.Debug;
 import me.matl114.logitech.Utils.ReflectUtils;
 import me.matl114.logitech.Utils.Settings;
-import org.bukkit.Bukkit;
 
 public class DependencyNetwork {
 

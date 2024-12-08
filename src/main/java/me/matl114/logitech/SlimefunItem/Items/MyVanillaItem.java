@@ -1,5 +1,10 @@
 package me.matl114.logitech.SlimefunItem.Items;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.inventory.ItemStack;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemHandler;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -9,10 +14,6 @@ import me.matl114.logitech.SlimefunItem.Interface.RecipeDisplay;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.Debug;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MyVanillaItem extends VanillaItem implements RecipeDisplay {
     List<ItemStack> displayedMemory;

@@ -1,14 +1,17 @@
 package me.matl114.logitech.Utils.UtilClass.MenuClass;
 
-import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.MenuUtils;
-import me.matl114.logitech.Utils.Settings;
-import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
+import me.matl114.logitech.Utils.MenuUtils;
+import me.matl114.logitech.Utils.Settings;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 
 public class CustomMenu {
     private static ItemStack[] constructItemList(HashMap<Integer,ItemStack> content) {

@@ -1,10 +1,11 @@
 package me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiLevelBlock;
 
-import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.AbstractMultiBlock;
-import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
+import java.util.List;
+
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.AbstractMultiBlock;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
 
 public class MultiLevelBlock implements AbstractMultiBlock {
     protected int level;

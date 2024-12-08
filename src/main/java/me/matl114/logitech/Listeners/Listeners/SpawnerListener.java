@@ -1,11 +1,7 @@
 package me.matl114.logitech.Listeners.Listeners;
 
-import io.github.thebusybiscuit.slimefun4.implementation.items.tools.PickaxeOfContainment;
-import me.matl114.logitech.SlimefunItem.Blocks.AbstractSpawner;
-import me.matl114.logitech.SlimefunItem.Items.EntityFeat;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.CraftUtils;
-import me.matl114.logitech.Utils.DataCache;
+import java.util.Random;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -15,7 +11,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-import java.util.Random;
+import io.github.thebusybiscuit.slimefun4.implementation.items.tools.PickaxeOfContainment;
+import me.matl114.logitech.SlimefunItem.Blocks.AbstractSpawner;
+import me.matl114.logitech.SlimefunItem.Items.EntityFeat;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.DataCache;
 
 public class SpawnerListener implements Listener {
     private Random rand=new Random();

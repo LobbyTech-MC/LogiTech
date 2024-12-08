@@ -1,9 +1,11 @@
 package me.matl114.logitech.SlimefunItem.Interface;
 
+import org.bukkit.Location;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
+
 import me.matl114.logitech.Utils.DataCache;
-import org.bukkit.Location;
 
 public interface MultiCraftType extends RecipeLock {
     static int getRecipeTypeIndex(Location loc){

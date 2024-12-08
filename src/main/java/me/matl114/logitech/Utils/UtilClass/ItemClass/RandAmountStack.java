@@ -1,9 +1,8 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import me.matl114.logitech.Utils.AddUtils;
-import org.bukkit.inventory.ItemStack;
-
 import java.util.Random;
+
+import org.bukkit.inventory.ItemStack;
 
 public class RandAmountStack extends ItemStack implements AbstractItemStack,RandOutItem{
     public Random rand=new Random();

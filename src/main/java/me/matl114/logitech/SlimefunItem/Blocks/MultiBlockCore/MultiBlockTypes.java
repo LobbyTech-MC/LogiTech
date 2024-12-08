@@ -1,8 +1,8 @@
 package me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore;
 
-import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.CubeMultiBlock.CubeMultiBlockType;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockType;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.CubeMultiBlock.CubeMultiBlockType;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiLevelBlock.MultiLevelBlockType;
 
 public class MultiBlockTypes {

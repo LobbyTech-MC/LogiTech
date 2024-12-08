@@ -1,16 +1,16 @@
 package me.matl114.logitech.Utils.UtilClass.MultiBlockClass;
 
 
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.UtilClass.FunctionalClass.OutputStream;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.bukkit.Location;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.UtilClass.FunctionalClass.OutputStream;
 
 public abstract class MultiBlockType implements AbstractMultiBlockType {
     private HashMap<BlockVector,String> STRUCTURE_MAP;

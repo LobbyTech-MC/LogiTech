@@ -1,6 +1,33 @@
 package me.matl114.logitech.SlimefunItem.Machines.SpecialMachines;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.stream.IntStream;
+
+import javax.annotation.Nonnull;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.loot.LootContext;
+import org.bukkit.loot.LootTables;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -12,39 +39,24 @@ import io.github.thebusybiscuit.slimefun4.implementation.items.magical.staves.Wi
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
-import jdk.dynalink.Operation;
 import me.matl114.logitech.Schedule.Schedules;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
-import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.Debug;
+import me.matl114.logitech.Utils.MenuUtils;
+import me.matl114.logitech.Utils.Settings;
+import me.matl114.logitech.Utils.WorldUtils;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemCounter;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.CustomMachineOperation;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.RandomMachineOperation;
-import me.matl114.logitech.Utils.UtilClass.RecipeClass.SimpleCraftingOperation;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.TimeCounterOperation;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
-import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.loot.LootContext;
-import org.bukkit.loot.LootTables;
-import org.checkerframework.checker.units.qual.C;
-
-import javax.annotation.Nonnull;
-import javax.swing.text.html.parser.Entity;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class VirtualExplorer extends AbstractMachine implements MachineProcessHolder<CustomMachineOperation> {
     protected final int[] INPUT_SLOTS=new int[]{10,13,16};
@@ -174,7 +186,7 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
             if(meta.isUnbreakable()){
                 return item;
             }else {
-                int level=meta.getEnchantLevel(Enchantment.DURABILITY);
+                int level=meta.getEnchantLevel(Enchantment.UNBREAKING);
                 if(rand.nextInt(0,level+1)==0){
                     if(meta instanceof Damageable dm){
                         int damage=dm.getDamage()+1;

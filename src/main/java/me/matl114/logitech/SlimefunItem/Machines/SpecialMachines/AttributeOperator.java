@@ -1,9 +1,27 @@
 package me.matl114.logitech.SlimefunItem.Machines.SpecialMachines;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import javax.annotation.Nonnull;
+
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
+
 import com.google.common.collect.Multimap;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
@@ -11,31 +29,19 @@ import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.Schedule.Schedules;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
-import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.Debug;
+import me.matl114.logitech.Utils.Settings;
+import me.matl114.logitech.Utils.Utils;
 import me.matl114.logitech.Utils.UtilClass.MenuClass.DataMenuClickHandler;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import net.guizhanss.guizhanlib.minecraft.helper.attribute.AttributeHelper;
 import net.guizhanss.guizhanlib.minecraft.helper.enchantments.EnchantmentHelper;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.block.Block;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.units.qual.A;
-import org.checkerframework.checker.units.qual.C;
-
-import javax.annotation.Nonnull;
-import java.util.*;
-import java.util.function.Consumer;
 
 public class AttributeOperator extends AbstractMachine {
     protected final int[] BORDER=new int[]{0,1,2,3,4,5,6,7,8,11,12,14,15,18,19,25,26,29,30,32,33,36,37,38,39,40,41,42,43,44};
@@ -391,7 +397,7 @@ public class AttributeOperator extends AbstractMachine {
         int t=0;
         for (Map.Entry<Enchantment,Integer> entry:map.entrySet()) {
             lore.add(AddUtils.concat((t==index)?PREFIX_CHOOSEN:PREFIX_LORE,
-                    EnchantmentHelper.getEnchantmentName(entry.getKey(),false)," lvl: ",entry.getValue().toString())) ;
+                    EnchantmentHelper.getName(entry.getKey().getName(),false)," lvl: ",entry.getValue().toString())) ;
             ++t;
         }
         meta.setLore(lore);

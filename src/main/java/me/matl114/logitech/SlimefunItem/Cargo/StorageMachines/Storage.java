@@ -1,26 +1,17 @@
 package me.matl114.logitech.SlimefunItem.Cargo.StorageMachines;
 
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-
 import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
-
 import me.matl114.logitech.Utils.UtilClass.TickerClass.Ticking;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-
-import org.bukkit.block.Block;
-
-import org.bukkit.inventory.ItemStack;
-
-
-import java.util.ArrayList;
-
-import java.util.List;
 
 public class Storage extends AbstractMachine implements Ticking {
     public static final int[] COMMON_INPUT_SLOT = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,

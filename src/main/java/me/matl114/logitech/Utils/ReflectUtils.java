@@ -1,12 +1,12 @@
 package me.matl114.logitech.Utils;
 
-import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 
 public class ReflectUtils {
     public static  Object invokeGetRecursively(Object target, Settings mod, String declared){

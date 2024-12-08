@@ -1,11 +1,11 @@
 package me.matl114.logitech.Utils.UtilClass.FunctionalClass;
 
-import me.matl114.logitech.Schedule.Schedules;
-import me.matl114.logitech.Utils.Debug;
+import java.util.concurrent.CountDownLatch;
+
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.concurrent.CountDownLatch;
+import me.matl114.logitech.Schedule.Schedules;
 
 public abstract class AsyncResultRunnable<T extends Object> extends BukkitRunnable implements Runnable {
     public T result;

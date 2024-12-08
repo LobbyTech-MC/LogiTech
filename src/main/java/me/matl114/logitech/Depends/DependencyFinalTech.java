@@ -1,8 +1,8 @@
 package me.matl114.logitech.Depends;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-
 import java.lang.reflect.Method;
+
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 
 public class DependencyFinalTech {
     public static SlimefunItem storageCardInstance;

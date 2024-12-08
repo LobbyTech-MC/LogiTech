@@ -1,12 +1,12 @@
 package me.matl114.logitech.Utils;
 
-import me.matl114.logitech.MyAddon;
-import org.bukkit.Bukkit;
-import org.bukkit.inventory.meta.Repairable;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+
+import org.bukkit.Bukkit;
+
+import me.matl114.logitech.MyAddon;
 
 public class Debug {
     public  static Logger log = Logger.getLogger(AddUtils.ADDON_ID);

@@ -1,14 +1,16 @@
 package me.matl114.logitech.Utils.UtilClass.PdcClass;
 
-import com.jeff_media.morepersistentdatatypes.DataType;
-import me.matl114.logitech.Utils.AddUtils;
+import javax.annotation.Nonnull;
+
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import javax.annotation.Nonnull;
+import com.jeff_media.morepersistentdatatypes.DataType;
+
+import me.matl114.logitech.Utils.AddUtils;
 
 public class AbstractStorageType implements PersistentDataType<PersistentDataContainer, ItemStack> {
     public final static AbstractStorageType TYPE = new AbstractStorageType();

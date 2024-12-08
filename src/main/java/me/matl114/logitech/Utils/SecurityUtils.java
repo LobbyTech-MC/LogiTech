@@ -1,12 +1,11 @@
 package me.matl114.logitech.Utils;
 
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public class SecurityUtils {
     public static ConcurrentHashMap<Lock, HashSet<UUID>> PLAYERACTIONLOCK = new ConcurrentHashMap<>();

@@ -1,15 +1,15 @@
 package me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiLevelBlock;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.Location;
+import org.bukkit.util.Vector;
+
 import me.matl114.logitech.Utils.UtilClass.FunctionalClass.OutputStream;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.AbstractMultiBlock;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.AbstractMultiBlockType;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
-import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockType;
-import org.bukkit.Location;
-import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class MultiLevelBlockType implements AbstractMultiBlockType {
     protected final List<AbstractMultiBlockType> SUBMULTIBLOCKS_LIST;

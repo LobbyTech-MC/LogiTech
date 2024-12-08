@@ -1,16 +1,18 @@
 package me.matl114.logitech.Utils.UtilClass.PdcClass;
 
 
-import me.matl114.logitech.Utils.AddUtils;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import me.matl114.logitech.Utils.AddUtils;
 
 public class AbstractStringList implements PersistentDataType<PersistentDataContainer, List<String>>{
         public static final PersistentDataType<PersistentDataContainer, List<String>> TYPE = new AbstractStringList();

@@ -2,7 +2,6 @@ package me.matl114.logitech.Utils.UtilClass.MenuClass;
 
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
-import org.bukkit.inventory.Inventory;
 
 public interface CustomMenuHandler {
     /**

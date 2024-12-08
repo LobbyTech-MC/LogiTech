@@ -1,10 +1,10 @@
 package me.matl114.logitech.Utils;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
-import java.security.MessageDigest;
-import java.util.function.Supplier;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 public class MathUtils {
     protected static final boolean isCompacted=((Supplier<Boolean>)(()->{

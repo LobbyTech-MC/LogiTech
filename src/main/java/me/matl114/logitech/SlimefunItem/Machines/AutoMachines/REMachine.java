@@ -1,23 +1,13 @@
 package me.matl114.logitech.SlimefunItem.Machines.AutoMachines;
 
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+import java.util.LinkedHashMap;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
-import me.matl114.logitech.Utils.CraftUtils;
-import me.matl114.logitech.Utils.MenuUtils;
-import me.matl114.logitech.Utils.Settings;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
-import me.matl114.logitech.Utils.UtilClass.RecipeClass.RandomMachineOperation;
-import me.matl114.logitech.Utils.UtilClass.RecipeClass.SimpleCraftingOperation;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.LinkedHashMap;
 
 @Deprecated
 public class REMachine extends EMachine{

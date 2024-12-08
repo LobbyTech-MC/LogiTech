@@ -1,25 +1,24 @@
 package me.matl114.logitech.SlimefunItem.Items;
 
-import io.github.thebusybiscuit.slimefun4.api.geo.GEOResource;
-import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import me.matl114.logitech.SlimefunItem.AddHandlers;
-import me.matl114.logitech.SlimefunItem.AddSlimefunItems;
-import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.Debug;
-import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.List;
+import io.github.thebusybiscuit.slimefun4.api.geo.GEOResource;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import me.matl114.logitech.SlimefunItem.AddHandlers;
+import me.matl114.logitech.SlimefunItem.AddSlimefunItems;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.Debug;
 
 public class AbstractGeoResource extends SlimefunItem implements GEOResource {
     protected final int MAXDEVIATION;

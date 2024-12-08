@@ -1,15 +1,14 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import me.matl114.logitech.Utils.Debug;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
 import me.matl114.logitech.Utils.MathUtils;
 import me.matl114.logitech.Utils.Settings;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * this consumer have NO cnt limit, when  calling symmetricDiff they will grab allllllll they can get and count num

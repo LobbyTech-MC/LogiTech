@@ -1,13 +1,25 @@
 package me.matl114.logitech.Listeners;
 
 
-import me.matl114.logitech.Listeners.Listeners.*;
-import me.matl114.logitech.SlimefunItem.Cargo.SpaceStorage.StorageSpace;
-import me.matl114.logitech.Unittest;
-import me.matl114.logitech.Utils.Debug;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+
+import me.matl114.logitech.Unittest;
+import me.matl114.logitech.Listeners.Listeners.BlockMenuClickProtectListener;
+import me.matl114.logitech.Listeners.Listeners.BlockOpenListener;
+import me.matl114.logitech.Listeners.Listeners.CraftingListener;
+import me.matl114.logitech.Listeners.Listeners.LaserGunOnHeadListener;
+import me.matl114.logitech.Listeners.Listeners.MilkListener;
+import me.matl114.logitech.Listeners.Listeners.PlayerQuiteListener;
+import me.matl114.logitech.Listeners.Listeners.PortalTeleport;
+import me.matl114.logitech.Listeners.Listeners.PotionClearOnDeath;
+import me.matl114.logitech.Listeners.Listeners.SlimefunBlockPlaceLimitListener;
+import me.matl114.logitech.Listeners.Listeners.SpawnerListener;
+import me.matl114.logitech.Listeners.Listeners.StorageWorldListener;
+import me.matl114.logitech.Listeners.Listeners.SuperSpongeDryListener;
+import me.matl114.logitech.SlimefunItem.Cargo.SpaceStorage.StorageSpace;
+import me.matl114.logitech.Utils.Debug;
 
 public class ListenerManager {
     public static void registerListeners(Plugin plugin,PluginManager manager){

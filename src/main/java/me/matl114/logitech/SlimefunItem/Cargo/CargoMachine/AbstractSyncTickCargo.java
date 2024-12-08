@@ -1,6 +1,10 @@
 package me.matl114.logitech.SlimefunItem.Cargo.CargoMachine;
 
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -10,8 +14,6 @@ import me.matl114.logitech.Utils.Settings;
 import me.matl114.logitech.Utils.UtilClass.TickerClass.SyncBlockTick;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * controlled by sync tick and chip code to perform certain sequence task

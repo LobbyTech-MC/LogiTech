@@ -1,20 +1,10 @@
 package me.matl114.logitech;
 
 
-import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
-import me.matl114.logitech.Utils.*;
-import me.matl114.logitech.Utils.Algorithms.DynamicArray;
-import me.matl114.logitech.Utils.Algorithms.SimpleLinkList;
-import me.matl114.logitech.Utils.UtilClass.CargoClass.CargoConfigs;
-import me.matl114.logitech.Utils.UtilClass.TestItemStack;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
 
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import me.matl114.logitech.Utils.MathUtils;
+import me.matl114.logitech.Utils.UtilClass.CargoClass.CargoConfigs;
 
 public class Tests {
     public static void log(String message) {

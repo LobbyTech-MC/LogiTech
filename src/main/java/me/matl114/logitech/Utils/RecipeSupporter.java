@@ -1,5 +1,32 @@
 package me.matl114.logitech.Utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.FurnaceRecipe;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.RecipeChoice;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
+
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -20,20 +47,15 @@ import me.matl114.logitech.SlimefunItem.AddDepends;
 import me.matl114.logitech.SlimefunItem.AddItem;
 import me.matl114.logitech.SlimefunItem.AddSlimefunItems;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
+import me.matl114.logitech.SlimefunItem.Machines.AbstractTransformer;
 import me.matl114.logitech.SlimefunItem.Machines.AutoMachines.AEMachine;
 import me.matl114.logitech.SlimefunItem.Machines.AutoMachines.EMachine;
 import me.matl114.logitech.SlimefunItem.Machines.AutoMachines.MTMachine;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ProbItemStack;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.ImportRecipes;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.MGeneratorRecipe;
-import me.matl114.logitech.SlimefunItem.Machines.AbstractTransformer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import org.bukkit.*;
-import org.bukkit.entity.EntityType;
-import org.bukkit.inventory.*;
-
-import java.util.*;
 
 public class RecipeSupporter {
     public static void init(){

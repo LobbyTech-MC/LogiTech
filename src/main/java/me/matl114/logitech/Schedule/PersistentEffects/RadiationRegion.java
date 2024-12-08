@@ -1,17 +1,18 @@
 package me.matl114.logitech.Schedule.PersistentEffects;
 
-import me.matl114.logitech.Schedule.ScheduleSave;
-import me.matl114.logitech.Schedule.Schedules;
-import me.matl114.logitech.Utils.AddUtils;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import me.matl114.logitech.Schedule.ScheduleSave;
+import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.Utils.AddUtils;
 
 public class RadiationRegion {
     public static void setup(){

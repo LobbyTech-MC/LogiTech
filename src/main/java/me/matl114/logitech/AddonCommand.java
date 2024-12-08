@@ -1,10 +1,7 @@
 package me.matl114.logitech;
 
-import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
-import io.github.thebusybiscuit.slimefun4.core.commands.subcommands.SlimefunSubCommands;
-import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.Validate;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.UtilClass.CommandClass.ExportAddons;
+import java.util.function.Consumer;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -12,10 +9,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.plugin.Plugin;
 
-import javax.annotation.Nonnull;
-import java.util.function.Consumer;
+import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.Validate;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.UtilClass.CommandClass.ExportAddons;
 
 public class AddonCommand implements CommandExecutor, Listener {
     private boolean registered = false;

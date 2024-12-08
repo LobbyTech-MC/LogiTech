@@ -1,11 +1,11 @@
 package me.matl114.logitech.Utils;
 
-import org.bukkit.inventory.ItemStack;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.bukkit.inventory.ItemStack;
 
 public class Utils {
     public static void log(String... message) {

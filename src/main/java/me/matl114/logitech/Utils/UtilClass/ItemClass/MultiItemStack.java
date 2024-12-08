@@ -1,9 +1,10 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedException;
+import java.util.List;
+
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
+import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedException;
 
 public interface MultiItemStack extends AbstractItemStack {
     public List<ItemStack> getItemStacks();

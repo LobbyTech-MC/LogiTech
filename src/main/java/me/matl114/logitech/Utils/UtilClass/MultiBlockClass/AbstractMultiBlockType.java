@@ -1,9 +1,9 @@
 package me.matl114.logitech.Utils.UtilClass.MultiBlockClass;
 
-import me.matl114.logitech.Utils.UtilClass.FunctionalClass.OutputStream;
 import org.bukkit.Location;
-import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
+
+import me.matl114.logitech.Utils.UtilClass.FunctionalClass.OutputStream;
 
 public interface AbstractMultiBlockType {
     /**

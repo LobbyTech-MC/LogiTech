@@ -1,5 +1,14 @@
 package me.matl114.logitech.Utils.UtilClass.CommandClass;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.function.Consumer;
+
+import org.bukkit.Bukkit;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.core.attributes.RecipeDisplayItem;
@@ -10,14 +19,6 @@ import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.Debug;
 import me.matl114.logitech.Utils.RecipeSupporter;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import org.bukkit.Bukkit;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
-
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.function.Consumer;
 
 public class ExportAddons {
     public static void export(String addonName,boolean doExportIfAbsent,boolean doExportWhenEmpty, Consumer<String> outputStream){

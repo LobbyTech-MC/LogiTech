@@ -1,8 +1,6 @@
 package me.matl114.logitech.SlimefunItem.Cargo;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,7 +20,6 @@ import me.matl114.logitech.Utils.Debug;
 import me.matl114.logitech.Utils.MenuUtils;
 import me.matl114.logitech.Utils.WorldUtils;
 import me.matl114.logitech.Utils.UtilClass.MenuClass.MenuFactory;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 

@@ -1,20 +1,17 @@
 package me.matl114.logitech.Utils;
 
+import java.util.HashSet;
+import java.util.function.IntFunction;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
 import me.matl114.logitech.Utils.Algorithms.DynamicArray;
 import me.matl114.logitech.Utils.UtilClass.CargoClass.CargoConfigs;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusher;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusherProvider;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
-import org.bukkit.Material;
-import org.bukkit.entity.Item;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.function.IntFunction;
 
 public class TransportUtils {
     public static final ItemStack AIR = new ItemStack(Material.AIR);

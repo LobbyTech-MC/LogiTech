@@ -1,10 +1,10 @@
 package me.matl114.logitech.Schedule;
 
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.RecipeSupporter;
-
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+
+import me.matl114.logitech.Utils.Debug;
+import me.matl114.logitech.Utils.RecipeSupporter;
 
 public class SchedulePostRegister {
     //在服务器启动之后执行的初始化

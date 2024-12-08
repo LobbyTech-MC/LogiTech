@@ -1,13 +1,19 @@
 package me.matl114.logitech.SlimefunItem.Machines;
 
+import java.util.HashSet;
+import java.util.function.IntFunction;
+
+import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import me.matl114.logitech.SlimefunItem.AddSlimefunItems;
 import me.matl114.logitech.SlimefunItem.Blocks.Laser;
 import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.FinalAltarCore;
 import me.matl114.logitech.SlimefunItem.Items.ReplaceCard;
 import me.matl114.logitech.Utils.CraftUtils;
-import me.matl114.logitech.Utils.Debug;
 import me.matl114.logitech.Utils.Settings;
 import me.matl114.logitech.Utils.UtilClass.CargoClass.Directions;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusher;
@@ -15,14 +21,7 @@ import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusherProvider;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemReplacerPusher;
 import me.matl114.logitech.Utils.UtilClass.StorageClass.ItemStorageCache;
 import me.matl114.logitech.Utils.UtilClass.StorageClass.LocationStorageProxy;
-import me.matl114.logitech.Utils.UtilClass.StorageClass.StorageType;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.HashSet;
-import java.util.function.IntFunction;
 
 public class FinalFeature {
     public static ItemPusherProvider STORAGE_READER =new ItemPusherProvider() {

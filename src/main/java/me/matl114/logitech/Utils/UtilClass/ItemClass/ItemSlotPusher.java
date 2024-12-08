@@ -1,14 +1,12 @@
 package me.matl114.logitech.Utils.UtilClass.ItemClass;
 
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.MenuUtils;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import javax.annotation.Nonnull;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.annotation.Nonnull;
+import me.matl114.logitech.Utils.MenuUtils;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 /**
  * ItemPusher for menu slot

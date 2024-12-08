@@ -1,22 +1,12 @@
 package me.matl114.logitech.SlimefunItem.Machines.Electrics;
 
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.core.attributes.EnergyNetComponent;
-import me.matl114.logitech.SlimefunItem.Interface.DirectionalBlock;
-import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.Settings;
-import me.matl114.logitech.Utils.UtilClass.CargoClass.Directions;
-import me.matl114.logitech.Utils.UtilClass.FunctionalClass.Counter;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Set;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -26,8 +16,21 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.*;
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import me.matl114.logitech.SlimefunItem.Interface.DirectionalBlock;
+import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.Settings;
+import me.matl114.logitech.Utils.UtilClass.CargoClass.Directions;
+import me.matl114.logitech.Utils.UtilClass.FunctionalClass.Counter;
+import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
 public abstract class AbstractPipe extends AbstractMachine implements DirectionalBlock {
     protected final int[] INPUT_SLOTS=new int[0];

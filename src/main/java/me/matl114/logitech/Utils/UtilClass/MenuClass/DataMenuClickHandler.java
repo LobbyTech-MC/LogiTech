@@ -1,8 +1,9 @@
 package me.matl114.logitech.Utils.UtilClass.MenuClass;
 
-import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
+
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 
 public interface DataMenuClickHandler extends ChestMenu.MenuClickHandler {
     default int getInt(int val){

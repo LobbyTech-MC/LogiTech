@@ -1,13 +1,13 @@
 package me.matl114.logitech.Utils.UtilClass.EntityClass;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public abstract class DisplayBuilder <T extends DisplayBuilder<T> > {
     protected Transformation transformation;
