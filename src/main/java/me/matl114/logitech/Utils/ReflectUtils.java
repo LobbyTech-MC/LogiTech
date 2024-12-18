@@ -12,20 +12,22 @@ public class ReflectUtils {
     public static  Object invokeGetRecursively(Object target, Settings mod, String declared){
         return invokeGetRecursively(target,target.getClass(),mod,declared);
     }
-    public static  Object invokeGetRecursively(Object target, Class clazz, Settings mod, String decleared){
+    public static  Object invokeGetRecursively(Object target, Class<?> clazz, Settings mod, String decleared){
 //        if(Debug.debug){
 //            Debug.debug("try invoke ",clazz);
 //        }
         try{
             switch (mod){
                 case FIELD:
-//                    if(clazz.getName().endsWith("AbstractMachineBlock")){
-//                        Debug.debug("try print this");
-//                        Field[] fields=clazz.getDeclaredFields();
-//                        for(Field f:fields){
-//                            Debug.debug(f.getName());
-//                        }
-//                    }
+                	/*
+                    if(clazz.getName().endsWith("MaterialGenerator")){
+                        Debug.debug("try print this");
+                        Field[] fields=clazz.getDeclaredFields();
+                        for(Field f:fields){
+                            Debug.debug(f.getName());
+                        }
+                    }
+                    */
                     //Debug.debug("start find field ",decleared);
                     Field _hasType=clazz.getDeclaredField(decleared);
                    // Debug.debug("find field");
@@ -50,7 +52,7 @@ public class ReflectUtils {
     public static boolean invokeSetRecursively(Object target,  String declared,Object value){
         return invokeSetRecursively(target,target.getClass(),declared,value);
     }
-    public static boolean invokeSetRecursively(Object target,Class clazz, String decleared,Object value){
+    public static boolean invokeSetRecursively(Object target,Class<?> clazz, String decleared,Object value){
         try{
             Field _hasType=clazz.getDeclaredField(decleared);
             _hasType.setAccessible(true);
@@ -65,11 +67,11 @@ public class ReflectUtils {
             return invokeSetRecursively(target,clazz,decleared,value);
         }
     }
-    public static Object invokeMethodRecursively(Object target,Class clazz,Settings mod,String declared,Object ... args){
+    public static Object invokeMethodRecursively(Object target,Class<?> clazz,Settings mod,String declared,Object ... args){
         return null;
 
     }
-    public static    void printAllDeclared(Class clazz,Settings mod){
+    public static void printAllDeclared(Class<?> clazz,Settings mod){
         if(mod==Settings.FIELD){
             Field[] fields=clazz.getDeclaredFields();
             for(Field f:fields){
@@ -84,11 +86,11 @@ public class ReflectUtils {
             }
         }
     }
-    public static Pair<Field,Class> getDeclaredFieldsRecursively(Class clazz, String fieldName){
+    public static Pair<Field, Class<?>> getDeclaredFieldsRecursively(Class<?> clazz, String fieldName){
         try{
             Field field=clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
-            return new Pair(field,clazz);
+            return new Pair<Field, Class<?>>(field,clazz);
         }catch (Throwable e){
             clazz=clazz.getSuperclass();
             if(clazz==null){
@@ -98,7 +100,7 @@ public class ReflectUtils {
             }
         }
     }
-    public static List<Field> getAllDeclaredFieldsRecursively(Class clazz){
+    public static List<Field> getAllDeclaredFieldsRecursively(Class<?> clazz){
         List<Field> fieldList=new ArrayList<>();
         if(clazz==null){
             return fieldList;
@@ -115,11 +117,11 @@ public class ReflectUtils {
         fieldList.addAll(getAllDeclaredFieldsRecursively(clazz.getSuperclass()));
         return fieldList;
     }
-    public static Pair<Method,Class> getDeclaredMethodsRecursively(Class clazz, String fieldName,Class[] parameterTypes){
+    public static Pair<Method, Class<?>> getDeclaredMethodsRecursively(Class<?> clazz, String fieldName,Class[] parameterTypes){
         try{
             Method field=clazz.getDeclaredMethod(fieldName,parameterTypes);
             field.setAccessible(true);
-            return new Pair(field,clazz);
+            return new Pair<Method, Class<?>>(field,clazz);
         }catch (Throwable e){
             clazz=clazz.getSuperclass();
             if(clazz==null){
@@ -129,7 +131,7 @@ public class ReflectUtils {
             }
         }
     }
-    public static Pair< Method,Class> getSuitableMethod(Class clazz,String methodName,Class[] parameterTypes){
+    public static Pair< Method,Class> getSuitableMethod(Class<?> clazz,String methodName,Class[] parameterTypes){
         try{
             Method[] methods=clazz.getDeclaredMethods();
             for(Method m:methods){
@@ -161,9 +163,9 @@ public class ReflectUtils {
         if(clazz==null){return null;}
         return getSuitableMethod(clazz,methodName,parameterTypes);
     }
-    public static Constructor getSuitableConstructor(Class clazz,Class... parameterTypes){
+    public static Constructor<?> getSuitableConstructor(Class<?> clazz,Class<?>... parameterTypes){
         Constructor[] constructors=clazz.getDeclaredConstructors();
-        for(Constructor c:constructors){
+        for(Constructor<?> c:constructors){
             Class[] params=c.getParameterTypes();
             boolean match=true;
             if(params.length==parameterTypes.length){
@@ -184,7 +186,7 @@ public class ReflectUtils {
         }
         return null;
     }
-    public static boolean isExtendedFrom(Class clazz,String s){
+    public static boolean isExtendedFrom(Class<?> clazz,String s){
         if(clazz==null){
             return false;
         }else {

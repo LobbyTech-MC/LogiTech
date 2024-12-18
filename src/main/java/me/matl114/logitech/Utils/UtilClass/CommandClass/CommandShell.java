@@ -592,7 +592,7 @@ public class CommandShell {
                 if(cls.isEnum()){
                     res=Enum.valueOf(cls,argv[0]);
                 }else {
-                    Pair<Field,Class> result= ReflectUtils.getDeclaredFieldsRecursively(cls,argv[0]);
+                    Pair<Field, Class<?>> result= ReflectUtils.getDeclaredFieldsRecursively(cls,argv[0]);
                     if(result==null){
                         return classFieldNotFound(shell,cls);
                     }else {
@@ -629,7 +629,7 @@ public class CommandShell {
         public int cmd(String[] argv,CommandShell shell){
             Object obj=getVariable(shell,getPathVarName());
             if(obj instanceof Class clazz) {
-                Pair<Field,Class> result=ReflectUtils.getDeclaredFieldsRecursively(clazz,argv[0]);
+                Pair<Field, Class<?>> result=ReflectUtils.getDeclaredFieldsRecursively(clazz,argv[0]);
                 if(result==null){
                     return classFieldNotFound(shell,clazz);
                 }else {
@@ -698,7 +698,7 @@ public class CommandShell {
                 return variableNotInit(shell,argv[0]);
             }else {
                 Class clazz=obj.getClass();
-                Pair<Field,Class> result=ReflectUtils.getDeclaredFieldsRecursively(clazz,argv[1]);
+                Pair<Field, Class<?>> result=ReflectUtils.getDeclaredFieldsRecursively(clazz,argv[1]);
                 if(result==null){
                     return variableFieldNotFound(shell,argv[0]);
                 }else {
@@ -768,7 +768,7 @@ public class CommandShell {
                 return variableNotInit(shell,argv[0]);
             }else {
                 Class clazz=obj.getClass();
-                Pair<Field,Class> result=ReflectUtils.getDeclaredFieldsRecursively(clazz,argv[1]);
+                Pair<Field, Class<?>> result=ReflectUtils.getDeclaredFieldsRecursively(clazz,argv[1]);
                 if(result==null){
                     return variableFieldNotFound(shell,argv[0]);
                 }else {
