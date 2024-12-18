@@ -40,6 +40,9 @@ public class TestStorageUnit extends AbstractMachine {
     }
     public void constructMenu(BlockMenuPreset preset){
         preset.setSize(54);
+        preset.addMenuOpeningHandler((player -> {
+            Debug.stackTrace();
+        }));
         preset.addMenuClickHandler(18,(player, i, itemStack, clickAction)->{
 
             new MenuFactory(MenuUtils.SIMPLE_MENU,"测试BYD",4){

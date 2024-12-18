@@ -5,21 +5,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
-import me.matl114.logitech.Unittest;
-import me.matl114.logitech.Listeners.Listeners.BlockMenuClickProtectListener;
-import me.matl114.logitech.Listeners.Listeners.BlockOpenListener;
-import me.matl114.logitech.Listeners.Listeners.CraftingListener;
-import me.matl114.logitech.Listeners.Listeners.LaserGunOnHeadListener;
-import me.matl114.logitech.Listeners.Listeners.MilkListener;
-import me.matl114.logitech.Listeners.Listeners.PlayerQuiteListener;
-import me.matl114.logitech.Listeners.Listeners.PortalTeleport;
-import me.matl114.logitech.Listeners.Listeners.PotionClearOnDeath;
-import me.matl114.logitech.Listeners.Listeners.SlimefunBlockPlaceLimitListener;
-import me.matl114.logitech.Listeners.Listeners.SpawnerListener;
-import me.matl114.logitech.Listeners.Listeners.StorageWorldListener;
-import me.matl114.logitech.Listeners.Listeners.SuperSpongeDryListener;
-import me.matl114.logitech.SlimefunItem.Cargo.SpaceStorage.StorageSpace;
-import me.matl114.logitech.Utils.Debug;
+import java.util.List;
 
 public class ListenerManager {
     public static void registerListeners(Plugin plugin,PluginManager manager){
@@ -43,6 +29,9 @@ public class ListenerManager {
         }
         register(BLOCKMENU_PROTECT_LISTENER);
         register(SLIMEFUN_BLOCKLIMIT_LISTENER);
+        register(TICKERBLOCK_PLACE_LISTENER);
+        register(MULTIBLOCK_BREAK_LISTENER);
+        register(SMITH_INTERFACE_LISTENER);
     }
     public static Plugin plugin;
     public static PluginManager manager;
@@ -63,4 +52,7 @@ public class ListenerManager {
     public static final Listener STORAGESPACE_PROTECTION=new StorageWorldListener();
     public static final Listener BLOCKMENU_PROTECT_LISTENER=new BlockMenuClickProtectListener();
     public static final Listener SLIMEFUN_BLOCKLIMIT_LISTENER=new SlimefunBlockPlaceLimitListener();
+    public static final Listener TICKERBLOCK_PLACE_LISTENER=new TickBlockListener();
+    public static final Listener MULTIBLOCK_BREAK_LISTENER=new MultiBlockVanillaPartListener();
+    public static final Listener SMITH_INTERFACE_LISTENER=new SmithInterfaceListener();
 }

@@ -45,17 +45,12 @@ import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction
 import me.matl114.logitech.Language;
 import me.matl114.logitech.MyAddon;
 import me.matl114.logitech.Schedule.Schedules;
-import me.matl114.logitech.Schedule.PersistentEffects.RadiationRegion;
-import me.matl114.logitech.SlimefunItem.Blocks.AbstractBlock;
-import me.matl114.logitech.SlimefunItem.Blocks.AbstractSpawner;
-import me.matl114.logitech.SlimefunItem.Blocks.Laser;
-import me.matl114.logitech.SlimefunItem.Blocks.SpreadBlock;
-import me.matl114.logitech.SlimefunItem.Blocks.WitherProofBlock;
-import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.FinalAltarCore;
-import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.MultiIOPort;
-import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.PortalCore;
-import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SolarReactorCore;
-import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.Transmutator;
+import me.matl114.logitech.SlimefunItem.Blocks.*;
+import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.*;
+import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SmithWorkShop.SWAmplifyComponent;
+import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SmithWorkShop.SmithInterfaceProcessor;
+import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SmithWorkShop.SmithingInterface;
+import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SmithWorkShop.SmithingWorkshop;
 import me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore.MultiBlockTypes;
 import me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore.MultiPart;
 import me.matl114.logitech.SlimefunItem.Cargo.TestStorageUnit;
@@ -175,6 +170,23 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecip
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
+import org.bukkit.*;
+import org.bukkit.block.Biome;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Waterlogged;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.SpongeAbsorbEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * register main
@@ -519,13 +531,13 @@ public class AddSlimefunItems {
             .register();
 
     public static final SlimefunItem PDCECDMD=new MaterialItem(AddGroups.MATERIAL,AddItem.PDCECDMD,AddSlimefunItems.STARSMELTERY,
-            recipe("64PLUTONIUM",setC(AddItem.CERIUM,64),setC(AddItem.CADMIUM_INGOT,64),
-                    setC(AddItem.MENDELEVIUM,64),setC(AddItem.LSINGULARITY,1)
+            recipe("18PLUTONIUM",setC(AddItem.CERIUM,64),setC(AddItem.CADMIUM_INGOT,64),
+                    setC(AddItem.MENDELEVIUM,48),setC(AddItem.LSINGULARITY,1)
                     ),null)
             .register();
     public static final SlimefunItem HGTLPBBI=new MaterialItem(AddGroups.MATERIAL,AddItem.HGTLPBBI,AddSlimefunItems.STARSMELTERY,
             recipe(setC(AddItem.HYDRAGYRUM,64),setC(AddItem.THALLIUM,64),
-                    "64LEAD_INGOT",setC(AddItem.BISILVER,16),setC(AddItem.LSINGULARITY,1)),null)
+                    "64LEAD_INGOT",setC(AddItem.BISILVER,12),setC(AddItem.LSINGULARITY,1)),null)
             .register();
     public static final SlimefunItem REINFORCED_CHIP_INGOT=new MaterialItem(AddGroups.MATERIAL,AddItem.REINFORCED_CHIP_INGOT,AddSlimefunItems.STARSMELTERY,
             recipe(setC(AddItem.STAR_GOLD_INGOT,40),setC(AddItem.CHIP_INGOT,16),
@@ -609,7 +621,7 @@ public class AddSlimefunItems {
             recipe("REDSTONE","LEAD_INGOT","REDSTONE","LEAD_INGOT","WITHER_PROOF_OBSIDIAN","LEAD_INGOT",
                     "REDSTONE","LEAD_INGOT","REDSTONE"))
             .register().setOutput(setC(AddItem.WITHERPROOF_REDS,4));
-    public static final MyVanillaItem UNBREAKING_SHIELD=new MyVanillaItem(AddGroups.SPECIAL,AddItem.UNBREAKING_SHIELD,"UNBREAKING_SHIELD",BukkitUtils.VANILLA_CRAFTTABLE,
+    public static final MyVanillaItem UNBREAKING_SHIELD=new MyVanillaItem(AddGroups.TOOLS,AddItem.UNBREAKING_SHIELD,"UNBREAKING_SHIELD",BukkitUtils.VANILLA_CRAFTTABLE,
             recipe("IRON_BLOCK","DAMASCUS_STEEL_INGOT","IRON_BLOCK","IRON_BLOCK","OBSIDIAN","IRON_BLOCK",
             null,"IRON_BLOCK",null)).register();
     //machines
@@ -1159,11 +1171,8 @@ public class AddSlimefunItems {
                     AddItem.BISILVER,AddItem.SPACE_PLATE,setC(AddItem.LSINGULARITY,1),setC(AddItem.LSINGULARITY,1),AddItem.SPACE_PLATE,AddItem.BISILVER,
                     AddItem.PDCECDMD,AddItem.LPLATE,AddItem.LMOTOR,AddItem.LMOTOR,AddItem.LPLATE,AddItem.PDCECDMD))
             .register();
-    public static final  SlimefunItem ATTR_OP=new AttributeOperator(AddGroups.SPECIAL, AddItem.ATTR_OP,RecipeType.MAGIC_WORKBENCH,
-            recipe("AUTO_DISENCHANTER_2",AddItem.LENGINE,"AUTO_DISENCHANTER_2",AddItem.STAR_GOLD_INGOT,"BOOK_BINDER",AddItem.STAR_GOLD_INGOT,
-                    "AUTO_ENCHANTER_2",AddItem.LENGINE,"AUTO_ENCHANTER_2"), 1200,120)
-            .register();
-    public static final  SlimefunItem ITEM_OP=new ItemOperator(AddGroups.SPECIAL, AddItem.ITEM_OP,RecipeType.ENHANCED_CRAFTING_TABLE,
+
+    public static final  SlimefunItem ITEM_OP=new ItemOperator(AddGroups.TOOLS, AddItem.ITEM_OP,RecipeType.ENHANCED_CRAFTING_TABLE,
             recipe("NAME_TAG","CRYING_OBSIDIAN","NAME_TAG","AUTO_DISENCHANTER_2","AUTO_ANVIL_2","AUTO_ENCHANTER_2",
                     "ENCHANTING_TABLE","ANVIL","SMITHING_TABLE"), 0,0)
             .register();
@@ -1231,6 +1240,7 @@ public class AddSlimefunItems {
                         AddUtils.forceGive(p,AddItem.SUPERSPONGE_USED,1);
                         final HashSet<Block> liquids=new HashSet<>();
                         final HashSet<Block> blockInLiquids=new HashSet<>();
+                        final HashSet<Block> forceLiquids=new HashSet<>();
                         Schedules.launchSchedules(()->{
                             COOL_DOWN.add(p);
                             try{
@@ -1248,22 +1258,24 @@ public class AddSlimefunItems {
                                                 }
                                                 else if(WorldUtils.isWaterLogged(checkBlock)){
                                                     blockInLiquids.add(checkBlock);
+                                                }else if(WorldUtils.BLOCK_MUST_WATERLOGGED.contains(checkBlock.getType())){
+                                                    forceLiquids.add(checkBlock);
                                                 }
                                             }
 
                                         }
                                     }
                                 }
-                                List<BlockState> blocksToBeChanged=new ArrayList<>(liquids.size()+blockInLiquids.size()+2);
-                                for(Block b:liquids){
-                                    blocksToBeChanged.add(b.getState());
-                                }
-                                for(Block b:blockInLiquids){
-                                    blocksToBeChanged.add(b.getState());
-                                }
-                                if(!blocksToBeChanged.isEmpty()){
+                                if(!liquids.isEmpty()||!blockInLiquids.isEmpty()||!forceLiquids.isEmpty()){
                                     AddUtils.sendMessage(p,"&a搜索完成,正在吸取液体");
                                     BukkitUtils.executeSync(()->{
+                                        List<BlockState> blocksToBeChanged=new ArrayList<>(liquids.size()+blockInLiquids.size()+2);
+                                        for(Block b:liquids){
+                                            blocksToBeChanged.add(b.getState());
+                                        }
+                                        for(Block b:blockInLiquids){
+                                            blocksToBeChanged.add(b.getState());
+                                        }
                                         SpongeAbsorbEvent spongeAbsorbEvent=new SpongeAbsorbEvent(loc.getBlock(),blocksToBeChanged);
                                         Bukkit.getPluginManager().callEvent(spongeAbsorbEvent);
                                         if(spongeAbsorbEvent.isCancelled()){
@@ -1279,7 +1291,16 @@ public class AddSlimefunItems {
                                                     b.setBlockData(data,true);
                                                 }
                                             }
+
                                             AddUtils.sendMessage(p,"&a成功移除液体!");
+                                        }
+                                        if(!forceLiquids.isEmpty()){
+                                            for(Block b:forceLiquids){
+                                                if(WorldUtils.testVanillaBlockBreakPermission(b,p,false)){
+                                                    b.setType(Material.AIR);
+                                                }
+                                            }
+                                            AddUtils.sendMessage(p,"&a成功移除海草和海带!");
                                         }
                                     });
                                 }else{
@@ -1697,21 +1718,21 @@ public class AddSlimefunItems {
                                 "128EMERALD",8)
                 )));
                 put(mkl(AddItem.NETHER_FEAT),mkl(AddUtils.randItemStackFactory(
-                        mkMp("64NETHERITE_INGOT",1,
-                                "256QUARTZ",1,
+                        mkMp("48NETHERITE_INGOT",1,
+                                "192QUARTZ",1,
                                 "64MAGMA_BLOCK",1,
                                 "64OBSIDIAN",1,
                                 "64ANCIENT_DEBRIS",1,
-                                "4NETHER_ICE",1)
+                                "12NETHER_ICE",1)
                 )));
                 put(mkl(AddItem.END_FEAT),mkl(AddUtils.randItemStackFactory(
-                        mkMp("4DRAGON_BREATH",2,
+                        mkMp("8DRAGON_BREATH",2,
                        // "4CHORUS_FLOWER",2,
                                 "16ENDER_EYE",2,
                                 "16ENDER_PEARL",2,
-                                "4BUCKET_OF_OIL",2,
-                                AddItem.STAR_GOLD,2,
-                                AddItem.DIMENSIONAL_SHARD,2
+                                "12BUCKET_OF_OIL",2,
+                                setC(AddItem.STAR_GOLD,20),2,
+                                setC(AddItem.DIMENSIONAL_SHARD,36),2
                         )
                 )));
             }})
@@ -2109,8 +2130,29 @@ public class AddSlimefunItems {
                     )
             )
             .register();
+    public static final  SlimefunItem TIMER_RD=new TimerRandomtick(AddGroups.ADVANCED, AddItem.TIMER_RD,COMMON_TYPE,
+            recipe(setC(AddItem.CHIP_CORE,4),setC(AddItem.BISILVER,4),setC(AddItem.LSINGULARITY,3),setC(AddItem.LSINGULARITY,3),setC(AddItem.BISILVER,4),setC(AddItem.CHIP_CORE,4),
+                    setC(AddItem.STAR_GOLD_INGOT,3),setC(AddItem.LSCHEDULER,2),setC(AddItem.TECH_CORE,4),setC(AddItem.TECH_CORE,4),setC(AddItem.LSCHEDULER,2),setC(AddItem.STAR_GOLD_INGOT,3),
+                    setC(AddItem.STAR_GOLD_INGOT,3),setC(AddItem.WORLD_FEAT,3),"6TREE_GROWTH_ACCELERATOR","6TREE_GROWTH_ACCELERATOR",setC(AddItem.WORLD_FEAT,3),setC(AddItem.STAR_GOLD_INGOT,3),
+                    setC(AddItem.STAR_GOLD_INGOT,3),setC(AddItem.NETHER_FEAT,3),"3ANIMAL_GROWTH_ACCELERATOR","3ANIMAL_GROWTH_ACCELERATOR",setC(AddItem.NETHER_FEAT,3),setC(AddItem.STAR_GOLD_INGOT,3),
+                    setC(AddItem.STAR_GOLD_INGOT,3),setC(AddItem.END_FEAT,3),"6CROP_GROWTH_ACCELERATOR_2","6CROP_GROWTH_ACCELERATOR_2",setC(AddItem.END_FEAT,3),setC(AddItem.STAR_GOLD_INGOT,3),
+                    setC(AddItem.CHIP_CORE,4),setC(AddItem.BISILVER,4),setC(AddItem.LENGINE,2),setC(AddItem.LENGINE,2),setC(AddItem.BISILVER,4),setC(AddItem.CHIP_CORE,4)), 0,0)
+            .register();
+    public static final  SlimefunItem TIMER_BLOCKENTITY=new TimerBlockEntity(AddGroups.ADVANCED, AddItem.TIMER_BLOCKENTITY,COMMON_TYPE,
+            recipe(setC(AddItem.LSINGULARITY,6),AddItem.DIMENSIONAL_SINGULARITY,AddItem.VIRTUAL_SPACE,AddItem.VIRTUAL_SPACE,AddItem.DIMENSIONAL_SINGULARITY,setC(AddItem.LSINGULARITY,6),
+                    AddItem.DIMENSIONAL_SINGULARITY,setC(AddItem.MOLYBDENUM,32),AddItem.SPACE_PLATE,AddItem.SPACE_PLATE,setC(AddItem.MOLYBDENUM,32),AddItem.DIMENSIONAL_SINGULARITY,
+                    AddItem.DIMENSIONAL_SINGULARITY,AddItem.LASER,AddItem.TECH_CORE,AddItem.TECH_CORE,AddItem.LASER,AddItem.DIMENSIONAL_SINGULARITY,
+                    AddItem.DIMENSIONAL_SINGULARITY,AddItem.LASER,AddItem.TECH_CORE,AddItem.TECH_CORE,AddItem.LASER,AddItem.DIMENSIONAL_SINGULARITY,
+                    AddItem.DIMENSIONAL_SINGULARITY,setC(AddItem.DYSPROSIUM,32),setC(AddItem.LSCHEDULER,2),setC(AddItem.LSCHEDULER,2),setC(AddItem.DYSPROSIUM,32),AddItem.DIMENSIONAL_SINGULARITY,
+                    setC(AddItem.LSINGULARITY,6),AddItem.DIMENSIONAL_SINGULARITY,AddItem.PDCECDMD,AddItem.PDCECDMD,AddItem.DIMENSIONAL_SINGULARITY,setC(AddItem.LSINGULARITY,6)),0,0)
+            .register();
 
-
+    public static final  SlimefunItem TIMER_SF=new TimerSlimefun(AddGroups.ADVANCED, AddItem.TIMER_SF,RecipeType.NULL,
+            AddUtils.formatInfoRecipe(AddItem.TMP1,Language.get("Tmp.TMP1.Name")),0,0)
+            .register();
+//    public static final  SlimefunItem TIMER_SF_SEQ=new TimerSequentialSlimefun(AddGroups.ADVANCED, AddItem.TIMER_SF_SEQ,RecipeType.NULL,
+//            AddUtils.formatInfoRecipe(AddItem.TMP1,Language.get("Tmp.TMP1.Name")),0,0)
+//            .register();
 
     //
     //manuals
@@ -2513,11 +2555,11 @@ public class AddSlimefunItems {
     public static final SlimefunItem RECIPE_LOGGER=new RegisteryLogger(AddGroups.SPECIAL,AddItem.RECIPE_LOGGER,RecipeType.ENHANCED_CRAFTING_TABLE,
             recipe(null,null,null,"CRAFTING_TABLE",BUG,Material.WRITABLE_BOOK,null,null))
             .register();
-    public static final SlimefunItem LASER_GUN= new LaserGun(AddGroups.SPECIAL, AddItem.LASER_GUN, RecipeType.ANCIENT_ALTAR,
+    public static final SlimefunItem LASER_GUN= new LaserGun(AddGroups.TOOLS, AddItem.LASER_GUN, SmithInterfaceProcessor.INTERFACED_CRAFTTABLE,
             recipe(AddItem.STAR_GOLD_INGOT, AddItem.LSINGULARITY, AddItem.STAR_GOLD_INGOT, "ENERGIZED_CAPACITOR", AddItem.LASER, "ENERGIZED_CAPACITOR",
                     AddItem.STAR_GOLD_INGOT, AddItem.LSINGULARITY, AddItem.STAR_GOLD_INGOT))
             .register();
-    public static final SlimefunItem TRACE_ARROW=new TrackingArrowLauncher(AddGroups.SPECIAL,AddItem.TRACE_ARROW,RecipeType.ANCIENT_ALTAR,
+    public static final SlimefunItem TRACE_ARROW=new TrackingArrowLauncher(AddGroups.TOOLS,AddItem.TRACE_ARROW,SmithInterfaceProcessor.INTERFACED_CRAFTTABLE,
             recipe(AddItem.LSINGULARITY,"EXPLOSIVE_BOW",AddItem.LSINGULARITY,"ENERGIZED_CAPACITOR",AddItem.ATOM_INGOT,"ENERGIZED_CAPACITOR",
                     AddItem.LSINGULARITY,"ICY_BOW",AddItem.LSINGULARITY))
             .register();
@@ -2895,6 +2937,56 @@ public class AddSlimefunItems {
     }
             .register();
 
+
+    public static final  SlimefunItem SMITH_WORKSHOP=new SmithingWorkshop(AddGroups.TOOLS, AddItem.SMITH_WORKSHOP,COMMON_TYPE,
+            recipe(AddItem.BISILVER,AddItem.SPACE_PLATE,"ENERGIZED_CAPACITOR","ENERGIZED_CAPACITOR",AddItem.SPACE_PLATE,AddItem.BISILVER,
+                    AddItem.BISILVER,setC(AddItem.SMELERY_CORE,3),AddItem.LSCHEDULER,AddItem.LSCHEDULER,setC(AddItem.SMELERY_CORE,3),AddItem.BISILVER,
+                    setC(AddItem.PAGOLD,2),setC(AddItem.SMELERY_CORE,3),setC(AddItem.LSINGULARITY,16),setC(AddItem.LSINGULARITY,16),setC(AddItem.SMELERY_CORE,3),setC(AddItem.PAGOLD,2),
+                    setC(AddItem.PAGOLD,2),setC(AddItem.SMELERY_CORE,3),setC(AddItem.LSINGULARITY,16),setC(AddItem.LSINGULARITY,16),setC(AddItem.SMELERY_CORE,3),setC(AddItem.PAGOLD,2),
+                    AddItem.BISILVER,setC(AddItem.SMELERY_CORE,3),AddItem.LENGINE,AddItem.LENGINE,setC(AddItem.SMELERY_CORE,3),AddItem.BISILVER,
+                    AddItem.BISILVER,setC(AddItem.ATOM_INGOT,8),"ENERGIZED_CAPACITOR","ENERGIZED_CAPACITOR",setC(AddItem.ATOM_INGOT,8),AddItem.BISILVER), "smith.core")
+            .setDisplayRecipes(
+                    Utils.list(
+                            AddUtils.getInfoShow("&f机制",
+                                    "&7该机器需要搭建锻铸工坊的结构方可运行",
+                                    "&7该多方块投影中海晶灯部分需放置\"工坊接口\"",
+                                    "&7其余方块均为原版方块",
+                                    "&7对于铜质组成部分,任意生锈状态/打蜡状态的同类型方块均可识别",
+                                    "&a每多搭建一层该机器并行处理数x2(即机器快一倍)"),null,
+                            AddUtils.getInfoShow("&f机制",
+                                    "&7任意\"工坊接口\"类型的机器需要在该多方块",
+                                    "&7中方可执行其功效",
+                                    "&7"
+                            ),null
+                    )
+            )
+            .register();
+    public static final  SlimefunItem SMITH_INTERFACE_NONE=new SmithingInterface(AddGroups.TOOLS, AddItem.SMITH_INTERFACE_NONE,RecipeType.ENHANCED_CRAFTING_TABLE,
+            recipe(AddItem.ATOM_INGOT,AddItem.ATOM_INGOT,AddItem.ATOM_INGOT,AddItem.ATOM_INGOT,AddItem.TECH_CORE,AddItem.ATOM_INGOT,
+                    AddItem.ATOM_INGOT,AddItem.ATOM_INGOT,AddItem.ATOM_INGOT),0,0,false)
+            .register();
+    public static final  SlimefunItem SMITH_INTERFACE_CRAFT=new SmithInterfaceProcessor(AddGroups.TOOLS, AddItem.SMITH_INTERFACE_CRAFT,RecipeType.ENHANCED_CRAFTING_TABLE,
+            recipe(AddItem.STAR_GOLD_INGOT,AddItem.BUG,AddItem.STAR_GOLD_INGOT,"CRAFTING_TABLE",AddItem.SMITH_INTERFACE_NONE,"CRAFTING_TABLE",
+                    AddItem.STAR_GOLD_INGOT,AddItem.CARGO_PIP,AddItem.STAR_GOLD_INGOT),24_000,1200)
+            .register();
+
+    public static final  SlimefunItem ATTR_OP=new AttributeOperator(AddGroups.TOOLS, AddItem.ATTR_OP,RecipeType.MAGIC_WORKBENCH,
+            recipe("AUTO_DISENCHANTER_2",AddItem.LENGINE,"AUTO_DISENCHANTER_2",AddItem.STAR_GOLD_INGOT,"BOOK_BINDER",AddItem.STAR_GOLD_INGOT,
+                    "AUTO_ENCHANTER_2",AddItem.LENGINE,"AUTO_ENCHANTER_2"), 1200,120)
+            .register();
+    public static final SlimefunItem AMPLIFY_BASE=new MaterialItem(AddGroups.TOOLS,AddItem.AMPLIFY_BASE,RecipeType.ENHANCED_CRAFTING_TABLE,
+            recipe(AddItem.BUG,AddItem.PAGOLD,AddItem.BUG,AddItem.PAGOLD,AddItem.HGTLPBBI,AddItem.PAGOLD,
+                    AddItem.BUG,AddItem.PAGOLD,AddItem.BUG),null)
+            .register()
+            .setOutput(setC(AddItem.AMPLIFY_BASE,6));
+    public static final SWAmplifyComponent SWAMP_SPEED=(SWAmplifyComponent)new SWAmplifyComponent(AddGroups.TOOLS,AddItem.SWAMP_SPEED,SmithInterfaceProcessor.INTERFACED_CRAFTTABLE,
+            recipe(AddItem.ATOM_INGOT,AddItem.ATOM_INGOT,AddItem.ATOM_INGOT,AddItem.ATOM_INGOT,AddItem.AMPLIFY_BASE,AddItem.ATOM_INGOT,
+                    AddItem.ATOM_INGOT,AddItem.ATOM_INGOT,AddItem.ATOM_INGOT))
+            .register();
+    public static final SWAmplifyComponent SWAMP_RANGE=(SWAmplifyComponent)new SWAmplifyComponent(AddGroups.TOOLS,AddItem.SWAMP_RANGE,SmithInterfaceProcessor.INTERFACED_CRAFTTABLE,
+            recipe(AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.AMPLIFY_BASE,AddItem.STAR_GOLD_INGOT,
+                    AddItem.STAR_GOLD_INGOT,AddItem.DIMENSIONAL_SINGULARITY,AddItem.STAR_GOLD_INGOT))
+            .register();
 
     public static final SlimefunItem TMP1=new MaterialItem(AddGroups.FUNCTIONAL,AddItem.TMP1,RecipeType.NULL,
             AddUtils.NULL_RECIPE.clone())

@@ -60,6 +60,27 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import javax.annotation.Nonnull;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AddUtils {
     public static final String ADDON_NAME=Language.getPlaceHolder("PLUGIN");
@@ -874,7 +895,7 @@ public class AddUtils {
         return stack;
     }
 
-    public static void sendMessage(Player p,String msg){
+    public static void sendMessage(CommandSender p, String msg){
         p.sendMessage(ChatColors.color(msg));
     }
     public static void sendTitle(Player p,String title,String subtitle){
@@ -955,7 +976,7 @@ public class AddUtils {
         return sb.toString();
     }
     public static void damageGeneric(Damageable e, double f){
-        e.setHealth(Math.max( e.getHealth()-f,0.0));
+        e.setHealth(Math.min( Math.max( e.getHealth()-f,0.0),e.getMaxHealth()));
     }
     public static ItemMeta setName(String name,ItemMeta meta){
         meta.setDisplayName(AddUtils.resolveColor(name));

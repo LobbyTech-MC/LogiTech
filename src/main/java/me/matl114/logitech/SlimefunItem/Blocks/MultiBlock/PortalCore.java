@@ -43,9 +43,9 @@ public class PortalCore extends MultiCore {
     protected final int HOLOGRAM_SLOT=8;
     protected final ItemStack TOGGLE_ITEM_ON=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换传送门状态","&7当前状态: &a开启","&7若需要更改目标坐标需要重新构建传送门");
     protected final ItemStack TOGGLE_ITEM_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6点击切换传送门状态","&7当前状态: &c关闭");
-    protected final ItemStack HOLOGRAM_ITEM_ON=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&7当前状态: &a南北向");
-    protected final ItemStack HOLOGRAM_ITEM_ON_2=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&7当前状态: &a东西向");
-    protected final ItemStack HOLOGRAM_ITEM_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6点击切换全息投影","&7当前状态: &c关闭");
+    protected final ItemStack HOLOGRAM_ITEM_ON=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&e或使用/logitech multiblock 查看搭建教程","&7当前状态: &a南北向");
+    protected final ItemStack HOLOGRAM_ITEM_ON_2=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&e或使用/logitech multiblock 查看搭建教程","&7当前状态: &a东西向");
+    protected final ItemStack HOLOGRAM_ITEM_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6点击切换全息投影","&e或使用/logitech multiblock 查看搭建教程","&7当前状态: &c关闭");
     protected final MultiBlockType MBTYPE;
     public HashMap<String,ItemStack> MBID_TO_ITEM=new HashMap<>(){{
         put("portal.part", AddItem.PORTAL_FRAME.clone());
@@ -64,8 +64,16 @@ public class PortalCore extends MultiCore {
     public MultiBlockType getMultiBlockType(){
         return MBTYPE;
     }
+    public MultiBlockService.MultiBlockBuilder BUILDER=((core, type, uid) -> {
+        BlockMenu inv= DataCache.getMenu(core);
+        if(inv!=null&&loadLink(inv)){
+            return  MultiBlockHandler.createHandler(core,type,uid);
+        }else {
+            return null;
+        }
+    });
     public MultiBlockService.MultiBlockBuilder getBuilder(){
-        return MultiBlockHandler::createHandler;
+        return BUILDER;
     }
     public boolean loadLink(BlockMenu inv){
         ItemStack link=inv.getItemInSlot(LINK_SLOT);
@@ -228,19 +236,13 @@ public class PortalCore extends MultiCore {
         }));
         updateMenu(inv,block,Settings.RUN);
     }
-    public void tick(Block b, BlockMenu menu,SlimefunBlockData data, int tickCount){
-        //in this case .blockMenu is null
-
-        if(MultiBlockService.acceptCoreRequest(b.getLocation(),getBuilder(),getMultiBlockType())){
-            processCore(b,menu);
-        }
-        process(b,menu,data);
-
-    }
     public void processCore(Block b, BlockMenu menu){
         if(menu.hasViewer()){
             updateMenu(menu,b,Settings.RUN);
         }
+    }
+    public boolean preCondition(Block b,BlockMenu inv,SlimefunBlockData data){
+        return inv.getItemInSlot(LINK_SLOT)!=null;
     }
 
     public void onBreak(BlockBreakEvent e, BlockMenu inv){

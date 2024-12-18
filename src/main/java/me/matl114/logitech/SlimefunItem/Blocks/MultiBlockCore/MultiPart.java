@@ -40,6 +40,6 @@ public class MultiPart extends AbstractBlock implements MultiBlockPart {
 //        }
         super.preRegister();
         handleMultiBlockPart(this);
-        registerTick(this);
+       // registerTick(this);
     }
 }

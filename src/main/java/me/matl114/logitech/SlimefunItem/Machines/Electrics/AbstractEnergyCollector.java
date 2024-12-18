@@ -1,10 +1,26 @@
 package me.matl114.logitech.SlimefunItem.Machines.Electrics;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
+import city.norain.slimefun4.utils.MathUtil;
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+import io.github.thebusybiscuit.slimefun4.api.ErrorReport;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.EnergyNetComponent;
+import io.github.thebusybiscuit.slimefun4.core.attributes.EnergyNetProvider;
+import io.github.thebusybiscuit.slimefun4.core.networks.energy.EnergyNetComponentType;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
+import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
+import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.SlimefunItem.Interface.EnergyProvider;
+import me.matl114.logitech.SlimefunItem.Interface.MenuTogglableBlock;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.MathUtils;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,7 +46,7 @@ import me.matl114.logitech.Utils.MathUtils;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
-public abstract class AbstractEnergyCollector extends AbstractEnergyMachine implements EnergyProvider{
+public abstract class AbstractEnergyCollector extends AbstractEnergyMachine implements EnergyProvider, MenuTogglableBlock {
     protected final int[] INPUT_SLOTS=new int[0];
     protected final int[] OUTPUT_SLOTS=new int[0];
     public int[] getInputSlots(){
@@ -65,26 +81,45 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
                 "&7范围发电机数目: %d/%d(max)".formatted(machine, getMaxCollectAmount()),
                 "&7发电机报错数目: %d".formatted(errors));
     }
+    public boolean isBorder(int i){
+        return i!=getLazySlot();
+    }
     public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for (int i=0;i<len;++i){
-            if(border[i]!=getLazySlot()){
+            if(isBorder(border[i])){
                 preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
             }
         }
         preset.addItem(getInfoSlot(),getInfoShow(0,0,0),ChestMenuUtils.getEmptyClickHandler());
     }
+    @Override
+    public boolean[] getStatus(BlockMenu inv) {
+        ItemStack itemStack=inv.getItemInSlot(getLazySlot());
+        if(itemStack!=null&&itemStack.getType()==Material.GREEN_STAINED_GLASS_PANE){
+            return new boolean[]{true};
+        }else {
+            return new boolean[]{false};
+        }
+    }
+
+    @Override
+    public void toggleStatus(BlockMenu inv, boolean... result) {
+        if(result[0]){
+            inv.replaceExistingItem(getLazySlot(),LAZY_ITEM_ON);
+        }else {
+            inv.replaceExistingItem(getLazySlot(),LAZY_ITEM_OFF);
+        }
+    }
     public void newMenuInstance(BlockMenu menu, Block block){
-        if(menu.getItemInSlot(getLazySlot())==null){
+        ItemStack icon=menu.getItemInSlot(getLazySlot());
+        if(icon==null||icon.getType()!=Material.RED_STAINED_GLASS_PANE){
             menu.replaceExistingItem(getLazySlot(),LAZY_ITEM_ON);
         }
         menu.addMenuClickHandler(getLazySlot(),((player, i, itemStack, clickAction) -> {
-            if(itemStack!=null&&itemStack.getType()==Material.GREEN_STAINED_GLASS_PANE){
-                menu.replaceExistingItem(getLazySlot(),LAZY_ITEM_OFF);
-            }else {
-                menu.replaceExistingItem(getLazySlot(),LAZY_ITEM_ON);
-            }
+            boolean t=getStatus(menu)[0];
+            toggleStatus(menu,!t);
             return false;
         }));
     }
@@ -110,8 +145,7 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
         int charge=this.getCharge(loc,data);
         int energyProvider=0;
         int errorMachine=0;
-        ItemStack lazymodItem= menu.getItemInSlot(getLazySlot());
-        boolean lazymod= lazymodItem==null||lazymodItem.getType()!=Material.RED_STAINED_GLASS_PANE;
+        boolean lazymod= getStatus(menu)[0];
         Collection<SlimefunBlockData> allDatas= getCollectRange(menu,b,data);
         if(allDatas!=null&&!allDatas.isEmpty()){
             Location testLocation;

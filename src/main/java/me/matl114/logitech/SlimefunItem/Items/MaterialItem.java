@@ -11,7 +11,7 @@ import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import me.matl114.logitech.SlimefunItem.AddHandlers;
 import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
 
-public final class MaterialItem extends CustomSlimefunItem {
+public class MaterialItem extends CustomSlimefunItem {
     public MaterialItem(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
         this.checkCanStack=false;

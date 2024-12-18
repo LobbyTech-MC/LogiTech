@@ -1,56 +1,31 @@
 package me.matl114.logitech.Utils;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.PriorityQueue;
-import java.util.function.IntFunction;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.AxolotlBucketMeta;
-import org.bukkit.inventory.meta.BannerMeta;
-import org.bukkit.inventory.meta.BlockDataMeta;
-import org.bukkit.inventory.meta.BlockStateMeta;
-import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.BundleMeta;
-import org.bukkit.inventory.meta.CompassMeta;
-import org.bukkit.inventory.meta.CrossbowMeta;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.FireworkEffectMeta;
-import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.MapMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.inventory.meta.SuspiciousStewMeta;
-import org.bukkit.inventory.meta.TropicalFishBucketMeta;
-
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.core.attributes.DistinctiveItem;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ActionType;
 import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
 import me.matl114.logitech.Utils.Algorithms.DynamicArray;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemCounter;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemGreedyConsumer;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusher;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusherProvider;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemSlotPusher;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.MultiItemStack;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.RandOutItem;
+
+import me.matl114.logitech.Utils.UtilClass.ItemClass.*;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import org.bukkit.Material;
+import org.bukkit.block.BlockState;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.*;
+
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.function.IntFunction;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 public class CraftUtils {
     private static final HashSet<Material> COMPLEX_MATERIALS = new HashSet<>(){{
@@ -83,11 +58,11 @@ public class CraftUtils {
         //add(Material.SHULKER_BOX);
         add(Material.BUNDLE);
     }};
-    public static final ItemStack DEFAULT_ITEMSTACK = new ItemStack(Material.STONE);
+    public static final ItemStack DEFAULT_ITEMSTACK=new ItemStack(Material.STONE);
     public static final ItemMeta NULL_META=(DEFAULT_ITEMSTACK.getItemMeta());
-    public static final Class<? extends ItemMeta> CRAFTMETAITEMCLASS=NULL_META.getClass();
-    public static final Class<ItemStack> ITEMSTACKCLASS=ItemStack.class;
-    public static Class<? extends ItemStack> CRAFTITEMSTACKCLASS;
+    public static final Class CRAFTMETAITEMCLASS=NULL_META.getClass();
+    public static final Class ITEMSTACKCLASS=ItemStack.class;
+    public static Class CRAFTITEMSTACKCLASS;
     public static ItemStack CRAFTITEMSTACK;
     public static Field CRAFTLORE;
     public static Field CRAFTDISPLAYNAME;
@@ -98,7 +73,6 @@ public class CraftUtils {
     public static boolean INVOKE_STACK_SUCCESS;
     static{
         try{
-        	
             CRAFTLORE=CRAFTMETAITEMCLASS.getDeclaredField("lore");
             CRAFTDISPLAYNAME=CRAFTMETAITEMCLASS.getDeclaredField("displayName");
             CRAFTLORE.setAccessible(true);
@@ -130,7 +104,6 @@ public class CraftUtils {
             //ITEMSTACKMETA.setAccessible(true);
             //INVOKE_STACK_SUCCESS=true;
             INVOKE_STACK_SUCCESS=false;
-
         }catch (Throwable e){
             Debug.logger("INVOKE STACK FAILED,PLEASE CHECK LOGGER!!!!!!");
             Debug.logger(e);
@@ -210,6 +183,14 @@ public class CraftUtils {
             return ItemGreedyConsumer.get(ro.getInstance());
         }
         return ItemGreedyConsumer.get(a);
+    }
+    public static ItemGreedyConsumer getGreedyConsumerOnce(ItemStack a){
+        return getGreedyConsumerAsAmount(a,1);
+    }
+    public static ItemGreedyConsumer getGreedyConsumerAsAmount(ItemStack a,int multiply){
+        ItemGreedyConsumer greedyConsumer=getGreedyConsumer(a);
+        greedyConsumer.setStackNum(multiply);
+        return greedyConsumer;
     }
 
     /**
@@ -1311,6 +1292,127 @@ public class CraftUtils {
         }
         return max;
     }
+    public static Pair<MachineRecipe, IntFunction<ItemGreedyConsumer[]>> matchNextShapedRecipe(BlockMenu inv, int[] inputs, List<MachineRecipe> recipes, int limit, boolean useHistory, Settings order, ItemPusherProvider pusher){
+        int delta;
+        switch(order){
+            case REVERSE:delta=-1;break;
+            case SEQUNTIAL:
+            default: delta=1;break;
+        }
+        int len = inputs.length;
+        ItemPusher[] inputItem=new ItemPusher[len];
+        IntFunction<ItemPusher> inputSlotInstance=pusher.getMenuInstance(Settings.INPUT,inv,inputs);
+        for(int i=0;i<len;++i){
+            inputItem[i]=inputSlotInstance.apply(i);
+        }
+        //end before anything
+        if(len==0)return null;
+        int recipeAmount=recipes.size();
+        int __index=0;
+        //if usehistory ,will suggest a better place to start
+        if(useHistory) {
+            __index= DataCache.getLastRecipe(inv.getLocation());
+            __index=(__index<0)?0:__index;
+            __index=(__index>=recipeAmount)?(recipeAmount-1):__index;
+        }
+
+        int __iter=__index;
+        MachineRecipe checkRecipe=recipes.get(__iter);
+        int craftAmount=matchShapedRecipe(inputItem,checkRecipe,limit);
+        if(craftAmount>0) {
+            final int finalAmount=craftAmount;
+            final MachineRecipe finalRecipe=checkRecipe;
+            final int index=__iter;
+            return new Pair<>(checkRecipe,(newLimit)->{
+                int amount=Math.min(newLimit,finalAmount);
+                ItemStack[] recipeInput=finalRecipe.getInput();
+                int len2=recipeInput.length;
+                for(int i=0;i<len2;++i){
+                    if(inputItem[i]!=null){
+                        inputItem[i].setAmount(inputItem[i].getAmount()-amount*recipeInput[i].getAmount());
+                        inputItem[i].updateMenu(inv);
+                    }
+                }
+                if(useHistory) {
+                    DataCache.setLastRecipe(inv.getLocation(),index);
+                }
+                ItemStack[] rpOut=finalRecipe.getOutput();
+                ItemGreedyConsumer[] output=new ItemGreedyConsumer[rpOut.length];
+                for(int i=0;i<output.length;++i){
+                    output[i]=getGreedyConsumer(rpOut[i]);
+                    output[i].setStackNum(amount);
+                }
+                return output;
+            });
+        }
+        __iter+=delta;
+        for(;__iter<recipeAmount&&__iter>=0;__iter+=delta){
+            checkRecipe=recipes.get(__iter);
+            craftAmount=matchShapedRecipe(inputItem,checkRecipe,limit);
+            if(craftAmount>0) {
+                final int finalAmount=craftAmount;
+                final MachineRecipe finalRecipe=checkRecipe;
+                final int index=__iter;
+                return new Pair<>(checkRecipe,(newLimit)->{
+                    int amount=Math.min(newLimit,finalAmount);
+                    ItemStack[] recipeInput=finalRecipe.getInput();
+                    int len2=recipeInput.length;
+                    for(int i=0;i<len2;++i){
+                        if(inputItem[i]!=null){
+                            inputItem[i].setAmount(inputItem[i].getAmount()-amount*recipeInput[i].getAmount());
+                            inputItem[i].updateMenu(inv);
+                        }
+                    }
+                    if(useHistory) {
+                        DataCache.setLastRecipe(inv.getLocation(),index);
+                    }
+                    ItemStack[] rpOut=finalRecipe.getOutput();
+                    ItemGreedyConsumer[] output=new ItemGreedyConsumer[rpOut.length];
+                    for(int i=0;i<output.length;++i){
+                        output[i]=getGreedyConsumer(rpOut[i]);
+                        output[i].setStackNum(amount);
+                    }
+                    return output;
+                });
+            }
+        }
+        if(__iter<0){
+            __iter=recipeAmount-1;
+        }else{
+            __iter=0;
+        }
+        for(;__iter!=__index;__iter+=delta) {
+            checkRecipe=recipes.get(__iter);
+            craftAmount=matchShapedRecipe(inputItem,checkRecipe,limit);
+            if(craftAmount>0) {
+                final int finalAmount=craftAmount;
+                final MachineRecipe finalRecipe=checkRecipe;
+                final int index=__iter;
+                return new Pair<>(checkRecipe,(newLimit)->{
+                    int amount=Math.min(newLimit,finalAmount);
+                    ItemStack[] recipeInput=finalRecipe.getInput();
+                    int len2=recipeInput.length;
+                    for(int i=0;i<len2;++i){
+                        if(inputItem[i]!=null){
+                            inputItem[i].setAmount(inputItem[i].getAmount()-amount*recipeInput[i].getAmount());
+                            inputItem[i].updateMenu(inv);
+                        }
+                    }
+                    if(useHistory) {
+                        DataCache.setLastRecipe(inv.getLocation(),index);
+                    }
+                    ItemStack[] rpOut=finalRecipe.getOutput();
+                    ItemGreedyConsumer[] output=new ItemGreedyConsumer[rpOut.length];
+                    for(int i=0;i<output.length;++i){
+                        output[i]=getGreedyConsumer(rpOut[i]);
+                        output[i].setStackNum(amount);
+                    }
+                    return output;
+                });
+            }
+        }
+        return null;
+    }
 //    public static Pair<MachineRecipe,ItemGreedyConsumer[]> findNextShapedRecipe(BlockMenu inv,int[] inputs,int[] outputs,
 //                                                                                List<MachineRecipe> recipes,int limit,boolean useHistory){
 //        return findNextShapedRecipe(inv,inputs,outputs,recipes,limit,useHistory,Settings.SEQUNTIAL);
@@ -1429,6 +1531,7 @@ public class CraftUtils {
         return null;
 
     }
+
 
     public static boolean matchSequenceRecipeTarget(ItemPusher[] inPushers,ItemConsumer target){
         boolean hasChange=false;
@@ -1672,7 +1775,7 @@ public class CraftUtils {
             return meta1.getDisplayName().equals(meta2.getDisplayName());
         }
     }
-    private static Class<?> CraftMetaBlockState;
+    private static Class CraftMetaBlockState;
     private static Field blockEntityTag;
     private static boolean hasFailed;
     public static boolean matchBlockStateMetaOnInvoke(BlockStateMeta meta1, BlockStateMeta meta2){
@@ -1862,14 +1965,7 @@ public class CraftUtils {
 
         // Potion
         if (metaOne instanceof PotionMeta instanceOne && metaTwo instanceof PotionMeta instanceTwo) {
-        	if (instanceOne.getBasePotionType() == null) {
-        		if (instanceTwo.getBasePotionType() == null) {
-        			return true;
-        		} else {
-        			return false;
-        		}
-        	}
-            if (!instanceOne.getBasePotionType().equals(instanceTwo.getBasePotionType())) {
+            if (!instanceOne.getBasePotionData().equals(instanceTwo.getBasePotionData())) {
                 return true;
             }
             if (instanceOne.hasCustomEffects() != instanceTwo.hasCustomEffects()) {

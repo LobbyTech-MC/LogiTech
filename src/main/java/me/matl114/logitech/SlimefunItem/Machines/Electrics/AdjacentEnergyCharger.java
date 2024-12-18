@@ -66,4 +66,6 @@ public class AdjacentEnergyCharger extends AbstractEnergyCharger implements Dire
         menu.addMenuClickHandler(DIRECTION_SLOTS[0],getDirectionHandler(0,menu));
         updateDirectionSlots(0,menu);
     }
+
+
 }

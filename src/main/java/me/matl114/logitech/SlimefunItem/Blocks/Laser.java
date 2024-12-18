@@ -15,6 +15,7 @@ import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
@@ -167,6 +168,9 @@ public class Laser extends AbstractMachine implements MultiBlockPart, FinalAltar
             DataCache.setCustomData(b.getLocation(),DIRECTION,Directions.fromBlockFace(dp.getFacing()).toInt());
         }
     }
+    public void onBreak(BlockBreakEvent event,BlockMenu menu ){
+        super.onBreak(event,menu);
+    }
     public boolean redirectMenu(){
         return false;
     }
@@ -176,6 +180,7 @@ public class Laser extends AbstractMachine implements MultiBlockPart, FinalAltar
     public void registerBlockMenu(SlimefunItem that){
         //handle blockPlaceEvent
         handleBlock(that);
+        handleMultiBlockPart(this);
     }
 
 }

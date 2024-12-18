@@ -62,12 +62,12 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
      * 不得中途破坏
      */
     protected final ItemStack[] HOLOGRAM_ITEM_ON=new ItemStack[]{
-            new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&7当前状态: &a北向"),
-            new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&7当前状态: &a东向"),
-            new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&7当前状态: &a南向"),
-            new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&7当前状态: &a西向")
+            new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&e或使用/logitech multiblock 查看搭建教程","&7当前状态: &a北向"),
+            new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&e或使用/logitech multiblock 查看搭建教程","&7当前状态: &a东向"),
+            new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&e或使用/logitech multiblock 查看搭建教程","&7当前状态: &a南向"),
+            new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换全息投影","&e或使用/logitech multiblock 查看搭建教程","&7当前状态: &a西向")
     };
-    protected final ItemStack HOLOGRAM_ITEM_OFF=new CustomItemStack(SlimefunItems.HOLOGRAM_PROJECTOR,"&6点击切换全息投影","&7当前状态: &c关闭");
+    protected final ItemStack HOLOGRAM_ITEM_OFF=new CustomItemStack(SlimefunItems.HOLOGRAM_PROJECTOR,"&6点击切换全息投影","&e或使用/logitech multiblock 查看搭建教程","&7当前状态: &c关闭");
     protected final ItemStack COOLER_INFO_ITEM=new CustomItemStack(SlimefunItems.NETHER_ICE_COOLANT_CELL,"&b冷却剂输入槽",
             "&7请保证冷却剂供应","&e上方填入冷却剂","&e下方填入下界冰冷却剂","&7冷却剂槽位会限制货运只传入冷却剂");
     protected final int COOLER_INFO_SLOT=27;
@@ -247,7 +247,6 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
         int holoStatus=DataCache.getCustomData(loc,MultiBlockService.getHologramKey(),0);
         if(holoStatus==0){
             inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_OFF);
-
         }else {
             inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_ON[holoStatus-1]);
         }
@@ -290,7 +289,7 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
                         }
                     }
                 }else {
-                    MultiBlockService.deleteMultiBlock(DataCache.getLastUUID(loc),MultiBlockService.MANUALLY);
+                    MultiBlockService.deleteMultiBlock(MultiBlockService.safeGetUUID(loc),MultiBlockService.MANUALLY);
                     AddUtils.sendMessage(player,"&a成功关闭多方块结构!");
                 }
             }else{
@@ -377,7 +376,7 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
             super.progressorCost(b,inv);
             if(charge<energyConsumption){
                 //避免重连的时候出现问题,重连的时候statusCode为-3到-1,但是如果没有电 直接寄
-                MultiBlockService.deleteMultiBlock(DataCache.getLastUUID(loc),MultiBlockService.EnergyOutCause.get(charge,energyConsumption));
+                MultiBlockService.deleteMultiBlock(MultiBlockService.safeGetUUID(loc),MultiBlockService.EnergyOutCause.get(charge,energyConsumption));
                 return;
             }
             if(inv.hasViewer()){
@@ -405,15 +404,12 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
         }
     }
     public void onBreak(BlockBreakEvent e, BlockMenu menu){
+        super.onBreak(e,menu);
         if(menu!=null){
-            Location l = menu.getLocation();
-            menu.dropItems(l, this.getInputSlots());
-            menu.dropItems(l, this.getOutputSlots());
+            menu.dropItems(menu.getLocation(),COOLER_INPUT_SLOT);
+            menu.dropItems(menu.getLocation(),NETHERICE_INPUT_SLOT);
             this.coolerProcessor.endOperation(menu.getLocation());
         }
-
-        //禁止了父类的关闭processor的操作，改为在MultiBlockBreak中关闭
-        //合理性:只有多方块完整的时候才能进行processor,在破坏多方块的时候会取消processor
     }
     public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
         if(flow==ItemTransportFlow.WITHDRAW){

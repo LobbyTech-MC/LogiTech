@@ -63,8 +63,8 @@ public class SolarReactorCore extends MultiBlockProcessor {
             ,new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换反应堆状态",
             "&6shift点击切换是否自动构建","&7当前状态: &a开启","&7自动构建: &a开","&7警告:你最好别在进程中破坏机器")
     };
-    protected final ItemStack HOLOGRAM_ITEM_ON=new CustomItemStack(SlimefunItems.HOLOGRAM_PROJECTOR,"&6点击切换全息投影","&7当前状态: &a开启");
-    protected final ItemStack HOLOGRAM_ITEM_OFF=new CustomItemStack(SlimefunItems.HOLOGRAM_PROJECTOR,"&6点击切换全息投影","&7当前状态: &c关闭");
+    protected final ItemStack HOLOGRAM_ITEM_ON=new CustomItemStack(SlimefunItems.HOLOGRAM_PROJECTOR,"&6点击切换全息投影","&e或使用/logitech multiblock 查看搭建教程","&7当前状态: &a开启");
+    protected final ItemStack HOLOGRAM_ITEM_OFF=new CustomItemStack(SlimefunItems.HOLOGRAM_PROJECTOR,"&6点击切换全息投影","&e或使用/logitech multiblock 查看搭建教程","&7当前状态: &c关闭");
     protected final int HALT_SLOT=0;
     protected final ItemStack HALT_ITEM=new CustomItemStack(Material.BARRIER,"&c点击安全终止进程","&6不会引发爆炸");
     protected final int INFO_SLOT=22;
@@ -387,7 +387,7 @@ public class SolarReactorCore extends MultiBlockProcessor {
                         }
                     }
                 }else {
-                    MultiBlockService.deleteMultiBlock(DataCache.getLastUUID(loc),MultiBlockService.MANUALLY);
+                    MultiBlockService.deleteMultiBlock(MultiBlockService.safeGetUUID(loc),MultiBlockService.MANUALLY);
                     AddUtils.sendMessage(player,"&a成功关闭多方块结构!");
                 }
             }else{
@@ -434,7 +434,7 @@ public class SolarReactorCore extends MultiBlockProcessor {
             Schedules.launchSchedules(()->checkCondition(loc,data),0,false,0);
             if(charge<energyConsumption){
                 //避免重连的时候出现问题,重连的时候statusCode为-3到-1,但是如果没有电 直接寄
-                MultiBlockService.deleteMultiBlock(DataCache.getLastUUID(loc),MultiBlockService.EnergyOutCause.get(charge,energyConsumption));
+                MultiBlockService.deleteMultiBlock(MultiBlockService.safeGetUUID(loc),MultiBlockService.EnergyOutCause.get(charge,energyConsumption));
                 return;
             }
             if(inv.hasViewer()){
@@ -456,10 +456,5 @@ public class SolarReactorCore extends MultiBlockProcessor {
     public void progressorCost(Block b, BlockMenu inv){
         //覆盖父类 让process中不扣电
         //转到我的ticker里扣
-    }
-
-    public void preRegister(){
-
-        super.preRegister();
     }
 }

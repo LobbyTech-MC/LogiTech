@@ -218,7 +218,7 @@ public class DataCache {
             mmp.getMachineProcessor().endOperation(loc);
         }
     }
-    private static SlimefunBlockData safeGetBlockDataFromCache(Location loc){
+    public static SlimefunBlockData safeGetBlockDataFromCache(Location loc){
         if(INVOKE_LOADEDCHUNK){
             String chunkKey=getChunkKey(loc);
             try{

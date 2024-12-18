@@ -39,7 +39,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 
 public abstract class AbstractWorkBench extends AbstractMachine {
-    public List<MachineRecipe> machineRecipes;
     protected final int CRAFT_LIMIT;
 
     protected int getRecipeMenuSlot(){
