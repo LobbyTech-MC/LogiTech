@@ -23,10 +23,6 @@ public class NetworksAdaptQuantumStorage extends StorageType {
         super();
     }
     @Override
-    public boolean isStorage(ItemMeta meta) {
-        return  (DataTypeMethods.hasCustom(meta, Keys.QUANTUM_STORAGE_INSTANCE, PersistentQuantumStorageType.TYPE));
-    }
-    @Override
     public boolean canStorage(ItemMeta meta) {
         //我们不帮网络存储设置类型 。
         //该方法只在设置类型的时候被调用
@@ -40,7 +36,6 @@ public class NetworksAdaptQuantumStorage extends StorageType {
 //        }
 //        return AddDepends.NETWORKSQUANTUMSTORAGE.isInstance(SlimefunItem.getById(id));
     }
-
     @Override
     public boolean canStorage(SlimefunItem item) {
         //我们不帮网络存储设置类型 。
@@ -50,14 +45,10 @@ public class NetworksAdaptQuantumStorage extends StorageType {
 //        }
 //        return AddDepends.NETWORKSQUANTUMSTORAGE.isInstance(item);
     }
-    public QuantumCache getQuantumCache(ItemMeta meta) {
-        try{
-           QuantumCache cache= DataTypeMethods.getCustom(meta, AddDepends.NTWQUANTUMKEY, PersistentQuantumStorageType.TYPE);
-           return cache;
-        }catch (Throwable e){
-            disableNetworkQuantum(e);
-            return null;
-        }
+
+    @Override
+    public void clearStorage(ItemMeta meta) {
+        throw new NotImplementedException("NetworkQuantumStorage's content shouldn't be cleared in this method");
     }
     public void disableNetworkQuantum(Throwable e){
         Debug.logger("AN ERROR OCCURED IN NETWORK_QUANTUM_STORAGE, STORAGE TYPE MAY BE DISABLED %d/%d".formatted(ExceptionTimes, 100));
@@ -68,48 +59,15 @@ public class NetworksAdaptQuantumStorage extends StorageType {
             disableStorageType(this);
         }
     }
-    public int getStorageMaxSize(QuantumCache cache){
-        if(cache==null){return 0;}
-        Method amount=NetWorkQuantumMethod. getLimitMethod(cache);
+    public QuantumCache getQuantumCache(ItemMeta meta) {
         try{
-            return (Integer)amount.invoke(cache);
+           QuantumCache cache= DataTypeMethods.getCustom(meta, AddDepends.NTWQUANTUMKEY, PersistentQuantumStorageType.TYPE);
+           return cache;
         }catch (Throwable e){
             disableNetworkQuantum(e);
-            return 0;
+            return null;
         }
     }
-    @Override
-    public int getStorageMaxSize(ItemMeta meta) {
-        QuantumCache cache= getQuantumCache(meta);
-        return getStorageMaxSize(cache);
-    }
-
-    @Override
-    public void setStorage(ItemMeta meta, ItemStack content) {
-        //我们不帮网络存储设置类型 。
-//        DataTypeMethods.setCustom(meta, Keys.QUANTUM_STORAGE_INSTANCE, PersistentQuantumStorageType.TYPE, cache);
-//        cache.addMetaLore(itemMeta);
-//        itemToDrop.setItemMeta(itemMeta);
-        throw new NotImplementedException("NetworkQuantumStorage's content shouldn't be set in this method");
-    }
-
-    public void setAmount(QuantumCache cache, int amount) {
-        if(cache==null){return;}
-            Method set=NetWorkQuantumMethod.getSetAmountMethod(cache);
-        try{
-            set.invoke(cache, amount);
-        }catch (Throwable e){
-            disableNetworkQuantum(e);
-            return ;
-        }
-    }
-    @Override
-    public void onStorageAmountWrite(ItemMeta meta, int amount) {
-        QuantumCache cache=getQuantumCache(meta);
-        setAmount(cache, amount);
-        DataTypeMethods.setCustom(meta,Keys.QUANTUM_STORAGE_INSTANCE, PersistentQuantumStorageType.TYPE,cache);
-    }
-
     @Override
     public int getStorageAmount(ItemMeta meta) {
         QuantumCache cache= getQuantumCache(meta);
@@ -132,6 +90,7 @@ public class NetworksAdaptQuantumStorage extends StorageType {
         QuantumCache cache= getQuantumCache(meta);
         return getStorageContent(cache);
     }
+
     public ItemStack getStorageContent(QuantumCache cache){
         if(cache==null){
             return null;}
@@ -143,14 +102,33 @@ public class NetworksAdaptQuantumStorage extends StorageType {
             return null;
         }
     }
-
     @Override
-    public void clearStorage(ItemMeta meta) {
-        throw new NotImplementedException("NetworkQuantumStorage's content shouldn't be cleared in this method");
+    public int getStorageMaxSize(ItemMeta meta) {
+        QuantumCache cache= getQuantumCache(meta);
+        return getStorageMaxSize(cache);
     }
 
+    public int getStorageMaxSize(QuantumCache cache){
+        if(cache==null){return 0;}
+        Method amount=NetWorkQuantumMethod. getLimitMethod(cache);
+        try{
+            return (Integer)amount.invoke(cache);
+        }catch (Throwable e){
+            disableNetworkQuantum(e);
+            return 0;
+        }
+    }
+    @Override
+    public boolean isStorage(ItemMeta meta) {
+        return  (DataTypeMethods.hasCustom(meta, Keys.QUANTUM_STORAGE_INSTANCE, PersistentQuantumStorageType.TYPE));
+    }
 
-
+    @Override
+    public void onStorageAmountWrite(ItemMeta meta, int amount) {
+        QuantumCache cache=getQuantumCache(meta);
+        setAmount(cache, amount);
+        DataTypeMethods.setCustom(meta,Keys.QUANTUM_STORAGE_INSTANCE, PersistentQuantumStorageType.TYPE,cache);
+    }
     @Override
     public void onStorageDisplayWrite(ItemMeta meta, int amount) {
         var cache=getQuantumCache(meta);
@@ -162,5 +140,27 @@ public class NetworksAdaptQuantumStorage extends StorageType {
         }catch (Throwable e){
             disableNetworkQuantum(e);
         }
+    }
+
+    public void setAmount(QuantumCache cache, int amount) {
+        if(cache==null){return;}
+            Method set=NetWorkQuantumMethod.getSetAmountMethod(cache);
+        try{
+            set.invoke(cache, amount);
+        }catch (Throwable e){
+            disableNetworkQuantum(e);
+            return ;
+        }
+    }
+
+
+
+    @Override
+    public void setStorage(ItemMeta meta, ItemStack content) {
+        //我们不帮网络存储设置类型 。
+//        DataTypeMethods.setCustom(meta, Keys.QUANTUM_STORAGE_INSTANCE, PersistentQuantumStorageType.TYPE, cache);
+//        cache.addMetaLore(itemMeta);
+//        itemToDrop.setItemMeta(itemMeta);
+        throw new NotImplementedException("NetworkQuantumStorage's content shouldn't be set in this method");
     }
 }

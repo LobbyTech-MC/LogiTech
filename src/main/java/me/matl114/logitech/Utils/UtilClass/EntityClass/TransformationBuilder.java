@@ -23,6 +23,10 @@ public final class TransformationBuilder {
 //        return this;
 //    }
 
+    public Transformation build() {
+        return new Transformation(this.translation, this.firstRotation, this.scaling, this.secondRotation);
+    }
+
     public TransformationBuilder scale(float scaleX, float scaleY, float scaleZ) {
         this.scaling = new Vector3f(scaleX, scaleY, scaleZ);
         return this;
@@ -31,9 +35,5 @@ public final class TransformationBuilder {
     public TransformationBuilder translation(float deltaX, float deltaY, float deltaZ) {
         this.translation = new Vector3f(deltaX, deltaY, deltaZ);
         return this;
-    }
-
-    public Transformation build() {
-        return new Transformation(this.translation, this.firstRotation, this.scaling, this.secondRotation);
     }
 }

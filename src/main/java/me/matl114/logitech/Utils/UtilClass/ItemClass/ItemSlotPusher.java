@@ -13,10 +13,20 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
  * automatically replaceExistingItem when item=null at beginning
  */
 public class ItemSlotPusher extends ItemPusher {
+    private static ItemSlotPusher INSTANCE=new ItemSlotPusher(new ItemStack(Material.STONE),-1);
+    public static ItemSlotPusher get(ItemStack item,int slot){
+//        if(item==null){
+//            return new ItemSlotPusher(slot);
+//        }else {
+//            return new ItemSlotPusher(item,slot);
+//        }
+        ItemSlotPusher itp=INSTANCE.clone();
+        itp.init(item,slot);
+        return itp;
+    }
     //mark if it is null before last sync
     protected boolean wasNull;
     protected int slot;
-    private static ItemSlotPusher INSTANCE=new ItemSlotPusher(new ItemStack(Material.STONE),-1);
     protected ItemSlotPusher(int slot){
         super();
         this.cnt=0;
@@ -29,16 +39,21 @@ public class ItemSlotPusher extends ItemPusher {
         this.wasNull=false;
         this.slot=slot;
     }
-    public static ItemSlotPusher get(ItemStack item,int slot){
-//        if(item==null){
-//            return new ItemSlotPusher(slot);
-//        }else {
-//            return new ItemSlotPusher(item,slot);
-//        }
-        ItemSlotPusher itp=INSTANCE.clone();
-        itp.init(item,slot);
-        return itp;
+    protected ItemSlotPusher clone(){
+        return (ItemSlotPusher) super.clone();
     }
+    public int getMaxStackCnt() {
+        return maxStackCnt;
+    }
+    public void grab(ItemCounter source){
+        if(this.item==null){
+            if(source!=null&&source.getItem()!=null&&source.getAmount()>0)
+                setFrom(source);
+            else return;
+        }
+        super.grab(source);
+    }
+
     protected void init(ItemStack item,int slot){
         if(item!=null){
             super.init(item);
@@ -52,10 +67,41 @@ public class ItemSlotPusher extends ItemPusher {
     public boolean isNull(){
         return wasNull;
     }
-    public int getMaxStackCnt() {
-        return maxStackCnt;
+    public void setFrom(ItemCounter source){
+        //only when null AND source not null, can we setFrom
+        //we don't support cache change
+        if(wasNull&&(source!=null&&source.getItem()!=null)){
+            item=source.getItem();
+            maxStackCnt=item!=null?item.getMaxStackSize():0;
+            cnt=0;
+            meta=null;
+        }
     }
 
+    public void syncData(){
+        if(!wasNull){
+            super.syncData();
+        }else{
+            item=null;
+            meta=null;
+            cnt=0;
+            dirty=false;
+        }
+    }
+    public int transportFrom(ItemCounter source,int limit){
+        if(this.item==null){
+            if(source!=null&&source.getItem()!=null){
+                setFrom(source);
+            }
+            else return limit;
+        }
+        return super.transportFrom(source,limit);
+    }
+    public void updateItemStack(){
+        if(getItem()!=null){
+            super.updateItemStack();
+        }
+    }
     //sync data need blockmenu
     public void updateMenu(@Nonnull BlockMenu menu){
         if(dirty&&getItem()!=null&&!getItem().getType().isAir()){
@@ -73,52 +119,6 @@ public class ItemSlotPusher extends ItemPusher {
             }
 
         }
-    }
-    public void updateItemStack(){
-        if(getItem()!=null){
-            super.updateItemStack();
-        }
-    }
-    public void syncData(){
-        if(!wasNull){
-            super.syncData();
-        }else{
-            item=null;
-            meta=null;
-            cnt=0;
-            dirty=false;
-        }
-    }
-
-    public void grab(ItemCounter source){
-        if(this.item==null){
-            if(source!=null&&source.getItem()!=null&&source.getAmount()>0)
-                setFrom(source);
-            else return;
-        }
-        super.grab(source);
-    }
-    public int transportFrom(ItemCounter source,int limit){
-        if(this.item==null){
-            if(source!=null&&source.getItem()!=null){
-                setFrom(source);
-            }
-            else return limit;
-        }
-        return super.transportFrom(source,limit);
-    }
-    public void setFrom(ItemCounter source){
-        //only when null AND source not null, can we setFrom
-        //we don't support cache change
-        if(wasNull&&(source!=null&&source.getItem()!=null)){
-            item=source.getItem();
-            maxStackCnt=item!=null?item.getMaxStackSize():0;
-            cnt=0;
-            meta=null;
-        }
-    }
-    protected ItemSlotPusher clone(){
-        return (ItemSlotPusher) super.clone();
     }
 
 }

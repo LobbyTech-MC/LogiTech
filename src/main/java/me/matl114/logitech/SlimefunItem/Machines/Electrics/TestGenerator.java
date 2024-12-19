@@ -37,21 +37,8 @@ public class TestGenerator extends AbstractEnergyProvider {
     public final ItemStack OUTPUT= AddItem.PARADOX;
     public final int DISPLAY_SLOT=0;
     public final int[] OUTPUT_SLOT=new int[]{1,2,3,4,5,6,7,8};
-    public int[] getInputSlots(){
-        return new int[0];
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
-    public void addInfo(ItemStack stack){
-        stack.setItemMeta(AddUtils.addLore(stack,
-                new StringBuilder("&8⇨ &e⚡ &7").
-                        append(AddUtils.formatDouble(-ENERGY_ABSMAX)).
-                        append(" ~ ").
-                        append(AddUtils.formatDouble(ENERGY_ABSMAX)).append(" J/t").toString()).getItemMeta());
-
-    }
     public final int RANDOM_THREASHOLD;
+    public ItemStack[] OUTPUTS=new ItemStack[]{OUTPUT};
     public TestGenerator(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, int energyBuffer, int energyAbsMax,
                          int outputMin, int outputMax){
         super(itemGroup, item, recipeType, recipe,energyBuffer,0);
@@ -72,17 +59,30 @@ public class TestGenerator extends AbstractEnergyProvider {
         this.machineRecipes=new ArrayList<>();
         this.RANDOM_THREASHOLD= 2*this.ENERGY_ABSMAX+1;
     }
+    public void addInfo(ItemStack stack){
+        stack.setItemMeta(AddUtils.addLore(stack,
+                new StringBuilder("&8⇨ &e⚡ &7").
+                        append(AddUtils.formatDouble(-ENERGY_ABSMAX)).
+                        append(" ~ ").
+                        append(AddUtils.formatDouble(ENERGY_ABSMAX)).append(" J/t").toString()).getItemMeta());
+
+    }
+    public void constructMenu(BlockMenuPreset inv){
+        inv.addItem(DISPLAY_SLOT, ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
+    }
 
     public EnergyNetComponentType getEnergyComponentType(){
             return EnergyNetComponentType.GENERATOR;
     }
-    public ItemStack[] OUTPUTS=new ItemStack[]{OUTPUT};
-
     public int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
         return ThreadLocalRandom.current().nextInt(RANDOM_THREASHOLD)-ENERGY_ABSMAX;
     }
-    public void constructMenu(BlockMenuPreset inv){
-        inv.addItem(DISPLAY_SLOT, ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
+
+    public int[] getInputSlots(){
+        return new int[0];
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
     }
     public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuOpeningHandler((player -> {

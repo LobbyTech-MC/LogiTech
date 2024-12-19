@@ -54,21 +54,6 @@ public class BiReactor extends AbstractEnergyProvider {
             new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6[%s]输入槽".formatted(Language.get("Items.FALSE_.Name"))),
             new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6[%s]输入槽".formatted(Language.get("Items.TRUE_.Name")))
     };
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
-        if(flow==ItemTransportFlow.WITHDRAW)return getOutputSlots();
-        if(item!=null&&!item.getType().isAir()&& item.getType()==Material.MUSIC_DISC_5){
-            return item.getEnchantments().isEmpty()?FALSE_SLOTS:TRUE_SLOTS;
-        }
-        return getInputSlots();
-    }
-
-
     protected final int[] OUTPUT_SLOTS=new int[0];
     protected int energyConsumptionFalse;
     public BiReactor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
@@ -84,6 +69,7 @@ public class BiReactor extends AbstractEnergyProvider {
                         formatted(this.energyConsumptionFalse)),
                 new DisplayItemStack(AddItem.FALSE_)));
     }
+
 
     public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
@@ -132,5 +118,19 @@ public class BiReactor extends AbstractEnergyProvider {
             }
             return -this.energyConsumptionFalse;
         }else return 0;
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
+    }
+    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+        if(flow==ItemTransportFlow.WITHDRAW)return getOutputSlots();
+        if(item!=null&&!item.getType().isAir()&& item.getType()==Material.MUSIC_DISC_5){
+            return item.getEnchantments().isEmpty()?FALSE_SLOTS:TRUE_SLOTS;
+        }
+        return getInputSlots();
     }
 }

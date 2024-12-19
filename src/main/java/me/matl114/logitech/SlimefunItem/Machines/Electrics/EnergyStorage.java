@@ -20,28 +20,13 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 public class EnergyStorage extends AbstractEnergyMachine{
     protected final int[] INPUT_SLOTS=new int[0];
     protected final int[] OUTPUT_SLOTS=new int[0];
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
     protected final int[] BORDER=new int[]{
             0,1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26
     };
     protected final int INFO_SLOT=13;
-
-    protected int getInfoSlot(){
-        return INFO_SLOT;
-    }
-
     public EnergyStorage(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                                  int energybuffer,EnergyNetComponentType energyNetComponent){
         super(category, item, recipeType, recipe, energybuffer, 0, energyNetComponent);
-    }
-
-    protected ItemStack getInfoShow(int charge){
-        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6信息","&7已存储: %sJ/%sJ".formatted(AddUtils.formatDouble(charge),AddUtils.formatDouble(this.energybuffer)));
     }
     public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
@@ -50,6 +35,21 @@ public class EnergyStorage extends AbstractEnergyMachine{
             preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
         }
         preset.addItem(getInfoSlot(),getInfoShow(0),ChestMenuUtils.getEmptyClickHandler());
+    }
+
+    protected ItemStack getInfoShow(int charge){
+        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6信息","&7已存储: %sJ/%sJ".formatted(AddUtils.formatDouble(charge),AddUtils.formatDouble(this.energybuffer)));
+    }
+
+    protected int getInfoSlot(){
+        return INFO_SLOT;
+    }
+
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
     }
     public void newMenuInstance(BlockMenu menu, Block block){
     }

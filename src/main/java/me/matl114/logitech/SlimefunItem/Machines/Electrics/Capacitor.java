@@ -13,6 +13,14 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
 public class Capacitor extends AbstractMachine {
+    public Capacitor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
+                     int energybuffer){
+        super(category,item,recipeType,recipe,energybuffer,0);
+    }
+    public void constructMenu(BlockMenuPreset preset){
+
+    }
+
     public int[] getInputSlots(){
         return new int[0];
     }
@@ -20,18 +28,10 @@ public class Capacitor extends AbstractMachine {
         return new int[0];
     }
 
-    public Capacitor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
-                     int energybuffer){
-        super(category,item,recipeType,recipe,energybuffer,0);
-    }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
-    }
-
-    public void constructMenu(BlockMenuPreset preset){
-
-    }
     public void preRegister(){
         registerTick(this);
         addInfo(this.getItem());
+    }
+    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
     }
 }

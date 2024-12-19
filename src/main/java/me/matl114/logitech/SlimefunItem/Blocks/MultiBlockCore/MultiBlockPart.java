@@ -18,15 +18,6 @@ import me.matl114.logitech.Utils.UtilClass.TickerClass.Ticking;
 
 public interface MultiBlockPart extends Ticking {
     public String getPartId();
-    default boolean redirectMenu(){
-        return true;
-    }
-    //you must add handle menu to preRegister in order to handle MultiBlockPart
-    default void onMultiBlockBreak(BlockBreakEvent e) {
-        String uid= MultiBlockService.safeGetUUID(e.getBlock().getLocation());
-        MultiBlockService.deleteMultiBlock(uid, MultiBlockService.MultiBlockBreakCause.get(e.getBlock()));
-    }
-
     /**
      * we override the handleBlock in @MenuBlock ,invoke this method in preRegister!
      * @param it
@@ -46,5 +37,14 @@ public interface MultiBlockPart extends Ticking {
         if (!itemUsed && event.useBlock() != Event.Result.DENY && !BlockOpenListener.rightClickBlock(event)) {
             return;
         }
+    }
+
+    //you must add handle menu to preRegister in order to handle MultiBlockPart
+    default void onMultiBlockBreak(BlockBreakEvent e) {
+        String uid= MultiBlockService.safeGetUUID(e.getBlock().getLocation());
+        MultiBlockService.deleteMultiBlock(uid, MultiBlockService.MultiBlockBreakCause.get(e.getBlock()));
+    }
+    default boolean redirectMenu(){
+        return true;
     }
 }

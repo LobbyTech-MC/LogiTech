@@ -63,11 +63,6 @@ public class QuantumLink extends DistinctiveCustomItemStack {
                 )
         );
     }
-    @Override
-    public void preRegister(){
-        super.preRegister();
-        addItemHandler((ItemUseHandler)this::onBindLocation);
-    }
     private void onBindLocation(PlayerRightClickEvent event) {
         if(event.getPlayer().isSneaking()){
             Optional<Block> b = event.getClickedBlock();
@@ -110,5 +105,10 @@ public class QuantumLink extends DistinctiveCustomItemStack {
                 }
             }
         }
+    }
+    @Override
+    public void preRegister(){
+        super.preRegister();
+        addItemHandler((ItemUseHandler)this::onBindLocation);
     }
 }

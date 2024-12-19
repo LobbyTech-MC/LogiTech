@@ -24,15 +24,9 @@ public class AdjacentEnergyCollector extends AbstractEnergyCollector implements 
     protected final String[] savedKeys = new String[]{
             "line_dir"
     };
-    public  String[] getSaveKeys(){
-        return savedKeys;
-    }
     protected final int[] DIRECTION_SLOTS = new int[]{
             10
     };
-    public int[] getDirectionSlots(){
-        return DIRECTION_SLOTS;
-    }
     public AdjacentEnergyCollector(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                                int energybuffer){
         super(category, item, recipeType, recipe, energybuffer);
@@ -63,8 +57,14 @@ public class AdjacentEnergyCollector extends AbstractEnergyCollector implements 
         }
         return ret;
     }
+    public int[] getDirectionSlots(){
+        return DIRECTION_SLOTS;
+    }
     public int getMaxCollectAmount(){
         return MAX_LEN;
+    }
+    public  String[] getSaveKeys(){
+        return savedKeys;
     }
     public void newMenuInstance(BlockMenu menu, Block block){
         super.newMenuInstance(menu, block);

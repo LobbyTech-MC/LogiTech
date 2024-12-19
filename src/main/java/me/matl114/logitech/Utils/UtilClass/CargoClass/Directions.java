@@ -13,51 +13,15 @@ public enum Directions {
     DOWN(0,-1,0,"D",6),
     NONE(0,0,0,"X",0)
     ;
-    int seqCode;
-    int dx;
-    int dy;
-    int dz;
-    String nickname;
-    private Directions(int dx,int dy,int dz,String nickname,int seq){
-        this.dx = dx;
-        this.dy = dy;
-        this.dz = dz;
-        this.nickname = nickname;
-        this.seqCode = seq;
-    }
-    public Location relate(Location loc){
-        return loc.clone().add(dx,dy,dz);
-    }
-    public Location remote(Location loc,int dis){
-        return loc.clone().add(dis*dx,dis*dy,dis*dz);
-    }
-    public Location remote(Location loc,double dis){
-        return loc.clone().add(dis*dx,dis*dy,dis*dz);
-    }
-    public Location move(Location loc){
-        return move(loc,1);
-    }
-    public Location move(Location loc,int dis){
-        return loc.add(dis*dx,dis*dy,dis*dz);
-    }
-    public Location move(Location loc,double dis){
-        return loc.add(dis*dx,dis*dy,dis*dz);
-    }
-    public String toString(){
-        return nickname;
-    }
-    public int toInt(){
-        return seqCode;
-    }
-    public static Directions fromString(String s){
-        switch(s){
-            case "N" : return NORTH;
-            case "W" : return WEST;
-            case "S" : return SOUTH;
-            case "E" : return EAST;
-            case "U" : return UP;
-            case "D" : return DOWN;
-            default: return NONE;
+    public static Directions fromBlockFace(BlockFace blockface){
+        switch(blockface){
+            case NORTH: return Directions.NORTH;
+            case WEST: return Directions.WEST;
+            case SOUTH: return Directions.SOUTH;
+            case EAST: return Directions.EAST;
+            case UP: return Directions.UP;
+            case DOWN: return Directions.DOWN;
+            default: return Directions.NONE;
         }
     }
     public static Directions fromInt(int i){
@@ -72,6 +36,42 @@ public enum Directions {
             default: return NONE;
         }
     }
+    public static Directions fromString(String s){
+        switch(s){
+            case "N" : return NORTH;
+            case "W" : return WEST;
+            case "S" : return SOUTH;
+            case "E" : return EAST;
+            case "U" : return UP;
+            case "D" : return DOWN;
+            default: return NONE;
+        }
+    }
+    public static Directions fromVector(Vector v){
+        for(Directions d : values()){
+            if(d.dx==v.getBlockX()&&d.dy==v.getBlockY()&&d.dz==v.getBlockZ()){
+                return d;
+            }
+        }
+        return null;
+    }
+    public static Directions[] nonnullValues(){
+        return new Directions[]{
+                NORTH,WEST,SOUTH,EAST,UP,DOWN
+        };
+    }
+    int seqCode;
+    int dx;
+    int dy;
+    int dz;
+    String nickname;
+    private Directions(int dx,int dy,int dz,String nickname,int seq){
+        this.dx = dx;
+        this.dy = dy;
+        this.dz = dz;
+        this.nickname = nickname;
+        this.seqCode = seq;
+    }
     public Directions getNext(){
         switch(this){
             case NORTH: return WEST;
@@ -84,6 +84,24 @@ public enum Directions {
             default: return NORTH;
         }
     }
+    public Location move(Location loc){
+        return move(loc,1);
+    }
+    public Location move(Location loc,double dis){
+        return loc.add(dis*dx,dis*dy,dis*dz);
+    }
+    public Location move(Location loc,int dis){
+        return loc.add(dis*dx,dis*dy,dis*dz);
+    }
+    public Location relate(Location loc){
+        return loc.clone().add(dx,dy,dz);
+    }
+    public Location remote(Location loc,double dis){
+        return loc.clone().add(dis*dx,dis*dy,dis*dz);
+    }
+    public Location remote(Location loc,int dis){
+        return loc.clone().add(dis*dx,dis*dy,dis*dz);
+    }
     public BlockFace toBlockFace(){
         switch(this){
             case NORTH: return BlockFace.NORTH;
@@ -95,29 +113,11 @@ public enum Directions {
             default: return null;
         }
     }
-    public static Directions fromBlockFace(BlockFace blockface){
-        switch(blockface){
-            case NORTH: return Directions.NORTH;
-            case WEST: return Directions.WEST;
-            case SOUTH: return Directions.SOUTH;
-            case EAST: return Directions.EAST;
-            case UP: return Directions.UP;
-            case DOWN: return Directions.DOWN;
-            default: return Directions.NONE;
-        }
+    public int toInt(){
+        return seqCode;
     }
-    public static Directions[] nonnullValues(){
-        return new Directions[]{
-                NORTH,WEST,SOUTH,EAST,UP,DOWN
-        };
-    }
-    public static Directions fromVector(Vector v){
-        for(Directions d : values()){
-            if(d.dx==v.getBlockX()&&d.dy==v.getBlockY()&&d.dz==v.getBlockZ()){
-                return d;
-            }
-        }
-        return null;
+    public String toString(){
+        return nickname;
     }
 
 

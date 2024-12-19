@@ -21,8 +21,8 @@ public class CubeMultiBlock implements AbstractMultiBlock {
         this.size2=size1+ TYPE.sizeP*height;
         this.size3=size2+TYPE.sizeT;
     }
-    public AbstractMultiBlockType getType() {
-        return TYPE;
+    public MultiBlockService.Direction getDirection() {
+        return DIRECTION;
     }
     public int getHeight() {
         return height;
@@ -44,10 +44,10 @@ public class CubeMultiBlock implements AbstractMultiBlock {
     public String getStructurePartId(int index){
         return (index<size1)?TYPE.BOTTOM_IDS[index]:((index<size2)?TYPE.PLATE_IDS[(index-size1)%TYPE.sizeP]:TYPE.TOP_IDS[index-size2]);
     }
-    public MultiBlockService.Direction getDirection() {
-        return DIRECTION;
-    }
     public int getStructureSize(){
         return size3;
+    }
+    public AbstractMultiBlockType getType() {
+        return TYPE;
     }
 }

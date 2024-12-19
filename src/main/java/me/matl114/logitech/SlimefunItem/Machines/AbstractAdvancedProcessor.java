@@ -46,6 +46,8 @@ public abstract class AbstractAdvancedProcessor extends AbstractMachine implemen
     protected final ItemStack progressbar;
     protected final MachineProcessor<MultiCraftingOperation> processor;
     protected final int INFO_SLOT=40;
+    protected boolean USE_HISTORY=true;
+
     public AbstractAdvancedProcessor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                              Material progressItem, int energyConsumption, int energyBuffer,
                              LinkedHashMap<Object, Integer> customRecipes){
@@ -71,39 +73,12 @@ public abstract class AbstractAdvancedProcessor extends AbstractMachine implemen
 
     }
 
-    /**
-     * method from MachineProcessorHolder
-     * @return
-     */
-    public MachineProcessor<MultiCraftingOperation> getMachineProcessor() {
-        return this.processor;
-    }
-
     public void addInfo(ItemStack stack){
 
         stack.setItemMeta( AddUtils.machineInfoAdd(
                 AddUtils.addLore(stack,"&8⇨ &7并行处理机器"),
                 this.energybuffer,this.energyConsumption).getItemMeta());
     }
-    /**
-     * need implement,  method from MachineProcessorHolder
-     * @return
-     */
-    public ItemStack getProgressBar(){
-        return this.progressbar;
-    }
-
-
-    /**
-     * cancel machineprocessor after break
-     * @param e
-     * @param menu
-     */
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
-        super.onBreak(e,menu);
-        AbstractAdvancedProcessor.this.processor.endOperation(menu.getLocation());
-    }
-
     /**
      *
      * @param preset
@@ -125,8 +100,21 @@ public abstract class AbstractAdvancedProcessor extends AbstractMachine implemen
         preset.addMenuClickHandler(INFO_SLOT,ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(PROCESSOR_SLOT,MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
     }
+
+
+    public int getCraftLimit(Block b,BlockMenu inv){
+        return 64;
+    }
+
     public int[] getInputSlots(){
         return INPUT_SLOT;
+    }
+    /**
+     * method from MachineProcessorHolder
+     * @return
+     */
+    public MachineProcessor<MultiCraftingOperation> getMachineProcessor() {
+        return this.processor;
     }
 
     public int[] getOutputSlots(){
@@ -135,10 +123,25 @@ public abstract class AbstractAdvancedProcessor extends AbstractMachine implemen
 
 
 
-    public int getCraftLimit(Block b,BlockMenu inv){
-        return 64;
+    /**
+     * need implement,  method from MachineProcessorHolder
+     * @return
+     */
+    public ItemStack getProgressBar(){
+        return this.progressbar;
     }
-    protected boolean USE_HISTORY=true;
+    /**
+     * cancel machineprocessor after break
+     * @param e
+     * @param menu
+     */
+    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+        super.onBreak(e,menu);
+        AbstractAdvancedProcessor.this.processor.endOperation(menu.getLocation());
+    }
+    public void preRegister(){
+        super.preRegister();
+    }
     public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         MultiCraftingOperation currentOperation = this.processor.getOperation(b);
         ItemGreedyConsumer[] fastCraft=null;
@@ -209,8 +212,5 @@ public abstract class AbstractAdvancedProcessor extends AbstractMachine implemen
             currentOperation.progress(1);
 
         }
-    }
-    public void preRegister(){
-        super.preRegister();
     }
 }

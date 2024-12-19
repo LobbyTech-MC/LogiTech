@@ -11,6 +11,8 @@ public class MenuPreset {
     int size;
     int prelen;
     int suflen;
+    HashMap<Integer, ItemStack> preitems=new HashMap<>();
+    HashMap<Integer, ChestMenu.MenuClickHandler> prehandlers=new HashMap<>();
     public MenuPreset(int size){
         this(size,0,0);
     }
@@ -20,14 +22,7 @@ public class MenuPreset {
         this.prelen = prelen;
         this.suflen = suflen;
     }
-    HashMap<Integer, ItemStack> preitems=new HashMap<>();
-    HashMap<Integer, ChestMenu.MenuClickHandler> prehandlers=new HashMap<>();
 
-    public MenuPreset addItem( ItemStack item,int... slot) {
-        for(int slot_i :slot)
-        preitems.put(slot_i, item);
-        return this;
-    }
     public MenuPreset addItem(ChestMenu.MenuClickHandler handler,int... slot) {
         for(int slot_i :slot)
             prehandlers.put(slot_i, handler);
@@ -38,24 +33,29 @@ public class MenuPreset {
         prehandlers.put(slot_i, handler);
         return addItem(item,slot);
     }
-    public HashMap<Integer, ItemStack> getPreitems() {
-        return preitems;
+    public MenuPreset addItem( ItemStack item,int... slot) {
+        for(int slot_i :slot)
+        preitems.put(slot_i, item);
+        return this;
     }
     public HashMap<Integer, ChestMenu.MenuClickHandler> getPrehandlers() {
         return prehandlers;
     }
+    public HashMap<Integer, ItemStack> getPreitems() {
+        return preitems;
+    }
 
+    public int getPrelen() {
+        return prelen;
+    }
     public int getSize() {
         return size;
+    }
+    public int getSuflen() {
+        return suflen;
     }
     public MenuPreset setSize(int size){
         this.size = size;
         return this;
-    }
-    public int getPrelen() {
-        return prelen;
-    }
-    public int getSuflen() {
-        return suflen;
     }
 }

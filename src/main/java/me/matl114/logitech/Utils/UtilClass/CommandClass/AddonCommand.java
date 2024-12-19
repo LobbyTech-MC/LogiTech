@@ -1,14 +1,15 @@
 package me.matl114.logitech.Utils.UtilClass.CommandClass;
 
-import me.matl114.logitech.MyAddon;
-import me.matl114.logitech.Utils.AddUtils;
+import java.util.List;
+import java.util.function.Consumer;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.function.Consumer;
+import me.matl114.logitech.MyAddon;
+import me.matl114.logitech.Utils.AddUtils;
 
 public class AddonCommand implements TabExecutor {
     private boolean registered = false;

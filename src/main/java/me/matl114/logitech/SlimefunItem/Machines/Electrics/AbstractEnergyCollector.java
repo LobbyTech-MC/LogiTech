@@ -1,26 +1,10 @@
 package me.matl114.logitech.SlimefunItem.Machines.Electrics;
 
-import city.norain.slimefun4.utils.MathUtil;
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import io.github.thebusybiscuit.slimefun4.api.ErrorReport;
-import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.core.attributes.EnergyNetComponent;
-import io.github.thebusybiscuit.slimefun4.core.attributes.EnergyNetProvider;
-import io.github.thebusybiscuit.slimefun4.core.networks.energy.EnergyNetComponentType;
-import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
-import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
-import me.matl114.logitech.Schedule.Schedules;
-import me.matl114.logitech.SlimefunItem.Interface.EnergyProvider;
-import me.matl114.logitech.SlimefunItem.Interface.MenuTogglableBlock;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.MathUtils;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -40,6 +24,7 @@ import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.SlimefunItem.Interface.EnergyProvider;
+import me.matl114.logitech.SlimefunItem.Interface.MenuTogglableBlock;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.MathUtils;
@@ -49,40 +34,18 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 public abstract class AbstractEnergyCollector extends AbstractEnergyMachine implements EnergyProvider, MenuTogglableBlock {
     protected final int[] INPUT_SLOTS=new int[0];
     protected final int[] OUTPUT_SLOTS=new int[0];
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
     protected final int[] BORDER=new int[]{
             0,1,2,3,4,5,6,7,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26
     };
     protected final int INFO_SLOT=13;
     protected final int LAZY_SLOT=8;
-    protected int getLazySlot(){
-        return LAZY_SLOT;
-    }
-    protected int getInfoSlot(){
-        return INFO_SLOT;
-    }
     protected final ItemStack LAZY_ITEM_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6点击切换懒惰模式","&7当前状态: &c关闭",
             "&7当启用懒惰模式时,只有自身电力不满时","&7才会尝试收集发电机电力");
     protected final ItemStack LAZY_ITEM_ON=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6点击切换懒惰模式","&7当前状态: &a开启",
             "&7当启用懒惰模式时,只有自身电力不满时","&7才会尝试收集发电机电力");
-
     public AbstractEnergyCollector(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                                  int energybuffer){
         super(category, item, recipeType, recipe, energybuffer, 0, EnergyNetComponentType.GENERATOR);
-    }
-
-    protected ItemStack getInfoShow(int charge,int machine,int errors){
-        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6信息","&7已存储: %sJ/%sJ".formatted(AddUtils.formatDouble(charge),AddUtils.formatDouble(this.energybuffer)),
-                "&7范围发电机数目: %d/%d(max)".formatted(machine, getMaxCollectAmount()),
-                "&7发电机报错数目: %d".formatted(errors));
-    }
-    public boolean isBorder(int i){
-        return i!=getLazySlot();
     }
     public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
@@ -94,6 +57,33 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
         }
         preset.addItem(getInfoSlot(),getInfoShow(0,0,0),ChestMenuUtils.getEmptyClickHandler());
     }
+    public abstract Collection<SlimefunBlockData> getCollectRange(BlockMenu menu, Block block, SlimefunBlockData data);
+    protected EnergyNetProvider getEnergyProvider(SlimefunItem item){
+        if(item!=null&& isCollectable(item)&&item instanceof EnergyNetProvider ec){
+            return ec;
+        }else return null;
+    }
+
+    protected ItemStack getInfoShow(int charge,int machine,int errors){
+        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6信息","&7已存储: %sJ/%sJ".formatted(AddUtils.formatDouble(charge),AddUtils.formatDouble(this.energybuffer)),
+                "&7范围发电机数目: %d/%d(max)".formatted(machine, getMaxCollectAmount()),
+                "&7发电机报错数目: %d".formatted(errors));
+    }
+
+    protected int getInfoSlot(){
+        return INFO_SLOT;
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+    protected int getLazySlot(){
+        return LAZY_SLOT;
+    }
+    public abstract int getMaxCollectAmount();
+
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
+    }
     @Override
     public boolean[] getStatus(BlockMenu inv) {
         ItemStack itemStack=inv.getItemInSlot(getLazySlot());
@@ -104,13 +94,11 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
         }
     }
 
-    @Override
-    public void toggleStatus(BlockMenu inv, boolean... result) {
-        if(result[0]){
-            inv.replaceExistingItem(getLazySlot(),LAZY_ITEM_ON);
-        }else {
-            inv.replaceExistingItem(getLazySlot(),LAZY_ITEM_OFF);
-        }
+    public boolean isBorder(int i){
+        return i!=getLazySlot();
+    }
+    protected boolean isCollectable(SlimefunItem that){
+        return true;
     }
     public void newMenuInstance(BlockMenu menu, Block block){
         ItemStack icon=menu.getItemInSlot(getLazySlot());
@@ -123,22 +111,10 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
             return false;
         }));
     }
-
     @Override
     public void onBreak(BlockBreakEvent e, BlockMenu menu) {
         super.onBreak(e, menu);
     }
-    public abstract Collection<SlimefunBlockData> getCollectRange(BlockMenu menu, Block block, SlimefunBlockData data);
-    protected boolean isCollectable(SlimefunItem that){
-        return true;
-    }
-    protected EnergyNetProvider getEnergyProvider(SlimefunItem item){
-        if(item!=null&& isCollectable(item)&&item instanceof EnergyNetProvider ec){
-            return ec;
-        }else return null;
-    }
-    public abstract int getMaxCollectAmount();
-
     @Override
     public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
         Location loc=menu.getLocation();
@@ -209,6 +185,15 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
 
         if(menu.hasViewer()){
             menu.replaceExistingItem(getInfoSlot(),getInfoShow(charge,energyProvider, errorMachine));
+        }
+    }
+
+    @Override
+    public void toggleStatus(BlockMenu inv, boolean... result) {
+        if(result[0]){
+            inv.replaceExistingItem(getLazySlot(),LAZY_ITEM_ON);
+        }else {
+            inv.replaceExistingItem(getLazySlot(),LAZY_ITEM_OFF);
         }
     }
 }

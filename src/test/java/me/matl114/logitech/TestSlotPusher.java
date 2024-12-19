@@ -6,6 +6,9 @@ public class TestSlotPusher extends TestPusher{
         super(stack);
         this.slot = slot;
     }
+    public TestSlotPusher clone(){
+        return (TestSlotPusher) super.clone();
+    }
     public void init(TestStack item,int slot){
         if(item!=null){
             init(item);
@@ -15,8 +18,5 @@ public class TestSlotPusher extends TestPusher{
         this.slot=slot;
         Tests.log("TestSlotPusher init");
         this.slot = slot;
-    }
-    public TestSlotPusher clone(){
-        return (TestSlotPusher) super.clone();
     }
 }

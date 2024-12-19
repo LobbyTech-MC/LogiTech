@@ -31,6 +31,7 @@ import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 
 public abstract class AbstractSorter extends AbstractSyncTickCargo implements  ChipControllable {
 
+    protected int[] blankSlot=new int[0];
     public AbstractSorter(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,int divideAmount){
         super(itemGroup, item, recipeType, recipe);
         setDisplayRecipes(
@@ -60,21 +61,6 @@ public abstract class AbstractSorter extends AbstractSyncTickCargo implements  C
                 )
         );
     }
-    public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
-        blockMenu.addMenuOpeningHandler(player -> {
-            updateMenu(blockMenu,block,Settings.INIT);
-        });
-        blockMenu.addMenuCloseHandler(player -> {
-            updateMenu(blockMenu,block,Settings.INIT);
-        });
-        updateMenu(blockMenu,block,Settings.INIT);
-        blockMenu.replaceExistingItem(getInfoSlot(),getInfoOffItem(0));
-        blockMenu.addMenuClickHandler(getInfoSlot(), ChestMenuUtils.getEmptyClickHandler());
-    }
-    public void updateMenu(BlockMenu blockMenu, Block block, Settings mod){
-        loadChipCommand(blockMenu);
-    }
-    public abstract int getInfoSlot();
     public ItemStack getInfoItem(int code, int tickCount){
         int ticks=tickCount%32;
         return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a信息","&7下方为货运输出槽","&7上方为芯片槽"
@@ -86,8 +72,53 @@ public abstract class AbstractSorter extends AbstractSyncTickCargo implements  C
         return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a信息","&7下方为货运输出槽","&7上方为芯片槽"
                 ,AddUtils.concat("&7当前读取编码位数: ",String.valueOf(ticks)),"&e待机中,芯片不存在或已损坏");
     }
+    public abstract int getInfoSlot();
     public abstract int[] getInputWLSlot();
-    protected int[] blankSlot=new int[0];
+    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+        if(flow==ItemTransportFlow.WITHDRAW){
+            return getOutputSlots();
+        }
+        else {
+            if(item==null||item.getType().isAir()){
+                return getInputSlots();
+            }
+            int[] slots=getInputSlots();
+            int[] wlslots=getInputWLSlot();
+            int len=slots.length;
+            ItemStack st;
+            ItemCounter ct=CraftUtils.getConsumer(item);
+            for (int i=0;i<len;i++){
+                st=menu.getItemInSlot(wlslots[i]);
+                if(st==null||( CraftUtils.matchItemStack(st,ct,false))){
+                    return new int[] {slots[i]};
+                }
+            }
+            return blankSlot;
+        }
+    }
+    public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
+        blockMenu.addMenuOpeningHandler(player -> {
+            updateMenu(blockMenu,block,Settings.INIT);
+        });
+        blockMenu.addMenuCloseHandler(player -> {
+            updateMenu(blockMenu,block,Settings.INIT);
+        });
+        updateMenu(blockMenu,block,Settings.INIT);
+        blockMenu.replaceExistingItem(getInfoSlot(),getInfoOffItem(0));
+        blockMenu.addMenuClickHandler(getInfoSlot(), ChestMenuUtils.getEmptyClickHandler());
+    }
+    public void onBreak(BlockBreakEvent e, BlockMenu inv){
+        super.onBreak(e, inv);
+        if(inv!=null){
+            inv.dropItems(inv.getLocation(),getInputWLSlot());
+            inv.dropItems(inv.getLocation(),getChipSlot());
+        }
+    }
+    public void preRegister(){
+        super.preRegister();
+        //shared ticker
+        this.addItemHandler((BlockTicker) CHIP_SYNC);
+    }
     public void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount){
         if(inv.hasViewer())
             updateMenu(inv,b,Settings.RUN);
@@ -114,38 +145,7 @@ public abstract class AbstractSorter extends AbstractSyncTickCargo implements  C
         int slot=inputs[ MathUtils.bitCount(code,(synTickCount%32)+1)%inputs.length];
         TransportUtils.transportItem(inv,new int[]{slot},inv,getOutputSlots(), CargoConfigs.getDefaultConfig(),false,null,CraftUtils.getpusher);
     }
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
-        if(flow==ItemTransportFlow.WITHDRAW){
-            return getOutputSlots();
-        }
-        else {
-            if(item==null||item.getType().isAir()){
-                return getInputSlots();
-            }
-            int[] slots=getInputSlots();
-            int[] wlslots=getInputWLSlot();
-            int len=slots.length;
-            ItemStack st;
-            ItemCounter ct=CraftUtils.getConsumer(item);
-            for (int i=0;i<len;i++){
-                st=menu.getItemInSlot(wlslots[i]);
-                if(st==null||( CraftUtils.matchItemStack(st,ct,false))){
-                    return new int[] {slots[i]};
-                }
-            }
-            return blankSlot;
-        }
-    }
-    public void preRegister(){
-        super.preRegister();
-        //shared ticker
-        this.addItemHandler((BlockTicker) CHIP_SYNC);
-    }
-    public void onBreak(BlockBreakEvent e, BlockMenu inv){
-        super.onBreak(e, inv);
-        if(inv!=null){
-            inv.dropItems(inv.getLocation(),getInputWLSlot());
-            inv.dropItems(inv.getLocation(),getChipSlot());
-        }
+    public void updateMenu(BlockMenu blockMenu, Block block, Settings mod){
+        loadChipCommand(blockMenu);
     }
 }

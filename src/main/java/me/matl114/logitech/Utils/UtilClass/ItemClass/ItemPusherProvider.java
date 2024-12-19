@@ -19,33 +19,33 @@ public interface ItemPusherProvider {
      */
     static int[] NOSLOT= IntStream.generate(()->-1).limit(60).toArray();
     ItemPusher get(Settings settings, ItemStack item, int slot);
-    //need override?
-   default ItemPusher getPusher(Settings settings, BlockMenu blockMenu, int slot){
-       return get(settings,blockMenu.getItemInSlot(slot),slot);
-   }
-   default IntFunction<ItemPusher> getMenu(Settings settings, BlockMenu inv, IntFunction<ItemStack> stackFunction,int[] slots){
+    default IntFunction<ItemPusher> getMenu(Settings settings, BlockMenu inv, IntFunction<ItemStack> stackFunction,int[] slots){
        return (i -> get(settings,stackFunction.apply(i),slots[i]));
    }
-
-
-
-
-
    default IntFunction<ItemPusher> getMenuInstance(Settings settings  ,BlockMenu blockMenu,int[] slots){
        return getMenu(settings,blockMenu,i->blockMenu.getItemInSlot(slots[i]),slots);
    }
 
+
+
+
+
+   default IntFunction<ItemPusher> getMenuInstance(Settings settings, BlockMenu blockMenu,IntFunction<ItemStack> prov,int[] slots){
+    return getMenu(settings,blockMenu,i->prov.apply(i),slots);
+}
+
    default IntFunction<ItemPusher> getMenuInstance(Settings settings  ,BlockMenu blockMenu,ItemStack[] item){
        return getMenu(settings,blockMenu,i->item[i],NOSLOT);
    }
-    default IntFunction<ItemPusher> getMenuInstance(Settings settings  , BlockMenu blockMenu, List<ItemStack> item){
-        return getMenu(settings,blockMenu,(i)->  item.get(i),NOSLOT);
-    }
     default IntFunction<ItemPusher> getMenuInstance(Settings settings, BlockMenu blockMenu, ItemStack[] item,int[] slots){
        return getMenu(settings,blockMenu,(i)->  item[i],slots);
     }
-    default IntFunction<ItemPusher> getMenuInstance(Settings settings, BlockMenu blockMenu,IntFunction<ItemStack> prov,int[] slots){
-        return getMenu(settings,blockMenu,i->prov.apply(i),slots);
+    default IntFunction<ItemPusher> getMenuInstance(Settings settings  , BlockMenu blockMenu, List<ItemStack> item){
+        return getMenu(settings,blockMenu,(i)->  item.get(i),NOSLOT);
     }
+    //need override?
+	   default ItemPusher getPusher(Settings settings, BlockMenu blockMenu, int slot){
+	       return get(settings,blockMenu.getItemInSlot(slot),slot);
+	   }
 
 }

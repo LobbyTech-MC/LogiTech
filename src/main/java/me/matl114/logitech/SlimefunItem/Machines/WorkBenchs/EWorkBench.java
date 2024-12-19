@@ -50,6 +50,16 @@ public class EWorkBench extends AbstractWorkBench {
         preset.addItem(CRAFT_SLOT,CRAFT_ITEM);
         preset.addItem(getRecipeMenuSlot(),AbstractWorkBench.RECIPEBOOK_SHOW_ITEM);
     }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public int getRecipeMenuSlot(){return MENU_SLOT; }
+    public int[] getRecipeSlots(){
+        return INPUT_SLOT;
+    }
     public void newMenuInstance(BlockMenu menu, Block block){
         menu.addMenuClickHandler(CRAFT_SLOT,
                 (player, i, itemStack, clickAction)->{
@@ -66,14 +76,4 @@ public class EWorkBench extends AbstractWorkBench {
 //            return false;
 //        }));
     }
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
-    public int[] getRecipeSlots(){
-        return INPUT_SLOT;
-    }
-    public int getRecipeMenuSlot(){return MENU_SLOT; }
 }

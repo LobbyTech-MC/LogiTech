@@ -90,12 +90,6 @@ public class RegisteryLogger extends AbstractMachine {
                 "            .register();",
         "NULL"
     };
-    public int[] getInputSlots(){
-        return new int[0];
-    }
-    public int[] getOutputSlots(){
-        return new int[0];
-    }
     public RegisteryLogger(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, recipeType, recipe, 0,0);
     }
@@ -115,13 +109,13 @@ public class RegisteryLogger extends AbstractMachine {
         preset.addItem(ADDSFITEM_SLOT,ADDSFITEM_ITEM);
         preset.addItem(ID_SLOT,ID_ITEM);
     }
-
-    public void process(Block b, BlockMenu preset, SlimefunBlockData data){
-
+    public int[] getInputSlots(){
+        return new int[0];
     }
-    public void registerTick(SlimefunItem item){
-        //no ticker
+    public int[] getOutputSlots(){
+        return new int[0];
     }
+
     public String getRecipeString(BlockMenu inv,int[] slots){
         SlimefunAddon addon= MyAddon.getInstance();
         String result="recipe(";
@@ -168,6 +162,14 @@ public class RegisteryLogger extends AbstractMachine {
         }
         result+=")";
         return result;
+    }
+    public String getRecordId(Location loc){
+        try{
+            return StorageCacheUtils.getData(loc,"id");
+        }   catch (Throwable a){
+            setRecordId(loc,"null");
+            return "null";
+        }
     }
     public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
         if(DataCache.getLastRecipe(blockMenu.getLocation())<0||DataCache.getLastRecipe(blockMenu.getLocation())>CHOOSE_ITEM.length){
@@ -253,13 +255,11 @@ public class RegisteryLogger extends AbstractMachine {
             return false;
         }));
     }
-    public String getRecordId(Location loc){
-        try{
-            return StorageCacheUtils.getData(loc,"id");
-        }   catch (Throwable a){
-            setRecordId(loc,"null");
-            return "null";
-        }
+    public void process(Block b, BlockMenu preset, SlimefunBlockData data){
+
+    }
+    public void registerTick(SlimefunItem item){
+        //no ticker
     }
     public void setRecordId(Location loc,String id){
         StorageCacheUtils.setData(loc,"id",id);

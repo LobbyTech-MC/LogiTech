@@ -13,29 +13,29 @@ public class EnergyProviderOperation implements CustomMachineOperation {
         this.currentTicks = 0;
         this.energyPertick = energyPerTick;
     }
-    public void progress(int var1){
-        this.currentTicks += var1;
+    public int getEnergy(){
+        return this.energyPertick;
     }
 
     public int getProgress(){
         return this.currentTicks;
     }
 
-    public int getTotalTicks(){
-        return this.totalTicks;
-    }
-
     public int getRemainingTicks() {
         return this.totalTicks-this.currentTicks;
     }
 
-    public boolean isFinished() {
-        return this.totalTicks<=this.currentTicks;
-    }
     public ItemConsumer[] getResults(){
         return this.outputItems;
     }
-    public int getEnergy(){
-        return this.energyPertick;
+
+    public int getTotalTicks(){
+        return this.totalTicks;
+    }
+    public boolean isFinished() {
+        return this.totalTicks<=this.currentTicks;
+    }
+    public void progress(int var1){
+        this.currentTicks += var1;
     }
 }

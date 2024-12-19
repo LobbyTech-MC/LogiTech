@@ -40,24 +40,10 @@ public class CargoConfigCard {
         lore.add(AddUtils.concat( LORE_PREFIX[6],CargoConfigs.REVERSE.getConfig(code)?"true":"false"));
         lore.add(AddUtils.concat( LORE_PREFIX[7],String.valueOf( CargoConfigs.TRANSLIMIT.getConfigInt(code))));
     }
-    public static boolean isConfig(ItemMeta meta) {
-        return meta.getPersistentDataContainer().has(KEY_LOC);
-    }
     public static boolean canConfig(ItemMeta meta) {
         String it= CraftUtils.parseSfId(meta);
         if(it==null) return false;
         return SlimefunItem.getById(it) instanceof ConfigCard;
-    }
-    public boolean canConfig(SlimefunItem sfitem){
-        return sfitem instanceof ConfigCard;
-    }
-    public static int getConfig(ItemMeta meta) {
-        try{
-            Integer code= meta.getPersistentDataContainer().get(KEY_LOC, PersistentDataType.INTEGER);
-            return code!=null?code:-1;
-        }catch(Throwable e){
-            return 0;
-        }
     }
     public static void clearConfig(ItemMeta meta) {
         meta.getPersistentDataContainer().remove(KEY_LOC);
@@ -74,6 +60,17 @@ public class CargoConfigCard {
             }
             meta.setLore(lore);
         }
+    }
+    public static int getConfig(ItemMeta meta) {
+        try{
+            Integer code= meta.getPersistentDataContainer().get(KEY_LOC, PersistentDataType.INTEGER);
+            return code!=null?code:-1;
+        }catch(Throwable e){
+            return 0;
+        }
+    }
+    public static boolean isConfig(ItemMeta meta) {
+        return meta.getPersistentDataContainer().has(KEY_LOC);
     }
     public static void setConfig(ItemMeta meta, int code) {
         if(code!=-1) {
@@ -102,5 +99,8 @@ public class CargoConfigCard {
         lore.subList(size-len,size).clear();
         appendConfigLore(lore,code);
         meta.setLore(lore);
+    }
+    public boolean canConfig(SlimefunItem sfitem){
+        return sfitem instanceof ConfigCard;
     }
 }

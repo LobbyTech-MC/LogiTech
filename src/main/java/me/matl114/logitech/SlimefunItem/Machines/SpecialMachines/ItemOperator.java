@@ -68,12 +68,6 @@ public class ItemOperator extends AbstractMachine {
         }
     }};
 
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
     public ItemOperator(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                               int energybuffer, int energyConsumption){
         super(category, item, recipeType, recipe, energybuffer, energyConsumption);
@@ -96,11 +90,17 @@ public class ItemOperator extends AbstractMachine {
         }
 
     }
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
     private ItemStack getOperated(BlockMenu inv,boolean onlyOne){
         ItemStack stack=inv.getItemInSlot(OUTPUT_SLOTS[0]);
         if(!onlyOne||(stack!=null&&stack.getAmount()==1)){
             return stack;
         }else return null;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
     }
     public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuClickHandler(FUNCTION_SLOT[0],((player, i, itemStack, clickAction) -> {
@@ -274,7 +274,7 @@ public class ItemOperator extends AbstractMachine {
             }
         }));
     }
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
+    public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
 
 
     @Override
@@ -282,5 +282,5 @@ public class ItemOperator extends AbstractMachine {
 
     }
 
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
+    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 }

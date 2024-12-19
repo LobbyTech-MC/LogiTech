@@ -20,19 +20,28 @@ public class BukkitUtils {
     public static final RecipeType VANILLA_FURNACE=new RecipeType(AddUtils.getNameKey("vanilla_furnace"),
             new CustomItemStack(Material.FURNACE,null,"","&6原版熔炉"));
 
-    public static void sendRecipeToVanilla(NamespacedKey key,ShapedMachineRecipe recipe){
-        sendRecipeToVanilla(key,recipe.getInput(),recipe.getOutput()[0]);
-    }
-    public static void sendRecipeToVanilla(SlimefunItem sfitem){
-        sendRecipeToVanilla(AddUtils.getNameKey(sfitem.getId()+"_vl"),sfitem.getRecipe(),sfitem.getRecipeOutput());
-    }
-    public static void setup(){
-        addMoreRecipes();
-    }
     public static void addMoreRecipes(){
         sendRecipeToVanilla(AddSlimefunItems.CRAFT_MANUAL);
         sendRecipeToVanilla(AddSlimefunItems.ENHANCED_CRAFT_MANUAL);
         sendRecipeToVanilla(AddSlimefunItems.MAGIC_WORKBENCH_MANUAL);
+    }
+    public static void executeAsync(Runnable runnable){
+        if(Bukkit.isPrimaryThread()){
+            Schedules.launchSchedules(
+                    runnable,0,false,0
+            );
+        }else {
+            runnable.run();
+        }
+    }
+    public static void executeSync(Runnable runnable){
+        if(Bukkit.isPrimaryThread()){
+            runnable.run();
+        }else {
+            Schedules.launchSchedules(
+                    runnable,0,true,0
+            );
+        }
     }
     public static void sendRecipeToVanilla(NamespacedKey key, ItemStack[] input, ItemStack output){
         if(input.length>9){
@@ -61,22 +70,13 @@ public class BukkitUtils {
 
         Bukkit.addRecipe(vanillaRecipe);
     }
-    public static void executeSync(Runnable runnable){
-        if(Bukkit.isPrimaryThread()){
-            runnable.run();
-        }else {
-            Schedules.launchSchedules(
-                    runnable,0,true,0
-            );
-        }
+    public static void sendRecipeToVanilla(NamespacedKey key,ShapedMachineRecipe recipe){
+        sendRecipeToVanilla(key,recipe.getInput(),recipe.getOutput()[0]);
     }
-    public static void executeAsync(Runnable runnable){
-        if(Bukkit.isPrimaryThread()){
-            Schedules.launchSchedules(
-                    runnable,0,false,0
-            );
-        }else {
-            runnable.run();
-        }
+    public static void sendRecipeToVanilla(SlimefunItem sfitem){
+        sendRecipeToVanilla(AddUtils.getNameKey(sfitem.getId()+"_vl"),sfitem.getRecipe(),sfitem.getRecipeOutput());
+    }
+    public static void setup(){
+        addMoreRecipes();
     }
 }

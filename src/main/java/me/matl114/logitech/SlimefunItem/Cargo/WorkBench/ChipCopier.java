@@ -51,12 +51,6 @@ public class ChipCopier extends AbstractSyncTickCargo {
     protected int[] SLOTS = {
            16
     };
-    public int[] getInputSlots(){
-        return SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return SLOTS;
-    }
     public ChipCopier(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
         setDisplayRecipes(
@@ -76,11 +70,6 @@ public class ChipCopier extends AbstractSyncTickCargo {
                                 "&a机器可以同时向一组芯片拷贝数据"),null
                 )
         );
-    }
-    public ItemStack getInfoItem( int tickCount){
-        int ticks=tickCount%32;
-        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a信息"
-                , AddUtils.concat("&7当前读取编码位数: ",String.valueOf(ticks)));
     }
     public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
@@ -106,11 +95,29 @@ public class ChipCopier extends AbstractSyncTickCargo {
         preset.addItem(STATUS_SLOT,getInfoItem(0),ChestMenuUtils.getEmptyClickHandler());
 
     }
+    public ItemStack getInfoItem( int tickCount){
+        int ticks=tickCount%32;
+        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a信息"
+                , AddUtils.concat("&7当前读取编码位数: ",String.valueOf(ticks)));
+    }
+    public int[] getInputSlots(){
+        return SLOTS;
+    }
+    public int[] getOutputSlots(){
+        return SLOTS;
+    }
     public void newMenuInstance(BlockMenu inv,Block b ){
 
     }
-    public void updateMenu(BlockMenu inv, Block b, Settings mod){
-
+    public void onBreak(BlockBreakEvent e,BlockMenu inv){
+        super.onBreak(e,inv);
+        if(inv!=null){
+            inv.dropItems(inv.getLocation(),SAMPLE_SLOT);
+        }
+    }
+    public void preRegister(){
+        super.preRegister();
+        this.addItemHandler((BlockTicker) CHIP_SYNC);
     }
     public void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount){
         if(inv.hasViewer()){
@@ -147,14 +154,7 @@ public class ChipCopier extends AbstractSyncTickCargo {
             }});
         }
     }
-    public void onBreak(BlockBreakEvent e,BlockMenu inv){
-        super.onBreak(e,inv);
-        if(inv!=null){
-            inv.dropItems(inv.getLocation(),SAMPLE_SLOT);
-        }
-    }
-    public void preRegister(){
-        super.preRegister();
-        this.addItemHandler((BlockTicker) CHIP_SYNC);
+    public void updateMenu(BlockMenu inv, Block b, Settings mod){
+
     }
 }

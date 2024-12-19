@@ -16,26 +16,26 @@ public class MultiCraftingOperation implements CustomMachineOperation {
     }
 
 
-    public void progress(int var1){
-        this.currentTicks += var1;
-    }
-
     public int getProgress(){
         return this.currentTicks;
-    }
-
-    public int getTotalTicks(){
-        return this.totalTicks;
     }
 
     public int getRemainingTicks() {
         return this.totalTicks-this.currentTicks;
     }
 
+    public ItemGreedyConsumer[] getResults(){
+        return this.outputItems;
+    }
+
+    public int getTotalTicks(){
+        return this.totalTicks;
+    }
+
     public boolean isFinished() {
         return this.totalTicks<=this.currentTicks;
     }
-    public ItemGreedyConsumer[] getResults(){
-        return this.outputItems;
+    public void progress(int var1){
+        this.currentTicks += var1;
     }
 }

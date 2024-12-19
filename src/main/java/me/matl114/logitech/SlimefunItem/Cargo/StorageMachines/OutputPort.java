@@ -23,19 +23,7 @@ public class OutputPort extends AbstractIOPort {
     protected static final int[] BORDER=new int[]{
             28,37,46
     };
-    public int getDisplaySlot(){
-        return 19;
-    }
-    public int getStorageSlot(){
-        return 10;
-    }
     protected static int INFO_SLOT=1;
-    public int[] getInputSlots() {
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
     public OutputPort(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(category, item, recipeType, recipe);
     }
@@ -54,5 +42,17 @@ public class OutputPort extends AbstractIOPort {
         preset.addItem(getDisplaySlot(), ITEM_DISPLAY_NULL, ChestMenuUtils.getEmptyClickHandler());
         preset.addItem( INFO_SLOT, INFO_ITEM, ChestMenuUtils.getEmptyClickHandler());
         preset.setSize(54);
+    }
+    public int getDisplaySlot(){
+        return 19;
+    }
+    public int[] getInputSlots() {
+        return INPUT_SLOT;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public int getStorageSlot(){
+        return 10;
     }
 }

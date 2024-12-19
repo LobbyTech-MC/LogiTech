@@ -46,6 +46,12 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
     private Function<Location,Boolean> handleProcess;
     private Consumer<Location> handlerProcessCost;
     /**
+     * provided for craft counter-generate
+     * can generated custom wrapped item cache by changing this
+     */
+    protected ItemPusherProvider CRAFT_PROVIDER= CraftUtils.getpusher;
+
+    /**
      * constructor of abstractMachines will keep Collections of MachineRecipes,will register energyNetwork params,
      * will set up menu by overriding constructMenu method
      * @param category
@@ -100,6 +106,10 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
 
     }
 
+    public void addCharge(@Nonnull Location l, int charge){
+        EnergyNetComponent.super.addCharge(l,charge);
+    }
+
     /**
      * automatically add information lore to sfitemstack
      * @param stack
@@ -115,22 +125,60 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
     }
 
     /**
+     * handle all conditions and make response like electricity, and so on,
+     * if condition pass, run process()
+     * @param b
+     * @param menu
+     * @return
+     */
+    public boolean conditionHandle(Block b,BlockMenu menu){
+        if(menu!=null)
+            return this.handleProcess.apply(menu.getLocation());
+        else
+            return this.handleProcess.apply(b.getLocation());
+    }
+
+    /**
      * construct your menu here.called in constructor
      * @param preset
      */
     public abstract void constructMenu(BlockMenuPreset preset);
 
+    public void disable() {
+        super.disable();
+        //this.getMachineRecipes().clear();
+    }
+    public void enable() {
+        super.enable();
+        this.registerDefaultRecipes();
+    }
+    /**
+     * get capacity
+     * @return
+     */
+    public final int getCapacity(){
+        return this.energybuffer;
+    }
+    /**
+     * get energycomponenttype
+     * @return
+     */
+    @Override
+    public EnergyNetComponentType getEnergyComponentType() {
+        return this.energyNetComponent;
+    }
     /**
      * cargo and IO
      * @return
      */
     public abstract int[] getInputSlots();
-
     /**
-     * cargo and IO
+     * container name,default item name
      * @return
      */
-    public abstract int[] getOutputSlots();
+    public final String getInventoryTitle() {
+        return this.getItemName();
+    }
 
     public List<MachineRecipe> getMachineRecipes(){
         if(this.machineRecipes==null||this.machineRecipes.isEmpty()){
@@ -144,7 +192,6 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
         }
         return this.machineRecipes;
     }
-
     /**
      * differently get machinerecipes via location and inv
      * @param b
@@ -154,46 +201,48 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
     public List<MachineRecipe> getMachineRecipes(Block b,BlockMenu inv){
         return getMachineRecipes();
     }
+
     public List<MachineRecipe> getMachineRecipes(SlimefunBlockData data){
         return getMachineRecipes();
     }
-    /**
-     * handle all conditions and make response like electricity, and so on,
-     * if condition pass, run process()
-     * @param b
-     * @param menu
-     * @return
-     */
-    public boolean conditionHandle(Block b,BlockMenu menu){
-        if(menu!=null)
-            return this.handleProcess.apply(menu.getLocation());
-        else
-            return this.handleProcess.apply(b.getLocation());
-    }
-    public void setCharge(@Nonnull Location l, int charge){
-        EnergyNetComponent.super.setCharge(l,Math.max(0,charge));
-    }
-    public void removeCharge(@Nonnull Location l, int charge){
-        if(charge>0){
-            EnergyNetComponent.super.removeCharge(l,charge);
-        }
-    }
-    public void addCharge(@Nonnull Location l, int charge){
-        EnergyNetComponent.super.addCharge(l,charge);
-    }
 
     /**
-     * provided for craft counter-generate
-     * can generated custom wrapped item cache by changing this
+     * cargo and IO
+     * @return
      */
-    protected ItemPusherProvider CRAFT_PROVIDER= CraftUtils.getpusher;
+    public abstract int[] getOutputSlots();
+
+    /**
+     * create new Menu INSTANCE at blockMenu,default None
+     * @param blockMenu
+     * @param block
+     */
+    public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
+        updateMenu(blockMenu,block,Settings.INIT);
+    }
+
+    public void postRegister() {
+        super.postRegister();
+        if (this.getState() == ItemState.ENABLED) {
+            this.registerDefaultRecipes();
+        }
+
+    }
+
+    public void preRegister(){
+        super.preRegister();
+        //
+        registerTick(this);
+        //为menublock提供 需要
+        registerBlockMenu(this);
+    }
+
     /**
      * do real tick process like findrecipe or pushitem
      * @param b
      * @param preset
      */
     public abstract void process(Block b, BlockMenu preset, SlimefunBlockData data);
-
     /**
      * make cost for process
      * @param b
@@ -205,49 +254,6 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
         else
             this.handlerProcessCost.accept(b.getLocation());
     }
-
-    /**
-     * get energycomponenttype
-     * @return
-     */
-    @Override
-    public EnergyNetComponentType getEnergyComponentType() {
-        return this.energyNetComponent;
-    }
-
-    /**
-     * get capacity
-     * @return
-     */
-    public final int getCapacity(){
-        return this.energybuffer;
-    }
-
-    /**
-     * container name,default item name
-     * @return
-     */
-    public final String getInventoryTitle() {
-        return this.getItemName();
-    }
-
-    /**
-     * update menu when we have sth change or we have a new Instance
-     * @param blockMenu
-     * @param block
-     */
-    public void updateMenu(BlockMenu blockMenu, Block block, Settings mod){
-
-    }
-
-    /**
-     * create new Menu INSTANCE at blockMenu,default None
-     * @param blockMenu
-     * @param block
-     */
-    public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
-        updateMenu(blockMenu,block,Settings.INIT);
-    }
     /**
      * fetch List of recipes tobee show
      * @return
@@ -255,37 +261,31 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
     public List<MachineRecipe> provideDisplayRecipe(){
         return getMachineRecipes();
     }
+    protected void registerDefaultRecipes() {
+    }
+    public void removeCharge(@Nonnull Location l, int charge){
+        if(charge>0){
+            EnergyNetComponent.super.removeCharge(l,charge);
+        }
+    }
+
+    public void setCharge(@Nonnull Location l, int charge){
+        EnergyNetComponent.super.setCharge(l,Math.max(0,charge));
+    }
+    public final void tick(Block b, BlockMenu menu, int ticker) {
+
+    }
     public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
         if(conditionHandle(b,menu)){
             process(b,menu,data);
         }}
-    public final void tick(Block b, BlockMenu menu, int ticker) {
+    /**
+     * update menu when we have sth change or we have a new Instance
+     * @param blockMenu
+     * @param block
+     */
+    public void updateMenu(BlockMenu blockMenu, Block block, Settings mod){
 
-    }
-    public void enable() {
-        super.enable();
-        this.registerDefaultRecipes();
-    }
-
-    public void disable() {
-        super.disable();
-        //this.getMachineRecipes().clear();
-    }
-    public void postRegister() {
-        super.postRegister();
-        if (this.getState() == ItemState.ENABLED) {
-            this.registerDefaultRecipes();
-        }
-
-    }
-    public void preRegister(){
-        super.preRegister();
-        //
-        registerTick(this);
-        //为menublock提供 需要
-        registerBlockMenu(this);
-    }
-    protected void registerDefaultRecipes() {
     }
 
 

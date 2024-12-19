@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -21,14 +22,6 @@ import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.WorldUtils;
 import me.matl114.logitech.Utils.UtilClass.CargoClass.Directions;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 public class LineEnergyCollector extends AbstractEnergyCollector implements DirectionalBlock {
     protected final int MAX_LEN=64;
@@ -36,15 +29,12 @@ public class LineEnergyCollector extends AbstractEnergyCollector implements Dire
     protected final String[] savedKeys = new String[]{
             "line_dir"
     };
-    public  String[] getSaveKeys(){
-        return savedKeys;
-    }
     protected final int[] DIRECTION_SLOTS = new int[]{
             10
     };
-    public int[] getDirectionSlots(){
-        return DIRECTION_SLOTS;
-    }
+    private final int PARTICLE_SLOT=0;
+    private ItemStack PARTICLE_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&a点击切换粒子效果","&7当前状态: &c关");
+    private ItemStack PARTICLE_ON=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a点击切换粒子效果","&7当前状态: &a开");
     public LineEnergyCollector(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                              int energybuffer){
         super(category, item, recipeType, recipe, energybuffer);
@@ -81,12 +71,15 @@ public class LineEnergyCollector extends AbstractEnergyCollector implements Dire
         }
         return ret;
     }
+    public int[] getDirectionSlots(){
+        return DIRECTION_SLOTS;
+    }
     public int getMaxCollectAmount(){
         return MAX_LEN;
     }
-    private final int PARTICLE_SLOT=0;
-    private ItemStack PARTICLE_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&a点击切换粒子效果","&7当前状态: &c关");
-    private ItemStack PARTICLE_ON=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a点击切换粒子效果","&7当前状态: &a开");
+    public  String[] getSaveKeys(){
+        return savedKeys;
+    }
     @Override
     public boolean[] getStatus(BlockMenu inv) {
         ItemStack itemStack=inv.getItemInSlot(PARTICLE_SLOT);
@@ -94,18 +87,6 @@ public class LineEnergyCollector extends AbstractEnergyCollector implements Dire
             return new boolean[]{super.getStatus(inv)[0],true};
         }else {
             return new boolean[]{super.getStatus(inv)[0],false};
-        }
-    }
-
-    @Override
-    public void toggleStatus(BlockMenu inv, boolean... result) {
-        super.toggleStatus(inv, result[0]);
-        if(result.length==2){
-            if(result[1]){
-                inv.replaceExistingItem(PARTICLE_SLOT,PARTICLE_ON);
-            }else {
-                inv.replaceExistingItem(PARTICLE_SLOT,PARTICLE_OFF);
-            }
         }
     }
 
@@ -127,6 +108,18 @@ public class LineEnergyCollector extends AbstractEnergyCollector implements Dire
             return false;
         }));
         updateDirectionSlots(0,menu);
+    }
+
+    @Override
+    public void toggleStatus(BlockMenu inv, boolean... result) {
+        super.toggleStatus(inv, result[0]);
+        if(result.length==2){
+            if(result[1]){
+                inv.replaceExistingItem(PARTICLE_SLOT,PARTICLE_ON);
+            }else {
+                inv.replaceExistingItem(PARTICLE_SLOT,PARTICLE_OFF);
+            }
+        }
     }
 
 }

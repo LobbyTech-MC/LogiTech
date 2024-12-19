@@ -1,6 +1,19 @@
 package me.matl114.logitech.SlimefunItem.Machines.SpecialMachines;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -10,17 +23,6 @@ import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.ChunkPosition;
 import me.matl114.logitech.Utils.DataCache;
 import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 public class TimerSequentialSlimefun extends TimerSlimefun{
     /**
@@ -40,10 +42,10 @@ public class TimerSequentialSlimefun extends TimerSlimefun{
     public void registerTick(SlimefunItem item){
         item.addItemHandler(
                 new BlockTicker() {
+                    int tickCount=0;
                     public boolean isSynchronized() {
                         return false;
                     }
-                    int tickCount=0;
                     @ParametersAreNonnullByDefault
                     public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
                         Location loc=b.getLocation();
@@ -83,6 +85,16 @@ public class TimerSequentialSlimefun extends TimerSlimefun{
         );
     }
 
+    @ParametersAreNonnullByDefault
+    private void tickBlockTimer(Location l, Block b, SlimefunItem item, SlimefunBlockData data,int timer) {
+        try {
+            for (int i=0;i<timer;++i){
+                item.getBlockTicker().tick(b, item, data);
+            }
+        } catch (LinkageError | Exception var11) {
+            reportError.invokeCallback((nul)->{},()->{},Slimefun.getTickerTask(),l,item,var11);
+        }
+    }
     private int tickChunk(Set<Location> locations, int timer) {
         List<Runnable> tickTasks = new ArrayList<>();
         locations.forEach(l->{
@@ -126,15 +138,5 @@ public class TimerSequentialSlimefun extends TimerSlimefun{
         }
         CompletableFuture.allOf(waitThreads.toArray(new CompletableFuture[0])).join();
         return tickTasks.size();
-    }
-    @ParametersAreNonnullByDefault
-    private void tickBlockTimer(Location l, Block b, SlimefunItem item, SlimefunBlockData data,int timer) {
-        try {
-            for (int i=0;i<timer;++i){
-                item.getBlockTicker().tick(b, item, data);
-            }
-        } catch (LinkageError | Exception var11) {
-            reportError.invokeCallback((nul)->{},()->{},Slimefun.getTickerTask(),l,item,var11);
-        }
     }
 }

@@ -42,17 +42,11 @@ public class ChipReactor extends AbstractEnergyProcessor {
     };
     protected final int INFO_SLOT=4;
     protected final ItemStack INFO_ITEM=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6当前机器信息");
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
-
-
-
     protected final int[] OUTPUT_SLOTS=new int[0];
     protected double multiple;
+
+
+
     protected int time;
     public ChipReactor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                      int energyBuffer,double multiple,int time) {
@@ -144,5 +138,11 @@ public class ChipReactor extends AbstractEnergyProcessor {
             return currentOperation.getEnergy();
 
         }else return 0;
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
     }
 }

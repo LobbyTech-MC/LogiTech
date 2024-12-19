@@ -12,6 +12,9 @@ import me.matl114.logitech.MyAddon;
 
 public class SlimefunBlockPlaceLimitListener implements Listener {
     static HashMap<SlimefunItem, Consumer<SlimefunBlockPlaceEvent>> eventHandlers = new HashMap<>();
+    public static void registerBlockLimit(SlimefunItem item, Consumer<SlimefunBlockPlaceEvent> handler) {
+        eventHandlers.put(item, handler);
+    }
     @EventHandler
     public void onBlockPlace(SlimefunBlockPlaceEvent event) {
         SlimefunItem item=event.getSlimefunItem();
@@ -20,8 +23,5 @@ public class SlimefunBlockPlaceLimitListener implements Listener {
                 eventHandlers.get(item).accept(event);
             }
         }
-    }
-    public static void registerBlockLimit(SlimefunItem item, Consumer<SlimefunBlockPlaceEvent> handler) {
-        eventHandlers.put(item, handler);
     }
 }

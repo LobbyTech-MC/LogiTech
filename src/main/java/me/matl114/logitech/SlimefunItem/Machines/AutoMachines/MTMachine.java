@@ -24,15 +24,6 @@ public class MTMachine extends AbstractMultiThreadProcessor {
 
     public MTMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                      ItemStack processbar, int energyConsumption, int energyBuffer,
-                    Supplier<List<MachineRecipe>> machineRecipeSupplier) {
-        super(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,null);
-        this.machineRecipeSupplier=machineRecipeSupplier;
-        SchedulePostRegister.addPostRegisterTask(()->{
-            getMachineRecipes();
-        });
-    }
-    public MTMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
-                     ItemStack processbar, int energyConsumption, int energyBuffer,
                     RecipeType... recipeTypes) {
         this(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,()->{
             if(recipeTypes==null||recipeTypes.length==0){
@@ -48,6 +39,15 @@ public class MTMachine extends AbstractMultiThreadProcessor {
                 }
                 return mr;
             }
+        });
+    }
+    public MTMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
+                     ItemStack processbar, int energyConsumption, int energyBuffer,
+                    Supplier<List<MachineRecipe>> machineRecipeSupplier) {
+        super(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,null);
+        this.machineRecipeSupplier=machineRecipeSupplier;
+        SchedulePostRegister.addPostRegisterTask(()->{
+            getMachineRecipes();
         });
     }
 

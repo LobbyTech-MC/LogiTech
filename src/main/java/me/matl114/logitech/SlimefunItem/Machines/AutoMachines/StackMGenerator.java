@@ -47,6 +47,47 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
 
 public class StackMGenerator extends MMGenerator implements MultiCraftType, ImportRecipes {
+    protected static final List<SlimefunItem> BW_LIST=new ArrayList<>();
+    protected static int[] BW_LIST_ENERGYCOMSUME;
+    protected static int BWSIZE;
+    protected static MenuFactory MACHINE_LIST_MENU=null;
+    static{
+        SchedulePostRegister.addPostRegisterTask(()->{
+            getMachineList();
+            MACHINE_LIST_MENU=  MenuUtils.createMachineListDisplay(getMachineList(),null).setBack(1);
+        });
+    }
+    public static boolean hasInit=false;
+    public static int getEnergy(int index){
+        if(BW_LIST_ENERGYCOMSUME==null||BW_LIST_ENERGYCOMSUME.length==0){
+            getMachineList();
+        }
+        return BW_LIST_ENERGYCOMSUME[index];
+    }
+    public static final int getListSize(){
+        if(BW_LIST.isEmpty()||BWSIZE==0){
+            BWSIZE=getMachineList().size();
+        }
+        return BWSIZE;
+    }
+    public static List<SlimefunItem> getMachineList(){
+        if(!hasInit)
+        synchronized (BW_LIST){
+            if(BW_LIST.isEmpty()){
+                RecipeSupporter.init();
+                BWSIZE=RecipeSupporter.STACKMGENERATOR_LIST.size();
+                BW_LIST_ENERGYCOMSUME=new int[BWSIZE+1];
+                int i=0;
+                for(Map.Entry<SlimefunItem,Integer> e:RecipeSupporter.STACKMGENERATOR_LIST.entrySet()){
+                    BW_LIST.add(e.getKey());
+                    BW_LIST_ENERGYCOMSUME[i]=e.getValue();
+                    ++i;
+                }
+                hasInit=true;
+            }
+        }
+        return BW_LIST;
+    }
     protected final int[] BORDER=new int[]{
             6,7,8,15,16,17
     };
@@ -56,15 +97,6 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
     protected final int [] OUTPUT_SLOTS=new int[]{
            18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53
     };
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
-    protected static final List<SlimefunItem> BW_LIST=new ArrayList<>();
-    protected static int[] BW_LIST_ENERGYCOMSUME;
-    protected static int BWSIZE;
     protected final int MACHINE_SLOT=13;
     protected final int MINFO_SLOT=14;
     protected final int INFO_SLOT=4;
@@ -74,27 +106,12 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
     protected final ItemStack MINFO_ITEM_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c机器信息","&7待机中");
     protected final int MACHINEMENU_SLOT=3;
     protected final int RECIPEMENU_SLOT=5;
+
     protected final ItemStack MACHINEMENU_ICON=new CustomItemStack(Material.BLAST_FURNACE,"&b该机器支持的机器列表","&6点击打开菜单");
     protected final ItemStack RECIPEMENU_ICON=new CustomItemStack(Material.KNOWLEDGE_BOOK,"&b当前模拟的机器配方列表","&6点击打开菜单");
-    protected ItemStack getInfoItem(int craftlimit,int energyCost,int charge,double efficiency,String name){
-        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a生成器信息",AddUtils.concat("&7当前模拟的生成器名称: ",(name)),
-                "&7当前并行处理数: %-3d".formatted(craftlimit),"&7当前每刻耗电量: %sJ/t".formatted(AddUtils.formatDouble(energyCost)),"&7当前电量: %sJ".formatted(AddUtils.formatDouble(charge)),
-                AddUtils.concat("&7当前工作效率: ",AddUtils.getPercentFormat(efficiency)));
-    }
-    protected ItemStack getInfoOffItem(int craftlimit ,int energyCost,int charge,String name){
-        return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c生成器信息","&c缺少电力!",AddUtils.concat("&7当前模拟的生成器名称: ",(name)),
-                "&7当前并行处理数: %-3d".formatted(craftlimit),"&7当前每刻耗电量: %sJ/t".formatted(AddUtils.formatDouble(energyCost)),"&7当前电量: %sJ".formatted(AddUtils.formatDouble(charge)));
-    }
-
     protected int efficiency;
-    protected static MenuFactory MACHINE_LIST_MENU=null;
-    static{
-        SchedulePostRegister.addPostRegisterTask(()->{
-            getMachineList();
-            MACHINE_LIST_MENU=  MenuUtils.createMachineListDisplay(getMachineList(),null).setBack(1);
-        });
-    }
     protected ItemPusherProvider MACHINE_PROVIDER=CraftUtils.getpusher;
+    public final int DATA_SLOT=4;
     public StackMGenerator(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                            int time, int energybuffer, int energyConsumption,int efficiency) {
         super(itemGroup, item, recipeType, recipe, time, energybuffer, energyConsumption, new LinkedHashMap<>());
@@ -115,51 +132,8 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         );
         this.PROCESSOR_SLOT=12;
     }
-    public static boolean hasInit=false;
-    public static List<SlimefunItem> getMachineList(){
-        if(!hasInit)
-        synchronized (BW_LIST){
-            if(BW_LIST.isEmpty()){
-                RecipeSupporter.init();
-                BWSIZE=RecipeSupporter.STACKMGENERATOR_LIST.size();
-                BW_LIST_ENERGYCOMSUME=new int[BWSIZE+1];
-                int i=0;
-                for(Map.Entry<SlimefunItem,Integer> e:RecipeSupporter.STACKMGENERATOR_LIST.entrySet()){
-                    BW_LIST.add(e.getKey());
-                    BW_LIST_ENERGYCOMSUME[i]=e.getValue();
-                    ++i;
-                }
-                hasInit=true;
-            }
-        }
-        return BW_LIST;
-    }
-    public static final int getListSize(){
-        if(BW_LIST.isEmpty()||BWSIZE==0){
-            BWSIZE=getMachineList().size();
-        }
-        return BWSIZE;
-    }
-    public static int getEnergy(int index){
-        if(BW_LIST_ENERGYCOMSUME==null||BW_LIST_ENERGYCOMSUME.length==0){
-            getMachineList();
-        }
-        return BW_LIST_ENERGYCOMSUME[index];
-    }
     public void addInfo(ItemStack stack){
         stack.setItemMeta( AddUtils.capacitorInfoAdd(stack,energybuffer).getItemMeta());
-    }
-
-    public MachineRecipe getRecordRecipe(SlimefunBlockData data){
-        List<MachineRecipe> lst=getMachineRecipes(data);
-        int size=lst.size();
-        if(size>0){
-            int index=DataCache.getLastRecipe(data);
-            if(index>=0&&index<size){
-                return lst.get(index);
-            }
-        }
-        return null;
     }
     public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
@@ -174,6 +148,75 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         preset.addItem(RECIPEMENU_SLOT,RECIPEMENU_ICON);
         preset.addItem(MINFO_SLOT,MINFO_ITEM_OFF,ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(PROCESSOR_SLOT, this.INFO_NULL, ChestMenuUtils.getEmptyClickHandler());
+    }
+    public DataMenuClickHandler createDataHolder(){
+        return new DataMenuClickHandler() {
+            //0 为 数量 1 为 电力
+            int[] intdata=new int[4];
+            public int getInt(int i){
+                return intdata[i];
+            }
+            @Override
+            public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
+                return false;
+            }
+            public void setInt(int i, int val){
+                intdata[i]=val;
+            }
+        };
+    }
+    public final int getCraftLimit(Block b,BlockMenu inv){
+        return (this.efficiency*getDataHolder(b,inv).getInt(0));
+    }
+
+    public final DataMenuClickHandler getDataHolder(Block b, BlockMenu inv){
+        ChestMenu.MenuClickHandler handler=inv.getMenuClickHandler(DATA_SLOT);
+        if(handler instanceof DataMenuClickHandler dh){return dh;}
+        else{
+            DataMenuClickHandler dh=createDataHolder();
+            inv.addMenuClickHandler(DATA_SLOT,dh);
+            Schedules.launchSchedules(()->{
+                updateMenu(  inv,b,Settings.INIT);
+            },20,false,0);
+            return dh;
+        }
+    }
+    protected ItemStack getInfoItem(int craftlimit,int energyCost,int charge,double efficiency,String name){
+        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a生成器信息",AddUtils.concat("&7当前模拟的生成器名称: ",(name)),
+                "&7当前并行处理数: %-3d".formatted(craftlimit),"&7当前每刻耗电量: %sJ/t".formatted(AddUtils.formatDouble(energyCost)),"&7当前电量: %sJ".formatted(AddUtils.formatDouble(charge)),
+                AddUtils.concat("&7当前工作效率: ",AddUtils.getPercentFormat(efficiency)));
+    }
+    protected ItemStack getInfoOffItem(int craftlimit ,int energyCost,int charge,String name){
+        return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c生成器信息","&c缺少电力!",AddUtils.concat("&7当前模拟的生成器名称: ",(name)),
+                "&7当前并行处理数: %-3d".formatted(craftlimit),"&7当前每刻耗电量: %sJ/t".formatted(AddUtils.formatDouble(energyCost)),"&7当前电量: %sJ".formatted(AddUtils.formatDouble(charge)));
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public List<MachineRecipe> getMachineRecipes(Block b, BlockMenu inv){
+        return getMachineRecipes(DataCache.safeLoadBlock(inv.getLocation()));
+    }
+    public List<MachineRecipe> getMachineRecipes(SlimefunBlockData data){
+        int index= MultiCraftType.getRecipeTypeIndex(data);
+        if(index>=0&&index<getListSize()){
+            List<MachineRecipe> lst= RecipeSupporter.MACHINE_RECIPELIST.get(getMachineList().get(index ));
+            return lst!=null?lst:new ArrayList<>();
+        }
+        return new ArrayList<>();
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
+    }
+    public MachineRecipe getRecordRecipe(SlimefunBlockData data){
+        List<MachineRecipe> lst=getMachineRecipes(data);
+        int size=lst.size();
+        if(size>0){
+            int index=DataCache.getLastRecipe(data);
+            if(index>=0&&index<size){
+                return lst.get(index);
+            }
+        }
+        return null;
     }
     public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuOpeningHandler((player -> {
@@ -209,118 +252,13 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         }));
         updateMenu(inv,block,Settings.INIT);
     }
-    public DataMenuClickHandler createDataHolder(){
-        return new DataMenuClickHandler() {
-            //0 为 数量 1 为 电力
-            int[] intdata=new int[4];
-            public int getInt(int i){
-                return intdata[i];
-            }
-            public void setInt(int i, int val){
-                intdata[i]=val;
-            }
-            @Override
-            public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
-                return false;
-            }
-        };
-    }
-    public final int DATA_SLOT=4;
-    public final DataMenuClickHandler getDataHolder(Block b, BlockMenu inv){
-        ChestMenu.MenuClickHandler handler=inv.getMenuClickHandler(DATA_SLOT);
-        if(handler instanceof DataMenuClickHandler dh){return dh;}
-        else{
-            DataMenuClickHandler dh=createDataHolder();
-            inv.addMenuClickHandler(DATA_SLOT,dh);
-            Schedules.launchSchedules(()->{
-                updateMenu(  inv,b,Settings.INIT);
-            },20,false,0);
-            return dh;
+    public void onBreak(BlockBreakEvent e, BlockMenu inv){
+        if(inv!=null){
+            Location loc=inv.getLocation();
+            inv.dropItems(loc,MACHINE_SLOT);
         }
-    }
-    public final void updateMenu(BlockMenu inv, Block block, Settings mod){
-        SlimefunBlockData data=DataCache.safeGetBlockCacheWithLoad(inv.getLocation());
-        if(data==null){
-            Debug.logger("SF DATA LOST AT %s! PLEASE REPORT THIS LOG TO THE AUTHOR".formatted(DataCache.locationToString(inv.getLocation())));
-            return;
-        }else if(!data.isDataLoaded()){
-            Debug.logger("SF DATA NOT LOAD YET IN %s! PLEASE REPORT THIS LOG TO THE AUTHOR".formatted(DataCache.locationToString(inv.getLocation())));
+        super.onBreak(e,inv);
 
-            Schedules.launchSchedules(()->{
-                updateMenu(  inv,block,mod);
-            },20,false,0);
-            return;
-        }
-        if(mod== Settings.INIT) {
-            //new CraftItemStack instance to trigger slimefun save thread
-            ItemStack rawStack = inv.getItemInSlot(this.MACHINE_SLOT);
-            inv.replaceExistingItem(this.MACHINE_SLOT,rawStack);
-        }
-        ItemPusher it=this.MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,this.MACHINE_SLOT);
-        int index=MultiCraftType.getRecipeTypeIndex(data);
-        DataMenuClickHandler db=this.getDataHolder(block,inv);
-        if(it!=null){
-            SlimefunItem sfitem=SlimefunItem.getByItem(it.getItem());
-            if(sfitem!=null){
-                SlimefunItem historyMachine;
-                if(index>=0&&index<getListSize()){
-                    historyMachine= getMachineList().get(index);
-                }else {
-                    historyMachine=null;
-                }
-                if(sfitem==historyMachine){
-                    //和历史机器一样
-                    //设置当前数量
-                    int lastCount=db.getInt(0);
-                    if(lastCount!=it.getAmount()){
-                        db.setInt(0,it.getAmount());
-                        db.setInt(2,-1);
-                        inv.replaceExistingItem(this.PROCESSOR_SLOT,this.INFO_NULL);
-                    }
-                    int charge=getEnergy(index);
-                    db.setInt(1,charge==-1?energyConsumption:charge);
-                    if( CraftUtils.matchNextRecipe(inv, getInputSlots(),RecipeSupporter.MACHINE_RECIPELIST.get(historyMachine),
-                            //不许用高级的 你是多有病才能在不消耗的槽里面塞存储
-                            true, Settings.SEQUNTIAL,CraftUtils.getpusher)==null){
-                        DataCache.setLastRecipe(inv.getLocation(),-1);
-                    }
-                    return;
-                }else {
-                    int size=getListSize();
-                    List<SlimefunItem> lst=getMachineList();
-                    String thisId=sfitem.getId();
-                    for(int i=0;i<size;++i){
-                        SlimefunItem item=lst.get(i);
-                        if(item==null){
-                            continue;
-                        }
-                        if(sfitem==item||thisId.equals(item.getId())){
-                            //是该机器,设置下标，都不用查了 肯定不一样
-                            MultiCraftType.forceSetRecipeTypeIndex(data,i);
-                            int charge=getEnergy(i);
-                            //  DataCache.setCustomData(data,"mae",charge==-1?energyConsumption:charge);
-                            db.setInt(0,it.getAmount());
-                            db.setInt(1,charge==-1?energyConsumption:charge);
-                            //重置机器时间
-                            db.setInt(2,-1);
-                            inv.replaceExistingItem(this.PROCESSOR_SLOT,this.INFO_NULL);
-
-                            if( CraftUtils.matchNextRecipe(inv, getInputSlots(),RecipeSupporter.MACHINE_RECIPELIST.get(sfitem),
-                                    true, Settings.SEQUNTIAL,CRAFT_PROVIDER)==null){
-                                DataCache.setLastRecipe(inv.getLocation(),-1);
-                            }
-                            return;
-                        }
-                    }
-                }//找不到,给你机会你不重用啊
-            }
-        }
-        if(index!=-1)//即将变成-1,不一样才变,不用重复查询
-            MultiCraftType.forceSetRecipeTypeIndex(data,-1);
-        db.setInt(0,0);
-        db.setInt(1,0);
-        db.setInt(2,-1);
-        inv.replaceExistingItem(this.PROCESSOR_SLOT,this.INFO_NULL);
     }
     public void progressorCost(Block b, BlockMenu inv){
         DataMenuClickHandler dh=getDataHolder(b,inv);
@@ -328,20 +266,6 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         int machineCnt=dh.getInt(0);
         int consumption=Math.min(charge*machineCnt ,this.energybuffer);
         this.removeCharge(inv.getLocation(),consumption);
-    }
-    public final int getCraftLimit(Block b,BlockMenu inv){
-        return (this.efficiency*getDataHolder(b,inv).getInt(0));
-    }
-    public List<MachineRecipe> getMachineRecipes(Block b, BlockMenu inv){
-        return getMachineRecipes(DataCache.safeLoadBlock(inv.getLocation()));
-    }
-    public List<MachineRecipe> getMachineRecipes(SlimefunBlockData data){
-        int index= MultiCraftType.getRecipeTypeIndex(data);
-        if(index>=0&&index<getListSize()){
-            List<MachineRecipe> lst= RecipeSupporter.MACHINE_RECIPELIST.get(getMachineList().get(index ));
-            return lst!=null?lst:new ArrayList<>();
-        }
-        return new ArrayList<>();
     }
     public final void tick(Block b, @Nullable BlockMenu inv, SlimefunBlockData data, int tickCount){
         //首先 加载
@@ -432,13 +356,89 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         }
     }
 
-    public void onBreak(BlockBreakEvent e, BlockMenu inv){
-        if(inv!=null){
-            Location loc=inv.getLocation();
-            inv.dropItems(loc,MACHINE_SLOT);
-        }
-        super.onBreak(e,inv);
+    public final void updateMenu(BlockMenu inv, Block block, Settings mod){
+        SlimefunBlockData data=DataCache.safeGetBlockCacheWithLoad(inv.getLocation());
+        if(data==null){
+            Debug.logger("SF DATA LOST AT %s! PLEASE REPORT THIS LOG TO THE AUTHOR".formatted(DataCache.locationToString(inv.getLocation())));
+            return;
+        }else if(!data.isDataLoaded()){
+            Debug.logger("SF DATA NOT LOAD YET IN %s! PLEASE REPORT THIS LOG TO THE AUTHOR".formatted(DataCache.locationToString(inv.getLocation())));
 
+            Schedules.launchSchedules(()->{
+                updateMenu(  inv,block,mod);
+            },20,false,0);
+            return;
+        }
+        if(mod== Settings.INIT) {
+            //new CraftItemStack instance to trigger slimefun save thread
+            ItemStack rawStack = inv.getItemInSlot(this.MACHINE_SLOT);
+            inv.replaceExistingItem(this.MACHINE_SLOT,rawStack);
+        }
+        ItemPusher it=this.MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,this.MACHINE_SLOT);
+        int index=MultiCraftType.getRecipeTypeIndex(data);
+        DataMenuClickHandler db=this.getDataHolder(block,inv);
+        if(it!=null){
+            SlimefunItem sfitem=SlimefunItem.getByItem(it.getItem());
+            if(sfitem!=null){
+                SlimefunItem historyMachine;
+                if(index>=0&&index<getListSize()){
+                    historyMachine= getMachineList().get(index);
+                }else {
+                    historyMachine=null;
+                }
+                if(sfitem==historyMachine){
+                    //和历史机器一样
+                    //设置当前数量
+                    int lastCount=db.getInt(0);
+                    if(lastCount!=it.getAmount()){
+                        db.setInt(0,it.getAmount());
+                        db.setInt(2,-1);
+                        inv.replaceExistingItem(this.PROCESSOR_SLOT,this.INFO_NULL);
+                    }
+                    int charge=getEnergy(index);
+                    db.setInt(1,charge==-1?energyConsumption:charge);
+                    if( CraftUtils.matchNextRecipe(inv, getInputSlots(),RecipeSupporter.MACHINE_RECIPELIST.get(historyMachine),
+                            //不许用高级的 你是多有病才能在不消耗的槽里面塞存储
+                            true, Settings.SEQUNTIAL,CraftUtils.getpusher)==null){
+                        DataCache.setLastRecipe(inv.getLocation(),-1);
+                    }
+                    return;
+                }else {
+                    int size=getListSize();
+                    List<SlimefunItem> lst=getMachineList();
+                    String thisId=sfitem.getId();
+                    for(int i=0;i<size;++i){
+                        SlimefunItem item=lst.get(i);
+                        if(item==null){
+                            continue;
+                        }
+                        if(sfitem==item||thisId.equals(item.getId())){
+                            //是该机器,设置下标，都不用查了 肯定不一样
+                            MultiCraftType.forceSetRecipeTypeIndex(data,i);
+                            int charge=getEnergy(i);
+                            //  DataCache.setCustomData(data,"mae",charge==-1?energyConsumption:charge);
+                            db.setInt(0,it.getAmount());
+                            db.setInt(1,charge==-1?energyConsumption:charge);
+                            //重置机器时间
+                            db.setInt(2,-1);
+                            inv.replaceExistingItem(this.PROCESSOR_SLOT,this.INFO_NULL);
+
+                            if( CraftUtils.matchNextRecipe(inv, getInputSlots(),RecipeSupporter.MACHINE_RECIPELIST.get(sfitem),
+                                    true, Settings.SEQUNTIAL,CRAFT_PROVIDER)==null){
+                                DataCache.setLastRecipe(inv.getLocation(),-1);
+                            }
+                            return;
+                        }
+                    }
+                }//找不到,给你机会你不重用啊
+            }
+        }
+        if(index!=-1)//即将变成-1,不一样才变,不用重复查询
+            MultiCraftType.forceSetRecipeTypeIndex(data,-1);
+        db.setInt(0,0);
+        db.setInt(1,0);
+        db.setInt(2,-1);
+        inv.replaceExistingItem(this.PROCESSOR_SLOT,this.INFO_NULL);
     }
 
 }

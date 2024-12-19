@@ -14,11 +14,6 @@ import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedE
 import me.matl114.logitech.Utils.CraftUtils;
 
 public class EquivalItemStack extends ItemStack implements MultiItemStack ,EqualInItem{
-    public ItemStack[] itemList;
-    public ItemCounter[] counterList;
-    public Double[] itemWeight;
-    public double[] weightSum;
-    public int sum;
     private static Material getFirstMaterial(HashMap<ItemStack,Integer> map) {
         if(map.isEmpty()) {
             return Material.STONE;
@@ -32,6 +27,11 @@ public class EquivalItemStack extends ItemStack implements MultiItemStack ,Equal
             }
         }
     }
+    public ItemStack[] itemList;
+    public ItemCounter[] counterList;
+    public Double[] itemWeight;
+    public double[] weightSum;
+    public int sum;
     protected int eamount=1;
 	private HashMap<ItemStack, Integer> itemSettings;
     public EquivalItemStack(HashMap<ItemStack ,Integer> itemSettings) {
@@ -54,6 +54,22 @@ public class EquivalItemStack extends ItemStack implements MultiItemStack ,Equal
             ++cnt;
         }
     }
+    public ItemStack clone(){
+        return itemList[0].clone();
+    }
+    public EquivalItemStack copy(){
+        EquivalItemStack stack = new EquivalItemStack(itemSettings);
+        stack.itemList=Arrays.copyOf(this.itemList,this.itemList.length);
+        stack.counterList=Arrays.copyOf(this.counterList,this.counterList.length);
+        stack.sum=this.sum;
+        stack.weightSum=Arrays.copyOf(this.weightSum,this.weightSum.length);
+        stack.itemWeight=Arrays.copyOf(this.itemWeight,this.itemWeight.length);
+        return stack;
+
+    }
+    public int getAmount(){
+        return this.eamount;
+    }
     //递归地解析全体物品列
     public List<ItemStack> getItemStacks() {
         List<ItemStack> items = new ArrayList<>();
@@ -70,6 +86,9 @@ public class EquivalItemStack extends ItemStack implements MultiItemStack ,Equal
 
         return items;
     }
+    public int getTypeNum(){
+        return this.sum;
+    }
     public List<Double> getWeight(Double percentage) {
         List<Double> weights = new ArrayList<>();
         for(int i=0;i<sum;i++) {
@@ -81,22 +100,6 @@ public class EquivalItemStack extends ItemStack implements MultiItemStack ,Equal
         }
         return weights;
     }
-    public int getTypeNum(){
-        return this.sum;
-    }
-    public ItemStack clone(){
-        return itemList[0].clone();
-    }
-    public EquivalItemStack copy(){
-        EquivalItemStack stack = new EquivalItemStack(itemSettings);
-        stack.itemList=Arrays.copyOf(this.itemList,this.itemList.length);
-        stack.counterList=Arrays.copyOf(this.counterList,this.counterList.length);
-        stack.sum=this.sum;
-        stack.weightSum=Arrays.copyOf(this.weightSum,this.weightSum.length);
-        stack.itemWeight=Arrays.copyOf(this.itemWeight,this.itemWeight.length);
-        return stack;
-
-    }
     public boolean matchItem(ItemStack item,boolean strickCheck){
         for (int i = 0; i < counterList.length; i++) {
             if(CraftUtils.matchItemStack(item,counterList[i],strickCheck)){
@@ -105,13 +108,10 @@ public class EquivalItemStack extends ItemStack implements MultiItemStack ,Equal
         }
         return false;
     }
-    public void setEqualAmount(int t){
-        this.eamount=t;
-    }
-    public int getAmount(){
-        return this.eamount;
-    }
     public void setAmount(int t){
         throw new NotImplementedException("this method shoudln't be called");
+    }
+    public void setEqualAmount(int t){
+        this.eamount=t;
     }
 }

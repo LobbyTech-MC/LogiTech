@@ -17,17 +17,17 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 public class TrashCan extends AbstractMachine {
     protected final int[] INPUT_SLOTS= IntStream.rangeClosed(0, 53).toArray();
     protected final int[] OUTPUT_SLOTS= new int[0];
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
     public TrashCan(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(category,item,recipeType,recipe,0,0);
     }
     public void constructMenu(BlockMenuPreset preset){
         preset.setSize(54);
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
     }
 
     public void process(Block b, BlockMenu preset, SlimefunBlockData data){

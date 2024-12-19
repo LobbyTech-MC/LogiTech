@@ -48,23 +48,7 @@ public class VirtualKiller extends AbstractMachine {
     protected final int MULTIPLY;
     protected final int SPAWNER_SLOT=4;
     protected final int MAX_AMOUNT=16;
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
-    public ItemStack getInfoItem(EntityType type,int amount) {
-        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,
-                "&6机制",
-                "&7上方放入带生物种类的任意笼子",
-                "&7下方输出该生物可能的特殊掉落物",
-                "&7输出倍率=%d/%d(max)".formatted(amount*MULTIPLY,MAX_AMOUNT*MULTIPLY) ,
-               AddUtils.concat( "&7当前生物: &a",type==null?"&c无生物": ChatUtils.humanize(type.name())),
-                AddUtils.concat("&7当前数量: &a",String.valueOf(amount)));
-    }
-
-
+    public final int DATA_SLOT=0;
     public VirtualKiller(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                            int energybuffer, int energyConsumption,int multiply){
         super(category, item, recipeType, recipe, energybuffer, energyConsumption);
@@ -76,15 +60,6 @@ public class VirtualKiller extends AbstractMachine {
                         "&7机器即可执行产出,会产出普通掉落物和所有附属加载的粘液特殊掉落物",
                         "&a注明:普通掉落物部分由ChatGPT生成,并由@haiman补充完整,若有欠缺欢迎补充"),null
         ));
-    }
-    public List<MachineRecipe> provideDisplayRecipe(){
-        HashMap<EntityType,ItemStack[]> map=getEntityMap();
-        List<MachineRecipe> providedRecipes=new ArrayList<>();
-        for(Map.Entry<EntityType,ItemStack[]> entry:map.entrySet()){
-            if(entry.getValue().length!=0)
-                providedRecipes.add(MachineRecipeUtils.stackFrom(0,new ItemStack[]{ EntityFeat.getItemFromEntityType(entry.getKey())},entry.getValue()));
-        }
-        return providedRecipes;
     }
     public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
@@ -100,6 +75,8 @@ public class VirtualKiller extends AbstractMachine {
         preset.addItem(INFO_SLOT,getInfoItem(null,0),ChestMenuUtils.getEmptyClickHandler());
         preset.setSize(54);
     }
+
+
     public DataMenuClickHandler createDataHolder(){
         return new DataMenuClickHandler() {
             //0 为 数量 1 为 电力
@@ -108,22 +85,21 @@ public class VirtualKiller extends AbstractMachine {
             public int getInt(int i){
                 return amount;
             }
-            public void setInt(int i, int val){
-                amount=val;
-            }
             public Object getObject(int i){
                 return spawnerType;
-            }
-            public void setObject(int i, Object val){
-                spawnerType=val;
             }
             @Override
             public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
                 return false;
             }
+            public void setInt(int i, int val){
+                amount=val;
+            }
+            public void setObject(int i, Object val){
+                spawnerType=val;
+            }
         };
     }
-    public final int DATA_SLOT=0;
     public DataMenuClickHandler getDataHolder(Block b, BlockMenu inv){
         ChestMenu.MenuClickHandler handler=inv.getMenuClickHandler(DATA_SLOT);
         if(handler instanceof DataMenuClickHandler dh){return dh;}
@@ -133,13 +109,34 @@ public class VirtualKiller extends AbstractMachine {
             return dh;
         }
     }
+    public HashMap<EntityType,ItemStack[]> getEntityMap(){
+        return RecipeSupporter.ENTITY_DROPLIST;
+    }
+    public ItemStack getInfoItem(EntityType type,int amount) {
+        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,
+                "&6机制",
+                "&7上方放入带生物种类的任意笼子",
+                "&7下方输出该生物可能的特殊掉落物",
+                "&7输出倍率=%d/%d(max)".formatted(amount*MULTIPLY,MAX_AMOUNT*MULTIPLY) ,
+               AddUtils.concat( "&7当前生物: &a",type==null?"&c无生物": ChatUtils.humanize(type.name())),
+                AddUtils.concat("&7当前数量: &a",String.valueOf(amount)));
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
+    }
     public void newMenuInstance(BlockMenu menu, Block block){
         menu.addMenuOpeningHandler(player -> updateMenu(menu,block,Settings.RUN));
         menu.addMenuCloseHandler(player -> updateMenu(menu,block,Settings.RUN));
         updateMenu(menu,block,Settings.INIT);
     }
-    public void updateMenu(BlockMenu menu,Block block,Settings mod){
-        parseItem(menu,block);
+    public void onBreak(BlockBreakEvent event,BlockMenu inv){
+        super.onBreak(event,inv);
+        if(inv!=null){
+            inv.dropItems(inv.getLocation(),SPAWNER_SLOT);
+        }
     }
 
 
@@ -158,9 +155,6 @@ public class VirtualKiller extends AbstractMachine {
         handler.setObject(0,null);
         menu.replaceExistingItem(INFO_SLOT,getInfoItem(null,0));
     }
-    public HashMap<EntityType,ItemStack[]> getEntityMap(){
-        return RecipeSupporter.ENTITY_DROPLIST;
-    }
     public void process(Block b, BlockMenu menu, SlimefunBlockData data){
         if(menu.hasViewer()){
             updateMenu(menu,b,Settings.RUN);
@@ -175,10 +169,16 @@ public class VirtualKiller extends AbstractMachine {
             }
         }
     }
-    public void onBreak(BlockBreakEvent event,BlockMenu inv){
-        super.onBreak(event,inv);
-        if(inv!=null){
-            inv.dropItems(inv.getLocation(),SPAWNER_SLOT);
+    public List<MachineRecipe> provideDisplayRecipe(){
+        HashMap<EntityType,ItemStack[]> map=getEntityMap();
+        List<MachineRecipe> providedRecipes=new ArrayList<>();
+        for(Map.Entry<EntityType,ItemStack[]> entry:map.entrySet()){
+            if(entry.getValue().length!=0)
+                providedRecipes.add(MachineRecipeUtils.stackFrom(0,new ItemStack[]{ EntityFeat.getItemFromEntityType(entry.getKey())},entry.getValue()));
         }
+        return providedRecipes;
+    }
+    public void updateMenu(BlockMenu menu,Block block,Settings mod){
+        parseItem(menu,block);
     }
 }

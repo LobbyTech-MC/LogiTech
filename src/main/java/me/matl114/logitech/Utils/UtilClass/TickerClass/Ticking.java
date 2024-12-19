@@ -12,6 +12,9 @@ import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 public interface Ticking {
+    default boolean isSync(){
+        return  false;
+    }
     /**
      * call this method in preRegister
      * @param item
@@ -37,8 +40,8 @@ public interface Ticking {
 
         );
     }
-    default boolean isSync(){
-        return  false;
+    default void tick(Block b, @Nullable BlockMenu menu, int tickCount){
+
     }
     /**
      * imple blockTicking in this method
@@ -49,9 +52,6 @@ public interface Ticking {
      */
     default void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data,int tickCount){
         tick(b,menu,tickCount);
-    }
-    default void tick(Block b, @Nullable BlockMenu menu, int tickCount){
-
     }
 
 }

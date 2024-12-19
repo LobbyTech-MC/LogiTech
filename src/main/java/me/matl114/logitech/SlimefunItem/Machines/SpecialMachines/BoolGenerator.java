@@ -39,12 +39,6 @@ public class BoolGenerator extends AbstractProcessor {
     protected final int[] BORDER_OUT=new int[] {15,16};
     protected final int processtick;
     protected final int inputCost=53;
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
     public BoolGenerator(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, Material progressItem,int tick) {
         super(category,item,recipeType,recipe,progressItem,5,100,null);
         this.processtick=tick;
@@ -133,6 +127,12 @@ public class BoolGenerator extends AbstractProcessor {
         }else{
             return null;
         }
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
     }
 
     @Override

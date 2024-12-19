@@ -36,12 +36,6 @@ public class ChipConsumer extends AbstractMachine {
     protected int[] OUTPUT_SLOT=new int[]{
             16
     };
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
     protected int[] INFO_SLOT=new int[]{
             1,4,7
     };
@@ -50,6 +44,19 @@ public class ChipConsumer extends AbstractMachine {
             new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6逻辑物质输入槽","&7将位运算对应的物品放入该槽"),
             new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a输出槽","&7只有输入槽为空时才会输出")
     };
+    protected final ItemCounter[] MATCH_ITEM=new ItemCounter[]{
+           CraftUtils.getConsumer( AddItem.NOLOGIC),
+            CraftUtils.getConsumer(  AddItem.EXISTE),
+            CraftUtils.getConsumer(  AddItem.UNIQUE),
+    };
+    protected Material ChipMaterial=AddItem.CHIP.getType();
+    int[] CHIP_SLOT=new int[]{
+            INPUT_SLOT[0],
+    };
+    int[] NOCHIP_SLOT=new int[]{
+            INPUT_SLOT[1],
+    };
+
     public ChipConsumer(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                         int energybuffer, int energyConsumption) {
         super(category, item, recipeType, recipe, energybuffer, energyConsumption);
@@ -65,13 +72,6 @@ public class ChipConsumer extends AbstractMachine {
                         "&7运算规则:","&7当最末位是1时,向01码最末尾部加1,并丢掉首位","&7当最末位是0时,向01码最末尾部加0,并丢掉首位"),AddItem.UNIQUE
         ));
     }
-    protected final ItemCounter[] MATCH_ITEM=new ItemCounter[]{
-           CraftUtils.getConsumer( AddItem.NOLOGIC),
-            CraftUtils.getConsumer(  AddItem.EXISTE),
-            CraftUtils.getConsumer(  AddItem.UNIQUE),
-    };
-
-    protected Material ChipMaterial=AddItem.CHIP.getType();
 
     public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
@@ -84,6 +84,23 @@ public class ChipConsumer extends AbstractMachine {
         for(int i=0;i<len;i++){
             preset.addItem(INFO_SLOT[i],INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
         }
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    @Override
+    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
+        if(flow==ItemTransportFlow.WITHDRAW)return getOutputSlots();
+        if(item==null||item.getType().isAir()){
+            return getInputSlots();
+        }
+        if(item.getType()==ChipMaterial){
+            return CHIP_SLOT;
+        }
+        return NOCHIP_SLOT;
     }
     public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         ItemStack it2=inv.getItemInSlot(INPUT_SLOT[1]);
@@ -125,23 +142,6 @@ public class ChipConsumer extends AbstractMachine {
                 }
             },0,false,0);
         }
-    }
-    int[] CHIP_SLOT=new int[]{
-            INPUT_SLOT[0],
-    };
-    int[] NOCHIP_SLOT=new int[]{
-            INPUT_SLOT[1],
-    };
-    @Override
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
-        if(flow==ItemTransportFlow.WITHDRAW)return getOutputSlots();
-        if(item==null||item.getType().isAir()){
-            return getInputSlots();
-        }
-        if(item.getType()==ChipMaterial){
-            return CHIP_SLOT;
-        }
-        return NOCHIP_SLOT;
     }
 
 }

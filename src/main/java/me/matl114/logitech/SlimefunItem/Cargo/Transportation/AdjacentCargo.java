@@ -46,18 +46,11 @@ public class AdjacentCargo extends AbstractCargo {
     protected final int[] DIRECTION_SLOT=new int[]{
             10,16
     };
-    public int[] getBWListSlot(){
-        return BWSLOT;
-    }
-    public int[] getInputSlots(){
-        return new int[0];
-    }
-    public int[] getOutputSlots(){
-        return new int[0];
-    }
-    public int getConfigSlot(){
-        return 4;
-    }
+    protected final String[] savedKeys=new String[]{
+            "from_dir",
+            "to_dir"
+    };
+    protected boolean transportSmarter=false;
     public AdjacentCargo(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, List<ItemStack> displayList) {
         super(itemGroup, item, recipeType, recipe, displayList);
         setDisplayRecipes(
@@ -73,45 +66,6 @@ public class AdjacentCargo extends AbstractCargo {
                 )
         );
     }
-    public void constructMenu(BlockMenuPreset preset){
-        int[] border=BORDER;
-        int len=border.length;
-        for (int i=0;i<len;++i){
-            preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
-        }
-        border=INFO_SLOT;
-        len=border.length;
-        for (int i=0;i<len;++i){
-            preset.addItem(INFO_SLOT[i],INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
-        }
-    }
-    protected final String[] savedKeys=new String[]{
-            "from_dir",
-            "to_dir"
-    };
-    public String[] getSaveKeys(){
-        return savedKeys;
-    }
-    public int[] getDirectionSlots(){
-        return DIRECTION_SLOT;
-    }
-    public void newMenuInstance(BlockMenu inv, Block b){
-        inv.addMenuOpeningHandler((player -> {
-            updateMenu(inv,b,Settings.RUN);
-        }));
-        inv.addMenuCloseHandler(player -> {
-            updateMenu(inv,b,Settings.RUN);
-        });
-        inv.addMenuClickHandler(DIRECTION_SLOT[0],getDirectionHandler(0,inv));
-        inv.addMenuClickHandler(DIRECTION_SLOT[1],getDirectionHandler(1,inv));
-        updateMenu(inv,b, Settings.INIT);
-    }
-    public void updateMenu(BlockMenu inv ,Block b,Settings mod){
-        loadConfig(inv,b);
-        updateDirectionSlots(0,inv);
-        updateDirectionSlots(1,inv);
-    }
-    protected boolean transportSmarter=false;
     public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
         Location loc=menu.getLocation();
         Directions from_dir=getDirection(0,data);
@@ -128,6 +82,52 @@ public class AdjacentCargo extends AbstractCargo {
             }
             ContainerUtils.transferWithContainer(from_dir.relate(loc),to_dir.relate(loc),configCode,bwset,transportSmarter);
         }
+    }
+    public void constructMenu(BlockMenuPreset preset){
+        int[] border=BORDER;
+        int len=border.length;
+        for (int i=0;i<len;++i){
+            preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
+        }
+        border=INFO_SLOT;
+        len=border.length;
+        for (int i=0;i<len;++i){
+            preset.addItem(INFO_SLOT[i],INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
+        }
+    }
+    public int[] getBWListSlot(){
+        return BWSLOT;
+    }
+    public int getConfigSlot(){
+        return 4;
+    }
+    public int[] getDirectionSlots(){
+        return DIRECTION_SLOT;
+    }
+    public int[] getInputSlots(){
+        return new int[0];
+    }
+    public int[] getOutputSlots(){
+        return new int[0];
+    }
+    public String[] getSaveKeys(){
+        return savedKeys;
+    }
+    public void newMenuInstance(BlockMenu inv, Block b){
+        inv.addMenuOpeningHandler((player -> {
+            updateMenu(inv,b,Settings.RUN);
+        }));
+        inv.addMenuCloseHandler(player -> {
+            updateMenu(inv,b,Settings.RUN);
+        });
+        inv.addMenuClickHandler(DIRECTION_SLOT[0],getDirectionHandler(0,inv));
+        inv.addMenuClickHandler(DIRECTION_SLOT[1],getDirectionHandler(1,inv));
+        updateMenu(inv,b, Settings.INIT);
+    }
+    public void updateMenu(BlockMenu inv ,Block b,Settings mod){
+        loadConfig(inv,b);
+        updateDirectionSlots(0,inv);
+        updateDirectionSlots(1,inv);
     }
 
 }

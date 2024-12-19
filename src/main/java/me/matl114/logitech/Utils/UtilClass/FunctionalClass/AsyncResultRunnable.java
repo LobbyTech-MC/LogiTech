@@ -9,12 +9,20 @@ import me.matl114.logitech.Schedule.Schedules;
 
 public abstract class AsyncResultRunnable<T extends Object> extends BukkitRunnable implements Runnable {
     public T result;
+    public T getResult(){
+        return result;
+    }
     public abstract T result();
     public void run(){
         result = result();
     }
-    public T getResult(){
-        return result;
+    public CountDownLatch runThreadBackground(){
+        CountDownLatch latch = new CountDownLatch(1);
+        Schedules.launchSchedules(()->{
+            this.run();
+            latch.countDown();
+        },0,false,0);
+        return latch;
     }
     public T waitThreadDone(boolean isSync){
         if(Bukkit.isPrimaryThread()&&isSync){
@@ -33,13 +41,5 @@ public abstract class AsyncResultRunnable<T extends Object> extends BukkitRunnab
             return result;
 
         }
-    }
-    public CountDownLatch runThreadBackground(){
-        CountDownLatch latch = new CountDownLatch(1);
-        Schedules.launchSchedules(()->{
-            this.run();
-            latch.countDown();
-        },0,false,0);
-        return latch;
     }
 }

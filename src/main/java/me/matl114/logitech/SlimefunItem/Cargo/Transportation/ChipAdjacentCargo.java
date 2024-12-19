@@ -55,32 +55,12 @@ public class ChipAdjacentCargo extends AdjacentCargo implements ChipControllable
         }
         preset.addItem(getInfoSlot(),getInfoOffItem(0), ChestMenuUtils.getEmptyClickHandler());
     }
-    public void newMenuInstance(BlockMenu inv, Block b){
-        inv.addMenuOpeningHandler((player -> {
-            updateMenu(inv,b,Settings.RUN);
-        }));
-        inv.addMenuCloseHandler(player -> {
-            updateMenu(inv,b,Settings.RUN);
-        });
-        inv.addMenuClickHandler(DIRECTION_SLOT[0],getDirectionHandler("from_dir",inv));
-        inv.addMenuClickHandler(DIRECTION_SLOT[1],getDirectionHandler("to_dir",inv));
-        updateMenu(inv,b, Settings.INIT);
-    }
-    public void updateMenu(BlockMenu inv ,Block b,Settings mod){
-        loadConfig(inv,b);
-        updateDirectionSlots("from_dir",inv,DIRECTION_SLOT[0]);
-        updateDirectionSlots("to_dir",inv,DIRECTION_SLOT[1]);
-        loadChipCommand(inv);
-    }
-    public  int getInfoSlot(){
-        return 4;
+    public int getChipSlot(){
+        return 5;
     }
     public int getConfigSlot(){
 
         return 3;
-    }
-    public int getChipSlot(){
-        return 5;
     }
     public ItemStack getInfoItem(int code, int tickCount,int bit){
         int ticks=tickCount%32;
@@ -93,6 +73,32 @@ public class ChipAdjacentCargo extends AdjacentCargo implements ChipControllable
         return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a信息","&7左侧为货运配置卡槽","&7右侧为芯片槽","&7在左侧配置源方方块邻接方向","&7在右侧配置目标方块邻接方向"
                 ,AddUtils.concat("&7当前运行状态: ",String.valueOf(ticks)),"&e待机中,芯片不存在或已损坏");
     }
+    public  int getInfoSlot(){
+        return 4;
+    }
+    public void newMenuInstance(BlockMenu inv, Block b){
+        inv.addMenuOpeningHandler((player -> {
+            updateMenu(inv,b,Settings.RUN);
+        }));
+        inv.addMenuCloseHandler(player -> {
+            updateMenu(inv,b,Settings.RUN);
+        });
+        inv.addMenuClickHandler(DIRECTION_SLOT[0],getDirectionHandler("from_dir",inv));
+        inv.addMenuClickHandler(DIRECTION_SLOT[1],getDirectionHandler("to_dir",inv));
+        updateMenu(inv,b, Settings.INIT);
+    }
+    public void onBreak(BlockBreakEvent e, BlockMenu inv){
+        super.onBreak(e, inv);
+        if(inv!=null){
+            inv.dropItems(inv.getLocation(),getChipSlot());
+        }
+    }
+    public void preRegister(){
+        super.preRegister();
+        //shared ticker
+        this.addItemHandler((BlockTicker) AbstractSyncTickCargo. CHIP_SYNC);
+    }
+
     public void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount){
         if(inv.hasViewer())
             updateMenu(inv,b,Settings.RUN);
@@ -121,16 +127,10 @@ public class ChipAdjacentCargo extends AdjacentCargo implements ChipControllable
             super.tick(b,inv,data,synTickCount);
         }
     }
-
-    public void preRegister(){
-        super.preRegister();
-        //shared ticker
-        this.addItemHandler((BlockTicker) AbstractSyncTickCargo. CHIP_SYNC);
-    }
-    public void onBreak(BlockBreakEvent e, BlockMenu inv){
-        super.onBreak(e, inv);
-        if(inv!=null){
-            inv.dropItems(inv.getLocation(),getChipSlot());
-        }
+    public void updateMenu(BlockMenu inv ,Block b,Settings mod){
+        loadConfig(inv,b);
+        updateDirectionSlots("from_dir",inv,DIRECTION_SLOT[0]);
+        updateDirectionSlots("to_dir",inv,DIRECTION_SLOT[1]);
+        loadChipCommand(inv);
     }
 }

@@ -12,23 +12,6 @@ import me.matl114.logitech.Utils.BukkitUtils;
 import me.matl114.logitech.Utils.DataCache;
 
 public interface ChunkLimit {
-    public HashMap<Chunk, Location> getRecords();
-    default <T extends SlimefunItem> boolean onChunkPlace(Location location,Class<T> instance){
-        Chunk chunk = location.getChunk();
-        Location loc=getRecords().get(chunk);
-        if(loc==null||loc.equals(location)) {
-            getRecords().put(chunk, location);
-            return true;
-        }else {
-            SlimefunItem item=DataCache.getSfItem(loc);
-            if(instance.isInstance(item)){
-                return false;
-            }else{
-                getRecords().put(chunk, location);
-                return true;
-            }
-        }
-    }
     default <T extends SlimefunItem> boolean checkChunkPlace(Location location,Class<T> instance){
         Chunk chunk = location.getChunk();
         Location loc=getRecords().get(chunk);
@@ -48,10 +31,27 @@ public interface ChunkLimit {
 //            }
         }
     }
+    public HashMap<Chunk, Location> getRecords();
     default boolean onChunkBreak(Location location){
         Chunk chunk = location.getChunk();
         Location loc=getRecords().remove(chunk);
         return true;
+    }
+    default <T extends SlimefunItem> boolean onChunkPlace(Location location,Class<T> instance){
+        Chunk chunk = location.getChunk();
+        Location loc=getRecords().get(chunk);
+        if(loc==null||loc.equals(location)) {
+            getRecords().put(chunk, location);
+            return true;
+        }else {
+            SlimefunItem item=DataCache.getSfItem(loc);
+            if(instance.isInstance(item)){
+                return false;
+            }else{
+                getRecords().put(chunk, location);
+                return true;
+            }
+        }
     }
     default void onChunkReachLimit(Location location, SlimefunItem slimefunItem, Consumer<String> outputStream){
         BukkitUtils.executeSync(()->{

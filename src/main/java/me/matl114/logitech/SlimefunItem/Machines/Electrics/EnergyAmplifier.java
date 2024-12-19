@@ -39,12 +39,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
 public class EnergyAmplifier extends AbstractEnergyProvider implements MenuTogglableBlock {
     protected final int[] NULL_SLOT=new int[0];
-    public int[] getInputSlots(){
-        return NULL_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return NULL_SLOT;
-    }
     protected final int[] BORDER=new int[]{
             0,1,2,3,5,6,7,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26
     };
@@ -52,13 +46,14 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
     protected final int STATUS_SLOT=4;
     protected final int MACHINE_SLOT=13;
     protected final ItemStack STATUS_ITEM_OFF=new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&c当前状态: 未发电");
-
     protected ItemPusherProvider MACHINE_PROVIDER= FinalFeature.STORAGE_READER;
     protected double multiply;
+
     protected final ItemStack RUNWHENFULL_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6过载模式: &c关","&7点击切换过载模式",
             "&7当过载模式启用时候,即使发电机存电量已满仍旧会发电");
     protected final ItemStack RUNWHENFULL_ON=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6过载模式: &a开","&7点击切换过载模式",
             "&7当过载模式启用时候,即使发电机存电量已满仍旧会发电");
+    public final int DATA_SLOT=0;
     public EnergyAmplifier(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                                   int energyBuffer,double multiply) {
         super(category, item, recipeType, recipe,   energyBuffer,1);
@@ -84,43 +79,38 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
         }
         preset.addItem(STATUS_SLOT,getStatusItem(0,0,0),ChestMenuUtils.getEmptyClickHandler());
     }
-    public ItemStack getStatusItem(int energyProvide,int charge,int stackNum){
-        if(stackNum==0){
-            return STATUS_ITEM_OFF;
-        }else {
-            if(charge>this.energybuffer){
-                return new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&a当前状态: 发电中",
-                        "&7当前单体发电: 电力缓存已满!"
-                        ,"&7当前电机数目: %dx".formatted(stackNum),
-                        "&7当前工作效率: %.3f".formatted(multiply),
-                        "&7当前发电速率: 电力缓存已满!",
-                        "&7当前电力存储: %dJ".formatted(charge));
-            }else {
-                return new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&a当前状态: 发电中",
-                        "&7当前单体发电: %dJ/t".formatted(energyProvide)
-                        ,"&7当前电机数目: %dx".formatted(stackNum),
-                        "&7当前工作效率: %.3f".formatted(multiply),
-                        "&7当前发电速率: %dJ/t".formatted((int)(stackNum*energyProvide*multiply)),
-                        "&7当前电力存储: %dJ".formatted(charge));
+    public DataMenuClickHandler createDataHolder(){
+        return new DataMenuClickHandler() {
+            //0 为 数量 1 为 电力
+            Object it=null;
+            int t;
+            public int getInt(int val1){
+                return t;
             }
-        }
+            public Object getObject(int val2){
+                return it;
+            }
+            @Override
+            public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
+                return false;
+            }
+            public void setInt(int val1,int val2){
+                t=val2;
+            }
+            public void setObject(int val1,Object val2){
+                it=val2;
+            }
+        };
     }
-    public void registerTick(SlimefunItem item){
-        item.addItemHandler(
-                new BlockTicker() {
-                    public boolean isSynchronized() {
-                        return false;
-                    }
-
-                    @ParametersAreNonnullByDefault
-                    public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
-                        BlockMenu menu = data.getBlockMenu();
-                       if(menu!=null&&menu.hasViewer()){
-                           updateMenu(menu,b,Settings.RUN);
-                       }
-                    }
-                }
-        );
+    public DataMenuClickHandler getDataHolder(Block b, BlockMenu inv){
+        ChestMenu.MenuClickHandler handler=inv.getMenuClickHandler(DATA_SLOT);
+        if(handler instanceof DataMenuClickHandler dh){return dh;}
+        else{
+            DataMenuClickHandler dh=createDataHolder();
+            inv.addMenuClickHandler(DATA_SLOT,dh);
+            updateMenu(inv,b,Settings.RUN);
+            return dh;
+        }
     }
     public  int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
         BlockMenu inv=data.getBlockMenu();
@@ -158,38 +148,40 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
         }
         return 0;
     }
-    public final int DATA_SLOT=0;
-    public DataMenuClickHandler createDataHolder(){
-        return new DataMenuClickHandler() {
-            //0 为 数量 1 为 电力
-            Object it=null;
-            int t;
-            public void setInt(int val1,int val2){
-                t=val2;
-            }
-            public int getInt(int val1){
-                return t;
-            }
-            public void setObject(int val1,Object val2){
-                it=val2;
-            }
-            public Object getObject(int val2){
-                return it;
-            }
-            @Override
-            public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
-                return false;
-            }
-        };
+    public int[] getInputSlots(){
+        return NULL_SLOT;
     }
-    public DataMenuClickHandler getDataHolder(Block b, BlockMenu inv){
-        ChestMenu.MenuClickHandler handler=inv.getMenuClickHandler(DATA_SLOT);
-        if(handler instanceof DataMenuClickHandler dh){return dh;}
-        else{
-            DataMenuClickHandler dh=createDataHolder();
-            inv.addMenuClickHandler(DATA_SLOT,dh);
-            updateMenu(inv,b,Settings.RUN);
-            return dh;
+    public int[] getOutputSlots(){
+        return NULL_SLOT;
+    }
+    @Override
+    public boolean[] getStatus(BlockMenu inv) {
+        ItemStack itemStack=inv.getItemInSlot(RUNWHENFULL_SLOT);
+        if(itemStack==null||itemStack.getType()!=Material.RED_STAINED_GLASS_PANE){
+            return new boolean[]{true};
+        }else {
+            return new boolean[]{false};
+        }
+    }
+    public ItemStack getStatusItem(int energyProvide,int charge,int stackNum){
+        if(stackNum==0){
+            return STATUS_ITEM_OFF;
+        }else {
+            if(charge>this.energybuffer){
+                return new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&a当前状态: 发电中",
+                        "&7当前单体发电: 电力缓存已满!"
+                        ,"&7当前电机数目: %dx".formatted(stackNum),
+                        "&7当前工作效率: %.3f".formatted(multiply),
+                        "&7当前发电速率: 电力缓存已满!",
+                        "&7当前电力存储: %dJ".formatted(charge));
+            }else {
+                return new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&a当前状态: 发电中",
+                        "&7当前单体发电: %dJ/t".formatted(energyProvide)
+                        ,"&7当前电机数目: %dx".formatted(stackNum),
+                        "&7当前工作效率: %.3f".formatted(multiply),
+                        "&7当前发电速率: %dJ/t".formatted((int)(stackNum*energyProvide*multiply)),
+                        "&7当前电力存储: %dJ".formatted(charge));
+            }
         }
     }
     public void newMenuInstance(BlockMenu inv, Block b){
@@ -213,6 +205,38 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
         }
         updateMenu(inv,b,Settings.INIT);
     }
+    public void onBreak(BlockBreakEvent e,BlockMenu inv){
+        super.onBreak(e,inv);
+        if(inv!=null){
+            inv.dropItems(inv.getLocation(),MACHINE_SLOT);
+        }
+    }
+    public void registerTick(SlimefunItem item){
+        item.addItemHandler(
+                new BlockTicker() {
+                    public boolean isSynchronized() {
+                        return false;
+                    }
+
+                    @ParametersAreNonnullByDefault
+                    public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
+                        BlockMenu menu = data.getBlockMenu();
+                       if(menu!=null&&menu.hasViewer()){
+                           updateMenu(menu,b,Settings.RUN);
+                       }
+                    }
+                }
+        );
+    }
+
+    @Override
+    public void toggleStatus(BlockMenu inv, boolean... result) {
+        if(result[0]){
+            inv.replaceExistingItem(RUNWHENFULL_SLOT,RUNWHENFULL_ON);
+        }else {
+            inv.replaceExistingItem(RUNWHENFULL_SLOT,RUNWHENFULL_OFF);
+        }
+    }
     public void updateMenu(BlockMenu inv, Block b, Settings mod){
         ItemPusher pusher=MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,MACHINE_SLOT);
         DataMenuClickHandler dh=getDataHolder(b,inv);
@@ -228,29 +252,5 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
         }
         dh.setInt(0,0);
         dh.setObject(0,null);
-    }
-    public void onBreak(BlockBreakEvent e,BlockMenu inv){
-        super.onBreak(e,inv);
-        if(inv!=null){
-            inv.dropItems(inv.getLocation(),MACHINE_SLOT);
-        }
-    }
-
-    @Override
-    public boolean[] getStatus(BlockMenu inv) {
-        ItemStack itemStack=inv.getItemInSlot(RUNWHENFULL_SLOT);
-        if(itemStack==null||itemStack.getType()!=Material.RED_STAINED_GLASS_PANE){
-            return new boolean[]{true};
-        }else {
-            return new boolean[]{false};
-        }
-    }
-    @Override
-    public void toggleStatus(BlockMenu inv, boolean... result) {
-        if(result[0]){
-            inv.replaceExistingItem(RUNWHENFULL_SLOT,RUNWHENFULL_ON);
-        }else {
-            inv.replaceExistingItem(RUNWHENFULL_SLOT,RUNWHENFULL_OFF);
-        }
     }
 }

@@ -14,6 +14,12 @@ public class ItemPusher extends ItemCounter {
 
 
     private static ItemPusher INSTANCE=new ItemPusher(new ItemStack(Material.STONE));
+    public static ItemPusher get(ItemStack item) {
+        if(item==null) return null;
+        ItemPusher itp=INSTANCE.clone();
+        itp.init(item);
+        return itp;
+    }
     public ItemPusher(){
         super();
     }
@@ -22,42 +28,13 @@ public class ItemPusher extends ItemCounter {
         super(item);
 
     }
-    public static ItemPusher get(ItemStack item) {
-        if(item==null) return null;
-        ItemPusher itp=INSTANCE.clone();
-        itp.init(item);
-        return itp;
-    }
-    protected void init(ItemStack item){
-        super.init( item);
-    }
-    protected void init( ){
-        super.init();
-    }
-
     public ItemPusher(ItemStack item,int maxcnt) {
         //can use as storage unit
         super(item);
         this.maxStackCnt = maxcnt;
     }
-    public boolean safeAddAmount(int amount){
-        int result=amount+cnt;
-        if(result>maxStackCnt){
-            return false;
-        }else {
-            setAmount(result);
-            return true;
-        }
-    }
-    /**
-     * this arguments has no meaning ,just a formated argument
-     * @param menu
-     */
-    public void updateMenu(@Nonnull BlockMenu menu){
-        if(dirty){
-            updateItemStack();
-
-        }
+    protected ItemPusher clone(){
+        return (ItemPusher)super.clone();
     }
 
     public void grab(ItemCounter counter) {
@@ -70,8 +47,24 @@ public class ItemPusher extends ItemCounter {
             counter.addAmount(-left);
         }
     }
+    protected void init( ){
+        super.init();
+    }
+    protected void init(ItemStack item){
+        super.init( item);
+    }
+
     public void push(ItemCounter counter) {
         counter.grab(this);
+    }
+    public boolean safeAddAmount(int amount){
+        int result=amount+cnt;
+        if(result>maxStackCnt){
+            return false;
+        }else {
+            setAmount(result);
+            return true;
+        }
     }
 
 
@@ -114,7 +107,14 @@ public class ItemPusher extends ItemCounter {
         }
         return limit-left;
     }
-    protected ItemPusher clone(){
-        return (ItemPusher)super.clone();
+    /**
+     * this arguments has no meaning ,just a formated argument
+     * @param menu
+     */
+    public void updateMenu(@Nonnull BlockMenu menu){
+        if(dirty){
+            updateItemStack();
+
+        }
     }
 }

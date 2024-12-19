@@ -39,11 +39,7 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
 public class MultiBlockManual extends AbstractManual implements MultiCraftType, ImportRecipes {
 
-    protected final int[] INPUT_SLOT=new int[]{4,5,6,7,8,13,14,15,16,17,22,23,24,25,26,31,32,33,34,35,40,41,42,43,44,49,50,51,52,53};
-    protected final int[] OUTPUT_SLOT=new int[]{31,32,33,34,35,40,41,42,43,44,49,50,51,52,53,4,5,6,7,8,13,14,15,16,17,22,23,24,25,26};
-    protected final int[] BORDER=new int[]{3,12,21,30,39,48,46};
     protected static final int[] MACHINEITEM_SLOT= new int[ ]{0,1,2,9,10,11,18,19,20};
-    public MultiBlockMachine[] craftType ;
     protected static final ItemStack DISPLAY_DEFAULT_BKGROUND=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c没有匹配的多方块机器");
     protected static final int DISPLAYEITEM_SLOT=27;
     protected static final ItemStack INFO_ITEM=new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6机制:"," ","&6在上方的3x3区域摆入多方块机器构造","&6即可加载配方","&a可以使用槽位伪装板填充空余的槽位!","&6在右边放入物品进行快捷合成");
@@ -62,7 +58,12 @@ public class MultiBlockManual extends AbstractManual implements MultiCraftType, 
     protected static final int RECIPE_ITEM_SLOT=37;
     protected static final int RECIPEBOOK_SHOW_SLOT=29;
     protected static final ItemStack RECIPEBOOK_SHOW_ITEM=new CustomItemStack(Material.BOOK,"&6点击查看配方","","&6但是并没有一键放置配方的功能");
+    protected final int[] INPUT_SLOT=new int[]{4,5,6,7,8,13,14,15,16,17,22,23,24,25,26,31,32,33,34,35,40,41,42,43,44,49,50,51,52,53};
+    protected final int[] OUTPUT_SLOT=new int[]{31,32,33,34,35,40,41,42,43,44,49,50,51,52,53,4,5,6,7,8,13,14,15,16,17,22,23,24,25,26};
+    protected final int[] BORDER=new int[]{3,12,21,30,39,48,46};
+    public MultiBlockMachine[] craftType ;
 
+    protected HashMap<MultiBlockMachine, MenuFactory> RECIPEMENU=null;
     public MultiBlockManual(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                          int energybuffer, int energyConsumption,
                          RecipeType... craftType){
@@ -72,62 +73,15 @@ public class MultiBlockManual extends AbstractManual implements MultiCraftType, 
             initMenuFactory();
         });
     }
-    public MultiBlockMachine[] getCraftTypes(){
-        if(craftType==null||craftType.length<=0){
-            HashMap<MultiBlockMachine,List<MachineRecipe>> types= RecipeSupporter.MULTIBLOCK_RECIPES;
-            if(types==null||types.size()<=0){
-                return craftType;
+    public List<ItemStack> _getDisplayRecipes(List<ItemStack> re){
+        List<ItemStack> its= new ArrayList<>(){{
+            for(SlimefunItem item : RecipeSupporter.MULTIBLOCK_RECIPES.keySet()){
+                add(AddUtils.getInfoShow("&f支持的多方块机器","&7将机器配方置于指定槽位以进行合成"));
+                add(new DisplayItemStack(item.getItem()));
             }
-            craftType=new MultiBlockMachine[types.size()];
-            int cnt=0;
-            for(MultiBlockMachine e :types.keySet()){
-                craftType[cnt]=e;
-                cnt++;
-            }
-        }return craftType;
-    }
-    public MachineRecipe getRecordRecipe(Location loc){
-        int index=MultiCraftType.getRecipeTypeIndex(loc);
-
-        if(index>=0&&index<getCraftTypes().length){
-            int index2= getNowRecordRecipe(loc);
-            if(index2>=0){
-                return RecipeSupporter.MULTIBLOCK_RECIPES.get(getCraftTypes()[index]).get(index2);
-            }
-        }else if (index>0){
-            MultiCraftType.setRecipeTypeIndex(loc,-1);
-            setNowRecordRecipe(loc,-1);
-        }
-        return null;
-    }
-    public List<MachineRecipe> getMachineRecipes(Block b,BlockMenu inv){
-        Location loc=inv.getLocation();
-        int index=MultiCraftType.getRecipeTypeIndex(loc);
-        if(index>=0&&index<getCraftTypes().length){
-            return RecipeSupporter.MULTIBLOCK_RECIPES.get(getCraftTypes()[index]);
-        }else if (index>0){
-            MultiCraftType.setRecipeTypeIndex(loc,-1);
-            setNowRecordRecipe(loc,-1);
-        }
-        return null;
-    }
-    protected HashMap<MultiBlockMachine, MenuFactory> RECIPEMENU=null;
-    protected void initMenuFactory(){
-        if(RECIPEMENU==null) {
-            RECIPEMENU = new HashMap<>();
-            MultiBlockMachine[] list = getCraftTypes();
-            int len = list.length;
-            for (int i = 0; i < len; i++) {
-                RECIPEMENU.put(list[i], MenuUtils.createMRecipeListDisplay(list[i].getItem(), RecipeSupporter.MULTIBLOCK_RECIPES.get(list[i]), null
-                ));
-            }
-        }
-    }
-    protected MenuFactory getMenuFactory(MultiBlockMachine r){
-        if(RECIPEMENU==null){
-            initMenuFactory();
-        }
-        return RECIPEMENU.get(r);
+        }};
+        re.addAll(its);
+        return re;
     }
     public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
@@ -145,6 +99,68 @@ public class MultiBlockManual extends AbstractManual implements MultiCraftType, 
         preset.addItem(ONE_SLOT,CRAFT_ONE);
         preset.addItem(MUL_SLOT,CRAFT_MUL);
         preset.addItem(RECIPEBOOK_SHOW_SLOT,RECIPEBOOK_SHOW_ITEM);
+    }
+    public MultiBlockMachine[] getCraftTypes(){
+        if(craftType==null||craftType.length<=0){
+            HashMap<MultiBlockMachine,List<MachineRecipe>> types= RecipeSupporter.MULTIBLOCK_RECIPES;
+            if(types==null||types.size()<=0){
+                return craftType;
+            }
+            craftType=new MultiBlockMachine[types.size()];
+            int cnt=0;
+            for(MultiBlockMachine e :types.keySet()){
+                craftType[cnt]=e;
+                cnt++;
+            }
+        }return craftType;
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public List<MachineRecipe> getMachineRecipes(Block b,BlockMenu inv){
+        Location loc=inv.getLocation();
+        int index=MultiCraftType.getRecipeTypeIndex(loc);
+        if(index>=0&&index<getCraftTypes().length){
+            return RecipeSupporter.MULTIBLOCK_RECIPES.get(getCraftTypes()[index]);
+        }else if (index>0){
+            MultiCraftType.setRecipeTypeIndex(loc,-1);
+            setNowRecordRecipe(loc,-1);
+        }
+        return null;
+    }
+    protected MenuFactory getMenuFactory(MultiBlockMachine r){
+        if(RECIPEMENU==null){
+            initMenuFactory();
+        }
+        return RECIPEMENU.get(r);
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public MachineRecipe getRecordRecipe(Location loc){
+        int index=MultiCraftType.getRecipeTypeIndex(loc);
+
+        if(index>=0&&index<getCraftTypes().length){
+            int index2= getNowRecordRecipe(loc);
+            if(index2>=0){
+                return RecipeSupporter.MULTIBLOCK_RECIPES.get(getCraftTypes()[index]).get(index2);
+            }
+        }else if (index>0){
+            MultiCraftType.setRecipeTypeIndex(loc,-1);
+            setNowRecordRecipe(loc,-1);
+        }
+        return null;
+    }
+    protected void initMenuFactory(){
+        if(RECIPEMENU==null) {
+            RECIPEMENU = new HashMap<>();
+            MultiBlockMachine[] list = getCraftTypes();
+            int len = list.length;
+            for (int i = 0; i < len; i++) {
+                RECIPEMENU.put(list[i], MenuUtils.createMRecipeListDisplay(list[i].getItem(), RecipeSupporter.MULTIBLOCK_RECIPES.get(list[i]), null
+                ));
+            }
+        }
     }
     public void newMenuInstance(BlockMenu menu, Block block){
         menu.addMenuOpeningHandler((player -> {
@@ -226,51 +242,6 @@ public class MultiBlockManual extends AbstractManual implements MultiCraftType, 
                 );
         updateMenu(menu,block,Settings.INIT);
     }
-    public void updateMenu(BlockMenu inv,Block block,Settings mod){
-        if(mod==Settings.INIT){
-            parseRecipe(inv);
-            orderSearchRecipe(inv,Settings.SEQUNTIAL);
-        }else {
-            if(parseRecipe(inv)){
-                Location  loc=inv.getLocation();
-                MachineRecipe getRecipe=CraftUtils.matchNextRecipe(inv,getInputSlots(),getMachineRecipes(block,inv),true,Settings.SEQUNTIAL,CRAFT_PROVIDER);
-
-                if(getRecipe==null){
-                    DataCache.setLastRecipe(loc,-1);
-                }
-            }
-        }
-        Location  loc=inv.getLocation();
-        int index_=MultiCraftType.getRecipeTypeIndex(loc);
-        if(index_>=0){
-            MultiBlockMachine nowMachine=getCraftTypes()[index_];
-            List<MachineRecipe> mRecipe=RecipeSupporter.MULTIBLOCK_RECIPES.get(nowMachine);
-            inv.replaceExistingItem(DISPLAYEITEM_SLOT,AddUtils.addLore(nowMachine.getItem(),"&8检测出的多方块机器"));
-
-        int index= DataCache.getLastRecipe(loc);
-        int indexRecord=getNowRecordRecipe(loc);
-        if(index!=-1){
-            MachineRecipe getRecipe=mRecipe.get(index);
-            inv.replaceExistingItem(RECIPE_ITEM_SLOT, AddUtils.addLore(getRecipe.getOutput()[0],
-                    "&8匹配的产物", "&8若有多输出则显示第一个", "&8配方编号: " + index));
-            if(index!=indexRecord||mod==Settings.INIT) {
-
-                setNowRecordRecipe(loc,index);
-                return;
-            }
-        }else{
-
-            if(indexRecord!=-1||mod==Settings.INIT){
-                inv.replaceExistingItem(RECIPE_ITEM_SLOT,DISPLAY_NOMATCH);
-                setNowRecordRecipe(loc,-1);
-            }
-        }
-        }else{
-            inv.replaceExistingItem(DISPLAYEITEM_SLOT,DISPLAY_DEFAULT_BKGROUND);
-            inv.replaceExistingItem(RECIPE_ITEM_SLOT,DISPLAY_NOMATCH);
-            setNowRecordRecipe(loc,-1);
-        }
-    }
     @Override
     public void onBreak(BlockBreakEvent e, BlockMenu inv){
         super.onBreak(e,inv);
@@ -324,20 +295,49 @@ public class MultiBlockManual extends AbstractManual implements MultiCraftType, 
             updateMenu(inv ,b,Settings.RUN);
         }
     }
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
-    public List<ItemStack> _getDisplayRecipes(List<ItemStack> re){
-        List<ItemStack> its= new ArrayList<>(){{
-            for(SlimefunItem item : RecipeSupporter.MULTIBLOCK_RECIPES.keySet()){
-                add(AddUtils.getInfoShow("&f支持的多方块机器","&7将机器配方置于指定槽位以进行合成"));
-                add(new DisplayItemStack(item.getItem()));
+    public void updateMenu(BlockMenu inv,Block block,Settings mod){
+        if(mod==Settings.INIT){
+            parseRecipe(inv);
+            orderSearchRecipe(inv,Settings.SEQUNTIAL);
+        }else {
+            if(parseRecipe(inv)){
+                Location  loc=inv.getLocation();
+                MachineRecipe getRecipe=CraftUtils.matchNextRecipe(inv,getInputSlots(),getMachineRecipes(block,inv),true,Settings.SEQUNTIAL,CRAFT_PROVIDER);
+
+                if(getRecipe==null){
+                    DataCache.setLastRecipe(loc,-1);
+                }
             }
-        }};
-        re.addAll(its);
-        return re;
+        }
+        Location  loc=inv.getLocation();
+        int index_=MultiCraftType.getRecipeTypeIndex(loc);
+        if(index_>=0){
+            MultiBlockMachine nowMachine=getCraftTypes()[index_];
+            List<MachineRecipe> mRecipe=RecipeSupporter.MULTIBLOCK_RECIPES.get(nowMachine);
+            inv.replaceExistingItem(DISPLAYEITEM_SLOT,AddUtils.addLore(nowMachine.getItem(),"&8检测出的多方块机器"));
+
+        int index= DataCache.getLastRecipe(loc);
+        int indexRecord=getNowRecordRecipe(loc);
+        if(index!=-1){
+            MachineRecipe getRecipe=mRecipe.get(index);
+            inv.replaceExistingItem(RECIPE_ITEM_SLOT, AddUtils.addLore(getRecipe.getOutput()[0],
+                    "&8匹配的产物", "&8若有多输出则显示第一个", "&8配方编号: " + index));
+            if(index!=indexRecord||mod==Settings.INIT) {
+
+                setNowRecordRecipe(loc,index);
+                return;
+            }
+        }else{
+
+            if(indexRecord!=-1||mod==Settings.INIT){
+                inv.replaceExistingItem(RECIPE_ITEM_SLOT,DISPLAY_NOMATCH);
+                setNowRecordRecipe(loc,-1);
+            }
+        }
+        }else{
+            inv.replaceExistingItem(DISPLAYEITEM_SLOT,DISPLAY_DEFAULT_BKGROUND);
+            inv.replaceExistingItem(RECIPE_ITEM_SLOT,DISPLAY_NOMATCH);
+            setNowRecordRecipe(loc,-1);
+        }
     }
 }

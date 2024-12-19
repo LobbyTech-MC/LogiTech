@@ -1,18 +1,8 @@
 package me.matl114.logitech.SlimefunItem.Items;
 
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import io.github.thebusybiscuit.slimefun4.api.events.PlayerRightClickEvent;
-import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.core.handlers.ItemUseHandler;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
-import me.matl114.logitech.SlimefunItem.Cargo.Links.HyperLink;
-import me.matl114.logitech.SlimefunItem.DistinctiveCustomItemStack;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.WorldUtils;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import java.util.ArrayList;
+import java.util.Optional;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -42,11 +32,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 public class HypLink extends DistinctiveCustomItemStack {
     public HypLink(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe,new ArrayList<>());
-    }
-    @Override
-    public void preRegister(){
-        super.preRegister();
-        addItemHandler((ItemUseHandler)this::onBindLocation);
     }
     private void onBindLocation(PlayerRightClickEvent event) {
         if(event.getPlayer().isSneaking()){
@@ -102,5 +87,10 @@ public class HypLink extends DistinctiveCustomItemStack {
                 }
             }
         }
+    }
+    @Override
+    public void preRegister(){
+        super.preRegister();
+        addItemHandler((ItemUseHandler)this::onBindLocation);
     }
 }

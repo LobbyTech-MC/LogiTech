@@ -14,10 +14,6 @@ import me.matl114.logitech.Utils.UtilClass.ItemClass.RandAmountStack;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 
 public interface RecipeDisplay extends RecipeDisplayItem {
-    List<MachineRecipe> provideDisplayRecipe();
-    default List<ItemStack> getDisplayRecipes() {
-        return this._getDisplayRecipes(new ArrayList<>());
-    }
     static ItemStack addRecipeInfo(ItemStack stack, Settings settings,int index,Double pro,int time){
         List<String> lore = new ArrayList<>();
         switch(settings){
@@ -140,4 +136,8 @@ public interface RecipeDisplay extends RecipeDisplayItem {
 
         return displayRecipes;
     }
+    default List<ItemStack> getDisplayRecipes() {
+        return this._getDisplayRecipes(new ArrayList<>());
+    }
+    List<MachineRecipe> provideDisplayRecipe();
 }

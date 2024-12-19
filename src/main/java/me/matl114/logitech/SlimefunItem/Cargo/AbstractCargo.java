@@ -32,14 +32,7 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
 public abstract class AbstractCargo extends DistinctiveCustomItemStack implements RecipeDisplay , MenuBlock, Ticking, DirectionalBlock {
-    public abstract int[] getInputSlots();
-    public abstract int[] getOutputSlots();
-    public abstract int getConfigSlot();
-    public abstract int[] getBWListSlot();
     public int defaultConfigCode=CargoConfigs.getDefaultConfig();
-    public int getDefaultConfig(){
-        return defaultConfigCode;
-    }
     protected final ItemStack[] DIRECTION_ITEM=new ItemStack[]{
             new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6点击切换方向","&3当前方向: 无"),
             AddUtils.addGlow( new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6点击切换方向","&3当前方向: 向北")),
@@ -61,10 +54,23 @@ public abstract class AbstractCargo extends DistinctiveCustomItemStack implement
             displayedMemory.add(null);
         }
     }
+    public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
+        //doing nothing
+    }
+    public boolean conditionHandle(Block b,BlockMenu menu){
+        return true;
+    }
     public abstract void constructMenu(BlockMenuPreset preset);
+    public abstract int[] getBWListSlot();
     public int getConfigCode(SlimefunBlockData data){
         return DataCache.getCustomData(data,"config",-1);
     }
+    public abstract int getConfigSlot();
+    public int getDefaultConfig(){
+        return defaultConfigCode;
+    }
+    public abstract int[] getInputSlots();
+    public abstract int[] getOutputSlots();
     public void loadConfig(BlockMenu inv,Block b){
         loadConfig(inv,b,DataCache.safeLoadBlock(inv.getLocation()));
     }
@@ -88,14 +94,19 @@ public abstract class AbstractCargo extends DistinctiveCustomItemStack implement
         });
         updateMenu(menu,b, Settings.INIT);
     }
+    public void onBreak(BlockBreakEvent e, BlockMenu menu){
+        MenuBlock.super.onBreak(e,menu);
+        if(menu!=null){
+            Location loc=menu.getLocation();
+            menu.dropItems(loc,getConfigSlot());
+            menu.dropItems(loc,getBWListSlot());
+        }
+    }
     public void preRegister(){
         super.preRegister();
         registerTick(this);
         registerBlockMenu(this);
         handleBlock(this);
-    }
-    public void updateMenu(BlockMenu blockMenu, Block block, Settings mod){
-        loadConfig(blockMenu,block);
     }
     public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
         if(menu.hasViewer()){
@@ -106,19 +117,8 @@ public abstract class AbstractCargo extends DistinctiveCustomItemStack implement
             cargoTask(b,menu,data,configCode);
         }
     }
-    public boolean conditionHandle(Block b,BlockMenu menu){
-        return true;
-    }
-    public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
-        //doing nothing
-    }
 
-    public void onBreak(BlockBreakEvent e, BlockMenu menu){
-        MenuBlock.super.onBreak(e,menu);
-        if(menu!=null){
-            Location loc=menu.getLocation();
-            menu.dropItems(loc,getConfigSlot());
-            menu.dropItems(loc,getBWListSlot());
-        }
+    public void updateMenu(BlockMenu blockMenu, Block block, Settings mod){
+        loadConfig(blockMenu,block);
     }
 }

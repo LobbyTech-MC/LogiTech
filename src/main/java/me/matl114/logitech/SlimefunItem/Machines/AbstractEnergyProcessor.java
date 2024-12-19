@@ -64,34 +64,6 @@ public abstract class AbstractEnergyProcessor extends AbstractEnergyProvider imp
 
     }
     /**
-     * method from MachineProcessorHolder
-     * @return
-     */
-    public MachineProcessor<EnergyProviderOperation> getMachineProcessor() {
-        return this.processor;
-    }
-
-
-    /**
-     * need implement,  method from MachineProcessorHolder
-     * @return
-     */
-    public ItemStack getProgressBar(){
-        return this.progressbar;
-    }
-
-
-    /**
-     * cancel machineprocessor after break
-     * @param e
-     * @param menu
-     */
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
-        super.onBreak(e,menu);
-        AbstractEnergyProcessor.this.processor.endOperation(menu.getLocation());
-    }
-
-    /**
      *
      * @param preset
      */
@@ -122,13 +94,8 @@ public abstract class AbstractEnergyProcessor extends AbstractEnergyProvider imp
         border = this.getOutputSlots();
         len = border.length;
     }
-    public int[] getInputSlots(){
-        return new int[]{19,20};
-    }
 
-    public int[] getOutputSlots(){
-        return new int[]{24,25};
-    }
+
     public int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
 
         BlockMenu inv= DataCache.getMenu(l);
@@ -183,6 +150,39 @@ public abstract class AbstractEnergyProcessor extends AbstractEnergyProvider imp
         }
 
 
+    }
+
+
+    public int[] getInputSlots(){
+        return new int[]{19,20};
+    }
+
+    /**
+     * method from MachineProcessorHolder
+     * @return
+     */
+    public MachineProcessor<EnergyProviderOperation> getMachineProcessor() {
+        return this.processor;
+    }
+    public int[] getOutputSlots(){
+        return new int[]{24,25};
+    }
+
+    /**
+     * need implement,  method from MachineProcessorHolder
+     * @return
+     */
+    public ItemStack getProgressBar(){
+        return this.progressbar;
+    }
+    /**
+     * cancel machineprocessor after break
+     * @param e
+     * @param menu
+     */
+    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+        super.onBreak(e,menu);
+        AbstractEnergyProcessor.this.processor.endOperation(menu.getLocation());
     }
     public void preRegister(){
         super.preRegister();

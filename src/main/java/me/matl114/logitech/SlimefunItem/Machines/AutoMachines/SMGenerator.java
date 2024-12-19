@@ -67,13 +67,13 @@ public class SMGenerator extends AbstractTransformer  {
     public boolean isSync(){
         return false;
     }
+    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
+        super.tick(b,menu,data,ticker);
+    }
     public void updateMenu(BlockMenu inv,Block b,Settings mod){
         if(mod==Settings.INIT){
             DataCache.setLastRecipe(inv.getLocation(),0);
         }
-    }
-    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
-        super.tick(b,menu,data,ticker);
     }
 
 }

@@ -62,20 +62,11 @@ public class LineCargo extends AbstractCargo {
     protected final int[] DIRECTION_SLOTS=new int[]{
             DIRECTION_SLOT
     };
-    public int[] getBWListSlot(){
-        return BWSLOT;
-    }
     protected final int MAX_LINE_LEN=64;
-    public int[] getInputSlots(){
-        return new int[0];
-    }
-    public int[] getOutputSlots(){
-        return new int[0];
-    }
-    public int getConfigSlot(){
-        return 4;
-    }
-
+    protected final String[] savedKeys=new String[]{
+            "line_dir"
+    };
+    protected boolean transportSmarter=false;
     public LineCargo(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, List<ItemStack> displayList) {
         super(itemGroup, item, recipeType, recipe, displayList);
         setDisplayRecipes(
@@ -95,83 +86,6 @@ public class LineCargo extends AbstractCargo {
                 )
         );
     }
-    public void constructMenu(BlockMenuPreset preset){
-        int[] border=BORDER;
-        int len=border.length;
-        for (int i=0;i<len;++i){
-            preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
-        }
-        border=INFO_SLOT;
-        len=border.length;
-        for (int i=0;i<len;++i){
-            preset.addItem(INFO_SLOT[i],INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
-        }
-    }
-    protected final String[] savedKeys=new String[]{
-            "line_dir"
-    };
-    public String[] getSaveKeys(){
-        return savedKeys;
-    }
-    public int[] getDirectionSlots(){
-        return DIRECTION_SLOTS;
-    }
-    public void newMenuInstance(BlockMenu inv, Block b){
-        inv.addMenuOpeningHandler((player -> {
-            updateMenu(inv,b,Settings.RUN);
-        }));
-        inv.addMenuCloseHandler(player -> {
-            updateMenu(inv,b,Settings.RUN);
-        });
-        inv.addMenuClickHandler(DIRECTION_SLOT,getDirectionHandler(0,inv));
-        int len=CONFIG_SLOT.length;
-        for (int i=0;i<len;++i){
-            inv.addMenuClickHandler(CONFIG_SLOT[i],getConfigHandlers(i,inv));
-        }
-        updateMenu(inv,b, Settings.INIT);
-    }
-    public void updateConfigSlots(BlockMenu inv ){
-        SlimefunBlockData data= DataCache.safeLoadBlock(inv.getLocation());
-        int len=CONFIG_SLOT.length;
-        String key;
-        int code;
-        for (int i=0;i<len;++i){
-            key=CONFIG_KEYS[i];
-            code=DataCache.getCustomData(data,key,CONFIG_VALUE[i]);
-            if(code>=CONFIG_VALUE[i+1]){
-                code=CONFIG_VALUE[i+1]-1;
-                DataCache.setCustomData(data,key,code);
-            }
-            inv.replaceExistingItem(CONFIG_SLOT[i],CONFIG_ITEM[code]);
-        }
-    }
-    public ChestMenu.MenuClickHandler getConfigHandlers(int configIdx,BlockMenu inv){
-        return ((player, i, itemStack, clickAction) -> {
-            SlimefunBlockData data=DataCache.safeLoadBlock(inv.getLocation());
-            if(data!=null){
-                int index=configIdx;
-                int code=DataCache.getCustomData(data,CONFIG_KEYS[index],CONFIG_VALUE[index]);
-                code+=1;
-                if(code>=CONFIG_VALUE[index+1]){
-                    code=CONFIG_VALUE[index];
-                }
-                inv.replaceExistingItem(CONFIG_SLOT[index],CONFIG_ITEM[code]);
-                DataCache.setCustomData(data,CONFIG_KEYS[index],code);
-                DataCache.setCustomData(data,CONFIG_KEYS[index],code);
-
-            }
-            return false;
-        });
-    }
-    public int getConfigValue(int configIdx,SlimefunBlockData data){
-        return DataCache.getCustomData(data,CONFIG_KEYS[configIdx],CONFIG_VALUE[configIdx]);
-    }
-    public void updateMenu(BlockMenu inv ,Block b,Settings mod){
-        loadConfig(inv,b);
-        updateDirectionSlots(0,inv);
-        updateConfigSlots(inv);
-    }
-    protected boolean transportSmarter=false;
     //todo async
     public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
         Directions dir=getDirection(0,data);
@@ -209,5 +123,91 @@ public class LineCargo extends AbstractCargo {
             }
         }
 
+    }
+
+    public void constructMenu(BlockMenuPreset preset){
+        int[] border=BORDER;
+        int len=border.length;
+        for (int i=0;i<len;++i){
+            preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
+        }
+        border=INFO_SLOT;
+        len=border.length;
+        for (int i=0;i<len;++i){
+            preset.addItem(INFO_SLOT[i],INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
+        }
+    }
+    public int[] getBWListSlot(){
+        return BWSLOT;
+    }
+    public ChestMenu.MenuClickHandler getConfigHandlers(int configIdx,BlockMenu inv){
+        return ((player, i, itemStack, clickAction) -> {
+            SlimefunBlockData data=DataCache.safeLoadBlock(inv.getLocation());
+            if(data!=null){
+                int index=configIdx;
+                int code=DataCache.getCustomData(data,CONFIG_KEYS[index],CONFIG_VALUE[index]);
+                code+=1;
+                if(code>=CONFIG_VALUE[index+1]){
+                    code=CONFIG_VALUE[index];
+                }
+                inv.replaceExistingItem(CONFIG_SLOT[index],CONFIG_ITEM[code]);
+                DataCache.setCustomData(data,CONFIG_KEYS[index],code);
+                DataCache.setCustomData(data,CONFIG_KEYS[index],code);
+
+            }
+            return false;
+        });
+    }
+    public int getConfigSlot(){
+        return 4;
+    }
+    public int getConfigValue(int configIdx,SlimefunBlockData data){
+        return DataCache.getCustomData(data,CONFIG_KEYS[configIdx],CONFIG_VALUE[configIdx]);
+    }
+    public int[] getDirectionSlots(){
+        return DIRECTION_SLOTS;
+    }
+    public int[] getInputSlots(){
+        return new int[0];
+    }
+    public int[] getOutputSlots(){
+        return new int[0];
+    }
+    public String[] getSaveKeys(){
+        return savedKeys;
+    }
+    public void newMenuInstance(BlockMenu inv, Block b){
+        inv.addMenuOpeningHandler((player -> {
+            updateMenu(inv,b,Settings.RUN);
+        }));
+        inv.addMenuCloseHandler(player -> {
+            updateMenu(inv,b,Settings.RUN);
+        });
+        inv.addMenuClickHandler(DIRECTION_SLOT,getDirectionHandler(0,inv));
+        int len=CONFIG_SLOT.length;
+        for (int i=0;i<len;++i){
+            inv.addMenuClickHandler(CONFIG_SLOT[i],getConfigHandlers(i,inv));
+        }
+        updateMenu(inv,b, Settings.INIT);
+    }
+    public void updateConfigSlots(BlockMenu inv ){
+        SlimefunBlockData data= DataCache.safeLoadBlock(inv.getLocation());
+        int len=CONFIG_SLOT.length;
+        String key;
+        int code;
+        for (int i=0;i<len;++i){
+            key=CONFIG_KEYS[i];
+            code=DataCache.getCustomData(data,key,CONFIG_VALUE[i]);
+            if(code>=CONFIG_VALUE[i+1]){
+                code=CONFIG_VALUE[i+1]-1;
+                DataCache.setCustomData(data,key,code);
+            }
+            inv.replaceExistingItem(CONFIG_SLOT[i],CONFIG_ITEM[code]);
+        }
+    }
+    public void updateMenu(BlockMenu inv ,Block b,Settings mod){
+        loadConfig(inv,b);
+        updateDirectionSlots(0,inv);
+        updateConfigSlots(inv);
     }
 }

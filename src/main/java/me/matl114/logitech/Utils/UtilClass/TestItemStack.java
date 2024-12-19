@@ -6,11 +6,11 @@ import org.bukkit.inventory.ItemStack;
 import me.matl114.logitech.Utils.Debug;
 
 public class TestItemStack extends ItemStack {
-    public TestItemStack( Material type, int amount, short damage,  Byte data) {
-        super(type, amount, damage, data);
-    }
     public TestItemStack(ItemStack item) {
         super(item);
+    }
+    public TestItemStack( Material type, int amount, short damage,  Byte data) {
+        super(type, amount, damage, data);
     }
     public boolean equals(Object a){
         Debug.logger("equal called");

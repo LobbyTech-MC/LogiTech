@@ -23,15 +23,9 @@ public class AdjacentEnergyCharger extends AbstractEnergyCharger implements Dire
     protected final String[] savedKeys = new String[]{
             "line_dir"
     };
-    public  String[] getSaveKeys(){
-        return savedKeys;
-    }
     protected final int[] DIRECTION_SLOTS = new int[]{
             10
     };
-    public int[] getDirectionSlots(){
-        return DIRECTION_SLOTS;
-    }
     public AdjacentEnergyCharger(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                              int energybuffer){
         super(category, item, recipeType, recipe, energybuffer);
@@ -58,8 +52,14 @@ public class AdjacentEnergyCharger extends AbstractEnergyCharger implements Dire
         }
         return ret;
     }
+    public int[] getDirectionSlots(){
+        return DIRECTION_SLOTS;
+    }
     public int getMaxChargeAmount(){
         return MAX_LEN;
+    }
+    public  String[] getSaveKeys(){
+        return savedKeys;
     }
     public void newMenuInstance(BlockMenu menu, Block block){
         super.newMenuInstance(menu, block);

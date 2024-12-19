@@ -36,6 +36,7 @@ public interface RecipeLock  {
 //            return -1;
 //        }
     }
+    MachineRecipe getRecordRecipe(SlimefunBlockData data);
     /**
      * representing the temp display item ,if not match to recipe index,change the existing display item
      * @param loc
@@ -48,6 +49,5 @@ public interface RecipeLock  {
     default void setNowRecordRecipe(SlimefunBlockData data ,int val){
         data.setData("record",String.valueOf(val));
     }
-    MachineRecipe getRecordRecipe(SlimefunBlockData data);
 
 }

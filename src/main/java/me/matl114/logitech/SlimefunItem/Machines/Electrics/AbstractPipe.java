@@ -35,114 +35,19 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 public abstract class AbstractPipe extends AbstractMachine implements DirectionalBlock {
     protected final int[] INPUT_SLOTS=new int[0];
     protected final int[] OUTPUT_SLOTS=new int[0];
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
     public String[] savedKeys=new String[]{
             "face_dir"
     };
     public int[] DIRECTION_SLOTS=new int[]{-1};
-    public String[] getSaveKeys(){
-        return savedKeys;
-    }
-    public int[] getDirectionSlots(){
-        return DIRECTION_SLOTS;
-    }
-    public boolean canModify(){
-        return false;
-    }
-    public void constructMenu(BlockMenuPreset preset){
-    }
-    public void newMenuInstance(BlockMenu menu, Block block){
-    }
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
-
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
+    protected final HashMap<Location, Counter<Location>> PIP_DIRECTION=new HashMap<>();
+    protected final HashMap<Location,Location> POINTING_RECORD=new HashMap<>();
     public  AbstractPipe(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(category, item, recipeType, recipe, 0,0);
     }
-
-    public void registerBlockMenu(SlimefunItem item){
-        //不用menu
-        //this.createPreset(item,item.getItemName(),this::constructMenu);
-        //handle blockPlaceEvent
-        handleBlock(item);
-    }
-
-    @Override
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
-        super.onBreak(e, menu);
-        PIP_DIRECTION.remove(e.getBlock().getLocation());
-        POINTING_RECORD.remove(e.getBlock().getLocation());
-    }
-
-    @Override
-    public void onPlace(BlockPlaceEvent e, Block b) {
-        super.onPlace(e, b);
-        BlockData data1=b.getBlockData();
-        if(data1 instanceof Directional dp){
-            Location loc=e.getBlockAgainst().getLocation();
-            Vector vector=b.getLocation().clone().subtract(loc).toVector();
-            Directions directions=Directions.fromVector(vector);
-            if(directions!=null&&directions!=Directions.NONE){
-                dp.setFacing(directions.toBlockFace());
-                b.setBlockData(data1,true);
-            }
-            DataCache.setCustomData(b.getLocation(),getSaveKeys()[0], Directions.fromBlockFace(dp.getFacing()).toInt());
-        }
-    }
-
-    public void registerTick(SlimefunItem item){
-        item.addItemHandler(
-                new BlockTicker() {
-                    int tickCounter=0;
-                    public boolean isSynchronized() {
-                        return isSync();
-                    }
-
-                    @ParametersAreNonnullByDefault
-                    public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
-                        //BlockMenu menu = BlockStorage.getInventory(b);
-                        AbstractPipe.this.tick(b, null,data,tickCounter);
-
-                    }
-
-                    @Override
-                    public void uniqueTick() {
-                        super.uniqueTick();
-                        this.tickCounter++;
-                    }
-                }
-        );
-    }
-    protected final HashMap<Location, Counter<Location>> PIP_DIRECTION=new HashMap<>();
-    protected final HashMap<Location,Location> POINTING_RECORD=new HashMap<>();
     protected final boolean avalEnd(Location loc){
         return DataCache.getSfItem(loc)!=this&&avalibleDestination(loc);
     }
-    @Override
-    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
-        Location loc=b.getLocation();
-        Counter<Location> counter=PIP_DIRECTION.computeIfAbsent(loc,(s)->{return new Counter<Location>(0,null);});
-        Directions dir= getDirection(0,data);
-        Location toLocation=POINTING_RECORD.computeIfAbsent(loc,dir::relate);
-        if(avalEnd(toLocation)){
-            counter.setCounter(ticker);
-            counter.setValue(toLocation);
-            bfssearchPipNet(loc,toLocation,ticker);
-        }
-        if((toLocation=(counter.read(ticker)))!=null){
-            Location fromLocation= dir.remote(loc,-1);
-            if(!fromLocation.equals(toLocation)){
-                transfer(fromLocation,toLocation);
-            }
-        }
-    }
     public abstract boolean avalibleDestination(Location toLocation);
-    public abstract void transfer(Location from, Location to);
     public void bfssearchPipNet(Location originLocation,Location value,int timeStamp){
         Set<Location> registeredLocations=PIP_DIRECTION.keySet();
 
@@ -173,4 +78,99 @@ public abstract class AbstractPipe extends AbstractMachine implements Directiona
             }
         }
     }
+    public boolean canModify(){
+        return false;
+    }
+    public void constructMenu(BlockMenuPreset preset){
+    }
+
+    public int[] getDirectionSlots(){
+        return DIRECTION_SLOTS;
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
+    }
+
+    public String[] getSaveKeys(){
+        return savedKeys;
+    }
+
+    public void newMenuInstance(BlockMenu menu, Block block){
+    }
+
+    @Override
+    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+        super.onBreak(e, menu);
+        PIP_DIRECTION.remove(e.getBlock().getLocation());
+        POINTING_RECORD.remove(e.getBlock().getLocation());
+    }
+    @Override
+    public void onPlace(BlockPlaceEvent e, Block b) {
+        super.onPlace(e, b);
+        BlockData data1=b.getBlockData();
+        if(data1 instanceof Directional dp){
+            Location loc=e.getBlockAgainst().getLocation();
+            Vector vector=b.getLocation().clone().subtract(loc).toVector();
+            Directions directions=Directions.fromVector(vector);
+            if(directions!=null&&directions!=Directions.NONE){
+                dp.setFacing(directions.toBlockFace());
+                b.setBlockData(data1,true);
+            }
+            DataCache.setCustomData(b.getLocation(),getSaveKeys()[0], Directions.fromBlockFace(dp.getFacing()).toInt());
+        }
+    }
+    public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
+    public void registerBlockMenu(SlimefunItem item){
+        //不用menu
+        //this.createPreset(item,item.getItemName(),this::constructMenu);
+        //handle blockPlaceEvent
+        handleBlock(item);
+    }
+    public void registerTick(SlimefunItem item){
+        item.addItemHandler(
+                new BlockTicker() {
+                    int tickCounter=0;
+                    public boolean isSynchronized() {
+                        return isSync();
+                    }
+
+                    @ParametersAreNonnullByDefault
+                    public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
+                        //BlockMenu menu = BlockStorage.getInventory(b);
+                        AbstractPipe.this.tick(b, null,data,tickCounter);
+
+                    }
+
+                    @Override
+                    public void uniqueTick() {
+                        super.uniqueTick();
+                        this.tickCounter++;
+                    }
+                }
+        );
+    }
+    @Override
+    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
+        Location loc=b.getLocation();
+        Counter<Location> counter=PIP_DIRECTION.computeIfAbsent(loc,(s)->{return new Counter<Location>(0,null);});
+        Directions dir= getDirection(0,data);
+        Location toLocation=POINTING_RECORD.computeIfAbsent(loc,dir::relate);
+        if(avalEnd(toLocation)){
+            counter.setCounter(ticker);
+            counter.setValue(toLocation);
+            bfssearchPipNet(loc,toLocation,ticker);
+        }
+        if((toLocation=(counter.read(ticker)))!=null){
+            Location fromLocation= dir.remote(loc,-1);
+            if(!fromLocation.equals(toLocation)){
+                transfer(fromLocation,toLocation);
+            }
+        }
+    }
+    public abstract void transfer(Location from, Location to);
+    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 }

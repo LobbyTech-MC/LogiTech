@@ -12,9 +12,9 @@ import me.matl114.logitech.SlimefunItem.Cargo.SpaceStorage.StorageSpace;
 
 public class StorageWorldListener implements Listener {
     @EventHandler
-    public void onPlace(BlockPlaceEvent event) {
-        if(StorageSpace.ENABLED&& StorageSpace.STORAGE_WORLD==event.getBlock().getWorld()){
-            event.setCancelled(true);
+    public void onBlockExplode(BlockExplodeEvent event) {
+        if(StorageSpace.ENABLED){
+            event.blockList().removeIf((block)->StorageSpace.STORAGE_WORLD==block.getWorld());
         }
     }
     @EventHandler
@@ -24,15 +24,15 @@ public class StorageWorldListener implements Listener {
         }
     }
     @EventHandler
-    public void onBlockExplode(BlockExplodeEvent event) {
+    public void onEntityExplode(EntityExplodeEvent event) {
         if(StorageSpace.ENABLED){
             event.blockList().removeIf((block)->StorageSpace.STORAGE_WORLD==block.getWorld());
         }
     }
     @EventHandler
-    public void onEntityExplode(EntityExplodeEvent event) {
-        if(StorageSpace.ENABLED){
-            event.blockList().removeIf((block)->StorageSpace.STORAGE_WORLD==block.getWorld());
+    public void onPlace(BlockPlaceEvent event) {
+        if(StorageSpace.ENABLED&& StorageSpace.STORAGE_WORLD==event.getBlock().getWorld()){
+            event.setCancelled(true);
         }
     }
     @EventHandler

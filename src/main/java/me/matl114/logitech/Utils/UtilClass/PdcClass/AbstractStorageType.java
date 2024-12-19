@@ -15,12 +15,19 @@ import me.matl114.logitech.Utils.AddUtils;
 public class AbstractStorageType implements PersistentDataType<PersistentDataContainer, ItemStack> {
     public final static AbstractStorageType TYPE = new AbstractStorageType();
     public static final NamespacedKey ITEM= AddUtils.getNameKey("data");
-    public Class<PersistentDataContainer> getPrimitiveType(){
-        return PersistentDataContainer.class;
+    @Override
+    @Nonnull
+    public ItemStack fromPrimitive(@Nonnull PersistentDataContainer primitive, @Nonnull PersistentDataAdapterContext context) {
+        final ItemStack item = primitive.get(ITEM, DataType.ITEM_STACK);
+        return item;
     }
     public Class<ItemStack> getComplexType(){
         return ItemStack.class;
     }
+    public Class<PersistentDataContainer> getPrimitiveType(){
+        return PersistentDataContainer.class;
+    }
+
     @Override
     @Nonnull
     public PersistentDataContainer toPrimitive(@Nonnull ItemStack complex, @Nonnull PersistentDataAdapterContext context) {
@@ -35,13 +42,6 @@ public class AbstractStorageType implements PersistentDataType<PersistentDataCon
 
         }
         return container;
-    }
-
-    @Override
-    @Nonnull
-    public ItemStack fromPrimitive(@Nonnull PersistentDataContainer primitive, @Nonnull PersistentDataAdapterContext context) {
-        final ItemStack item = primitive.get(ITEM, DataType.ITEM_STACK);
-        return item;
     }
 
 }

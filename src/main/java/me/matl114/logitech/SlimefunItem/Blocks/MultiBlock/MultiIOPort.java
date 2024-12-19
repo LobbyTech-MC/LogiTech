@@ -3,6 +3,7 @@ package me.matl114.logitech.SlimefunItem.Blocks.MultiBlock;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
@@ -23,13 +24,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-
-import javax.xml.crypto.Data;
 
 public class MultiIOPort extends AbstractTransportor implements MultiBlockPart {
     protected final boolean CONFIG_TO;
@@ -40,15 +34,7 @@ public class MultiIOPort extends AbstractTransportor implements MultiBlockPart {
     protected final ItemStack INFO_ITEM;
 
     protected final int INFO_SLOT=4;
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
     protected final String BLOCKID;
-
-
     public MultiIOPort(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType,
                        ItemStack[] recipe,String blockid,boolean isSym,boolean to) {
         super(itemGroup,item,recipeType,recipe);
@@ -60,9 +46,6 @@ public class MultiIOPort extends AbstractTransportor implements MultiBlockPart {
               AddUtils.concat(  "&7强对称: &6",CONFIG_SYMM?"是":"否"),
                 "&7可配置: &6否");
     }
-    public String getPartId(){
-        return BLOCKID;
-    }
     public void constructMenu(BlockMenuPreset preset){
         preset.setSize(18);
         int[] border = BORDER;
@@ -73,22 +56,17 @@ public class MultiIOPort extends AbstractTransportor implements MultiBlockPart {
         }
         preset.addItem(INFO_SLOT,INFO_ITEM,ChestMenuUtils.getEmptyClickHandler());
     }
-    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker){
-        Location core= MultiBlockService.acceptPartRequest(b.getLocation());
-        if(core!=null){
-            BlockMenu inv= DataCache.getMenu(core);
-            if (inv!=null){
-                if(CONFIG_TO){
-                    TransportUtils.transportItem(menu,getOutputSlots(),inv,TransportUtils.getInvInputSlot(inv),
-                            CONFIG_SYMM,null,576);
-                }else {
-                    TransportUtils.transportItem(inv,TransportUtils.getInvOutputSlot(inv),menu,getInputSlots(),
-                            CONFIG_SYMM,null,576);
-                }
-            }
-        }
-    }
 
+
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public String getPartId(){
+        return BLOCKID;
+    }
     @Override
     public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
         if(CONFIG_SYMM){
@@ -107,13 +85,29 @@ public class MultiIOPort extends AbstractTransportor implements MultiBlockPart {
             return super.getSlotsAccessedByItemTransportPlus(menu,flow,item);
         }
     }
+
+    public void onMultiBlockBreak(BlockBreakEvent e) {
+        super.onBreak(e, DataCache.getMenu(e.getBlock().getLocation()));
+        MultiBlockPart.super.onMultiBlockBreak(e);
+    }
     public void preRegister(){
         super.preRegister();
         handleMultiBlockPart(this);
     }
-    public void onMultiBlockBreak(BlockBreakEvent e) {
-        super.onBreak(e, DataCache.getMenu(e.getBlock().getLocation()));
-        MultiBlockPart.super.onMultiBlockBreak(e);
+    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker){
+        Location core= MultiBlockService.acceptPartRequest(b.getLocation());
+        if(core!=null){
+            BlockMenu inv= DataCache.getMenu(core);
+            if (inv!=null){
+                if(CONFIG_TO){
+                    TransportUtils.transportItem(menu,getOutputSlots(),inv,TransportUtils.getInvInputSlot(inv),
+                            CONFIG_SYMM,null,576);
+                }else {
+                    TransportUtils.transportItem(inv,TransportUtils.getInvOutputSlot(inv),menu,getInputSlots(),
+                            CONFIG_SYMM,null,576);
+                }
+            }
+        }
     }
 
 }

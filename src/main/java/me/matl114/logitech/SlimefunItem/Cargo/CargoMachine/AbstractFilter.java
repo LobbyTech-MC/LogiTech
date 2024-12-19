@@ -24,18 +24,12 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
 public abstract class AbstractFilter extends AbstractBlock implements Ticking {
+    public ItemStack CLEAN_ITEM_OFF=new CustomItemStack(SlimefunItems.TRASH_CAN,"&3开启输入槽清空模式","&7当输入槽物品无法匹配输出槽白名单时,会清空输入槽","&7当前状态: &c关闭");
+    public ItemStack CLEAN_ITEM_ON=new CustomItemStack(SlimefunItems.TRASH_CAN,"&3关闭输入槽清空模式","&7当输入槽物品无法匹配输出槽白名单时,会清空输入槽","&7当前状态: &a开启");
+    protected String KEY_CLEAN="filterclean";
     public AbstractFilter(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
-    public ItemStack CLEAN_ITEM_OFF=new CustomItemStack(SlimefunItems.TRASH_CAN,"&3开启输入槽清空模式","&7当输入槽物品无法匹配输出槽白名单时,会清空输入槽","&7当前状态: &c关闭");
-    public ItemStack CLEAN_ITEM_ON=new CustomItemStack(SlimefunItems.TRASH_CAN,"&3关闭输入槽清空模式","&7当输入槽物品无法匹配输出槽白名单时,会清空输入槽","&7当前状态: &a开启");
-    public abstract int[] getInputSlots();
-    public abstract int[] getOutputSlots();
-    public abstract int[] getOutputWLSlot();
-    public abstract int[] getInputBorders();
-    public abstract int[] getBorders();
-    public abstract int[] getOutputBorders();
-    public abstract ItemStack[] getOutputBordersItem();
     public void constructMenu(BlockMenuPreset preset){
         int[] border=getInputBorders();
         int len=border.length;
@@ -53,6 +47,16 @@ public abstract class AbstractFilter extends AbstractBlock implements Ticking {
             preset.addItem(border[i],getOutputBordersItem()[i],ChestMenuUtils.getEmptyClickHandler());
         }
     }
+    public abstract int[] getBorders();
+    public abstract int[] getInputBorders();
+    public abstract int[] getInputSlots();
+    public abstract int[] getOutputBorders();
+    public abstract ItemStack[] getOutputBordersItem();
+    public abstract int[] getOutputSlots();
+    public abstract int[] getOutputWLSlot();
+
+   // public abstract void updateMenu(BlockMenu blockMenu, Block block, Settings mod);
+    public abstract int getTrashSlot();
     public void newMenuInstance(BlockMenu menu, Block b){
         SlimefunBlockData data=DataCache.safeLoadBlock(menu.getLocation());
         String clean=DataCache.getCustomString(data,KEY_CLEAN,"no");
@@ -74,10 +78,11 @@ public abstract class AbstractFilter extends AbstractBlock implements Ticking {
             return false;
         }));
     }
-
-   // public abstract void updateMenu(BlockMenu blockMenu, Block block, Settings mod);
-    public abstract int getTrashSlot();
-    protected String KEY_CLEAN="filterclean";
+    public void preRegister(){
+        super.preRegister();
+        registerBlockMenu(this);
+        registerTick(this);
+    }
     public void tick(Block b,BlockMenu inv,SlimefunBlockData data ,int tickCount){
         int[] inputSlots = getInputSlots();
         int[] outputSlots = getOutputSlots();
@@ -116,10 +121,5 @@ public abstract class AbstractFilter extends AbstractBlock implements Ticking {
         if(code.length()==1){
             inv.replaceExistingItem(outputSlots[outputSlots.length-1],null,false);
         }
-    }
-    public void preRegister(){
-        super.preRegister();
-        registerBlockMenu(this);
-        registerTick(this);
     }
 }

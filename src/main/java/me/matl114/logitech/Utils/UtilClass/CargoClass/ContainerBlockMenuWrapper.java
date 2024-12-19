@@ -11,20 +11,7 @@ import me.matl114.logitech.Utils.ContainerUtils;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 public class ContainerBlockMenuWrapper extends BlockMenu implements Cloneable{
-    public static void setup(){
-
-    }
     private static final ContainerBlockMenuWrapper instanceTemplate=new ContainerBlockMenuWrapper();
-    @Getter
-    private int slotSize=0;
-    protected Inventory inventory;
-    protected Location location;
-    //protected ItemStack[] inventorySnapShot;
-    public void setup(Inventory inventory, Location location,int slotSize) {
-        this.inventory = inventory;
-        this.location = location;
-        this.slotSize=slotSize;
-    }
     public static BlockMenu getContainerBlockMenu(Inventory inv,Location loc) {
         return getContainerBlockMenu(inv,loc,inv.getSize());
     }
@@ -33,12 +20,18 @@ public class ContainerBlockMenuWrapper extends BlockMenu implements Cloneable{
         containerBlockMenu.setup(inv,loc,slotSize);
         return containerBlockMenu;
     }
+    public static void setup(){
+
+    }
+    @Getter
+    private int slotSize=0;
+    protected Inventory inventory;
+    protected Location location;
     private ContainerBlockMenuWrapper(){
         super(ContainerUtils.getContainerWrapperMenuPreset(),new Location(null,0,0,0));
         this.setEmptySlotsClickable(false);
         this.setPlayerInventoryClickable(false);
     }
-
     @Override
     protected ContainerBlockMenuWrapper clone() {
         try {
@@ -47,17 +40,45 @@ public class ContainerBlockMenuWrapper extends BlockMenu implements Cloneable{
             throw new AssertionError("clone failed", e);
         }
     }
+
     @Override
-    public Location getLocation() {
-        return this.location;
+    public void close(){
+        throw new UnsupportedOperationException("Not supported in Container Impl.");
+    }
+    @Override
+    public void delete(Location l) {
+        throw new UnsupportedOperationException("Not supported in Container Impl.");
+    }
+    @Override
+    public Block getBlock() {
+        return this.location.getBlock();
     }
     @Override
     public Inventory getInventory() {
         return this.inventory;
     }
     @Override
-    public void setInventory(Inventory inventory) {
-        this.inventory = inventory;
+    public ItemStack getItemInSlot(int slot) {
+        if(slot<this.slotSize){
+            return inventory.getItem(slot);
+        }else return null;
+    }
+    @Override
+    public Location getLocation() {
+        return this.location;
+    }
+    @Override
+    public boolean hasViewer() {
+        //because this is not persistent instance,so call hasViewer we return true
+        return true;
+    }
+    @Override
+    public void open(Player... players){
+        throw new UnsupportedOperationException("Not supported in Container Impl.");
+    }
+    @Override
+    public void reload() {
+        throw new UnsupportedOperationException("Not supported in Container Impl.");
     }
     @Override
     public void replaceExistingItem(int slot,ItemStack itemStack) {
@@ -76,38 +97,17 @@ public class ContainerBlockMenuWrapper extends BlockMenu implements Cloneable{
 
     }
     @Override
-    public ItemStack getItemInSlot(int slot) {
-        if(slot<this.slotSize){
-            return inventory.getItem(slot);
-        }else return null;
-    }
-    @Override
-    public void open(Player... players){
-        throw new UnsupportedOperationException("Not supported in Container Impl.");
-    }
-    @Override
-    public void close(){
-        throw new UnsupportedOperationException("Not supported in Container Impl.");
-    }
-    @Override
-    public boolean hasViewer() {
-        //because this is not persistent instance,so call hasViewer we return true
-        return true;
-    }
-    @Override
     public void save(Location l){
         throw new UnsupportedOperationException("Not supported in Container Impl.");
     }
     @Override
-    public void reload() {
-        throw new UnsupportedOperationException("Not supported in Container Impl.");
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
-    @Override
-    public Block getBlock() {
-        return this.location.getBlock();
-    }
-    @Override
-    public void delete(Location l) {
-        throw new UnsupportedOperationException("Not supported in Container Impl.");
+    //protected ItemStack[] inventorySnapShot;
+    public void setup(Inventory inventory, Location location,int slotSize) {
+        this.inventory = inventory;
+        this.location = location;
+        this.slotSize=slotSize;
     }
 }

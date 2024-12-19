@@ -53,6 +53,9 @@ public class ProbItemStack extends ItemStack implements MultiItemStack,RandOutIt
     public List<ItemStack> getItemStacks() {
         return stacklist;
     }
+    public int getTypeNum(){
+        return 1;
+    }
     public List<Double> getWeight(Double percent){
         List<Double> doubles=new ArrayList<>();
         int len=this.problist.size();
@@ -60,9 +63,6 @@ public class ProbItemStack extends ItemStack implements MultiItemStack,RandOutIt
             doubles.add(this.problist.get(i)*percent);
         }
         return doubles;
-    }
-    public int getTypeNum(){
-        return 1;
     }
     public boolean matchItem(ItemStack item,boolean strictCheck){
         return false;

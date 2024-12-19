@@ -44,12 +44,6 @@ public class LogicReactor extends AbstractProcessor {
     protected final int[] BORDER_OUT=new int[] {10,28,21,23,16,34};
     protected final int[] BOOL_SLOT= Arrays.copyOfRange(getInputSlots(),0,8);
     protected final int[] COMMON_SLOT= Arrays.copyOfRange(getInputSlots(),8,getInputSlots().length);
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
     protected final int processorTick;
     protected final int SWITCH_SLOT=13;
     protected final ItemStack SWITCH_OFF=new CustomItemStack(Material.SOUL_TORCH,"&6反应堆运行状态: &c关闭","&7点击开启反应堆");
@@ -87,49 +81,6 @@ public class LogicReactor extends AbstractProcessor {
             add(MachineRecipeUtils.FromMachine(AddUtils.formatInfoMachineRecipe(Utils.array(AddItem.EXISTE),tick,
                     "&7当前三个材料的生成条件均不满足","&7将会尝试生成 %s".formatted(Language.get("Items.EXISTE.Name")))));
         }};
-    }
-    public void constructMenu(BlockMenuPreset preset) {
-        //空白背景 禁止点击
-        int[] border = BORDER;
-        int len=border.length;
-        for(int var4 = 0; var4 < len; ++var4) {
-
-            preset.addItem(border[var4], ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler());
-        }
-        //输入槽边框
-        border = BORDER_IN;
-        len = border.length;
-        for(int var4 = 0; var4 <len; ++var4) {
-
-            preset.addItem(border[var4], ChestMenuUtils.getInputSlotTexture(), ChestMenuUtils.getEmptyClickHandler());
-        }
-        //输出槽边框
-        border = BORDER_OUT;
-        len = border.length;
-        for(int var4 = 0; var4 <len; ++var4) {
-
-            preset.addItem(border[var4], ChestMenuUtils.getOutputSlotTexture(), ChestMenuUtils.getEmptyClickHandler());
-        }
-        //空白边框
-        border = PROCESSOR_SLOT;
-        len = border.length;
-        for(int var4 = 0; var4 <len; ++var4) {
-            preset.addItem(border[var4], MenuUtils.PROCESSOR_NULL , ChestMenuUtils.getEmptyClickHandler());
-        }
-    }
-    public void newMenuInstance(@Nonnull BlockMenu inv, @Nonnull Block block){
-        if(inv.getItemInSlot(SWITCH_SLOT)==null){
-            inv.replaceExistingItem(SWITCH_SLOT,SWITCH_OFF);
-        }
-        inv.addMenuClickHandler(SWITCH_SLOT,((player, i, itemStack, clickAction) -> {
-            if(itemStack!=null&&itemStack.getType()==Material.SOUL_TORCH){
-                inv.replaceExistingItem(SWITCH_SLOT,SWITCH_ON);
-            }else{
-                inv.replaceExistingItem(SWITCH_SLOT,SWITCH_OFF);
-                this.processor.endOperation(block);
-            }
-            return false;
-        }));
     }
     public int checkLogic(BlockMenu inv,int[] inputs){
         int code1=0;
@@ -188,6 +139,35 @@ public class LogicReactor extends AbstractProcessor {
             return false;
         }else return super.conditionHandle(b,menu);
     }
+    public void constructMenu(BlockMenuPreset preset) {
+        //空白背景 禁止点击
+        int[] border = BORDER;
+        int len=border.length;
+        for(int var4 = 0; var4 < len; ++var4) {
+
+            preset.addItem(border[var4], ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler());
+        }
+        //输入槽边框
+        border = BORDER_IN;
+        len = border.length;
+        for(int var4 = 0; var4 <len; ++var4) {
+
+            preset.addItem(border[var4], ChestMenuUtils.getInputSlotTexture(), ChestMenuUtils.getEmptyClickHandler());
+        }
+        //输出槽边框
+        border = BORDER_OUT;
+        len = border.length;
+        for(int var4 = 0; var4 <len; ++var4) {
+
+            preset.addItem(border[var4], ChestMenuUtils.getOutputSlotTexture(), ChestMenuUtils.getEmptyClickHandler());
+        }
+        //空白边框
+        border = PROCESSOR_SLOT;
+        len = border.length;
+        for(int var4 = 0; var4 <len; ++var4) {
+            preset.addItem(border[var4], MenuUtils.PROCESSOR_NULL , ChestMenuUtils.getEmptyClickHandler());
+        }
+    }
     protected Pair<MachineRecipe, ItemConsumer[]> findNextRecipe(BlockMenu inv,int[] inputs,int[] outputs){
         ItemStack iv=inv.getItemInSlot(inputs[0]);
         ItemStack ov=inv.getItemInSlot(outputs[0]);
@@ -207,6 +187,38 @@ public class LogicReactor extends AbstractProcessor {
         }
         return null;
 
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+        if(flow==ItemTransportFlow.WITHDRAW)
+            return getOutputSlots();
+        else if(item==null||item.getType()==Material.AIR){
+            return getInputSlots();
+        }
+        if(item.getType()==Material.MUSIC_DISC_5){
+            return BOOL_SLOT;
+        }else {
+            return COMMON_SLOT;
+        }
+    }
+    public void newMenuInstance(@Nonnull BlockMenu inv, @Nonnull Block block){
+        if(inv.getItemInSlot(SWITCH_SLOT)==null){
+            inv.replaceExistingItem(SWITCH_SLOT,SWITCH_OFF);
+        }
+        inv.addMenuClickHandler(SWITCH_SLOT,((player, i, itemStack, clickAction) -> {
+            if(itemStack!=null&&itemStack.getType()==Material.SOUL_TORCH){
+                inv.replaceExistingItem(SWITCH_SLOT,SWITCH_ON);
+            }else{
+                inv.replaceExistingItem(SWITCH_SLOT,SWITCH_OFF);
+                this.processor.endOperation(block);
+            }
+            return false;
+        }));
     }
     @Override
     public void process(Block b, BlockMenu inv, SlimefunBlockData data){
@@ -256,18 +268,6 @@ public class LogicReactor extends AbstractProcessor {
                 }
             }
             currentOperation.progress(1);
-        }
-    }
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
-        if(flow==ItemTransportFlow.WITHDRAW)
-            return getOutputSlots();
-        else if(item==null||item.getType()==Material.AIR){
-            return getInputSlots();
-        }
-        if(item.getType()==Material.MUSIC_DISC_5){
-            return BOOL_SLOT;
-        }else {
-            return COMMON_SLOT;
         }
     }
 }

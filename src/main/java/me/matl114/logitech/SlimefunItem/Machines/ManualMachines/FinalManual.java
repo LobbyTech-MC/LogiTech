@@ -39,8 +39,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
 public class FinalManual extends AbstractManual implements MultiCraftType, ImportRecipes {
-    protected final int[] INPUT_SLOT = new int[]{3,4,5,6,7,8,12,13,14,15,16,17,21,22,23,24,25,26,30,31,32,33,34,35,39,40,41,42,43,44,48,49,50,51,52,53};
-    protected final int[] OUTPUT_SLOT=new int[]{30,31,32,33,34,35,39,40,41,42,43,44,48,49,50,51,52,53,3,4,5,6,7,8,12,13,14,15,16,17,21,22,23,24,25,26};
     protected static final int RECIPE_ITEM_SLOT=0;
     protected static final ItemStack INFO_ITEM=new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6配方匹配机制:"," "
             ,"&b点击左边图标切换合成类型","&b点击右边书本查看当前合成类型信息","&b在输入栏放入物品进行快捷合成");
@@ -72,6 +70,13 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
     protected static  final int[] RECIPE_DISPLAY={
             27,28,29,36,37,38,45,46,47
     };
+    public static final ItemPusherProvider SINGULARITY_PROVIDER=FinalFeature.STORAGE_AND_LOCPROXY_READER;
+    protected final int[] INPUT_SLOT = new int[]{3,4,5,6,7,8,12,13,14,15,16,17,21,22,23,24,25,26,30,31,32,33,34,35,39,40,41,42,43,44,48,49,50,51,52,53};
+    protected final int[] OUTPUT_SLOT=new int[]{30,31,32,33,34,35,39,40,41,42,43,44,48,49,50,51,52,53,3,4,5,6,7,8,12,13,14,15,16,17,21,22,23,24,25,26};
+    public final List<RecipeType> BW_LIST;
+    public RecipeType[] craftType=new RecipeType[]{RecipeType.ENHANCED_CRAFTING_TABLE};
+    protected boolean isWhiteList=true;
+    protected HashMap<RecipeType,MenuFactory>  RECIPEMENU=null;
     public FinalManual(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                          int energybuffer, int energyConsumption) {
         super(category,item,recipeType,recipe,0,0,null);
@@ -124,39 +129,6 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
         );
 
     }
-    public static final ItemPusherProvider SINGULARITY_PROVIDER=FinalFeature.STORAGE_AND_LOCPROXY_READER;
-    //after start,load recipeType from config
-    public void registerRecipeList(){
-        craftType=BW_LIST.toArray(new RecipeType[BW_LIST.size()]);
-    }
-    public final List<RecipeType> BW_LIST;
-    public RecipeType[] craftType=new RecipeType[]{RecipeType.ENHANCED_CRAFTING_TABLE};
-    protected boolean isWhiteList=true;
-    public List<MachineRecipe> getMachineRecipes(Block b,BlockMenu inv){
-        Location loc=inv.getLocation();
-        int index=MultiCraftType.getRecipeTypeIndex(loc);
-        if(index>=0&&index<getCraftTypes().length){
-            return RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(getCraftTypes()[index]);
-        }else if (index>0){
-            MultiCraftType.forceSetRecipeTypeIndex(loc,0);
-            setNowRecordRecipe(loc,-1);
-        }
-        return null;
-    }
-    public RecipeType[] getCraftTypes(){
-        return craftType;
-    }
-    public MachineRecipe getRecordRecipe(SlimefunBlockData data){
-        int index=MultiCraftType.getRecipeTypeIndex(data);
-        if(index>=0&&index<getCraftTypes().length){
-            int index2= getNowRecordRecipe(data);
-            if(index2>=0){//I think that's safe
-                return RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(getCraftTypes()[index]).get(index2);
-            }
-        }else {
-            MultiCraftType.forceSetRecipeTypeIndex(data,0);
-        }return null;
-    }
     public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         preset.addItem(DISPLAYEITEM_SLOT, DISPLAY_DEFAULT_BKGROUND, ChestMenuUtils.getEmptyClickHandler());
@@ -173,7 +145,43 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
             preset.addItem(RECIPE_DISPLAY[i],DISPLAY_DEFAULT_BKGROUND, ChestMenuUtils.getEmptyClickHandler());
         }
     }
-    protected HashMap<RecipeType,MenuFactory>  RECIPEMENU=null;
+    public RecipeType[] getCraftTypes(){
+        return craftType;
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public List<MachineRecipe> getMachineRecipes(Block b,BlockMenu inv){
+        Location loc=inv.getLocation();
+        int index=MultiCraftType.getRecipeTypeIndex(loc);
+        if(index>=0&&index<getCraftTypes().length){
+            return RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(getCraftTypes()[index]);
+        }else if (index>0){
+            MultiCraftType.forceSetRecipeTypeIndex(loc,0);
+            setNowRecordRecipe(loc,-1);
+        }
+        return null;
+    }
+    protected MenuFactory getMenuFactory(RecipeType r){
+        if(RECIPEMENU==null){
+            initMenuFactory();
+        }
+        return RECIPEMENU.get(r);
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public MachineRecipe getRecordRecipe(SlimefunBlockData data){
+        int index=MultiCraftType.getRecipeTypeIndex(data);
+        if(index>=0&&index<getCraftTypes().length){
+            int index2= getNowRecordRecipe(data);
+            if(index2>=0){//I think that's safe
+                return RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(getCraftTypes()[index]).get(index2);
+            }
+        }else {
+            MultiCraftType.forceSetRecipeTypeIndex(data,0);
+        }return null;
+    }
     protected void initMenuFactory(){
         if(RECIPEMENU==null){
             RECIPEMENU=new HashMap<>();
@@ -187,12 +195,7 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
             }
         }
     }
-    protected MenuFactory getMenuFactory(RecipeType r){
-        if(RECIPEMENU==null){
-            initMenuFactory();
-        }
-        return RECIPEMENU.get(r);
-    }
+
     public void newMenuInstance(BlockMenu menu, Block block){
         int ind=MultiCraftType.getRecipeTypeIndex(menu.getLocation());
         //清除非法记录
@@ -280,6 +283,47 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
         );
         updateMenu(menu,block,Settings.INIT);
     }
+    public void orderSearchRecipe(BlockMenu inv, Settings order){
+        if(inv!=null){
+            int delta;
+            switch (order){
+                case REVERSE:delta=-1;break;
+                case SEQUNTIAL:
+                default: delta=1;break;
+            }
+
+            Location  loc=inv.getLocation();
+            int index= DataCache.getLastRecipe(loc);
+            if(index<0){
+                return;
+            }
+            List<MachineRecipe> mRecipe=getMachineRecipes(null,inv);
+            if(mRecipe==null)return;
+            index=index+delta;
+            if(index<0){
+                index=mRecipe.size()-1;
+            }
+            else if(index>=mRecipe.size()){
+                index=0;
+            }
+            DataCache.setLastRecipe(loc,index);
+            if(CraftUtils.matchNextRecipe(inv,getInputSlots(),mRecipe,true,order,SINGULARITY_PROVIDER)==null){
+                DataCache.setLastRecipe(loc,-1);
+            }
+        }
+    }
+//
+    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+        //only works when has viewer.
+        if(inv!=null&&(inv.hasViewer())){
+
+            updateMenu(inv ,b,Settings.RUN);
+        }
+    }
+    //after start,load recipeType from config
+    public void registerRecipeList(){
+        craftType=BW_LIST.toArray(new RecipeType[BW_LIST.size()]);
+    }
 
     public void updateMenu(BlockMenu inv,Block block,Settings mod){
         if(mod==Settings.INIT){
@@ -332,50 +376,6 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
             }
         }else {
             MultiCraftType.forceSetRecipeTypeIndex(loc,0);
-        }
-    }
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
-    public void orderSearchRecipe(BlockMenu inv, Settings order){
-        if(inv!=null){
-            int delta;
-            switch (order){
-                case REVERSE:delta=-1;break;
-                case SEQUNTIAL:
-                default: delta=1;break;
-            }
-
-            Location  loc=inv.getLocation();
-            int index= DataCache.getLastRecipe(loc);
-            if(index<0){
-                return;
-            }
-            List<MachineRecipe> mRecipe=getMachineRecipes(null,inv);
-            if(mRecipe==null)return;
-            index=index+delta;
-            if(index<0){
-                index=mRecipe.size()-1;
-            }
-            else if(index>=mRecipe.size()){
-                index=0;
-            }
-            DataCache.setLastRecipe(loc,index);
-            if(CraftUtils.matchNextRecipe(inv,getInputSlots(),mRecipe,true,order,SINGULARITY_PROVIDER)==null){
-                DataCache.setLastRecipe(loc,-1);
-            }
-        }
-    }
-//
-
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
-        //only works when has viewer.
-        if(inv!=null&&(inv.hasViewer())){
-
-            updateMenu(inv ,b,Settings.RUN);
         }
     }
 

@@ -81,16 +81,30 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
     protected final int[] COMMON_INPUT_SLOT=new int[]{20,29,38};
     protected final int[] OUTPUT_SLOT=new int[]{23,24,25,32,33,34,41,42,43};
     protected final int[] ALL_INPUT_SLOT=new int[]{18,36,20,29,38};
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
     protected final MachineProcessor<MultiCraftingOperation> coolerProcessor;
-
     protected final int[] BORDER_IN = new int[]{9, 10, 11, 12, 19, 28, 37,45,46,47,48,21,30,39};
     protected final int[] BORDER_OUT = new int[]{14, 15, 16, 17, 26,35,44,50,51,52,53};
+
+    //check if lava
+    protected int[] lavadx=new int[]{
+            2,2,2,3,3,4,4,4,5,5,6,6,6
+    };
+    protected int[] lavady=new int[]{
+            -2,0,2,-1,1,-2,0,2,-1,1,-2,0,2
+    };
+    protected int baseHeight=2;
+
+    protected final int RADIATION_PERIOD=1000;
+    protected final int RADIATION_RANGE=40;
+    protected final int RADIATION_SPEED=80;
+    public HashMap<String,ItemStack> MBID_TO_ITEM=new HashMap<>(){{
+        put("nuclear.frame", AddUtils.addGlow(AddItem.TRANSMUTATOR_FRAME.clone()));
+        put("nuclear.glass", AddUtils.addGlow(AddItem.TRANSMUTATOR_GLASS.clone()));
+        put("nuclear.rod", AddUtils.addGlow(AddItem.TRANSMUTATOR_ROD.clone()));
+    }};
+    protected ItemCounter COOLER=CraftUtils.getConsumer(SlimefunItems.REACTOR_COOLANT_CELL );
+    protected ItemCounter NETHERICE=CraftUtils.getConsumer(SlimefunItems.NETHER_ICE_COOLANT_CELL);
+    public MultiBlockService.DeleteCause NOCOOLER=new MultiBlockService.DeleteCause("冷却剂不足",true);
     public Transmutator(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType,
                         ItemStack[] recipe, String blockId, AbstractMultiBlockType type, int energyConsumption, int energyBuffer,
                         LinkedHashMap<Object, Integer> customRecipes){
@@ -102,120 +116,39 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
         this.coolerProcessor.setProgressBar(COOLER_INFO_ITEM);
 
     }
-
-    public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
-        MultiCraftingOperation op=Transmutator.this.processor.getOperation(loc);
-        if(op!=null&&(!op.isFinished())){//如果还在进行中就暂停
-            onDestroyEffect(loc,handler,cause);
+    public boolean checkCooler(BlockMenu inv){
+        Location loc=inv.getLocation();
+        MultiCraftingOperation op=this.coolerProcessor.getOperation(loc);
+        if(op==null){
+            ItemStack it=inv.getItemInSlot(COOLER_INPUT_SLOT[0]);
+            if(it==null){
+                return false;
+            }
+            ItemStack it2=inv.getItemInSlot(NETHERICE_INPUT_SLOT[0]);
+            if(it2==null){
+                return false;
+            }
+            if(CraftUtils.matchItemStack(it,COOLER,false)&&CraftUtils.matchItemStack(it2,NETHERICE,false)){
+                it.setAmount(it.getAmount()-1);
+                it2.setAmount(it2.getAmount()-1);
+                op=new MultiCraftingOperation(new ItemGreedyConsumer[0],2);
+                coolerProcessor.startOperation(loc,op);
+            }else return false;
+        }
+        else if(op.isFinished()){
+            if(inv.hasViewer()){
+                inv.replaceExistingItem(COOLER_INFO_SLOT,COOLER_INFO_ITEM);
+            }
+            this.coolerProcessor.endOperation(loc);
+            return true;
         }else{
-            removeEffect(loc,handler);
-        }
-        DataCache.setCustomData(loc,this.HEIGHT_KEY,0);
+            op.progress(1);
 
-        super.onMultiBlockDisable(loc,handler,cause);
-    }
-    public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
-        super.onMultiBlockEnable(loc,handler);
-        createEffect(loc,handler);
-    }
-    //check if lava
-    protected int[] lavadx=new int[]{
-            2,2,2,3,3,4,4,4,5,5,6,6,6
-    };
-    protected int[] lavady=new int[]{
-            -2,0,2,-1,1,-2,0,2,-1,1,-2,0,2
-    };
-    protected int baseHeight=2;
-    protected final int RADIATION_PERIOD=1000;
-    protected final int RADIATION_RANGE=40;
-    protected final int RADIATION_SPEED=80;
-    public void createEffect(Location loc, AbstractMultiBlockHandler handler){
-        MultiBlockService.Direction dir=handler.getDirection();
-        AbstractMultiBlock block=  handler.getMultiBlock();
-        if(block instanceof CubeMultiBlock cb){
-            List<Location> fillWithLava=new ArrayList<>();
-            int height=baseHeight+ cb.getHeight();
-            int len=lavadx.length;
-            Location locer;
-            for(int y=0;y<height;y++){
-                for(int j=0;j<len;j++){
-                    locer=loc.clone().add(dir.getRotateX(lavadx[j],lavady[j]),y,dir.getRotateZ(lavadx[j],lavady[j]));
-                    fillWithLava.add(locer);
-                    WorldUtils.removeSlimefunBlock(locer,true);
-                }
-            }
-            Schedules.launchSchedules(()->{
-                int size=fillWithLava.size();
-                for(int i=0;i<size;i++){
-                    fillWithLava.get(i).getBlock().setType(Material.LAVA);
-                }
-            },0,true,0);
         }
+        if(inv.hasViewer())
+            this.coolerProcessor.updateProgressBar(inv,COOLER_INFO_SLOT,op);
+        return true;
     }
-    public void removeEffect(Location loc, AbstractMultiBlockHandler handler){
-        MultiBlockService.Direction dir=handler.getDirection();
-        AbstractMultiBlock block=  handler.getMultiBlock();
-        if(block instanceof CubeMultiBlock cb){
-            List<Location> fillWithLava=new ArrayList<>();
-            int height=baseHeight+ cb.getHeight();
-            int len=lavadx.length;
-            Location locer;
-            for(int y=0;y<height;y++){
-                for(int j=0;j<len;j++){
-                    locer=loc.clone().add(dir.getRotateX(lavadx[j],lavady[j]),y,dir.getRotateZ(lavadx[j],lavady[j]));
-                    fillWithLava.add(locer);
-                    WorldUtils.removeSlimefunBlock(locer,true);
-                }
-            }
-            Schedules.launchSchedules(()->{
-                int size=fillWithLava.size();
-                for(int i=0;i<size;i++){
-                    fillWithLava.get(i).getBlock().setType(Material.AIR);
-                }
-            },0,true,0);
-        }
-    }
-    public void onDestroyEffect(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
-        AddUtils.broadCast("&e位于[%s,%.0f,%.0f,%.0f]的元素嬗变机因 [%s] 熔毁!".formatted(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(),cause.getMessage()));
-
-        MultiBlockService.Direction dir=handler.getDirection();
-        AbstractMultiBlock block=  handler.getMultiBlock();
-        if(block instanceof CubeMultiBlock cb){
-            int height=baseHeight+ cb.getHeight();
-            Location locer;
-            for(int y=0;y<height;y++){
-                for(int j=2;j<7;j++){
-                    for(int k=-2;k<3;k++){
-                        locer=loc.clone().add(dir.getRotateX(j,k),y,dir.getRotateZ(j,k));
-                        WorldUtils.removeSlimefunBlock(locer,true);
-                    }
-                }
-            }
-            List<Location> fillWithLava=new ArrayList<>();
-            int len=lavadx.length;
-            for(int y=0;y<height;y++){
-                for(int j=0;j<len;j++){
-                    locer=loc.clone().add(dir.getRotateX(lavadx[j],lavady[j]),y,dir.getRotateZ(lavadx[j],lavady[j]));
-                    fillWithLava.add(locer);
-                }
-            }
-            Schedules.launchSchedules(()->{
-                int size=fillWithLava.size();
-                for(int i=0;i<size;i++){
-                    fillWithLava.get(i).getBlock().setType(Material.CRYING_OBSIDIAN);
-                }
-            },0,true,0);
-            Schedules.launchSchedules(()->{
-                RadiationRegion.runRadiation(loc,RADIATION_RANGE,2);
-            },0,true,0);
-            RadiationRegion.addRadiation(loc,RADIATION_RANGE,RADIATION_PERIOD,RADIATION_SPEED,1);
-        }
-    }
-    public HashMap<String,ItemStack> MBID_TO_ITEM=new HashMap<>(){{
-        put("nuclear.frame", AddUtils.addGlow(AddItem.TRANSMUTATOR_FRAME.clone()));
-        put("nuclear.glass", AddUtils.addGlow(AddItem.TRANSMUTATOR_GLASS.clone()));
-        put("nuclear.rod", AddUtils.addGlow(AddItem.TRANSMUTATOR_ROD.clone()));
-    }};
     public void constructMenu(BlockMenuPreset preset){
         int[] border = BORDER;
         int len=border.length;
@@ -242,22 +175,51 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
         preset.addItem(HALT_SLOT,HALT_ITEM);
         preset.addItem(COOLER_INFO_SLOT,COOLER_INFO_ITEM,ChestMenuUtils.getEmptyClickHandler());
     }
-    public void updateMenu(BlockMenu inv, Block block, Settings mod){
-        Location loc=block.getLocation();
-        int holoStatus=DataCache.getCustomData(loc,MultiBlockService.getHologramKey(),0);
-        if(holoStatus==0){
-            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_OFF);
-        }else {
-            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_ON[holoStatus-1]);
+    public void createEffect(Location loc, AbstractMultiBlockHandler handler){
+        MultiBlockService.Direction dir=handler.getDirection();
+        AbstractMultiBlock block=  handler.getMultiBlock();
+        if(block instanceof CubeMultiBlock cb){
+            List<Location> fillWithLava=new ArrayList<>();
+            int height=baseHeight+ cb.getHeight();
+            int len=lavadx.length;
+            Location locer;
+            for(int y=0;y<height;y++){
+                for(int j=0;j<len;j++){
+                    locer=loc.clone().add(dir.getRotateX(lavadx[j],lavady[j]),y,dir.getRotateZ(lavadx[j],lavady[j]));
+                    fillWithLava.add(locer);
+                    WorldUtils.removeSlimefunBlock(locer,true);
+                }
+            }
+            Schedules.launchSchedules(()->{
+                int size=fillWithLava.size();
+                for(int i=0;i<size;i++){
+                    fillWithLava.get(i).getBlock().setType(Material.LAVA);
+                }
+            },0,true,0);
         }
-        int status=MultiBlockService.getStatus(loc)==0?0:1;
-        //负数为
-        int autoRec=DataCache.getCustomData(loc,MultiBlockService.getAutoKey(),0)<=0?0:1;
-        inv.replaceExistingItem(TOGGLE_SLOT,TOGGLE_ITEM[status*2+autoRec]);
-        if(status==0){
-            inv.replaceExistingItem(INFO_SLOT,INFO_ITEM);
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+        if(flow==ItemTransportFlow.WITHDRAW){
+            return getOutputSlots();
         }
-
+        if(item==null||item.getType().isAir()){
+            return ALL_INPUT_SLOT;
+        }
+        if(item.getType()==Material.PLAYER_HEAD){
+            if(CraftUtils.matchItemStack(item,COOLER,false)){
+                return COOLER_INPUT_SLOT;
+            }
+            else {
+                return NETHERICE_INPUT_SLOT;
+            }
+        }
+        return getInputSlots();
     }
     public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuOpeningHandler((player -> {
@@ -322,42 +284,100 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
         }));
 
     }
-    protected ItemCounter COOLER=CraftUtils.getConsumer(SlimefunItems.REACTOR_COOLANT_CELL );
-    protected ItemCounter NETHERICE=CraftUtils.getConsumer(SlimefunItems.NETHER_ICE_COOLANT_CELL);
-    public boolean checkCooler(BlockMenu inv){
-        Location loc=inv.getLocation();
-        MultiCraftingOperation op=this.coolerProcessor.getOperation(loc);
-        if(op==null){
-            ItemStack it=inv.getItemInSlot(COOLER_INPUT_SLOT[0]);
-            if(it==null){
-                return false;
-            }
-            ItemStack it2=inv.getItemInSlot(NETHERICE_INPUT_SLOT[0]);
-            if(it2==null){
-                return false;
-            }
-            if(CraftUtils.matchItemStack(it,COOLER,false)&&CraftUtils.matchItemStack(it2,NETHERICE,false)){
-                it.setAmount(it.getAmount()-1);
-                it2.setAmount(it2.getAmount()-1);
-                op=new MultiCraftingOperation(new ItemGreedyConsumer[0],2);
-                coolerProcessor.startOperation(loc,op);
-            }else return false;
+    public void onBreak(BlockBreakEvent e, BlockMenu menu){
+        super.onBreak(e,menu);
+        if(menu!=null){
+            menu.dropItems(menu.getLocation(),COOLER_INPUT_SLOT);
+            menu.dropItems(menu.getLocation(),NETHERICE_INPUT_SLOT);
+            this.coolerProcessor.endOperation(menu.getLocation());
         }
-        else if(op.isFinished()){
-            if(inv.hasViewer()){
-                inv.replaceExistingItem(COOLER_INFO_SLOT,COOLER_INFO_ITEM);
-            }
-            this.coolerProcessor.endOperation(loc);
-            return true;
-        }else{
-            op.progress(1);
+    }
+    public void onDestroyEffect(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
+        AddUtils.broadCast("&e位于[%s,%.0f,%.0f,%.0f]的元素嬗变机因 [%s] 熔毁!".formatted(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(),cause.getMessage()));
 
+        MultiBlockService.Direction dir=handler.getDirection();
+        AbstractMultiBlock block=  handler.getMultiBlock();
+        if(block instanceof CubeMultiBlock cb){
+            int height=baseHeight+ cb.getHeight();
+            Location locer;
+            for(int y=0;y<height;y++){
+                for(int j=2;j<7;j++){
+                    for(int k=-2;k<3;k++){
+                        locer=loc.clone().add(dir.getRotateX(j,k),y,dir.getRotateZ(j,k));
+                        WorldUtils.removeSlimefunBlock(locer,true);
+                    }
+                }
+            }
+            List<Location> fillWithLava=new ArrayList<>();
+            int len=lavadx.length;
+            for(int y=0;y<height;y++){
+                for(int j=0;j<len;j++){
+                    locer=loc.clone().add(dir.getRotateX(lavadx[j],lavady[j]),y,dir.getRotateZ(lavadx[j],lavady[j]));
+                    fillWithLava.add(locer);
+                }
+            }
+            Schedules.launchSchedules(()->{
+                int size=fillWithLava.size();
+                for(int i=0;i<size;i++){
+                    fillWithLava.get(i).getBlock().setType(Material.CRYING_OBSIDIAN);
+                }
+            },0,true,0);
+            Schedules.launchSchedules(()->{
+                RadiationRegion.runRadiation(loc,RADIATION_RANGE,2);
+            },0,true,0);
+            RadiationRegion.addRadiation(loc,RADIATION_RANGE,RADIATION_PERIOD,RADIATION_SPEED,1);
         }
-        if(inv.hasViewer())
-            this.coolerProcessor.updateProgressBar(inv,COOLER_INFO_SLOT,op);
-        return true;
+    }
+    public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
+        MultiCraftingOperation op=Transmutator.this.processor.getOperation(loc);
+        if(op!=null&&(!op.isFinished())){//如果还在进行中就暂停
+            onDestroyEffect(loc,handler,cause);
+        }else{
+            removeEffect(loc,handler);
+        }
+        DataCache.setCustomData(loc,this.HEIGHT_KEY,0);
+
+        super.onMultiBlockDisable(loc,handler,cause);
     }
 
+    public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
+        super.onMultiBlockEnable(loc,handler);
+        createEffect(loc,handler);
+    }
+    public void preRegister(){
+
+        super.preRegister();
+    }
+    public void progressorCost(Block b, BlockMenu inv){
+        //覆盖父类 让process中不扣电
+        //转到我的ticker里扣
+        if(!checkCooler(inv)){
+            MultiBlockService.toggleOff(DataCache.safeLoadBlock(inv.getLocation()),NOCOOLER);
+        }
+    }
+    public void removeEffect(Location loc, AbstractMultiBlockHandler handler){
+        MultiBlockService.Direction dir=handler.getDirection();
+        AbstractMultiBlock block=  handler.getMultiBlock();
+        if(block instanceof CubeMultiBlock cb){
+            List<Location> fillWithLava=new ArrayList<>();
+            int height=baseHeight+ cb.getHeight();
+            int len=lavadx.length;
+            Location locer;
+            for(int y=0;y<height;y++){
+                for(int j=0;j<len;j++){
+                    locer=loc.clone().add(dir.getRotateX(lavadx[j],lavady[j]),y,dir.getRotateZ(lavadx[j],lavady[j]));
+                    fillWithLava.add(locer);
+                    WorldUtils.removeSlimefunBlock(locer,true);
+                }
+            }
+            Schedules.launchSchedules(()->{
+                int size=fillWithLava.size();
+                for(int i=0;i<size;i++){
+                    fillWithLava.get(i).getBlock().setType(Material.AIR);
+                }
+            },0,true,0);
+        }
+    }
     public void tick(Block b, BlockMenu inv, SlimefunBlockData data, int tickCount){
         //in this case .blockMenu is null
         int statusCode=MultiBlockService.getStatus(data);
@@ -395,41 +415,21 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
             super.process(b,inv,data);
         }
     }
-    public MultiBlockService.DeleteCause NOCOOLER=new MultiBlockService.DeleteCause("冷却剂不足",true);
-    public void progressorCost(Block b, BlockMenu inv){
-        //覆盖父类 让process中不扣电
-        //转到我的ticker里扣
-        if(!checkCooler(inv)){
-            MultiBlockService.toggleOff(DataCache.safeLoadBlock(inv.getLocation()),NOCOOLER);
+    public void updateMenu(BlockMenu inv, Block block, Settings mod){
+        Location loc=block.getLocation();
+        int holoStatus=DataCache.getCustomData(loc,MultiBlockService.getHologramKey(),0);
+        if(holoStatus==0){
+            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_OFF);
+        }else {
+            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_ON[holoStatus-1]);
         }
-    }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu){
-        super.onBreak(e,menu);
-        if(menu!=null){
-            menu.dropItems(menu.getLocation(),COOLER_INPUT_SLOT);
-            menu.dropItems(menu.getLocation(),NETHERICE_INPUT_SLOT);
-            this.coolerProcessor.endOperation(menu.getLocation());
+        int status=MultiBlockService.getStatus(loc)==0?0:1;
+        //负数为
+        int autoRec=DataCache.getCustomData(loc,MultiBlockService.getAutoKey(),0)<=0?0:1;
+        inv.replaceExistingItem(TOGGLE_SLOT,TOGGLE_ITEM[status*2+autoRec]);
+        if(status==0){
+            inv.replaceExistingItem(INFO_SLOT,INFO_ITEM);
         }
-    }
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
-        if(flow==ItemTransportFlow.WITHDRAW){
-            return getOutputSlots();
-        }
-        if(item==null||item.getType().isAir()){
-            return ALL_INPUT_SLOT;
-        }
-        if(item.getType()==Material.PLAYER_HEAD){
-            if(CraftUtils.matchItemStack(item,COOLER,false)){
-                return COOLER_INPUT_SLOT;
-            }
-            else {
-                return NETHERICE_INPUT_SLOT;
-            }
-        }
-        return getInputSlots();
-    }
-    public void preRegister(){
 
-        super.preRegister();
     }
 }

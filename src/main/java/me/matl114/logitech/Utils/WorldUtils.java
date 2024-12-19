@@ -1,44 +1,66 @@
 package me.matl114.logitech.Utils;
 
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.BlockDataController;
-import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
-import me.matl114.logitech.Listeners.Events.AttackPermissionTestEvent;
-import me.matl114.logitech.MyAddon;
-import me.matl114.logitech.Schedule.Schedules;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusher;
-import me.matl114.matlib.Utils.Reflect.FieldAccess;
-import org.bukkit.*;
-import org.bukkit.block.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import javax.annotation.Nonnull;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTables;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nonnull;
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.BlockDataController;
+
+import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
+import me.matl114.logitech.MyAddon;
+import me.matl114.logitech.Listeners.Events.AttackPermissionTestEvent;
+import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusher;
+import me.matl114.matlib.Utils.Reflect.FieldAccess;
 
 public class WorldUtils {
+    public static enum DustPreset{
+        REDSTONE(Color.fromRGB(255,0,0),1.0f);
+
+        Particle.DustOptions dustOptions;
+        DustPreset(Color color,float size){
+            dustOptions=new Particle.DustOptions(color,size);
+        }
+        public Particle.DustOptions getOptions(){
+            return dustOptions;
+        }
+    }
     public static SlimefunAddon INSTANCE= MyAddon.getInstance();
     public static final BlockDataController CONTROLLER=Slimefun.getDatabaseManager().getBlockDataController();
-    public static void setBlock(Location loc, Material material) {
-        loc.getBlock().setType(material);
-    }
-    public static void setAir(Location loc) {
-        loc.getBlock().setType(Material.AIR);
-    }
     public static HashMap<Material,Integer> FOOD_LEVELS=new HashMap<>(){{
         put(Material.MUSHROOM_STEW,6);
         put(Material.BEEF,3);
@@ -1138,14 +1160,14 @@ public class WorldUtils {
 
         //till 1.20.4
     }};
-
     protected static Class CraftBlockStateClass;
-//    protected static Field IBlockDataField;
+
+    //    protected static Field IBlockDataField;
 //    protected static Field BlockPositionField;
 //    protected static Field WorldField;
 //    protected static Field WeakWorldField;
     protected static boolean invokeBlockStateSuccess=false;
-    protected static FieldAccess iBlockDataFieldAccess;
+protected static FieldAccess iBlockDataFieldAccess;
     protected static FieldAccess blockPositionFieldAccess;
     protected static FieldAccess worldFieldAccess;
     protected static FieldAccess weakWorldFieldAccess;
@@ -1175,20 +1197,6 @@ public class WorldUtils {
            Debug.logger(e);
         }
     }
-    public static void setup(){
-
-    }
-    public static enum DustPreset{
-        REDSTONE(Color.fromRGB(255,0,0),1.0f);
-
-        Particle.DustOptions dustOptions;
-        public Particle.DustOptions getOptions(){
-            return dustOptions;
-        }
-        DustPreset(Color color,float size){
-            dustOptions=new Particle.DustOptions(color,size);
-        }
-    }
     public static HashSet<Material> WATER_LOGGABLE_TYPES=new HashSet<>(){{
         for (Material m : Material.values()) {
             if(m.isBlock()){
@@ -1204,56 +1212,6 @@ public class WorldUtils {
             }
         }
     }};
-    public static void setBlock(Block block, Material material) {
-
-    }
-    public static boolean isEntityBlock(Material type){
-        return BLOCKTYPE_WITH_ENTITY.contains(type);
-    }
-    public static boolean isRandomTickable(Material type){
-        return BLOCK_WITH_RANDOMTICK.contains(type);
-    }
-    public static boolean isBlockLocation(Location location){
-        if(location==null){
-            return false;
-        }
-        return location.getX()==location.getBlockX() && location.getY()==location.getBlockY() && location.getZ()==location.getBlockZ();
-    }
-
-
-    public static Location getBlockLocation(Location loc){
-        return new Location(loc.getWorld(),loc.getBlockX(),loc.getBlockY(),loc.getBlockZ());
-    }
-    /**
-     * this method no need to run sync
-     * @param loc
-     * @param force
-     */
-    public static void removeSlimefunBlock(Location loc, boolean force){
-        removeSlimefunBlock(loc,null,force);
-    }
-    public static void removeSlimefunBlock(Location loc,Player player, boolean force) {
-       if(force){
-           CONTROLLER.removeBlock(loc);
-           return;
-       }else {
-           BlockBreakEvent breakEvent =
-                   new BlockBreakEvent(loc.getBlock(),player);
-           Bukkit.getPluginManager().callEvent(breakEvent);
-
-
-           if (breakEvent.isCancelled()) {
-               return ;
-           }
-           CONTROLLER.removeBlock(loc);
-       }
-    }
-    public static void removeSlimefunBlockSafe(Location loc){
-    }
-    public static void moveSlimefunBlock(Location loc, boolean force) {
-
-    }
-
     /**
      * put arg hasSync to decide whether to create new sunc thread
      * @param loc
@@ -1264,106 +1222,21 @@ public class WorldUtils {
      * @param hasSync
      */
     public static ConcurrentHashMap<Location,SlimefunItem> CREATING_QUEUE = new ConcurrentHashMap<>();
-    public static boolean createSlimefunBlock(Location loc,Player player,SlimefunItem item,Material material,boolean force){
-        if(CREATING_QUEUE.containsKey(loc)){
-            SlimefunItem item1 = CREATING_QUEUE.get(loc);
-            if(item1==item){
-                return false;
-            }else {
-                force=true;
-            }
-        }
-        final boolean forceVal=force;
-        CREATING_QUEUE.put(loc,item);
-        BukkitUtils.executeSync(()->{
-            try{
-                createSlimefunBlockSync(loc,player,item,material,forceVal);
-            }finally {
-                CREATING_QUEUE.remove(loc);
-            }
-
-        });
-        return true;
-    }
-    public static boolean createSlimefunBlockSync(Location loc,Player player,SlimefunItem item,Material material,boolean force){
-        Block block = loc.getBlock();
-        if(!force&&player!=null){
-            if(!hasPermission(player,loc, Interaction.PLACE_BLOCK)){
-                return false ;
-            }
-//            if( DataCache.getSfItem(loc)!=null){
-//               Debug.logger("has block ,,, ",DataCache.getSfItem(loc));
-//            }
-            BlockBreakEvent breakEvent =
-                    new BlockBreakEvent(block,player);
-            Bukkit.getPluginManager().callEvent(breakEvent);
-            if (breakEvent.isCancelled()) {
-                return false;
-            }
-            breakEvent.setDropItems(false);
-            if (!item.canUse(player, false)) {
-                return false;
-            }
-
-        }
-        if( DataCache.getSfItem(loc)!=null){
-            CONTROLLER.removeBlock(loc);
-        }
-         BukkitUtils.executeSync(()->    createSlimefunBlockSync(loc, player, item, material));
-        return true;
-    }
-    /**
-     * this method must run sync
-     * @param loc
-     * @param item
-     * @param material
-     */
-    public static void createSlimefunBlockSync(Location loc,Player player,SlimefunItem item,Material material) {
-        Block block=loc.getBlock();
-
-        block.setType(material);
-        if (Slimefun.getBlockDataService().isTileEntity(block.getType())) {
-            Slimefun.getBlockDataService().setBlockData(block, item.getId());
-        }
-        CONTROLLER.createBlock(loc, item.getId());
-//        try{
-//            var placeEvent = new SlimefunBlockPlaceEvent(player, item.getItem(), block, item);
-//            Bukkit.getPluginManager().callEvent(placeEvent);
-//        }catch (Throwable e){
-//
-//        }
-    }
-    public static boolean hasPermission( Player player, @Nonnull Block location, @Nonnull Interaction... interactions) {
-        if(player==null)return true;
-        for (Interaction interaction : interactions) {
-            if (!Slimefun.getProtectionManager().hasPermission(player, location, interaction)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    public static boolean hasPermission( Player player, @Nonnull Location location, @Nonnull Interaction... interactions) {
-        if(player==null)return true;
-        for (Interaction interaction : interactions) {
-            if (!Slimefun.getProtectionManager().hasPermission(player, location, interaction)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    public static boolean testAttackPermission(Player player, Damageable entity,float expectedDamage){
-        //entity.damage(0,player);
-        try{
-            EntityDamageEvent event=new AttackPermissionTestEvent(player,entity,expectedDamage);
-            Bukkit.getPluginManager().callEvent(event);
-            if(event.isCancelled()){
-                return false;
+    private static final ItemStack effectivePickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
+    //IF SF DATA EXISTS,SF BLOCK WILL ALSO BE BREAKED, MAY CAUSE PROBLEMS
+    public static boolean breakVanillaBlockByPlayer(Block block,Player player,boolean hasCheckedProtection,boolean withDrop){
+        if(hasCheckedProtection||WorldUtils.hasPermission(player,block.getLocation(),Interaction.BREAK_BLOCK)){
+            if(block.getType()!=Material.AIR){
+                BlockBreakEvent event=new BlockBreakEvent(block,player);
+                Bukkit.getPluginManager().callEvent(event);
+                if(event.isCancelled()){
+                    return false;
+                }
+                event.setDropItems(withDrop);
+                block.setType(Material.AIR);
+                return true;
             }else return true;
-        }catch (Throwable e){
-            Debug.logger(e);
-            return true;
-        }
-
+        }else return false;
     }
     public static boolean consumeItem(Player player, ItemConsumer... consumers) {
         for (ItemConsumer consumer : consumers) {
@@ -1407,6 +1280,94 @@ public class WorldUtils {
         return true;
 
     }
+    public static boolean copyBlockState(BlockState state,Block block2){
+        if(invokeBlockStateSuccess){
+            BlockState state2=block2.getState();
+            if(CraftBlockStateClass.isInstance(state2)&&CraftBlockStateClass.isInstance(state)){
+                try{
+                    blockPositionFieldAccess.ofAccess(state).set(blockPositionFieldAccess.getValue(state2));
+                    worldFieldAccess.ofAccess(state).set(worldFieldAccess.getValue(state2));
+                    worldFieldAccess.ofAccess(state).set(worldFieldAccess.getValue(state2));
+                    weakWorldFieldAccess.ofAccess(state).set(weakWorldFieldAccess.getValue(state2));
+                    state.update(true,false);
+                    return true;
+                }catch (Throwable e){
+                    return false;
+                }
+            }else return false;
+        }else return false;
+    }
+    public static boolean createSlimefunBlock(Location loc,Player player,SlimefunItem item,Material material,boolean force){
+        if(CREATING_QUEUE.containsKey(loc)){
+            SlimefunItem item1 = CREATING_QUEUE.get(loc);
+            if(item1==item){
+                return false;
+            }else {
+                force=true;
+            }
+        }
+        final boolean forceVal=force;
+        CREATING_QUEUE.put(loc,item);
+        BukkitUtils.executeSync(()->{
+            try{
+                createSlimefunBlockSync(loc,player,item,material,forceVal);
+            }finally {
+                CREATING_QUEUE.remove(loc);
+            }
+
+        });
+        return true;
+    }
+    /**
+     * this method must run sync
+     * @param loc
+     * @param item
+     * @param material
+     */
+    public static void createSlimefunBlockSync(Location loc,Player player,SlimefunItem item,Material material) {
+        Block block=loc.getBlock();
+
+        block.setType(material);
+        if (Slimefun.getBlockDataService().isTileEntity(block.getType())) {
+            Slimefun.getBlockDataService().setBlockData(block, item.getId());
+        }
+        CONTROLLER.createBlock(loc, item.getId());
+//        try{
+//            var placeEvent = new SlimefunBlockPlaceEvent(player, item.getItem(), block, item);
+//            Bukkit.getPluginManager().callEvent(placeEvent);
+//        }catch (Throwable e){
+//
+//        }
+    }
+
+
+    public static boolean createSlimefunBlockSync(Location loc,Player player,SlimefunItem item,Material material,boolean force){
+        Block block = loc.getBlock();
+        if(!force&&player!=null){
+            if(!hasPermission(player,loc, Interaction.PLACE_BLOCK)){
+                return false ;
+            }
+//            if( DataCache.getSfItem(loc)!=null){
+//               Debug.logger("has block ,,, ",DataCache.getSfItem(loc));
+//            }
+            BlockBreakEvent breakEvent =
+                    new BlockBreakEvent(block,player);
+            Bukkit.getPluginManager().callEvent(breakEvent);
+            if (breakEvent.isCancelled()) {
+                return false;
+            }
+            breakEvent.setDropItems(false);
+            if (!item.canUse(player, false)) {
+                return false;
+            }
+
+        }
+        if( DataCache.getSfItem(loc)!=null){
+            CONTROLLER.removeBlock(loc);
+        }
+         BukkitUtils.executeSync(()->    createSlimefunBlockSync(loc, player, item, material));
+        return true;
+    }
     /**
      * no need to sync
      * @param start
@@ -1431,14 +1392,7 @@ public class WorldUtils {
             }
         }
     }
-    public static void spawnLineParticle(Location start, Location end, Particle type, int count){
-        doLineOperation(start,end,count,(loc)->{
-            loc.getWorld().spawnParticle(type,loc,0,0.0,0.0,0.0,1,null,true);
-        });
-    }
-    private static final ItemStack effectivePickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
-
-//    public ItemStack[] simulateKill(){
+    //    public ItemStack[] simulateKill(){
 //        Player player;
 //    }
     //should be without movement
@@ -1452,11 +1406,117 @@ public class WorldUtils {
             return false;
         })).size();
     }
-//    public static Vector getOrientations(Location loc){
+    public static void forceLoadChunk(Location loc,int tick){
+        int dx=loc.getBlockX()>>4;
+        int dz=loc.getBlockZ()>>4;
+        World world=loc.getWorld();
+        Chunk chunk=world.getChunkAt(dx,dz);
+        final boolean isForceload=chunk.isForceLoaded();
+        chunk.setForceLoaded(true);
+        Schedules.launchSchedules(()->{
+            chunk.setForceLoaded(isForceload);
+        },tick,true,0);
+    }
+    public static Location getBlockLocation(Location loc){
+        return new Location(loc.getWorld(),loc.getBlockX(),loc.getBlockY(),loc.getBlockZ());
+    }
+
+    //    public static Vector getOrientations(Location loc){
 //        loc.getDirection();
 //    }
     public static HashSet<Entity> getEntityInDistance(Location location, double distance, Predicate<Entity> predicate){
         return new HashSet<Entity>( location.getWorld().getNearbyEntities(location,2*distance,2*distance,2*distance,(e)->{return e.getLocation().distance(location)<=distance&&predicate.test(e);}));
+    }
+    public static Location getHandLocation(LivingEntity p){
+        Location loc=p.getEyeLocation();
+        Location playerLocation=p.getLocation();
+        loc.add(playerLocation.subtract(loc).multiply(0.3).toVector());
+        return loc;
+    }
+    public static boolean hasPermission( Player player, @Nonnull Block location, @Nonnull Interaction... interactions) {
+        if(player==null)return true;
+        for (Interaction interaction : interactions) {
+            if (!Slimefun.getProtectionManager().hasPermission(player, location, interaction)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public static boolean hasPermission( Player player, @Nonnull Location location, @Nonnull Interaction... interactions) {
+        if(player==null)return true;
+        for (Interaction interaction : interactions) {
+            if (!Slimefun.getProtectionManager().hasPermission(player, location, interaction)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public static boolean isBlockLocation(Location location){
+        if(location==null){
+            return false;
+        }
+        return location.getX()==location.getBlockX() && location.getY()==location.getBlockY() && location.getZ()==location.getBlockZ();
+    }
+    public static boolean isEntityBlock(Material type){
+        return BLOCKTYPE_WITH_ENTITY.contains(type);
+    }
+    public static boolean isLightPassableBlock(Block block){
+        Material material=block.getType();
+        if(material==Material.AIR||material.isTransparent()||WATER_VARIENT.contains(material)||material==Material.LAVA){
+            return true;
+        }else return false;
+    }
+    public static boolean isLiquid(Block block){
+        Material material=block.getType();
+        if(WATER_VARIENT.contains(material)||material==Material.LAVA){
+            return true;
+        }else return false;
+    }
+    public static boolean isMaterialWaterLoggable(Material material){
+        return WATER_LOGGABLE_TYPES.contains(material);
+    }
+    public static boolean isRandomTickable(Material type){
+        return BLOCK_WITH_RANDOMTICK.contains(type);
+    }
+    public static boolean isTargetableLivingEntity(Entity e){
+        if(e.isValid()&&!e.isDead()&&e instanceof LivingEntity le&&!le.isInvulnerable()){
+            if(e instanceof ArmorStand stand && (stand.isMarker()||stand.isSmall())){
+                return false;
+            }
+            return true;
+        }return false;
+    }
+
+public static boolean isWaterLogged(Block block){
+        Material type=block.getType();
+        if(isMaterialWaterLoggable(type)){
+            BlockData blockData=block.getBlockData();
+            if(blockData instanceof Waterlogged wl){
+                return wl.isWaterlogged();
+            }else return false;
+        }else{
+            return false;
+        }
+
+    }
+public static void moveSlimefunBlock(Location loc, boolean force) {
+
+    }
+    public static boolean moveVanillaBlockByPlayer(Block block1,Block block2,Player player,boolean checkFromPerms,boolean checkToPerms,boolean hasCheckedProtection,boolean applyPhysics){
+        if(hasCheckedProtection||((!checkFromPerms||WorldUtils.hasPermission(player,block1,Interaction.BREAK_BLOCK))&&(!checkToPerms||WorldUtils.hasPermission(player,block2,Interaction.PLACE_BLOCK)))){
+            if(checkFromPerms){
+                BlockBreakEvent event=new BlockBreakEvent(block1,player);
+                Bukkit.getPluginManager().callEvent(event);
+                if(event.isCancelled()){
+                    return false;
+                }
+                event.setDropItems(false);
+            }
+            block2.setType(block1.getType());
+            block2.setBlockData(block1.getBlockData(),applyPhysics);
+            block1.setType(Material.AIR);
+            return true;
+        }else return false;
     }
     public static Pair<Integer,Location> rayTraceLocation(LivingEntity entity, double period,double  maxLimitedDistance, Predicate<Location> execution){
         if(entity==null)return null;
@@ -1475,63 +1535,65 @@ public class WorldUtils {
         }
         return new Pair<Integer,Location>(i,walkLocation) ;
     }
-    public static boolean isLightPassableBlock(Block block){
-        Material material=block.getType();
-        if(material==Material.AIR||material.isTransparent()||WATER_VARIENT.contains(material)||material==Material.LAVA){
-            return true;
-        }else return false;
+    /**
+     * this method no need to run sync
+     * @param loc
+     * @param force
+     */
+    public static void removeSlimefunBlock(Location loc, boolean force){
+        removeSlimefunBlock(loc,null,force);
     }
-    public static boolean isLiquid(Block block){
-        Material material=block.getType();
-        if(WATER_VARIENT.contains(material)||material==Material.LAVA){
-            return true;
-        }else return false;
+    public static void removeSlimefunBlock(Location loc,Player player, boolean force) {
+       if(force){
+           CONTROLLER.removeBlock(loc);
+           return;
+       }else {
+           BlockBreakEvent breakEvent =
+                   new BlockBreakEvent(loc.getBlock(),player);
+           Bukkit.getPluginManager().callEvent(breakEvent);
+
+
+           if (breakEvent.isCancelled()) {
+               return ;
+           }
+           CONTROLLER.removeBlock(loc);
+       }
     }
-    public static boolean isMaterialWaterLoggable(Material material){
-        return WATER_LOGGABLE_TYPES.contains(material);
+    public static void removeSlimefunBlockSafe(Location loc){
     }
-    public static boolean isWaterLogged(Block block){
-        Material type=block.getType();
-        if(isMaterialWaterLoggable(type)){
-            BlockData blockData=block.getBlockData();
-            if(blockData instanceof Waterlogged wl){
-                return wl.isWaterlogged();
-            }else return false;
-        }else{
-            return false;
-        }
+    public static void setAir(Location loc) {
+        loc.getBlock().setType(Material.AIR);
+    }
+    public static void setBlock(Block block, Material material) {
 
     }
-    //IF SF DATA EXISTS,SF BLOCK WILL ALSO BE BREAKED, MAY CAUSE PROBLEMS
-    public static boolean breakVanillaBlockByPlayer(Block block,Player player,boolean hasCheckedProtection,boolean withDrop){
-        if(hasCheckedProtection||WorldUtils.hasPermission(player,block.getLocation(),Interaction.BREAK_BLOCK)){
-            if(block.getType()!=Material.AIR){
-                BlockBreakEvent event=new BlockBreakEvent(block,player);
-                Bukkit.getPluginManager().callEvent(event);
-                if(event.isCancelled()){
-                    return false;
-                }
-                event.setDropItems(withDrop);
-                block.setType(Material.AIR);
-                return true;
-            }else return true;
-        }else return false;
+    public static void setBlock(Location loc, Material material) {
+        loc.getBlock().setType(material);
     }
-    public static boolean moveVanillaBlockByPlayer(Block block1,Block block2,Player player,boolean checkFromPerms,boolean checkToPerms,boolean hasCheckedProtection,boolean applyPhysics){
-        if(hasCheckedProtection||((!checkFromPerms||WorldUtils.hasPermission(player,block1,Interaction.BREAK_BLOCK))&&(!checkToPerms||WorldUtils.hasPermission(player,block2,Interaction.PLACE_BLOCK)))){
-            if(checkFromPerms){
-                BlockBreakEvent event=new BlockBreakEvent(block1,player);
-                Bukkit.getPluginManager().callEvent(event);
-                if(event.isCancelled()){
-                    return false;
-                }
-                event.setDropItems(false);
-            }
-            block2.setType(block1.getType());
-            block2.setBlockData(block1.getBlockData(),applyPhysics);
-            block1.setType(Material.AIR);
+
+
+
+    public static void setup(){
+
+    }
+    public static void spawnLineParticle(Location start, Location end, Particle type, int count){
+        doLineOperation(start,end,count,(loc)->{
+            loc.getWorld().spawnParticle(type,loc,0,0.0,0.0,0.0,1,null,true);
+        });
+    }
+    public static boolean testAttackPermission(Player player, Damageable entity,float expectedDamage){
+        //entity.damage(0,player);
+        try{
+            EntityDamageEvent event=new AttackPermissionTestEvent(player,entity,expectedDamage);
+            Bukkit.getPluginManager().callEvent(event);
+            if(event.isCancelled()){
+                return false;
+            }else return true;
+        }catch (Throwable e){
+            Debug.logger(e);
             return true;
-        }else return false;
+        }
+
     }
     public static boolean testVanillaBlockBreakPermission(Block block,Player player,boolean hasCheckedProtection){
         if(hasCheckedProtection||(WorldUtils.hasPermission(player,block,Interaction.BREAK_BLOCK, Interaction.PLACE_BLOCK))){
@@ -1542,51 +1604,6 @@ public class WorldUtils {
             }
             event.setDropItems(false);
             return true;
-        }else return false;
-    }
-
-
-
-    public static void forceLoadChunk(Location loc,int tick){
-        int dx=loc.getBlockX()>>4;
-        int dz=loc.getBlockZ()>>4;
-        World world=loc.getWorld();
-        Chunk chunk=world.getChunkAt(dx,dz);
-        final boolean isForceload=chunk.isForceLoaded();
-        chunk.setForceLoaded(true);
-        Schedules.launchSchedules(()->{
-            chunk.setForceLoaded(isForceload);
-        },tick,true,0);
-    }
-    public static boolean isTargetableLivingEntity(Entity e){
-        if(e.isValid()&&!e.isDead()&&e instanceof LivingEntity le&&!le.isInvulnerable()){
-            if(e instanceof ArmorStand stand && (stand.isMarker()||stand.isSmall())){
-                return false;
-            }
-            return true;
-        }return false;
-    }
-    public static Location getHandLocation(LivingEntity p){
-        Location loc=p.getEyeLocation();
-        Location playerLocation=p.getLocation();
-        loc.add(playerLocation.subtract(loc).multiply(0.3).toVector());
-        return loc;
-    }
-    public static boolean copyBlockState(BlockState state,Block block2){
-        if(invokeBlockStateSuccess){
-            BlockState state2=block2.getState();
-            if(CraftBlockStateClass.isInstance(state2)&&CraftBlockStateClass.isInstance(state)){
-                try{
-                    blockPositionFieldAccess.ofAccess(state).set(blockPositionFieldAccess.getValue(state2));
-                    worldFieldAccess.ofAccess(state).set(worldFieldAccess.getValue(state2));
-                    worldFieldAccess.ofAccess(state).set(worldFieldAccess.getValue(state2));
-                    weakWorldFieldAccess.ofAccess(state).set(weakWorldFieldAccess.getValue(state2));
-                    state.update(true,false);
-                    return true;
-                }catch (Throwable e){
-                    return false;
-                }
-            }else return false;
         }else return false;
     }
 }

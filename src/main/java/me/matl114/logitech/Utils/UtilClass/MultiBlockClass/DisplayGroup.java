@@ -70,23 +70,6 @@ public class DisplayGroup {
 //        }
 //    }
 
-    @Nonnull
-    public Interaction getParentDisplay() {
-        return this.parentDisplay;
-    }
-
-    public UUID getParentUUID() {
-        return this.parentDisplay.getUniqueId();
-    }
-
-    public Location getLocation() {
-        return this.parentDisplay.getLocation();
-    }
-
-    public Map<String, Display> getDisplays() {
-        return Collections.unmodifiableMap(this.displays);
-    }
-
     public void addDisplay(@Nonnull String name, @Nonnull Display display) {
         List<String> childList = this.getChildList();
         List<String> childNames = this.getChildNames();
@@ -100,48 +83,9 @@ public class DisplayGroup {
         }
     }
 
-    @Nullable
-    public Display removeDisplay(@Nonnull String name) {
-        Display display = (Display)this.displays.remove(name);
-        if (display == null) {
-            return display;
-        } else {
-            List<String> childList = this.getChildList();
-            List<String> childNames = this.getChildNames();
-            if (childList != null && childNames != null) {
-                childList.add(display.getUniqueId().toString());
-                childNames.add(name);
-                this.applyLists(childList, childNames);
-                return display;
-            } else {
-                throw new IllegalArgumentException("This display doesn't appear to have a group");
-            }
-        }
-    }
-
-    public void killDisplay(@Nonnull String name) {
-        Display display = this.removeDisplay(name);
-        if (display != null) {
-            display.remove();
-        }
-
-    }
-
-    public void remove() {
-        this.displays.forEach((s, display) -> {
-            WorldUtils.executeOnSameEntity(display,(entity -> entity.remove()));
-            display.remove();
-        });
-        WorldUtils.executeOnSameEntity(this.parentDisplay,(entity -> entity.remove()));
-        this.parentDisplay.remove();
-    }
-
-    public void teleport(@Nonnull Location location) {
-        this.displays.forEach((s, display) -> {
-            Location offset = this.getParentDisplay().getLocation().subtract(display.getLocation());
-            display.teleport(location.clone().add(offset));
-        });
-        this.getParentDisplay().teleport(location);
+    private void applyLists(@Nonnull List<String> childList, @Nonnull List<String> childNames) {
+        this.parentDisplay.getPersistentDataContainer().set( KEY_LIST, AbstractStringList.TYPE, childList);
+        this.parentDisplay.getPersistentDataContainer().set(  KEY_NAMES, AbstractStringList.TYPE, childNames);
     }
 
     @Nullable
@@ -156,10 +100,10 @@ public class DisplayGroup {
         //return (List)PersistentDataAPI.get(this.parentDisplay, KEY_NAMES, AbstractStringList.TYPE);
     }
 
-    private void applyLists(@Nonnull List<String> childList, @Nonnull List<String> childNames) {
-        this.parentDisplay.getPersistentDataContainer().set( KEY_LIST, AbstractStringList.TYPE, childList);
-        this.parentDisplay.getPersistentDataContainer().set(  KEY_NAMES, AbstractStringList.TYPE, childNames);
+    public Map<String, Display> getDisplays() {
+        return Collections.unmodifiableMap(this.displays);
     }
+
     public Collection<Display> getDisplaySet(){
         if(this.displays==null||this.displays.isEmpty()){
             return new HashSet<>();
@@ -181,5 +125,61 @@ public class DisplayGroup {
 //    public static dev.sefiraat.sefilib.entity.display.DisplayGroup fromInteraction(@Nonnull Interaction interaction) {
 //        return PersistentDataAPI.has(interaction, KEY_LIST, AbstractStringList.TYPE) ? new dev.sefiraat.sefilib.entity.display.DisplayGroup(interaction) : null;
 //    }
+
+    public Location getLocation() {
+        return this.parentDisplay.getLocation();
+    }
+
+    @Nonnull
+    public Interaction getParentDisplay() {
+        return this.parentDisplay;
+    }
+
+    public UUID getParentUUID() {
+        return this.parentDisplay.getUniqueId();
+    }
+
+    public void killDisplay(@Nonnull String name) {
+        Display display = this.removeDisplay(name);
+        if (display != null) {
+            display.remove();
+        }
+
+    }
+
+    public void remove() {
+        this.displays.forEach((s, display) -> {
+            WorldUtils.executeOnSameEntity(display,(entity -> entity.remove()));
+            display.remove();
+        });
+        WorldUtils.executeOnSameEntity(this.parentDisplay,(entity -> entity.remove()));
+        this.parentDisplay.remove();
+    }
+
+    @Nullable
+    public Display removeDisplay(@Nonnull String name) {
+        Display display = (Display)this.displays.remove(name);
+        if (display == null) {
+            return display;
+        } else {
+            List<String> childList = this.getChildList();
+            List<String> childNames = this.getChildNames();
+            if (childList != null && childNames != null) {
+                childList.add(display.getUniqueId().toString());
+                childNames.add(name);
+                this.applyLists(childList, childNames);
+                return display;
+            } else {
+                throw new IllegalArgumentException("This display doesn't appear to have a group");
+            }
+        }
+    }
+    public void teleport(@Nonnull Location location) {
+        this.displays.forEach((s, display) -> {
+            Location offset = this.getParentDisplay().getLocation().subtract(display.getLocation());
+            display.teleport(location.clone().add(offset));
+        });
+        this.getParentDisplay().teleport(location);
+    }
 }
 

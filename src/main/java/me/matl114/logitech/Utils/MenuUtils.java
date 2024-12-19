@@ -10,11 +10,9 @@ import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.permissions.Permission;
 
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -40,6 +38,9 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
 
 public class MenuUtils {
+    public interface RecipeMenuConstructor{
+        public MenuFactory construct(ItemStack icon, MachineRecipe recipe , CustomMenuHandler backhandler, PlayerHistoryRecord<CustomMenu> history);
+    }
     public static final ItemStack PROCESSOR_NULL= new CustomItemStack(Material.BLACK_STAINED_GLASS_PANE, " ");
     public static final ItemStack PROCESSOR_SPACE=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6进程完成","&c空间不足");
     public static final ItemStack PROCESSOR_ENERGY=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c电力不足","");
@@ -53,66 +54,29 @@ public class MenuUtils {
     public static final ItemStack SEARCH_BUTTON = new SlimefunItemStack("_UI_SEARCH", Material.NAME_TAG, "&b搜索...", "",ChatColor.GRAY + "⇨ " +"&b单击搜索物品");
     public static final ItemStack NO_ITEM = new SlimefunItemStack("_UI_NO_ITEM",Material.BARRIER,"&8 ");
     public static final ItemStack PRESET_INFO=new CustomItemStack(Material.CYAN_STAINED_GLASS_PANE,"&3配方类型信息");
-    public static final ItemStack PRESET_MORE=new CustomItemStack(Material.LIME_STAINED_GLASS_PANE,"&a更多物品(已省略)");
 
+    public static final ItemStack PRESET_MORE=new CustomItemStack(Material.LIME_STAINED_GLASS_PANE,"&a更多物品(已省略)");
     public static final ChestMenu.MenuClickHandler CLOSE_HANDLER=((player, i, itemStack, clickAction) -> {
         player.closeInventory();
         return false;
 
     });
-    /**
-     * change the object in the slot to a different object ,in order to trigger save at this slot when server down ,
-     * will return the ref to the current object in the slot
-     * @return
-     */
-    public static ItemStack syncSlot(BlockMenu inv ,int slot){
-        ItemStack item = inv.getItemInSlot(slot);
-        return syncSlot(inv,slot,item);
-    }
-    /**
-     * change the object in the slot to a different object ,in order to trigger save at this slot when server down ,
-     * will return the ref to the current object in the slot
-     * @return
-     */
-    public static ItemStack syncSlot(BlockMenu inv ,int slot, ItemStack item){
-        if(item instanceof AbstractItemStack){
-            item=item.clone();
-        }
-        inv.replaceExistingItem(slot, item,false);
-        return inv.getItemInSlot(slot);
-    }
+    //3x3配方表的显示
+    public static final MenuPreset SIMPLE_MENU=new MenuPreset(54,9,9)
+            .addItem(BACK_BUTTON,1)
+            .addItem(new CustomItemStack(Material.BOOK,"&aINFO_TEST"),7);
 
-    public static ItemStack getPreviousButton(int page, int pages) {
-        return pages != 1 && page != 1 ? new CustomItemStack(PREV_BUTTON_ACTIVE, (meta) -> {
-            ChatColor var10001 = ChatColor.WHITE;
-            meta.setDisplayName("" + var10001 + "⇦ " + "上一页");
-            meta.setLore(Arrays.asList("", ChatColor.GRAY + "(" + page + " / " + pages + ")"));
-        }) : new CustomItemStack(PREV_BUTTON_INACTIVE, (meta) -> {
-            ChatColor var10001 = ChatColor.DARK_GRAY;
-            meta.setDisplayName("" + var10001 + "⇦ " +"上一页");
-            meta.setLore(Arrays.asList("", ChatColor.GRAY + "(" + page + " / " + pages + ")"));
-        });
-    }
-    public static ItemStack getNextButton( int page, int pages) {
-        return pages != 1 && page != pages ? new CustomItemStack(NEXT_BUTTON_ACTIVE, (meta) -> {
-            ChatColor var10001 = ChatColor.WHITE;
-            meta.setDisplayName("" + var10001 + "下一页" + " ⇨");
-            meta.setLore(Arrays.asList("", ChatColor.GRAY + "(" + page + " / " + pages + ")"));
-        }) : new CustomItemStack(NEXT_BUTTON_INACTIVE, (meta) -> {
-            ChatColor var10001 = ChatColor.DARK_GRAY;
-            meta.setDisplayName("" + var10001 + "下一页" + " ⇨");
-            meta.setLore(Arrays.asList("", ChatColor.GRAY + "(" + page + " / " + pages + ")"));
-        });
-    }
-    public static ItemStack getBackButton( String... lore) {
-        return new CustomItemStack(BACK_BUTTON, "&7⇦ " +"返回", lore);
-    }
-//clickType of InventoryClickEvnet
-// 左键
-//    LEFT,
-    //shift左键
-//    SHIFT_LEFT,
-    //右键
+    public static final MenuPreset RECIPE_MENU_3X3=new MenuPreset(27,0,0)
+            .addItem(BACK_BUTTON,1);
+    //not used yet need
+    public static final MenuPreset RECIPE_MENU_3x3_PLUS=new MenuPreset(54,0,0)
+            .addItem(ChestMenuUtils.getBackground(),27,29,30,31,32,33,35);
+    //6x6大配方的显示
+    public static final MenuPreset RECIPE_MENU_6X6= new MenuPreset(54,0,0)
+            .addItem(BACK_BUTTON,0)
+            .addItem(PRESET_INFO,7,16,17)
+            .addItem(ChestMenuUtils.getBackground(),9,18,27,36,45)
+            .addItem(ChestMenuUtils.getOutputSlotTexture(),25,26,34,43,52);
 
 //    RIGHT,
     //shift右键
@@ -151,21 +115,6 @@ public class MenuUtils {
 
 
 
-    //3x3配方表的显示
-    public static final MenuPreset SIMPLE_MENU=new MenuPreset(54,9,9)
-            .addItem(BACK_BUTTON,1)
-            .addItem(new CustomItemStack(Material.BOOK,"&aINFO_TEST"),7);
-    public static final MenuPreset RECIPE_MENU_3X3=new MenuPreset(27,0,0)
-            .addItem(BACK_BUTTON,1);
-    //not used yet need
-    public static final MenuPreset RECIPE_MENU_3x3_PLUS=new MenuPreset(54,0,0)
-            .addItem(ChestMenuUtils.getBackground(),27,29,30,31,32,33,35);
-    //6x6大配方的显示
-    public static final MenuPreset RECIPE_MENU_6X6= new MenuPreset(54,0,0)
-            .addItem(BACK_BUTTON,0)
-            .addItem(PRESET_INFO,7,16,17)
-            .addItem(ChestMenuUtils.getBackground(),9,18,27,36,45)
-            .addItem(ChestMenuUtils.getOutputSlotTexture(),25,26,34,43,52);
     public static final  int RECIPEBACKSLOT_3X3=1;
     public static final int RECIPETYPESLOT_3X3=10;
     public static final int RECIPEBACKSLOT_6X6=0;
@@ -174,126 +123,61 @@ public class MenuUtils {
     public static final int[] RECIPEOUT_3X3=new int[]{7,16,25};
     public static final int[] RECIPESLOT_6x6=new int[]{1,2,3,4,5,6,10,11,12,13,14,15,19,20,21,22,23,24,28,29,30,31,32,33,37,38,39,40,41,42,46,47,48,49,50,51};
     public static final int[] RECIPEOUTPUT_6X6=new int[]{35,44,53};
-    public interface RecipeMenuConstructor{
-        public MenuFactory construct(ItemStack icon, MachineRecipe recipe , CustomMenuHandler backhandler, PlayerHistoryRecord<CustomMenu> history);
+    public static MenuFactory createItemRecipeDisplay(SlimefunItem item,@Nullable CustomMenuHandler backHandler){
+        return createMRecipeDisplay(item.getRecipeType().toItem(),new MachineRecipe(-1,item.getRecipe(),new ItemStack[]{item.getRecipeOutput()}),backHandler,null);
     }
-    public static MenuFactory createMRecipeListDisplay(ItemStack machine, List<MachineRecipe> machineRecipes, @Nullable CustomMenuHandler backHandler){
-        return createMRecipeListDisplay(machine,machineRecipes,backHandler,null,MenuUtils::createMRecipeDisplay);
+    public static MenuFactory createItemRecipeDisplay(SlimefunItem item,@Nullable CustomMenuHandler backHandler,PlayerHistoryRecord<CustomMenu> history){
+        return createMRecipeDisplay(item.getRecipeType().toItem(),new MachineRecipe(-1,item.getRecipe(),new ItemStack[]{item.getRecipeOutput()}),backHandler,history);
     }
-    public static MenuFactory createMRecipeListDisplay(ItemStack machine, List<MachineRecipe> machineRecipes, @Nullable CustomMenuHandler backHandler,PlayerHistoryRecord<CustomMenu> history){
-        return createMRecipeListDisplay(machine,machineRecipes,backHandler,history,MenuUtils::createMRecipeDisplay);
+    public static MenuFactory createMachineListDisplay(List<SlimefunItem> machineTypes,CustomMenuHandler backHandler){
+        return createMachineListDisplay(machineTypes,backHandler,null);
     }
-    public static MenuFactory createMRecipeListDisplay(ItemStack machine, List<MachineRecipe> machineRecipes, @Nullable CustomMenuHandler backHandler,RecipeMenuConstructor constructor){
-        return createMRecipeListDisplay(machine,machineRecipes,backHandler,null,constructor);
-    }
-    public static MenuFactory createMRecipeListDisplay(ItemStack machine, List<MachineRecipe> machineRecipes, @Nullable CustomMenuHandler backHandler,PlayerHistoryRecord<CustomMenu> history,RecipeMenuConstructor constructor){
-        return  createMRecipeListDisplay(machine,machineRecipes,backHandler,history,constructor,false);
-    }
-    public static MenuFactory createMRecipeListDisplay(ItemStack machine, List<MachineRecipe> machineRecipes, @Nullable CustomMenuHandler backHandler,PlayerHistoryRecord<CustomMenu> history,RecipeMenuConstructor constructor,boolean withoutId){
-
-        int RecipeSize = machineRecipes.size();
+    public static MenuFactory createMachineListDisplay(List<SlimefunItem> machineTypes,CustomMenuHandler backHandler,PlayerHistoryRecord<CustomMenu> history){
+        HashMap<SlimefunItem,List<MachineRecipe>> map=RecipeSupporter.MACHINE_RECIPELIST;
+        int RecipeSize =0;
+        for(SlimefunItem entry:machineTypes){
+            if(map.containsKey(entry)){
+                RecipeSize++;
+            }
+        }
         int pageContent=36;
         int pageNum=(1+(RecipeSize-1)/pageContent);
-        ItemStack displayMachine;
-        if(machine!=null){
-            displayMachine=AddUtils.addLore(machine,"&8机器配方显示");
-        }else{
-            displayMachine=NO_ITEM;
-        }
-        MenuFactory a=new MenuFactory(SIMPLE_MENU,ItemStackHelper.getDisplayName(machine),pageNum){
+
+        MenuFactory a=new MenuFactory(SIMPLE_MENU,AddUtils.colorful("识别机器类型大赏"),pageNum){
             public void init(){
                 setDefaultNPSlots();
             }
-        }.addOverrides(7,displayMachine);
-        a.setGuideModHistory(history);
+        }.addOverrides(7, SlimefunGuide.getItem(SlimefunGuide.getDefaultMode())).setGuideModHistory(history);
+
         a.setBack(1);
         if(backHandler!=null){
             a.setBackHandler(backHandler);
         }else{
-            a.setBackHandler(CustomMenuHandler.from(CLOSE_HANDLER));
+            a.setBackHandler(CustomMenuHandler.from( CLOSE_HANDLER));
         }
-        for(int i=0;i<RecipeSize;i++){
-            MachineRecipe recipe=machineRecipes.get(i);
-            int pageNow=(1+(i)/pageContent);
-            if(recipe.getOutput().length>0){
-                a.addInventory(i,withoutId? AddUtils.getWithoutId(recipe.getOutput()[0]):recipe.getOutput()[0]);
+        int i=0;
+        for(SlimefunItem entry:machineTypes){
+            if(!map.containsKey(entry)){
+                continue;
             }
-            else{
-                a.addInventory(i,withoutId? AddUtils.getWithoutId( NO_ITEM):NO_ITEM);
+            int currentPage=(1+(i)/pageContent);
+            a.addInventory(i,entry.getItem());
+            List<MachineRecipe> recipe=map.get(entry);
+            if(recipe==null){
+                a.addHandler(i,((player, i1, itemStack, clickAction) -> {
+                    player.sendMessage(ChatColors.color("&e该机器类型无法识别,暂不支持查看"));
+                    return false;
+                }));
+            }else{
+                final List<MachineRecipe> machineRecipes=recipe;
+                a.addHandler(i,(cm)-> (player, i1, itemStack, clickAction) -> {
+                    createMRecipeListDisplay(entry.getItem(),machineRecipes,cm.getOpenThisHandler(currentPage)).build().open(player);
+                    return false;
+                });
             }
-            a.addHandler(i,(cm)-> (player, i1, itemStack, clickAction) -> {
-                constructor.construct(machine,recipe,cm.getOpenThisHandler(pageNow),history).build().open(player);
-                return false;
-            });
+            ++i;
         }
         return a;
-    }
-    private static String getAmountDisplay(ItemStack stack){
-        if(stack instanceof RandAmountStack rand){
-            return "%d~%d".formatted(rand.getMin(),rand.getMax());
-        }
-        else{
-            return "x"+stack.getAmount();
-        }
-
-    }
-
-    private static ItemStack getDisplayItem(ItemStack it){
-        if(it==null||it.getType().isAir())return null;
-        ItemStack finalStack;
-        if(it instanceof RandomItemStack||it instanceof ProbItemStack){
-            List<ItemStack> list=((MultiItemStack)it).getItemStacks();
-            List<String> namelist=new ArrayList<>(){{
-                add("");
-                add("&3随机物品输出~");
-
-                List<Double> wlist=((MultiItemStack)it).getWeight(1.0);
-                int len=list.size();
-                for(int i=0;i<len;i++){
-                    add(AddUtils.concat(  "&f",
-                            ItemStackHelper.getDisplayName(list.get(i)),
-                            " &e",getAmountDisplay(list.get(i)),
-                            " 概率: ",AddUtils.getPercentFormat(wlist.get(i))) );
-                }
-            }};
-            //如果是proItemStack就获得其实例 因为不能整一个air出来
-            ItemStack sample=list.get(0);
-            if(sample.getType().isAir())return null;
-            finalStack= AddUtils.addLore(sample,namelist.toArray(new String[namelist.size()]));
-        }else if(it instanceof EquivalItemStack){
-            List<ItemStack> list=((EquivalItemStack)it).getItemStacks();
-            List<String> namelist=new ArrayList<>(){{
-                add("");
-                add("&3等价物品输入~");
-                int len=list.size();
-                for(int i=0;i<len;i++){
-                    add(AddUtils.concat(  "&f",
-                            ItemStackHelper.getDisplayName(list.get(i)),
-                            " ",getAmountDisplay(list.get(i))) );
-                }
-            }};
-            ItemStack sample=list.get(0);
-            if(sample.getType().isAir())return null;
-            finalStack= AddUtils.addLore(sample,namelist.toArray(new String[namelist.size()]));
-        }
-        else if(it instanceof RandAmountStack){
-            finalStack=AddUtils.addLore(new ItemStack(it),AddUtils.concat("&e随机数量: ",getAmountDisplay(it)));
-        }else{
-            finalStack=it;
-        }
-        //防止因为意外出现的air 指
-        if(finalStack.getType().isAir()){
-            ItemMeta meta=finalStack.getItemMeta();
-            finalStack=NO_ITEM.clone();
-            finalStack.setItemMeta(meta);
-        }
-        if(finalStack.getAmount()>64){
-            finalStack=AddUtils.addLore(finalStack, "&c数量: "+finalStack.getAmount());
-        }else if(finalStack.getAmount()<=0){
-            finalStack=AddUtils.addLore(finalStack, "&c数量: "+finalStack.getAmount());
-            finalStack.setAmount(1);
-        }
-        return finalStack;
     }
     public static MenuFactory createMRecipeDisplay(ItemStack machine,MachineRecipe recipe,@Nullable CustomMenuHandler backHandler){
         return createMRecipeDisplay(machine,recipe,backHandler,null);
@@ -395,11 +279,56 @@ public class MenuUtils {
         }
 
     }
-    public static MenuFactory createItemRecipeDisplay(SlimefunItem item,@Nullable CustomMenuHandler backHandler,PlayerHistoryRecord<CustomMenu> history){
-        return createMRecipeDisplay(item.getRecipeType().toItem(),new MachineRecipe(-1,item.getRecipe(),new ItemStack[]{item.getRecipeOutput()}),backHandler,history);
+    public static MenuFactory createMRecipeListDisplay(ItemStack machine, List<MachineRecipe> machineRecipes, @Nullable CustomMenuHandler backHandler){
+        return createMRecipeListDisplay(machine,machineRecipes,backHandler,null,MenuUtils::createMRecipeDisplay);
     }
-    public static MenuFactory createItemRecipeDisplay(SlimefunItem item,@Nullable CustomMenuHandler backHandler){
-        return createMRecipeDisplay(item.getRecipeType().toItem(),new MachineRecipe(-1,item.getRecipe(),new ItemStack[]{item.getRecipeOutput()}),backHandler,null);
+    public static MenuFactory createMRecipeListDisplay(ItemStack machine, List<MachineRecipe> machineRecipes, @Nullable CustomMenuHandler backHandler,PlayerHistoryRecord<CustomMenu> history){
+        return createMRecipeListDisplay(machine,machineRecipes,backHandler,history,MenuUtils::createMRecipeDisplay);
+    }
+    public static MenuFactory createMRecipeListDisplay(ItemStack machine, List<MachineRecipe> machineRecipes, @Nullable CustomMenuHandler backHandler,PlayerHistoryRecord<CustomMenu> history,RecipeMenuConstructor constructor){
+        return  createMRecipeListDisplay(machine,machineRecipes,backHandler,history,constructor,false);
+    }
+    public static MenuFactory createMRecipeListDisplay(ItemStack machine, List<MachineRecipe> machineRecipes, @Nullable CustomMenuHandler backHandler,PlayerHistoryRecord<CustomMenu> history,RecipeMenuConstructor constructor,boolean withoutId){
+
+        int RecipeSize = machineRecipes.size();
+        int pageContent=36;
+        int pageNum=(1+(RecipeSize-1)/pageContent);
+        ItemStack displayMachine;
+        if(machine!=null){
+            displayMachine=AddUtils.addLore(machine,"&8机器配方显示");
+        }else{
+            displayMachine=NO_ITEM;
+        }
+        MenuFactory a=new MenuFactory(SIMPLE_MENU,ItemStackHelper.getDisplayName(machine),pageNum){
+            public void init(){
+                setDefaultNPSlots();
+            }
+        }.addOverrides(7,displayMachine);
+        a.setGuideModHistory(history);
+        a.setBack(1);
+        if(backHandler!=null){
+            a.setBackHandler(backHandler);
+        }else{
+            a.setBackHandler(CustomMenuHandler.from(CLOSE_HANDLER));
+        }
+        for(int i=0;i<RecipeSize;i++){
+            MachineRecipe recipe=machineRecipes.get(i);
+            int pageNow=(1+(i)/pageContent);
+            if(recipe.getOutput().length>0){
+                a.addInventory(i,withoutId? AddUtils.getWithoutId(recipe.getOutput()[0]):recipe.getOutput()[0]);
+            }
+            else{
+                a.addInventory(i,withoutId? AddUtils.getWithoutId( NO_ITEM):NO_ITEM);
+            }
+            a.addHandler(i,(cm)-> (player, i1, itemStack, clickAction) -> {
+                constructor.construct(machine,recipe,cm.getOpenThisHandler(pageNow),history).build().open(player);
+                return false;
+            });
+        }
+        return a;
+    }
+    public static MenuFactory createMRecipeListDisplay(ItemStack machine, List<MachineRecipe> machineRecipes, @Nullable CustomMenuHandler backHandler,RecipeMenuConstructor constructor){
+        return createMRecipeListDisplay(machine,machineRecipes,backHandler,null,constructor);
     }
 
     /**
@@ -463,55 +392,124 @@ public class MenuUtils {
         }
         return a;
     }
-    public static MenuFactory createMachineListDisplay(List<SlimefunItem> machineTypes,CustomMenuHandler backHandler){
-        return createMachineListDisplay(machineTypes,backHandler,null);
+    private static String getAmountDisplay(ItemStack stack){
+        if(stack instanceof RandAmountStack rand){
+            return "%d~%d".formatted(rand.getMin(),rand.getMax());
+        }
+        else{
+            return "x"+stack.getAmount();
+        }
+
     }
-    public static MenuFactory createMachineListDisplay(List<SlimefunItem> machineTypes,CustomMenuHandler backHandler,PlayerHistoryRecord<CustomMenu> history){
-        HashMap<SlimefunItem,List<MachineRecipe>> map=RecipeSupporter.MACHINE_RECIPELIST;
-        int RecipeSize =0;
-        for(SlimefunItem entry:machineTypes){
-            if(map.containsKey(entry)){
-                RecipeSize++;
-            }
+    public static ItemStack getBackButton( String... lore) {
+        return new CustomItemStack(BACK_BUTTON, "&7⇦ " +"返回", lore);
+    }
+//clickType of InventoryClickEvnet
+// 左键
+//    LEFT,
+    //shift左键
+//    SHIFT_LEFT,
+    //右键
+    private static ItemStack getDisplayItem(ItemStack it){
+        if(it==null||it.getType().isAir())return null;
+        ItemStack finalStack;
+        if(it instanceof RandomItemStack||it instanceof ProbItemStack){
+            List<ItemStack> list=((MultiItemStack)it).getItemStacks();
+            List<String> namelist=new ArrayList<>(){{
+                add("");
+                add("&3随机物品输出~");
+
+                List<Double> wlist=((MultiItemStack)it).getWeight(1.0);
+                int len=list.size();
+                for(int i=0;i<len;i++){
+                    add(AddUtils.concat(  "&f",
+                            ItemStackHelper.getDisplayName(list.get(i)),
+                            " &e",getAmountDisplay(list.get(i)),
+                            " 概率: ",AddUtils.getPercentFormat(wlist.get(i))) );
+                }
+            }};
+            //如果是proItemStack就获得其实例 因为不能整一个air出来
+            ItemStack sample=list.get(0);
+            if(sample.getType().isAir())return null;
+            finalStack= AddUtils.addLore(sample,namelist.toArray(new String[namelist.size()]));
+        }else if(it instanceof EquivalItemStack){
+            List<ItemStack> list=((EquivalItemStack)it).getItemStacks();
+            List<String> namelist=new ArrayList<>(){{
+                add("");
+                add("&3等价物品输入~");
+                int len=list.size();
+                for(int i=0;i<len;i++){
+                    add(AddUtils.concat(  "&f",
+                            ItemStackHelper.getDisplayName(list.get(i)),
+                            " ",getAmountDisplay(list.get(i))) );
+                }
+            }};
+            ItemStack sample=list.get(0);
+            if(sample.getType().isAir())return null;
+            finalStack= AddUtils.addLore(sample,namelist.toArray(new String[namelist.size()]));
         }
-        int pageContent=36;
-        int pageNum=(1+(RecipeSize-1)/pageContent);
-
-        MenuFactory a=new MenuFactory(SIMPLE_MENU,AddUtils.colorful("识别机器类型大赏"),pageNum){
-            public void init(){
-                setDefaultNPSlots();
-            }
-        }.addOverrides(7, SlimefunGuide.getItem(SlimefunGuide.getDefaultMode())).setGuideModHistory(history);
-
-        a.setBack(1);
-        if(backHandler!=null){
-            a.setBackHandler(backHandler);
+        else if(it instanceof RandAmountStack){
+            finalStack=AddUtils.addLore(new ItemStack(it),AddUtils.concat("&e随机数量: ",getAmountDisplay(it)));
         }else{
-            a.setBackHandler(CustomMenuHandler.from( CLOSE_HANDLER));
+            finalStack=it;
         }
-        int i=0;
-        for(SlimefunItem entry:machineTypes){
-            if(!map.containsKey(entry)){
-                continue;
-            }
-            int currentPage=(1+(i)/pageContent);
-            a.addInventory(i,entry.getItem());
-            List<MachineRecipe> recipe=map.get(entry);
-            if(recipe==null){
-                a.addHandler(i,((player, i1, itemStack, clickAction) -> {
-                    player.sendMessage(ChatColors.color("&e该机器类型无法识别,暂不支持查看"));
-                    return false;
-                }));
-            }else{
-                final List<MachineRecipe> machineRecipes=recipe;
-                a.addHandler(i,(cm)-> (player, i1, itemStack, clickAction) -> {
-                    createMRecipeListDisplay(entry.getItem(),machineRecipes,cm.getOpenThisHandler(currentPage)).build().open(player);
-                    return false;
-                });
-            }
-            ++i;
+        //防止因为意外出现的air 指
+        if(finalStack.getType().isAir()){
+            ItemMeta meta=finalStack.getItemMeta();
+            finalStack=NO_ITEM.clone();
+            finalStack.setItemMeta(meta);
         }
-        return a;
+        if(finalStack.getAmount()>64){
+            finalStack=AddUtils.addLore(finalStack, "&c数量: "+finalStack.getAmount());
+        }else if(finalStack.getAmount()<=0){
+            finalStack=AddUtils.addLore(finalStack, "&c数量: "+finalStack.getAmount());
+            finalStack.setAmount(1);
+        }
+        return finalStack;
+    }
+
+    public static ItemStack getNextButton( int page, int pages) {
+        return pages != 1 && page != pages ? new CustomItemStack(NEXT_BUTTON_ACTIVE, (meta) -> {
+            ChatColor var10001 = ChatColor.WHITE;
+            meta.setDisplayName("" + var10001 + "下一页" + " ⇨");
+            meta.setLore(Arrays.asList("", ChatColor.GRAY + "(" + page + " / " + pages + ")"));
+        }) : new CustomItemStack(NEXT_BUTTON_INACTIVE, (meta) -> {
+            ChatColor var10001 = ChatColor.DARK_GRAY;
+            meta.setDisplayName("" + var10001 + "下一页" + " ⇨");
+            meta.setLore(Arrays.asList("", ChatColor.GRAY + "(" + page + " / " + pages + ")"));
+        });
+    }
+    public static ItemStack getPreviousButton(int page, int pages) {
+        return pages != 1 && page != 1 ? new CustomItemStack(PREV_BUTTON_ACTIVE, (meta) -> {
+            ChatColor var10001 = ChatColor.WHITE;
+            meta.setDisplayName("" + var10001 + "⇦ " + "上一页");
+            meta.setLore(Arrays.asList("", ChatColor.GRAY + "(" + page + " / " + pages + ")"));
+        }) : new CustomItemStack(PREV_BUTTON_INACTIVE, (meta) -> {
+            ChatColor var10001 = ChatColor.DARK_GRAY;
+            meta.setDisplayName("" + var10001 + "⇦ " +"上一页");
+            meta.setLore(Arrays.asList("", ChatColor.GRAY + "(" + page + " / " + pages + ")"));
+        });
+    }
+    /**
+     * change the object in the slot to a different object ,in order to trigger save at this slot when server down ,
+     * will return the ref to the current object in the slot
+     * @return
+     */
+    public static ItemStack syncSlot(BlockMenu inv ,int slot){
+        ItemStack item = inv.getItemInSlot(slot);
+        return syncSlot(inv,slot,item);
+    }
+    /**
+     * change the object in the slot to a different object ,in order to trigger save at this slot when server down ,
+     * will return the ref to the current object in the slot
+     * @return
+     */
+    public static ItemStack syncSlot(BlockMenu inv ,int slot, ItemStack item){
+        if(item instanceof AbstractItemStack){
+            item=item.clone();
+        }
+        inv.replaceExistingItem(slot, item,false);
+        return inv.getItemInSlot(slot);
     }
     public BlockMenu createBlockMenuFromChest(Block b){
         //new BlockMenu()

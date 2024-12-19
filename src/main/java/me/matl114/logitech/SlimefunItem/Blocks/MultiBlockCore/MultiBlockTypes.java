@@ -1,17 +1,15 @@
 package me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore;
 
+import java.util.HashSet;
+
+import org.bukkit.Material;
+
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockType;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.CubeMultiBlock.CubeMultiBlockType;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiLevelBlock.MultiLevelBlockType;
-import org.bukkit.Material;
-
-import java.util.HashSet;
 
 public class MultiBlockTypes {
-    public static void setup(){
-
-    }
     public static final MultiBlockType PORTAL_TYPE=new MultiBlockType() {
         public void  init(){
             addBlock(0,0,0,"portal.core");
@@ -378,4 +376,7 @@ public class MultiBlockTypes {
         materials.add(Material.CHAIN);
         addAll(materials);
     }};
+    public static void setup(){
+
+    }
 }

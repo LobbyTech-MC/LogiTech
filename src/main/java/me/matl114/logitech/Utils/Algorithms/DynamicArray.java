@@ -16,11 +16,12 @@ public class DynamicArray<T> extends AbstractList<T> implements List<T> {
         this.func=indexer;
         this.maxinum=-1;
     }
-    public int size(){
-        return size;
-    }
-    public boolean isEmpty(){
-        return size==0;
+    public void applyPresent(Consumer<T> action){
+        for(int i=0;i<size;i++){
+            if(array[i]!=null){
+                action.accept(array[i]);
+            }
+        }
     }
     public T get(int index){
         if(index<0 || index>=size){
@@ -37,10 +38,6 @@ public class DynamicArray<T> extends AbstractList<T> implements List<T> {
             return array[index];
         }
     }
-    public T[] getResult(){
-        return array;
-    }
-
     /**
      * used in array sequencial visiting
      * @return
@@ -48,11 +45,14 @@ public class DynamicArray<T> extends AbstractList<T> implements List<T> {
     public int getMaxVisitedIndex(){
         return maxinum;
     }
-    public void applyPresent(Consumer<T> action){
-        for(int i=0;i<size;i++){
-            if(array[i]!=null){
-                action.accept(array[i]);
-            }
-        }
+    public T[] getResult(){
+        return array;
+    }
+
+    public boolean isEmpty(){
+        return size==0;
+    }
+    public int size(){
+        return size;
     }
 }

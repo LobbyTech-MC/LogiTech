@@ -32,15 +32,15 @@ public abstract class AbstractSyncTickCargo extends AbstractBlock implements Syn
     public AbstractSyncTickCargo(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
+    public abstract void constructMenu(BlockMenuPreset preset);
     public abstract int[] getInputSlots();
     public abstract int[] getOutputSlots();
-    public abstract void constructMenu(BlockMenuPreset preset);
     public abstract void newMenuInstance(BlockMenu menu,Block b);
-    public abstract void updateMenu(BlockMenu blockMenu, Block block, Settings mod);
-    public abstract void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount);
     public void preRegister(){
         super.preRegister();
         this.registerBlockMenu(this);
         this.handleBlock(this);
     }
+    public abstract void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount);
+    public abstract void updateMenu(BlockMenu blockMenu, Block block, Settings mod);
 }

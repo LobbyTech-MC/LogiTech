@@ -87,13 +87,46 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
             getCraftTypes();
         });
     }
-    public ItemStack getProgressBar(){
-        return this.progressbar;
+    public List<ItemStack> _getDisplayRecipes(){
+        return new ArrayList<>(){{
+            HashMap<SlimefunItem,RecipeType> providedRecipeTypeMap=getRecipeTypeMap();
+            if(providedRecipeTypeMap!=null&&!providedRecipeTypeMap.isEmpty()){
+                for(Map.Entry<SlimefunItem,RecipeType> e: providedRecipeTypeMap.entrySet()){
+                    if(BW_LIST.contains(e.getValue())){
+                        continue;
+                    }
+                    add(AddUtils.getInfoShow("&f支持的机器","&7将机器插入指定槽位以进行合成"));
+                    add(new DisplayItemStack(e.getKey().getItem()));
+                }
+            }
+        }};
+    }
+    public void constructMenu(BlockMenuPreset preset) {
+        //空白背景 禁止点击
+
+        //输入槽边框
+        int[] border = BORDER_SLOT;
+        int len = border.length;
+        for(int var4 = 0; var4 <len; ++var4) {
+            preset.addItem(border[var4], ChestMenuUtils.getInputSlotTexture(), ChestMenuUtils.getEmptyClickHandler());
+        }
+        border = BORDER;
+        len =border.length;
+        for(int var4 = 0; var4 < len; ++var4) {
+            preset.addItem(border[var4], ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler());
+        }
+        preset.addItem(21,MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
+        preset.addItem(23,MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
+        border = RECIPE_DISPLAY;
+        len = border.length;
+        //emptyhandler
+        for(int var4 = 0; var4 < len; ++var4) {
+            preset.addMenuClickHandler(border[var4], ChestMenuUtils.getEmptyClickHandler());
+        }
     }
     public int getCraftLimit(Block b,BlockMenu inv){
         return 64;
     }
-    public abstract HashMap<SlimefunItem,RecipeType> getRecipeTypeMap();
     public RecipeType[] getCraftTypes(){
         if(craftType==null){
             HashMap<SlimefunItem,RecipeType> types=getRecipeTypeMap();
@@ -123,53 +156,11 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
     public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public void constructMenu(BlockMenuPreset preset) {
-        //空白背景 禁止点击
+    public ItemStack getProgressBar(){
+        return this.progressbar;
+    }
+    public abstract HashMap<SlimefunItem,RecipeType> getRecipeTypeMap();
 
-        //输入槽边框
-        int[] border = BORDER_SLOT;
-        int len = border.length;
-        for(int var4 = 0; var4 <len; ++var4) {
-            preset.addItem(border[var4], ChestMenuUtils.getInputSlotTexture(), ChestMenuUtils.getEmptyClickHandler());
-        }
-        border = BORDER;
-        len =border.length;
-        for(int var4 = 0; var4 < len; ++var4) {
-            preset.addItem(border[var4], ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler());
-        }
-        preset.addItem(21,MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
-        preset.addItem(23,MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
-        border = RECIPE_DISPLAY;
-        len = border.length;
-        //emptyhandler
-        for(int var4 = 0; var4 < len; ++var4) {
-            preset.addMenuClickHandler(border[var4], ChestMenuUtils.getEmptyClickHandler());
-        }
-    }
-    public void newMenuInstance(BlockMenu menu, Block block){
-        menu.replaceExistingItem(PARSE_SLOT,PARSE_ITEM);
-        menu.addMenuClickHandler(PARSE_SLOT,(player, i, itemStack, clickAction)->{
-            parseRecipe(menu);
-            updateMenu(menu,block, Settings.RUN);
-            return false;
-        });
-        menu.addMenuOpeningHandler((player -> {
-            parseRecipe(menu);
-            updateMenu(menu,block,Settings.RUN);
-        }));
-        menu.addMenuCloseHandler((player -> {
-            parseRecipe(menu);
-            updateMenu(menu,block,Settings.RUN);
-        }));
-        updateMenu(menu,block,Settings.INIT);
-    }
-
-    public void onBreak(BlockBreakEvent e, BlockMenu menu){
-        super.onBreak(e, menu);
-        Location loc=menu.getLocation();
-        menu.dropItems(loc,RECIPEITEM_SLOT);
-        menu.dropItems(loc,MACHINEITEM_SLOT);
-    }
     public MachineRecipe getRecordRecipe(SlimefunBlockData data){
         int index= MultiCraftType.getRecipeTypeIndex(data);
         if(index>=0){
@@ -188,6 +179,70 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
             }
         }
         return null;
+    }
+    @Override
+    public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
+        return new int[0];
+    }
+    @Override
+    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
+        if (flow == ItemTransportFlow.WITHDRAW) return getOutputSlots();
+        int [] inputSlots=getInputSlots();
+        if(item==null||item.getType().isAir()||(!(menu instanceof BlockMenu)))return inputSlots;
+        SlimefunBlockData data = DataCache.safeLoadBlock(((BlockMenu)menu).getLocation());
+        if(data==null){
+            return inputSlots;
+        }
+        MachineRecipe now=getRecordRecipe(data);
+        if(now==null){
+            return new int[0];
+        }
+        int craftlimit=1;
+        int amountLimit=0;
+        int maxStack=item.getMaxStackSize();
+        ItemStack[] recipeInput=now.getInput();
+        for (int i=0;i<recipeInput.length;++i){
+            if(recipeInput[i].getType()==item.getType()&&recipeInput[i].hasItemMeta()==item.hasItemMeta()){
+                amountLimit+=Math.max(recipeInput[i].getAmount()*craftlimit,maxStack);
+            }
+        }
+        // Check the current amount
+        int itemAmount = 0;
+        for (int slot : getInputSlots()) {
+            ItemStack itemInSlot = menu.getItemInSlot(slot);
+            if(itemInSlot==null)continue;
+            if (itemInSlot.getType()==item.getType()&&itemInSlot.hasItemMeta()==item.hasItemMeta()) {
+                itemAmount+=itemInSlot.getAmount();
+                // Amount has reached the limited, just return.
+                if(itemAmount>=amountLimit){
+                    return new int[0];
+                }
+            }
+        }
+        return inputSlots;
+    }
+    public void newMenuInstance(BlockMenu menu, Block block){
+        menu.replaceExistingItem(PARSE_SLOT,PARSE_ITEM);
+        menu.addMenuClickHandler(PARSE_SLOT,(player, i, itemStack, clickAction)->{
+            parseRecipe(menu);
+            updateMenu(menu,block, Settings.RUN);
+            return false;
+        });
+        menu.addMenuOpeningHandler((player -> {
+            parseRecipe(menu);
+            updateMenu(menu,block,Settings.RUN);
+        }));
+        menu.addMenuCloseHandler((player -> {
+            parseRecipe(menu);
+            updateMenu(menu,block,Settings.RUN);
+        }));
+        updateMenu(menu,block,Settings.INIT);
+    }
+    public void onBreak(BlockBreakEvent e, BlockMenu menu){
+        super.onBreak(e, menu);
+        Location loc=menu.getLocation();
+        menu.dropItems(loc,RECIPEITEM_SLOT);
+        menu.dropItems(loc,MACHINEITEM_SLOT);
     }
     public boolean parseRecipe(BlockMenu menu){
         ItemStack machine=menu.getItemInSlot(MACHINEITEM_SLOT);
@@ -224,31 +279,7 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
             return false;
         }
     }
-    public void updateMenu(BlockMenu menu,Block block,Settings mod){
-        SlimefunBlockData data=DataCache.safeLoadBlock(menu.getLocation());
-        if(data==null){
-            Schedules.launchSchedules(()->{
-                updateMenu(menu,block,mod);
-            },20,false,0);
-            return;
-        }
-        MachineRecipe recipe=getRecordRecipe(data);
-        if(recipe==null){
-            for(int var4 = 0; var4 < RECIPE_DISPLAY.length; ++var4) {
-                menu.replaceExistingItem(RECIPE_DISPLAY[var4],DISPLAY_DEFAULT_BKGROUND);
-            }
-        }else{
-            ItemStack[] input ;
-            input =recipe.getInput();
 
-            int len=Math.min(RECIPE_DISPLAY.length,input.length);
-            for(int var4 = 0; var4 < len; ++var4) {
-                menu.replaceExistingItem(RECIPE_DISPLAY[var4], RecipeDisplay.addRecipeInfo(input[var4],Settings.INPUT,var4,1.0,0));
-            }
-            for(int var4 = len; var4 < RECIPE_DISPLAY.length; ++var4) {
-                menu.replaceExistingItem(RECIPE_DISPLAY[var4],DISPLAY_BKGROUND);
-            } }
-    }
     public void process(Block b, BlockMenu inv, SlimefunBlockData data){
 
         SimpleCraftingOperation currentOperation = this.processor.getOperation(b);
@@ -315,61 +346,30 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
             currentOperation.progress(1);
         }
     }
-    @Override
-    public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
-        return new int[0];
-    }
-
-    @Override
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
-        if (flow == ItemTransportFlow.WITHDRAW) return getOutputSlots();
-        int [] inputSlots=getInputSlots();
-        if(item==null||item.getType().isAir()||(!(menu instanceof BlockMenu)))return inputSlots;
-        SlimefunBlockData data = DataCache.safeLoadBlock(((BlockMenu)menu).getLocation());
+    public void updateMenu(BlockMenu menu,Block block,Settings mod){
+        SlimefunBlockData data=DataCache.safeLoadBlock(menu.getLocation());
         if(data==null){
-            return inputSlots;
+            Schedules.launchSchedules(()->{
+                updateMenu(menu,block,mod);
+            },20,false,0);
+            return;
         }
-        MachineRecipe now=getRecordRecipe(data);
-        if(now==null){
-            return new int[0];
-        }
-        int craftlimit=1;
-        int amountLimit=0;
-        int maxStack=item.getMaxStackSize();
-        ItemStack[] recipeInput=now.getInput();
-        for (int i=0;i<recipeInput.length;++i){
-            if(recipeInput[i].getType()==item.getType()&&recipeInput[i].hasItemMeta()==item.hasItemMeta()){
-                amountLimit+=Math.max(recipeInput[i].getAmount()*craftlimit,maxStack);
+        MachineRecipe recipe=getRecordRecipe(data);
+        if(recipe==null){
+            for(int var4 = 0; var4 < RECIPE_DISPLAY.length; ++var4) {
+                menu.replaceExistingItem(RECIPE_DISPLAY[var4],DISPLAY_DEFAULT_BKGROUND);
             }
-        }
-        // Check the current amount
-        int itemAmount = 0;
-        for (int slot : getInputSlots()) {
-            ItemStack itemInSlot = menu.getItemInSlot(slot);
-            if(itemInSlot==null)continue;
-            if (itemInSlot.getType()==item.getType()&&itemInSlot.hasItemMeta()==item.hasItemMeta()) {
-                itemAmount+=itemInSlot.getAmount();
-                // Amount has reached the limited, just return.
-                if(itemAmount>=amountLimit){
-                    return new int[0];
-                }
+        }else{
+            ItemStack[] input ;
+            input =recipe.getInput();
+
+            int len=Math.min(RECIPE_DISPLAY.length,input.length);
+            for(int var4 = 0; var4 < len; ++var4) {
+                menu.replaceExistingItem(RECIPE_DISPLAY[var4], RecipeDisplay.addRecipeInfo(input[var4],Settings.INPUT,var4,1.0,0));
             }
-        }
-        return inputSlots;
-    }
-    public List<ItemStack> _getDisplayRecipes(){
-        return new ArrayList<>(){{
-            HashMap<SlimefunItem,RecipeType> providedRecipeTypeMap=getRecipeTypeMap();
-            if(providedRecipeTypeMap!=null&&!providedRecipeTypeMap.isEmpty()){
-                for(Map.Entry<SlimefunItem,RecipeType> e: providedRecipeTypeMap.entrySet()){
-                    if(BW_LIST.contains(e.getValue())){
-                        continue;
-                    }
-                    add(AddUtils.getInfoShow("&f支持的机器","&7将机器插入指定槽位以进行合成"));
-                    add(new DisplayItemStack(e.getKey().getItem()));
-                }
-            }
-        }};
+            for(int var4 = len; var4 < RECIPE_DISPLAY.length; ++var4) {
+                menu.replaceExistingItem(RECIPE_DISPLAY[var4],DISPLAY_BKGROUND);
+            } }
     }
 
 

@@ -32,24 +32,21 @@ import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiLevelBlock.Multi
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiLevelBlock.MultiLevelBlockType;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-
-import javax.xml.crypto.Data;
-import java.util.HashMap;
 
 public class FinalAltarCore  extends MultiCore {
-    protected static final String LVL_KEY="lv";
     public interface FinalAltarChargable{
         public static String FORCE_STATE="fi";
-        default int getForced(SlimefunBlockData data){
-            return  DataCache.getCustomData(data,FORCE_STATE,0);
+        static void clearForced(Location loc){
+            SlimefunItem it=DataCache.getSfItem(loc);
+            if(it instanceof FinalAltarChargable fac){
+                DataCache.setCustomData(loc,FORCE_STATE,0);
+            }
         }
         static void setForced(SlimefunBlockData data,int lvl){
             DataCache.setCustomString(data,FORCE_STATE,String.valueOf(lvl));
+        }
+        default int getForced(SlimefunBlockData data){
+            return  DataCache.getCustomData(data,FORCE_STATE,0);
         }
         default int mayForced(SlimefunBlockData data){
             //TODO 完成多方块结构 完成多级激活模式
@@ -70,14 +67,9 @@ public class FinalAltarCore  extends MultiCore {
             }
             return 0;
         }
-        static void clearForced(Location loc){
-            SlimefunItem it=DataCache.getSfItem(loc);
-            if(it instanceof FinalAltarChargable fac){
-                DataCache.setCustomData(loc,FORCE_STATE,0);
-            }
-        }
     }
     //TODO set force level when mulitblock broke down
+    protected static final String LVL_KEY="lv";
 
     protected final int[] BORDER=new int[]{0,1,2,3,5,6,7};
     protected final int HOLOGRAM_SLOT=8;
@@ -97,28 +89,6 @@ public class FinalAltarCore  extends MultiCore {
         put("final.frame", AddItem.FINAL_FRAME.clone());
         put("final.base", AddItem.FINAL_BASE.clone());
     }};
-    public int[] getInputSlots(){
-        return new int[0];
-    }
-    public int[] getOutputSlots(){
-        return new int[0];
-    }
-    public FinalAltarCore(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType,
-                      ItemStack[] recipe, String blockId){
-        super(itemGroup, item, recipeType, recipe, blockId);
-        this.MBTYPE = MultiBlockTypes.FINAL_ALTAR;
-        this.setDisplayRecipes(Utils.list(
-           AddUtils.getInfoShow("&f机制 - &c多级多方块机器",
-                   "&7终极祭坛拥有两个等级",
-                   "&7其中,贰级终极祭坛需要在壹级终极祭坛上增加额外的多方块结构",
-                   "&7两者的构造在内置的投影中均可查看",
-                   "&7当你需要在壹,贰级终极祭坛切换时,请关闭多方块并重启,或者尝试点击刷新祭坛按钮")
-        ));
-        this.setAutoBuildDefault(false);
-    }
-    public MultiLevelBlockType getMultiBlockType(){
-        return MBTYPE;
-    }
     public MultiBlockService.MultiBlockBuilder BUILDER=( (core, type, uid) -> {
         int previouslevel=DataCache.getCustomData(core,LVL_KEY,0);
         AbstractMultiBlock block=type;
@@ -135,10 +105,19 @@ public class FinalAltarCore  extends MultiCore {
         DataCache.setCustomData(core,LVL_KEY,level);
         return blockHandler;
     });
-    public MultiBlockService.MultiBlockBuilder getBuilder(){
-        return BUILDER;
+    public FinalAltarCore(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType,
+                      ItemStack[] recipe, String blockId){
+        super(itemGroup, item, recipeType, recipe, blockId);
+        this.MBTYPE = MultiBlockTypes.FINAL_ALTAR;
+        this.setDisplayRecipes(Utils.list(
+           AddUtils.getInfoShow("&f机制 - &c多级多方块机器",
+                   "&7终极祭坛拥有两个等级",
+                   "&7其中,贰级终极祭坛需要在壹级终极祭坛上增加额外的多方块结构",
+                   "&7两者的构造在内置的投影中均可查看",
+                   "&7当你需要在壹,贰级终极祭坛切换时,请关闭多方块并重启,或者尝试点击刷新祭坛按钮")
+        ));
+        this.setAutoBuildDefault(false);
     }
-
     public void constructMenu(BlockMenuPreset inv) {
         int[] border = BORDER;
         int len = border.length;
@@ -147,44 +126,18 @@ public class FinalAltarCore  extends MultiCore {
         }
         inv.addItem(HOLOGRAM_SLOT, HOLOGRAM_ITEM_OFF);
     }
-    public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
-        super.onMultiBlockDisable(loc,handler,cause);
-        //这里也要清除,lvl数据 防止上面重新读取回来
-        DataCache.setCustomString(loc,LVL_KEY,"0");
-        //要设置上面的机器,清除里面的force level数据
-        Location poweredLoc =loc.clone().add(0,1,0);
-        FinalAltarChargable.clearForced(poweredLoc);
-        BlockMenu inv= DataCache.getMenu(loc);
-        if(inv!=null){
-            inv.replaceExistingItem(STATUS_SLOT,STATUS_ITEM_OFF);
-        }
+    public MultiBlockService.MultiBlockBuilder getBuilder(){
+        return BUILDER;
     }
-    public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
-        super.onMultiBlockEnable(loc,handler);
-        BlockMenu inv= DataCache.getMenu(loc);
-        if(inv!=null){
-            updateMenu(inv,loc.getBlock(),Settings.RUN);
-        }
-
+    public int[] getInputSlots(){
+        return new int[0];
     }
-    public void updateMenu(BlockMenu inv, Block block, Settings mod){
-        int holoStatus=DataCache.getCustomData(inv.getLocation(),MultiBlockService.getHologramKey(),0);
-        if(holoStatus==0){
-            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_OFF);
+    public MultiLevelBlockType getMultiBlockType(){
+        return MBTYPE;
+    }
 
-        }else if(holoStatus==1){
-            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_ON);
-
-        }else{
-            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_ON_2);
-        }
-        int status=MultiBlockService.getStatus(inv.getLocation());
-        if(status!=0){
-            int code=DataCache.getCustomData(inv.getLocation(),LVL_KEY,0);
-            inv.replaceExistingItem(STATUS_SLOT,code==1? STATUS_ITEM_ON_1:STATUS_ITEM_ON_2);
-        }else {
-            inv.replaceExistingItem(STATUS_SLOT,STATUS_ITEM_OFF);
-        }
+    public int[] getOutputSlots(){
+        return new int[0];
     }
     public void newMenuInstance(BlockMenu inv, Block block){
         Location loc2=block.getLocation();
@@ -242,6 +195,29 @@ public class FinalAltarCore  extends MultiCore {
         }));
         updateMenu(inv,block,Settings.RUN);
     }
+    public void onBreak(BlockBreakEvent e, BlockMenu inv){
+        super.onBreak(e,inv);
+    }
+    public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
+        super.onMultiBlockDisable(loc,handler,cause);
+        //这里也要清除,lvl数据 防止上面重新读取回来
+        DataCache.setCustomString(loc,LVL_KEY,"0");
+        //要设置上面的机器,清除里面的force level数据
+        Location poweredLoc =loc.clone().add(0,1,0);
+        FinalAltarChargable.clearForced(poweredLoc);
+        BlockMenu inv= DataCache.getMenu(loc);
+        if(inv!=null){
+            inv.replaceExistingItem(STATUS_SLOT,STATUS_ITEM_OFF);
+        }
+    }
+    public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
+        super.onMultiBlockEnable(loc,handler);
+        BlockMenu inv= DataCache.getMenu(loc);
+        if(inv!=null){
+            updateMenu(inv,loc.getBlock(),Settings.RUN);
+        }
+
+    }
 
     public void processCore(Block b, BlockMenu menu){
         if(menu.hasViewer()){
@@ -249,8 +225,24 @@ public class FinalAltarCore  extends MultiCore {
         }
     }
 
-    public void onBreak(BlockBreakEvent e, BlockMenu inv){
-        super.onBreak(e,inv);
+    public void updateMenu(BlockMenu inv, Block block, Settings mod){
+        int holoStatus=DataCache.getCustomData(inv.getLocation(),MultiBlockService.getHologramKey(),0);
+        if(holoStatus==0){
+            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_OFF);
+
+        }else if(holoStatus==1){
+            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_ON);
+
+        }else{
+            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_ON_2);
+        }
+        int status=MultiBlockService.getStatus(inv.getLocation());
+        if(status!=0){
+            int code=DataCache.getCustomData(inv.getLocation(),LVL_KEY,0);
+            inv.replaceExistingItem(STATUS_SLOT,code==1? STATUS_ITEM_ON_1:STATUS_ITEM_ON_2);
+        }else {
+            inv.replaceExistingItem(STATUS_SLOT,STATUS_ITEM_OFF);
+        }
     }
 
 

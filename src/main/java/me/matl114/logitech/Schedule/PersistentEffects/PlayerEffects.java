@@ -7,6 +7,14 @@ import org.bukkit.entity.Player;
 import me.matl114.logitech.Schedule.ScheduleEffects;
 
 public class PlayerEffects {
+    public static void grantEffect(AbstractEffect type, Player p, int level, int time){
+        PlayerEffects eff = new PlayerEffects(type,time,level);
+        ScheduleEffects.addEffect(p,eff);
+    }
+    public static void grantEffect(AbstractEffect type, Player p, int level, int time, Function<Player,Boolean> predicate){
+        PlayerEffects eff = new PlayerEffects(type,time,level);
+        ScheduleEffects.addEffect(p,eff,predicate);
+    }
     public final AbstractEffect TYPE;
     public int duration;
     public int level;
@@ -17,23 +25,32 @@ public class PlayerEffects {
         this.level = level;
         this.pendingMove = false;
     }
-    public final boolean isFinished(){
-        return duration <= 0 || this.pendingMove;
+    public void end(Player p){
+        TYPE.removeEffect(p,level);
+        this.pendingMove = true;
+    }
+    public void extend(PlayerEffects eff){
+
+        this.duration=eff.duration;
+        this.level=eff.level;
     }
     public final void finish(){
         this.duration=0;
     }
+    public String getEffectId(){
+        return TYPE.getEffectId();
+    }
+    public int getLeftTime(){
+        return duration;
+    }
+    public AbstractEffect getType(){
+        return TYPE;
+    }
     public final void halt(){
         this.pendingMove=true;
     }
-    public void tick(Player p){
-
-        duration--;
-        TYPE.tickEffect(p,level);
-    }
-    public void end(Player p){
-        TYPE.removeEffect(p,level);
-        this.pendingMove = true;
+    public final boolean isFinished(){
+        return duration <= 0 || this.pendingMove;
     }
     public boolean isPendingMove(){
         return pendingMove;
@@ -41,27 +58,10 @@ public class PlayerEffects {
     public void start(Player p){
         TYPE.aquireEffect(p,level);
     }
-    public AbstractEffect getType(){
-        return TYPE;
-    }
-    public String getEffectId(){
-        return TYPE.getEffectId();
-    }
-    public void extend(PlayerEffects eff){
+    public void tick(Player p){
 
-        this.duration=eff.duration;
-        this.level=eff.level;
-    }
-    public int getLeftTime(){
-        return duration;
-    }
-    public static void grantEffect(AbstractEffect type, Player p, int level, int time, Function<Player,Boolean> predicate){
-        PlayerEffects eff = new PlayerEffects(type,time,level);
-        ScheduleEffects.addEffect(p,eff,predicate);
-    }
-    public static void grantEffect(AbstractEffect type, Player p, int level, int time){
-        PlayerEffects eff = new PlayerEffects(type,time,level);
-        ScheduleEffects.addEffect(p,eff);
+        duration--;
+        TYPE.tickEffect(p,level);
     }
 
 }

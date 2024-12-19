@@ -4,7 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public class ItemReplacerPusher extends ItemPusher{
-    ItemStack source;
     private static ItemReplacerPusher INSTANCE=new ItemReplacerPusher(new ItemStack(Material.STONE),new ItemStack(Material.STONE));
     public static ItemPusher get(ItemStack source,ItemStack data){
         if(source!=null && data!=null){
@@ -13,19 +12,20 @@ public class ItemReplacerPusher extends ItemPusher{
             return ItemPusher.get(source);
         }
     }
+    ItemStack source;
     protected ItemReplacerPusher(ItemStack replacer,ItemStack replacement){
         super(replacement);
         this.source =replacer;
 
+    }
+    //修复了setFrom存储时覆写maxSize的问题
+    public void setFrom(ItemCounter source){
+        super.setFrom(source);
     }
     public void updateItemStack(){
         if(isDirty()){
             source.setAmount(cnt);
         }
         super.updateItemStack();
-    }
-    //修复了setFrom存储时覆写maxSize的问题
-    public void setFrom(ItemCounter source){
-        super.setFrom(source);
     }
 }

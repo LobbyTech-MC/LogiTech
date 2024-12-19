@@ -19,6 +19,7 @@ import me.matl114.logitech.Utils.Utils;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 public class RedstoneAdjacentCargo extends AdjacentCargo {
+    public String POWERED_KEY="po";
     public RedstoneAdjacentCargo (ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, List<ItemStack> displayList) {
         super(itemGroup, item, recipeType, recipe, displayList);
         setDisplayRecipes(
@@ -39,7 +40,6 @@ public class RedstoneAdjacentCargo extends AdjacentCargo {
                 )
         );
     }
-    public String POWERED_KEY="po";
     public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
 
         if(DataCache.getCustomData(data,POWERED_KEY,0)!=0){

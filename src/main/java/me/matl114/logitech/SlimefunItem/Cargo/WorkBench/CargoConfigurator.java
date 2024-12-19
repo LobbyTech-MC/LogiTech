@@ -86,13 +86,6 @@ public class CargoConfigurator extends AbstractBlock {
     public CargoConfigurator(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
-    public int[] getConfigureSlots(){
-        return CONFIG_SLOTS;
-    }
-    public int getConfigCardSlot(){
-        return OUTPUT_SLOT;
-    }
-
     public void constructMenu(BlockMenuPreset preset){
         int[] slot=BORDER;
         int len=slot.length;
@@ -166,6 +159,13 @@ public class CargoConfigurator extends AbstractBlock {
         }
         AddUtils.sendMessage(player,"&c配置失败,请放入货运配置卡");
         return false;
+    }
+
+    public int getConfigCardSlot(){
+        return OUTPUT_SLOT;
+    }
+    public int[] getConfigureSlots(){
+        return CONFIG_SLOTS;
     }
     public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuOpeningHandler(player -> {

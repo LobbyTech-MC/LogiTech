@@ -48,15 +48,9 @@ public abstract class AbstractSequenceProcessor extends AbstractMachine implemen
     };
     protected final int[] INPUT_SLOT=new int[]{19};
     protected final int[] OUTPUT_SLOT=new int[]{25};
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public  int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
-
     protected final ItemStack progressbar;
     protected final MachineProcessor<SequenceCraftingOperation> processor;
+
     protected int PROCESSOR_SLOT=22;
     protected int INFO_SLOT=13;
     protected int CLEAN_SLOT=31;
@@ -87,12 +81,6 @@ public abstract class AbstractSequenceProcessor extends AbstractMachine implemen
             this.machineRecipes=new ArrayList<>();
         }
     }
-    public MachineProcessor<SequenceCraftingOperation> getMachineProcessor() {
-        return this.processor;
-    }
-    public ItemStack getProgressBar(){
-        return this.progressbar;
-    }
     public void constructMenu(BlockMenuPreset preset){
         //空白背景 禁止点击
         int[] border = BORDER;
@@ -119,6 +107,18 @@ public abstract class AbstractSequenceProcessor extends AbstractMachine implemen
         preset.addItem(PROCESSOR_SLOT, MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(INFO_SLOT,INFO_ITEM,ChestMenuUtils.getEmptyClickHandler());
     }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public MachineProcessor<SequenceCraftingOperation> getMachineProcessor() {
+        return this.processor;
+    }
+    public  int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public ItemStack getProgressBar(){
+        return this.progressbar;
+    }
     public void newMenuInstance(BlockMenu inv,Block b){
         int clean=DataCache.getCustomData(inv.getLocation(),"clean",0);
         inv.replaceExistingItem(CLEAN_SLOT,CLEAN_ITEM[clean]);
@@ -128,6 +128,10 @@ public abstract class AbstractSequenceProcessor extends AbstractMachine implemen
             DataCache.setCustomData(inv.getLocation(),"clean",cleanCode);
             return false;
         }));
+    }
+    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+        super.onBreak(e,menu);
+        AbstractSequenceProcessor.this.processor.endOperation(menu.getLocation());
     }
     public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         SequenceCraftingOperation currentOperation = (SequenceCraftingOperation)this.processor.getOperation(b);
@@ -191,10 +195,6 @@ public abstract class AbstractSequenceProcessor extends AbstractMachine implemen
                 }//记得保证这玩意先于getDisplay 否则会数组越界
 
         }
-    }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
-        super.onBreak(e,menu);
-        AbstractSequenceProcessor.this.processor.endOperation(menu.getLocation());
     }
 
 

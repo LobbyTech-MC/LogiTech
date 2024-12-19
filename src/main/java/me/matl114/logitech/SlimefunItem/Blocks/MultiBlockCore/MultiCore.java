@@ -1,5 +1,6 @@
 package me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,12 +14,11 @@ import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.AbstractMultiBlockType;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
 
 public abstract class MultiCore extends MultiPart implements MultiBlockCore {
 
+    @Setter
+    protected boolean autoBuildDefault=true;
     public MultiCore(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType,
                      ItemStack[] recipe, String blockId){
         super(itemGroup, item, recipeType, recipe, blockId);
@@ -26,8 +26,22 @@ public abstract class MultiCore extends MultiPart implements MultiBlockCore {
     }
     public abstract MultiBlockService.MultiBlockBuilder getBuilder();
     public abstract AbstractMultiBlockType getMultiBlockType();
-    @Setter
-    protected boolean autoBuildDefault=true;
+    public boolean isSync(){
+        return false;
+    }
+    public boolean preCondition(Block b,BlockMenu inv,SlimefunBlockData data){
+        return true;
+    }
+    public void preRegister(){
+        this.registerBlockMenu(this);
+        this.registerTick(this);
+    }
+    public void processCore(Block b, BlockMenu menu){
+        //doing nothing
+    }
+    public boolean redirectMenu(){
+        return false;
+    }
     public final void tick(Block b, BlockMenu menu,SlimefunBlockData data, int tickCount){
         //in this case .blockMenu is null?
         Location loc=b.getLocation();
@@ -43,21 +57,5 @@ public abstract class MultiCore extends MultiPart implements MultiBlockCore {
             }
         }
         process(b,menu,data);
-    }
-    public boolean preCondition(Block b,BlockMenu inv,SlimefunBlockData data){
-        return true;
-    }
-    public boolean redirectMenu(){
-        return false;
-    }
-    public void processCore(Block b, BlockMenu menu){
-        //doing nothing
-    }
-    public void preRegister(){
-        this.registerBlockMenu(this);
-        this.registerTick(this);
-    }
-    public boolean isSync(){
-        return false;
     }
 }

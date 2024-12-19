@@ -15,14 +15,14 @@ public class FIrstCustomItem extends DistinctiveCustomItemStack {
         super(itemGroup, item, recipeType, recipe);
     }
 
+    private void onItemUseRightClick(PlayerRightClickEvent event) {
+        event.getPlayer().giveExpLevels(1);
+        event.getPlayer().setItemInHand(AddItem.MATL114.clone());
+    }
     @Override
     public void preRegister(){
         super.preRegister();
         addItemHandler((ItemUseHandler)this::onItemUseRightClick);
-    }
-    private void onItemUseRightClick(PlayerRightClickEvent event) {
-        event.getPlayer().giveExpLevels(1);
-        event.getPlayer().setItemInHand(AddItem.MATL114.clone());
     }
 
 }

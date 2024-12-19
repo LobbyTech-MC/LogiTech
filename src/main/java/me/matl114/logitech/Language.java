@@ -16,12 +16,12 @@ public class Language {
     public static final HashMap<String ,Object> LANGUAGE=new HashMap<>(){{
     }};
     public static final HashMap<String,String> PLACEHOLDERS=new HashMap<>();
-    public static HashMap<String ,Object> getLanguage() {
-        return LANGUAGE;
-    }
     public static String get(String key){
         String s=(String)getLanguage().get(key);
         return s!=null?s:key;
+    }
+    public static HashMap<String ,Object> getLanguage() {
+        return LANGUAGE;
     }
     public static List<String> getList(String key){
         List<String > ls= (List<String>) getLanguage().get(key);
@@ -29,16 +29,6 @@ public class Language {
     }
     public static String getPlaceHolder(String key){
         return PLACEHOLDERS.get("%%%s%%".formatted(key));
-    }
-    public static Object replacePlaceHolder(Object val){
-        if(val instanceof String s){
-            for(Map.Entry<String,String> entry:PLACEHOLDERS.entrySet()){
-                s=s.replace(entry.getKey(),entry.getValue());
-            }
-            return s;
-        }else if(val instanceof List<?> lst){
-            return lst.stream().map(Language::replacePlaceHolder).toList();
-        }else return val;
     }
     public static boolean loadConfig(Config cfg){
         Set<String> placeHolders=cfg.getKeys("placeholder");
@@ -73,5 +63,15 @@ public class Language {
                 loadRecursively(config,nextPath);
             }
         }
+    }
+    public static Object replacePlaceHolder(Object val){
+        if(val instanceof String s){
+            for(Map.Entry<String,String> entry:PLACEHOLDERS.entrySet()){
+                s=s.replace(entry.getKey(),entry.getValue());
+            }
+            return s;
+        }else if(val instanceof List<?> lst){
+            return lst.stream().map(Language::replacePlaceHolder).toList();
+        }else return val;
     }
 }

@@ -14,61 +14,53 @@ import org.bukkit.material.MaterialData;
 public class HandledItemStack extends ItemStack {
     public ItemStack handle;
     public ItemMeta handleMeta;
-    private ItemMeta createItemMeta(){
-        handleMeta = handle.getItemMeta();
-        return handleMeta;
-    }
     public HandledItemStack(ItemStack itemStack) {
         super();
         this.handle = itemStack;
     }
-    @Nullable
-    public ItemMeta getItemMeta() {
-        return this.handleMeta==null?createItemMeta():this.handleMeta;
+    public void addEnchantment(Enchantment ench, int level) {
+        this.handle.addEnchantment(ench, level);
+    }
+    public void addEnchantments( Map<Enchantment, Integer> enchantments) {
+        this.handle.addEnchantments(enchantments);
+
     }
 
-    public boolean hasItemMeta() {
-        return handle.hasItemMeta();
+    public void addUnsafeEnchantment( Enchantment ench, int level) {
+        this.handle.addUnsafeEnchantment(ench, level);
     }
 
-    public boolean setItemMeta(@Nullable ItemMeta itemMeta) {
+    public void addUnsafeEnchantments( Map<Enchantment, Integer> enchantments) {
+        this.handle.addUnsafeEnchantments(enchantments);
 
-        this.handleMeta = itemMeta;
-        return true;
     }
 
 
 
-    public Material getType() {
-        return this.handle.getType();
+    public ItemStack clone() {
+        return this.handle.clone();
     }
 
-    public void setType( Material type) {
-        this.handle.setType(type);
+    public boolean containsEnchantment( Enchantment ench) {
+        return this.handle.containsEnchantment(ench);
+    }
+
+    private ItemMeta createItemMeta(){
+        handleMeta = handle.getItemMeta();
+        return handleMeta;
+    }
+
+    public boolean equals(Object obj) {
+        return this.handle.equals(obj);
     }
 
     public int getAmount() {
         return this.handle.getAmount();
     }
 
-    public void setAmount(int amount) {
-        this.handle.setAmount(amount);
-    }
-
     @Nullable
     public MaterialData getData() {
         return this.handle.getData();
-    }
-
-    public void setData(@Nullable MaterialData data) {
-        this.handle.setData(data);
-    }
-
-    /** @deprecated */
-    @Deprecated
-    public void setDurability(short durability) {
-       this.handle.setDurability(durability);
-
     }
 
     /** @deprecated */
@@ -77,62 +69,45 @@ public class HandledItemStack extends ItemStack {
         return   this.handle.getDurability();
     }
 
+    public int getEnchantmentLevel( Enchantment ench) {
+        return this.handle.getEnchantmentLevel(ench);
+    }
+
+    public Map<Enchantment, Integer> getEnchantments() {
+        return this.handle.getEnchantments();
+    }
+
+
+
+    @Nullable
+    public ItemMeta getItemMeta() {
+        return this.handleMeta==null?createItemMeta():this.handleMeta;
+    }
+
     public int getMaxStackSize() {
         return this.handle.getMaxStackSize();
     }
 
-
-
-    public String toString() {
-        return this.handle.toString();
+    public String getTranslationKey() {
+        return Bukkit.getUnsafe().getTranslationKey(this);
     }
 
-    public boolean equals(Object obj) {
-        return this.handle.equals(obj);
-    }
-
-    public boolean isSimilar(@Nullable ItemStack stack) {
-        return this.handle.isSimilar(stack);
-    }
-
-    public ItemStack clone() {
-        return this.handle.clone();
+    public Material getType() {
+        return this.handle.getType();
     }
 
     public int hashCode() {
         return this.handle.hashCode();
     }
 
-    public boolean containsEnchantment( Enchantment ench) {
-        return this.handle.containsEnchantment(ench);
+    public boolean hasItemMeta() {
+        return handle.hasItemMeta();
     }
 
-    public int getEnchantmentLevel( Enchantment ench) {
-        return this.handle.getEnchantmentLevel(ench);
+    public boolean isSimilar(@Nullable ItemStack stack) {
+        return this.handle.isSimilar(stack);
     }
 
-
-    public Map<Enchantment, Integer> getEnchantments() {
-        return this.handle.getEnchantments();
-    }
-
-    public void addEnchantments( Map<Enchantment, Integer> enchantments) {
-        this.handle.addEnchantments(enchantments);
-
-    }
-
-    public void addEnchantment(Enchantment ench, int level) {
-        this.handle.addEnchantment(ench, level);
-    }
-
-    public void addUnsafeEnchantments( Map<Enchantment, Integer> enchantments) {
-        this.handle.addUnsafeEnchantments(enchantments);
-
-    }
-
-    public void addUnsafeEnchantment( Enchantment ench, int level) {
-        this.handle.addUnsafeEnchantment(ench, level);
-    }
 
     public int removeEnchantment( Enchantment ench) {
         return this.handle.removeEnchantment(ench);
@@ -146,11 +121,36 @@ public class HandledItemStack extends ItemStack {
         return this.handle.serialize();
     }
 
+    public void setAmount(int amount) {
+        this.handle.setAmount(amount);
+    }
+
+    public void setData(@Nullable MaterialData data) {
+        this.handle.setData(data);
+    }
+
+    /** @deprecated */
+    @Deprecated
+    public void setDurability(short durability) {
+       this.handle.setDurability(durability);
+
+    }
+
+    public boolean setItemMeta(@Nullable ItemMeta itemMeta) {
+
+        this.handleMeta = itemMeta;
+        return true;
+    }
+
+    public void setType( Material type) {
+        this.handle.setType(type);
+    }
 
 
 
 
-    public String getTranslationKey() {
-        return Bukkit.getUnsafe().getTranslationKey(this);
+
+    public String toString() {
+        return this.handle.toString();
     }
 }

@@ -14,12 +14,12 @@ import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.attributes.DistinctiveItem;
 
 public abstract class DistinctiveCustomItemStack extends CustomSlimefunItem implements DistinctiveItem {
-    public DistinctiveCustomItemStack(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, List<ItemStack> displayInfo) {
-        super(itemGroup, item, recipeType, recipe, displayInfo);
-    }
-
     public DistinctiveCustomItemStack(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
+    }
+
+    public DistinctiveCustomItemStack(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, List<ItemStack> displayInfo) {
+        super(itemGroup, item, recipeType, recipe, displayInfo);
     }
     public boolean canStack(@Nonnull ItemMeta var1, @Nonnull ItemMeta var2){
 

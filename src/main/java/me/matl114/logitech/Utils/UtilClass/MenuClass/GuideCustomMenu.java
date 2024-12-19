@@ -9,6 +9,9 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
  * CustomMenu that can record history
  */
 public class GuideCustomMenu extends CustomMenu {
+    private boolean useHistory;
+
+    private PlayerHistoryRecord<CustomMenu> history;
     public GuideCustomMenu(String title,int size, int menulens,MenuFactory factory){
         super(title,size,menulens,factory);
         this.useHistory=true;
@@ -19,13 +22,19 @@ public class GuideCustomMenu extends CustomMenu {
             return ChestMenuUtils.getEmptyClickHandler().onClick(player,i,itemStack,clickAction);
         });
     }
-
-    private boolean useHistory;
-    public CustomMenu setUseHistory(boolean useHistory){
-        this.useHistory = useHistory;
-        return this;
+    public void openPages(Player p,int page){
+        if(useHistory&&history!= null){
+//            CustomMenu menu= history.getRecord(p);
+//            if(menu!=null){
+//                ChestMenu historyMenu=menu.constructPage(menu.lastpage);
+//                historyMenu.open(p);
+//                return;
+//            }
+            history.addRecord(p,this);
+        }
+        ChestMenu menu=constructPage(page);
+        menu.open(p);
     }
-    private PlayerHistoryRecord<CustomMenu> history;
     public CustomMenu setBackHandler(ChestMenu.MenuClickHandler handler){
         ChestMenu.MenuClickHandler han =handler==null? ChestMenuUtils.getEmptyClickHandler():handler;
         this.backHandlers=((player, i, itemStack, clickAction) -> {
@@ -40,17 +49,8 @@ public class GuideCustomMenu extends CustomMenu {
         this.history=history;
         return this;
     }
-    public void openPages(Player p,int page){
-        if(useHistory&&history!= null){
-//            CustomMenu menu= history.getRecord(p);
-//            if(menu!=null){
-//                ChestMenu historyMenu=menu.constructPage(menu.lastpage);
-//                historyMenu.open(p);
-//                return;
-//            }
-            history.addRecord(p,this);
-        }
-        ChestMenu menu=constructPage(page);
-        menu.open(p);
+    public CustomMenu setUseHistory(boolean useHistory){
+        this.useHistory = useHistory;
+        return this;
     }
 }

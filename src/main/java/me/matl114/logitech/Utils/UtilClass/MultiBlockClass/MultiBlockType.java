@@ -25,32 +25,32 @@ public abstract class MultiBlockType implements AbstractMultiBlockType {
     protected boolean isSymmetric=false;
 
 
-    public abstract void init();
     public MultiBlockType() {
         this.STRUCTURE_MAP = new LinkedHashMap<BlockVector,String>();
         this.REQUIREMENT_MAP=new LinkedHashMap<>();
     }
-    public BlockVector[] getStructurePos() {
-        return STRUCTURE_LOC;
+    public MultiBlockType addBlock(int x, int y, int z,String id) {
+        if(x==0 && y==0 && z==0){
+            return this;
+        }
+        STRUCTURE_MAP.put(new BlockVector(x,y,z),id);
+        return this;
     }
-    public BlockVector getSchemaPart(int index){
-        return STRUCTURE_LOC[index].clone();
-    }
-    public int getSchemaSize() {
-        return size;
-    }
-    public int getRequirementSize() {return sizeR;}
-    public String getRequirementPartId(int index) {return REQUIREMENT_IDS[index];}
-    public BlockVector getRequirementPart(int index) {return REQUIREMENT_LOC[index].clone();}
-
-    public String[] getStructureIds() {
-        return STRUCTURE_IDS;
-    }
-    public String getSchemaPartId(int index) {
-        return STRUCTURE_IDS[index];
-    }
-    public boolean isSymmetric(){
-        return isSymmetric;
+    /**
+     * used in check multiblock from ,only when first setup(hasPrevRecord=false)
+     * keep some place with air, so that some block can be generated
+     * @param x
+     * @param y
+     * @param z
+     * @param id
+     * @return
+     */
+    public MultiBlockType addRequirement(int x, int y, int z, String id) {
+        if(x==0 && y==0 && z==0){
+            return this;
+        }
+        REQUIREMENT_MAP.put(new BlockVector(x,y,z),id);
+        return this;
     }
     public MultiBlockType build(){
         init();
@@ -77,30 +77,6 @@ public abstract class MultiBlockType implements AbstractMultiBlockType {
         this.STRUCTURE_MAP.clear();
         this.REQUIREMENT_MAP=null;
         this.STRUCTURE_MAP=null;
-        return this;
-    }
-    public MultiBlockType addBlock(int x, int y, int z,String id) {
-        if(x==0 && y==0 && z==0){
-            return this;
-        }
-        STRUCTURE_MAP.put(new BlockVector(x,y,z),id);
-        return this;
-    }
-
-    /**
-     * used in check multiblock from ,only when first setup(hasPrevRecord=false)
-     * keep some place with air, so that some block can be generated
-     * @param x
-     * @param y
-     * @param z
-     * @param id
-     * @return
-     */
-    public MultiBlockType addRequirement(int x, int y, int z, String id) {
-        if(x==0 && y==0 && z==0){
-            return this;
-        }
-        REQUIREMENT_MAP.put(new BlockVector(x,y,z),id);
         return this;
     }
     public AbstractMultiBlock genMultiBlockFrom(Location loc, MultiBlockService.Direction dir, boolean hasPrevRecord, OutputStream errorOut){
@@ -147,5 +123,29 @@ public abstract class MultiBlockType implements AbstractMultiBlockType {
         }
       //  Debug.logger("check finished ,return value ",this.getSchemaSize(),"and req ",REQUIREMENT_MAP.size());
         return new MultiBlock(this,dir);
+    }
+    public BlockVector getRequirementPart(int index) {return REQUIREMENT_LOC[index].clone();}
+    public String getRequirementPartId(int index) {return REQUIREMENT_IDS[index];}
+    public int getRequirementSize() {return sizeR;}
+
+    public BlockVector getSchemaPart(int index){
+        return STRUCTURE_LOC[index].clone();
+    }
+    public String getSchemaPartId(int index) {
+        return STRUCTURE_IDS[index];
+    }
+    public int getSchemaSize() {
+        return size;
+    }
+    public String[] getStructureIds() {
+        return STRUCTURE_IDS;
+    }
+    public BlockVector[] getStructurePos() {
+        return STRUCTURE_LOC;
+    }
+
+    public abstract void init();
+    public boolean isSymmetric(){
+        return isSymmetric;
     }
 }

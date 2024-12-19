@@ -23,29 +23,14 @@ public class InputPort extends AbstractIOPort {
     protected static final int[] BORDER=new int[]{
             34,43,52
     };
-    public int getDisplaySlot(){
-        return 25;
-    }
-    public int getStorageSlot(){
-        return 16;
-    }
     protected static int INFO_SLOT=7;
-
     public InputPort(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(category, item, recipeType, recipe);
     }
-
-    @Override
-    public int[] getInputSlots() {
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
-
     public  void addInfo(ItemStack item){
 
     }
+
     public  void constructMenu(BlockMenuPreset preset){
         //空白背景 禁止点击
         int[] border = BORDER;
@@ -58,5 +43,20 @@ public class InputPort extends AbstractIOPort {
         preset.addItem(getDisplaySlot(), ITEM_DISPLAY_NULL, ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(INFO_SLOT, INFO_ITEM, ChestMenuUtils.getEmptyClickHandler());
         preset.setSize(54);
+    }
+
+    public int getDisplaySlot(){
+        return 25;
+    }
+    @Override
+    public int[] getInputSlots() {
+        return INPUT_SLOT;
+    }
+
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public int getStorageSlot(){
+        return 16;
     }
 }

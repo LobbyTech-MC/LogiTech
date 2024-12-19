@@ -18,15 +18,11 @@ public class LocationStorageProxy extends ItemStorageCache{
         this.location = location;
         this.lastStorageAmount=((LocationProxy)storageType).getAmount(location);
     }
+    public Location getProxyLocation(){
+        return location;
+    }
     public boolean isDirty(){
         return lock||dirty;
-    }
-    public void updateStorage(){
-        //这里是代理存储 并不是唯一修改源
-        //需要刷新一下并加上用当前记录-历史记录 的东西
-        int delta=((LocationProxy)storageType).getAmount(location)-this.lastStorageAmount;
-        ((LocationProxy)storageType).setAmount(location, Math.min(getMaxStackCnt(), MathUtils.safeAdd(getStorageAmount(),delta)));
-        ((LocationProxy)storageType).updateLocation(location);
     }
     public void updateMenu(@Nonnull BlockMenu menu){
         if (getItem()!=null&&!getItem().getType().isAir()){
@@ -35,7 +31,11 @@ public class LocationStorageProxy extends ItemStorageCache{
         }
         dirty=false;
     }
-    public Location getProxyLocation(){
-        return location;
+    public void updateStorage(){
+        //这里是代理存储 并不是唯一修改源
+        //需要刷新一下并加上用当前记录-历史记录 的东西
+        int delta=((LocationProxy)storageType).getAmount(location)-this.lastStorageAmount;
+        ((LocationProxy)storageType).setAmount(location, Math.min(getMaxStackCnt(), MathUtils.safeAdd(getStorageAmount(),delta)));
+        ((LocationProxy)storageType).updateLocation(location);
     }
 }

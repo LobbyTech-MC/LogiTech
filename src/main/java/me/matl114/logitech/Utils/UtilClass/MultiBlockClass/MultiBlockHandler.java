@@ -11,19 +11,6 @@ import me.matl114.logitech.Utils.DataCache;
 
 public class MultiBlockHandler  implements AbstractMultiBlockHandler {
 
-    private final AbstractMultiBlock STRUCTURE_TYPE;
-    public final Location CORE;
-    private boolean active = false;
-    private final int size;
-    public final  String uid;
-    public MultiBlockService.DeleteCause lastDeleteCause=MultiBlockService.GENERIC;
-    private MultiBlockHandler(AbstractMultiBlock block, Location core,String uid) {
-        this.STRUCTURE_TYPE =block;
-        this.CORE=core;
-        this.uid=uid;
-        this.size=block.getStructureSize();
-    }
-
     public static AbstractMultiBlockHandler createHandler( Location core,AbstractMultiBlock type,String uid) {
         //check
         MultiBlockHandler multiBlockHandler = new MultiBlockHandler(type, core, uid);
@@ -51,35 +38,39 @@ public class MultiBlockHandler  implements AbstractMultiBlockHandler {
         }
         return multiBlockHandler;
     }
-    public AbstractMultiBlock getMultiBlock(){
-        return STRUCTURE_TYPE;
-    }
-    public Location getCore() {
-        return CORE.clone();
-    }
-    public MultiBlockService.Direction getDirection(){
-        return this.STRUCTURE_TYPE.getDirection();
-    }
-    public int getSize(){
-        return size;
-    }
-    public String getUid() {
-        return uid;
-    }
-    public boolean isActive(){
-        return active;
-    }
-    public void toggleOff(MultiBlockService.DeleteCause cause){
+    private final AbstractMultiBlock STRUCTURE_TYPE;
+    public final Location CORE;
+    private boolean active = false;
+    private final int size;
+    public final  String uid;
+    public MultiBlockService.DeleteCause lastDeleteCause=MultiBlockService.GENERIC;
 
-        this.lastDeleteCause=cause;
-        this.active=false;
+    protected Random rand=new Random();
+    private MultiBlockHandler(AbstractMultiBlock block, Location core,String uid) {
+        this.STRUCTURE_TYPE =block;
+        this.CORE=core;
+        this.uid=uid;
+        this.size=block.getStructureSize();
     }
-    public MultiBlockHandler setDeleteCause(MultiBlockService.DeleteCause deleteCause){
-        this.lastDeleteCause=deleteCause;
-        return this;
+    /**
+     * should tell if this is active and complete,then the service will called handler.destroy if not
+     * @return
+     */
+    public boolean acceptCoreRequest(){
+        return checkIfOnline();
+
     }
-    public MultiBlockService.DeleteCause getLastDeleteCause(){
-        return lastDeleteCause;
+    public void acceptPartRequest(Location loc){
+        if(this.active){
+//            int index=getPartIndex(loc);
+//            if(index>=0){
+//
+//            }
+        }else {
+            //multiblock被关闭 被抛出但是有part恰好响应了，则手动关掉part
+            MultiBlockService.setStatus(loc,0);
+            MultiBlockService.setUUID(loc,"null");
+        }
     }
     /**
      * try match given place as core with multiblock schema
@@ -99,7 +90,6 @@ public class MultiBlockHandler  implements AbstractMultiBlockHandler {
         }
         return -1;
     }
-    protected Random rand=new Random();
     public int checkIfCompleteRandom(){
         int len=this.size;
         int checkChance=10;//随机选取1/10的方块检测
@@ -117,37 +107,10 @@ public class MultiBlockHandler  implements AbstractMultiBlockHandler {
         }
         return -1;
     }
-    public void acceptPartRequest(Location loc){
-        if(this.active){
-//            int index=getPartIndex(loc);
-//            if(index>=0){
-//
-//            }
-        }else {
-            //multiblock被关闭 被抛出但是有part恰好响应了，则手动关掉part
-            MultiBlockService.setStatus(loc,0);
-            MultiBlockService.setUUID(loc,"null");
-        }
-    }
-
-    /**
-     * should tell if this is active and complete,then the service will called handler.destroy if not
-     * @return
-     */
-    public boolean acceptCoreRequest(){
-        return checkIfOnline();
-
-    }
     public boolean checkIfOnline(){
 
         return this.active;
     }
-
-    public Location getBlockLoc(int index){
-        Vector delta=STRUCTURE_TYPE.getStructurePart(index);
-        return this.CORE.clone().add(delta);
-    }
-
     /**
      * this method should called onMultiBlockDisable for CORE and reset blockdata!
      */
@@ -168,6 +131,43 @@ public class MultiBlockHandler  implements AbstractMultiBlockHandler {
                 MultiBlockService.setStatus(loc,0);
             }
         }
+    }
+    public Location getBlockLoc(int index){
+        Vector delta=STRUCTURE_TYPE.getStructurePart(index);
+        return this.CORE.clone().add(delta);
+    }
+    public Location getCore() {
+        return CORE.clone();
+    }
+    public MultiBlockService.Direction getDirection(){
+        return this.STRUCTURE_TYPE.getDirection();
+    }
+    public MultiBlockService.DeleteCause getLastDeleteCause(){
+        return lastDeleteCause;
+    }
+    public AbstractMultiBlock getMultiBlock(){
+        return STRUCTURE_TYPE;
+    }
+    public int getSize(){
+        return size;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+    public boolean isActive(){
+        return active;
+    }
+
+    public MultiBlockHandler setDeleteCause(MultiBlockService.DeleteCause deleteCause){
+        this.lastDeleteCause=deleteCause;
+        return this;
+    }
+
+    public void toggleOff(MultiBlockService.DeleteCause cause){
+
+        this.lastDeleteCause=cause;
+        this.active=false;
     }
 
 }

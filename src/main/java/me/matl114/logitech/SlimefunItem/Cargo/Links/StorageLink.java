@@ -26,24 +26,10 @@ public class StorageLink {
     public final  static String BLANK_STORAGE=AddUtils.resolveColor("&f空存储位");
     public final static NamespacedKey KEY_LOC = AddUtils.getNameKey("cache_loc");
     public final static String LOC_DISPLAY=AddUtils.resolveColor("&3[%s,x=%d,y=%d,z=%d]");
-    public static boolean isLink(ItemMeta meta) {
-        return meta.getPersistentDataContainer().has(KEY_LOC);
-    }
     public static boolean canLink(ItemMeta meta) {
         String it= CraftUtils.parseSfId(meta);
         if(it==null) return false;
         return SlimefunItem.getById(it) instanceof QuantumLink;
-    }
-    public boolean canLink(SlimefunItem sfitem){
-        return sfitem instanceof QuantumLink;
-    }
-    public static Location getLink(ItemMeta meta) {
-        try{
-            return DataCache.locationFromString(meta.getPersistentDataContainer().get(KEY_LOC, PersistentDataType.STRING));
-        }catch(Throwable e){
-            return null;
-        }
-
     }
     public static void clearLink(ItemMeta meta) {
         meta.getPersistentDataContainer().remove(KEY_LOC);
@@ -61,11 +47,16 @@ public class StorageLink {
             meta.setLore(lore);
         }
     }
-    public static void setLinkLocation(ItemMeta meta, Location loc) {
-        if(loc!=null) {
-            String  locstr= DataCache.locationToString(loc);
-            meta.getPersistentDataContainer().set(KEY_LOC, PersistentDataType.STRING,locstr);
+    public static Location getLink(ItemMeta meta) {
+        try{
+            return DataCache.locationFromString(meta.getPersistentDataContainer().get(KEY_LOC, PersistentDataType.STRING));
+        }catch(Throwable e){
+            return null;
         }
+
+    }
+    public static boolean isLink(ItemMeta meta) {
+        return meta.getPersistentDataContainer().has(KEY_LOC);
     }
     public static void setLink(ItemMeta meta, Location loc) {
         if(loc!=null) {
@@ -75,6 +66,19 @@ public class StorageLink {
             updateLore(lore,loc);
             meta.setLore(lore);
         }
+    }
+    public static void setLinkLocation(ItemMeta meta, Location loc) {
+        if(loc!=null) {
+            String  locstr= DataCache.locationToString(loc);
+            meta.getPersistentDataContainer().set(KEY_LOC, PersistentDataType.STRING,locstr);
+        }
+    }
+    public static void updateLinkLocationDisplay(ItemMeta meta, Location loc) {
+        List<String> lore =meta.hasLore()? meta.getLore():new ArrayList<>();
+        int len=lore.size();
+        lore.subList(Math.max(len-2,0),len).clear();
+        updateLore(lore,loc);
+        meta.setLore(lore);
     }
     public static void updateLore(List<String> lore,Location loc){
         lore.add(AddUtils.concat(LOC_DISPLAY_PREFIX,LOC_DISPLAY.formatted(loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())));
@@ -95,11 +99,7 @@ public class StorageLink {
         lore.add(AddUtils.concat(NAME_DISPLAY_PREFIX,name));
     }
 
-    public static void updateLinkLocationDisplay(ItemMeta meta, Location loc) {
-        List<String> lore =meta.hasLore()? meta.getLore():new ArrayList<>();
-        int len=lore.size();
-        lore.subList(Math.max(len-2,0),len).clear();
-        updateLore(lore,loc);
-        meta.setLore(lore);
+    public boolean canLink(SlimefunItem sfitem){
+        return sfitem instanceof QuantumLink;
     }
 }

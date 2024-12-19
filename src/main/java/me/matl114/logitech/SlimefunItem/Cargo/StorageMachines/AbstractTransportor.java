@@ -27,9 +27,6 @@ public abstract class AbstractTransportor extends DistinctiveCustomItemStack imp
     public abstract void constructMenu(BlockMenuPreset preset);
     public abstract int[] getInputSlots();
     public abstract int[] getOutputSlots();
-    public abstract void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker);
-    public void updateMenu(BlockMenu blockMenu, Block block, Settings mod){
-    }
     public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
         updateMenu(blockMenu,block,Settings.INIT);
     }
@@ -39,5 +36,8 @@ public abstract class AbstractTransportor extends DistinctiveCustomItemStack imp
         registerTick(this);
         //为menublock提供 需要
         registerBlockMenu(this);
+    }
+    public abstract void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker);
+    public void updateMenu(BlockMenu blockMenu, Block block, Settings mod){
     }
 }

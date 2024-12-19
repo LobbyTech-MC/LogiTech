@@ -27,44 +27,9 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
  * automatically deal with menu update ,call updateMenu at persistent=false mod to toggle save
  */
 public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
-    /**
-     * should be the reference to the exact slotItem in menu
-     */
-    //由何种存储解析器所解析
-    protected StorageType storageType;
-    //存储物品的物品源,记录一个CraftItemStack
-    protected ItemStack source;
-    //存储物品的物品meta 记录着含有存储数据的pdc的meta
-    protected ItemMeta sourceMeta;
-    //这个成员是记录该cache是否是长期cache
-    //长期cache会被记录在Map中,并且代表着一个AbstractIOPort
-    //短期cache比如存储解析器产物
-    protected boolean persistent=false;
-    //这个成员是记录存储数目的
-    protected int storageAmount;
-    //这个成员是用来记录这个cache是否还可以使用的
-    //当玩家尝试从menu里取出存储物品时 该物品将被标记为deprecated 之后的远程访问将不能访问该存储cache
-    boolean deprecated = false;
     //
     private static byte[] lock=new byte[0];
     public static final HashMap<Location, ItemStorageCache> cacheMap=new HashMap<>();
-    public static void setCache(BlockMenu inv,ItemStorageCache cache) {
-        synchronized(lock){
-            cacheMap.put(inv.getLocation(),cache);
-        }
-    }
-    public static ItemStorageCache getCache(Location loc) {
-        synchronized(lock){
-            return cacheMap.get(loc);
-        }
-    }
-    public static ItemStorageCache removeCache(Location loc) {
-        //prevent dupe from last record,
-        AbstractIOPort.setStorageAmount(loc,-1,false);
-        synchronized(lock){
-            return cacheMap.remove(loc);
-        }
-    }
     static {
         ScheduleSave.addFinalTask(
                 ()->{
@@ -85,7 +50,33 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
         });
         Storages.setup();
     }
-
+    /**
+     * will search storage content already have
+     * if type not specific, auto search
+     * @param source
+     * @param sourceMeta
+     * @param saveSlot
+     * @return
+     */
+    public static ItemStorageCache get(ItemStack source, ItemMeta sourceMeta, int saveSlot){
+        return get(source, sourceMeta, saveSlot,i->true );
+    }
+    public static ItemStorageCache get(ItemStack source, ItemMeta sourceMeta, int saveSlot, Predicate<StorageType> filter){
+        StorageType type=StorageType.getStorageType(sourceMeta,filter);
+        if(type==null){return null;}
+        return getWithoutCheck(source,sourceMeta,saveSlot,type);
+    }
+    public static ItemStorageCache get(ItemStack source, ItemMeta sourceMeta, int saveSlot,@Nonnull StorageType type) {
+        if(!type.isStorage(sourceMeta)){
+            return null;
+        }
+        return getWithoutCheck(source, sourceMeta, saveSlot, type);
+    }
+    public static ItemStorageCache getCache(Location loc) {
+        synchronized(lock){
+            return cacheMap.get(loc);
+        }
+    }
     /**
      * will try get ,if null, create a possible one or failed return null
      * if type not specific, auto search
@@ -124,29 +115,6 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
             return new ItemStorageCache(source,saveSlot,type);
         }
     }
-
-    /**
-     * will search storage content already have
-     * if type not specific, auto search
-     * @param source
-     * @param sourceMeta
-     * @param saveSlot
-     * @return
-     */
-    public static ItemStorageCache get(ItemStack source, ItemMeta sourceMeta, int saveSlot){
-        return get(source, sourceMeta, saveSlot,i->true );
-    }
-    public static ItemStorageCache get(ItemStack source, ItemMeta sourceMeta, int saveSlot, Predicate<StorageType> filter){
-        StorageType type=StorageType.getStorageType(sourceMeta,filter);
-        if(type==null){return null;}
-        return getWithoutCheck(source,sourceMeta,saveSlot,type);
-    }
-    public static ItemStorageCache get(ItemStack source, ItemMeta sourceMeta, int saveSlot,@Nonnull StorageType type) {
-        if(!type.isStorage(sourceMeta)){
-            return null;
-        }
-        return getWithoutCheck(source, sourceMeta, saveSlot, type);
-    }
     public static ItemStorageCache getWithoutCheck(ItemStack source, ItemMeta sourceMeta, int saveSlot,@Nonnull StorageType type) {
         if(type instanceof LocationProxy lp){
             Location loc=lp.getLocation(sourceMeta);
@@ -170,6 +138,57 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
         tmp.dirty=false;
         return tmp;
     }
+    public static ItemStorageCache removeCache(Location loc) {
+        //prevent dupe from last record,
+        AbstractIOPort.setStorageAmount(loc,-1,false);
+        synchronized(lock){
+            return cacheMap.remove(loc);
+        }
+    }
+
+    public static void setCache(BlockMenu inv,ItemStorageCache cache) {
+        synchronized(lock){
+            cacheMap.put(inv.getLocation(),cache);
+        }
+    }
+    /**
+     * should be the reference to the exact slotItem in menu
+     */
+    //由何种存储解析器所解析
+    protected StorageType storageType;
+    //存储物品的物品源,记录一个CraftItemStack
+    protected ItemStack source;
+
+    //存储物品的物品meta 记录着含有存储数据的pdc的meta
+    protected ItemMeta sourceMeta;
+    //这个成员是记录该cache是否是长期cache
+    //长期cache会被记录在Map中,并且代表着一个AbstractIOPort
+    //短期cache比如存储解析器产物
+    protected boolean persistent=false;
+    //这个成员是记录存储数目的
+    protected int storageAmount;
+    //这个成员是用来记录这个cache是否还可以使用的
+    //当玩家尝试从menu里取出存储物品时 该物品将被标记为deprecated 之后的远程访问将不能访问该存储cache
+    boolean deprecated = false;
+    protected ItemStorageCache(){
+        super(-1);
+    }
+    /**
+     * construct when storage = null potential
+     * @param source
+     * @param slot
+     * @param type
+     */
+    protected ItemStorageCache(ItemStack source, int slot,StorageType type) {
+        super(slot);
+        this.source = source;
+        this.sourceMeta = source.getItemMeta();
+        this.storageType=type;
+        this.maxStackCnt=type.getStorageMaxSize(sourceMeta);
+    }
+    protected ItemStorageCache(ItemStack item, ItemStack source, int saveslot,StorageType type) {
+        this(item,source,source.getItemMeta(),saveslot,type);
+    }
     /**
      * construct common
      * @param item
@@ -185,53 +204,13 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
         this.storageType=type;
         this.maxStackCnt=type.getStorageMaxSize(this.sourceMeta);
     }
-    protected ItemStorageCache(ItemStack item, ItemStack source, int saveslot,StorageType type) {
-        this(item,source,source.getItemMeta(),saveslot,type);
-    }
-    /**
-     * construct when storage = null potential
-     * @param source
-     * @param slot
-     * @param type
-     */
-    protected ItemStorageCache(ItemStack source, int slot,StorageType type) {
-        super(slot);
-        this.source = source;
-        this.sourceMeta = source.getItemMeta();
-        this.storageType=type;
-        this.maxStackCnt=type.getStorageMaxSize(sourceMeta);
-    }
-    protected ItemStorageCache(){
-        super(-1);
-    }
-    public int getStorageAmount(){
-        return this.storageAmount;
-    }
-
-    /**
-     * only const cache can set this true
-     * @param persistent
-     */
-    public void setPersistent(boolean persistent) {
-        this.persistent = persistent;
-        this.dirty=true;
-    }
-
-    /**
-     * set related slot num
-     * @param slot
-     */
-    public void setSaveSlot(int slot){
-        this.slot=slot;
-    }
-    public void setDeprecated(boolean deprecated){
-        this.deprecated=deprecated;
-        this.dirty=true;
-    }
     public boolean getDeprecated(){
         return this.deprecated;
     }
 
+    public int getStorageAmount(){
+        return this.storageAmount;
+    }
 
     /**
      * check if cache can continue bind on this item,or just a item change,
@@ -253,21 +232,49 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
             return true;
         }else return false;
     }
-    public void updateItemStack(){
-        if(dirty) {
-            if (wasNull) {
-                if (getItem() != null) {
-                    item = item.clone();
-                    item.setAmount(1);
-                    storageAmount = getAmount();
-                    storageType.setStorage(sourceMeta, this.getItem());
-                    wasNull = false;
-                }
-            }
-            storageAmount = getAmount();
+    public void setDeprecated(boolean deprecated){
+        this.deprecated=deprecated;
+        this.dirty=true;
+    }
+    //修复了setFrom存储时覆写maxSize的问题
+    public void setFrom(ItemCounter source){
+        if(wasNull||(source!=null&&source.getItem()!=null)){
+            item=source.getItem();
+            cnt=0;
+            meta=null;
         }
     }
 
+
+    /**
+     * only const cache can set this true
+     * @param persistent
+     */
+    public void setPersistent(boolean persistent) {
+        this.persistent = persistent;
+        this.dirty=true;
+    }
+    /**
+     * set related slot num
+     * @param slot
+     */
+    public void setSaveSlot(int slot){
+        this.slot=slot;
+    }
+
+    public void syncData(){
+        if(!wasNull){
+            if(dirty){
+                cnt=storageAmount;
+                dirty=false;
+            }
+        }else{
+            item=null;
+            meta=null;
+            cnt=0;
+            dirty=false;
+        }
+    }
     /**
      * save data to sfdata
      * @param loc
@@ -283,10 +290,19 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
             throw e;
         }
     }
-    public void updateStorage(){
-        storageType.onStorageAmountWrite(sourceMeta,storageAmount);
-        storageType.onStorageDisplayWrite(sourceMeta,storageAmount);
-        source.setItemMeta(sourceMeta);
+    public void updateItemStack(){
+        if(dirty) {
+            if (wasNull) {
+                if (getItem() != null) {
+                    item = item.clone();
+                    item.setAmount(1);
+                    storageAmount = getAmount();
+                    storageType.setStorage(sourceMeta, this.getItem());
+                    wasNull = false;
+                }
+            }
+            storageAmount = getAmount();
+        }
     }
     public void updateMenu(@Nonnull BlockMenu menu){
         if (getItem()!=null&&!getItem().getType().isAir()){
@@ -310,25 +326,9 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
         dirty=false;
 
     }
-    public void syncData(){
-        if(!wasNull){
-            if(dirty){
-                cnt=storageAmount;
-                dirty=false;
-            }
-        }else{
-            item=null;
-            meta=null;
-            cnt=0;
-            dirty=false;
-        }
-    }
-    //修复了setFrom存储时覆写maxSize的问题
-    public void setFrom(ItemCounter source){
-        if(wasNull||(source!=null&&source.getItem()!=null)){
-            item=source.getItem();
-            cnt=0;
-            meta=null;
-        }
+    public void updateStorage(){
+        storageType.onStorageAmountWrite(sourceMeta,storageAmount);
+        storageType.onStorageDisplayWrite(sourceMeta,storageAmount);
+        source.setItemMeta(sourceMeta);
     }
 }

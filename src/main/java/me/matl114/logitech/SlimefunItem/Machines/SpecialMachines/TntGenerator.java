@@ -47,24 +47,9 @@ public class TntGenerator extends AbstractMachine {
     protected final ItemStack START_ITEM_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6当前状态","&a已关闭","&e点击启动");
     protected final int ADJUSTMENT_SLOT=4;
     protected final int DELAY_SLOT=8;
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
     protected final String OFFSET_KEY="tntof";
     protected final String FUSE_KEY="tntfu";
     protected final String DELAY_KEY="tntd";
-    public TntGenerator(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
-        super(category, item, recipeType, recipe, 0,0);
-        SchedulePostRegister.addPostRegisterTask(
-                ()->Schedules.launchSchedules(
-                        gtThread,100,false,1
-                )
-        );
-
-    }
     protected final BukkitRunnable gtThread = new BukkitRunnable() {
         boolean isWorking=false;
         public void run() {
@@ -129,6 +114,23 @@ public class TntGenerator extends AbstractMachine {
         }
     };
     protected final ConcurrentHashMap<Chunk, ConcurrentHashMap<Location,BlockMenu>> INSTANCES=new ConcurrentHashMap<>();
+    public final int DATA_SLOT=1;
+    public TntGenerator(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
+        super(category, item, recipeType, recipe, 0,0);
+        SchedulePostRegister.addPostRegisterTask(
+                ()->Schedules.launchSchedules(
+                        gtThread,100,false,1
+                )
+        );
+
+    }
+    public void constructMenu(BlockMenuPreset preset){
+        int[] border=BORDER;
+        int len=border.length;
+        for(int i=0;i<len;i++){
+            preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
+        }
+    }
     public DataMenuClickHandler createDataHolder(){
         return new DataMenuClickHandler() {
             //0 为 数量 1 为 电力
@@ -137,22 +139,30 @@ public class TntGenerator extends AbstractMachine {
             public int getInt(int i){
                 return intdata[i];
             }
-            public void setInt(int i, int val){
-                intdata[i]=val;
-            }
             public Object getObject(int i){
                 return runnable;
-            }
-            public void setObject(int i,Object obj){
-                this.runnable=obj;
             }
             @Override
             public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
                 return false;
             }
+            public void setInt(int i, int val){
+                intdata[i]=val;
+            }
+            public void setObject(int i,Object obj){
+                this.runnable=obj;
+            }
         };
     }
-    public final int DATA_SLOT=1;
+    public ItemStack getAdjustmentDisplay(DataMenuClickHandler dh){
+        return new CustomItemStack(Material.COMPASS,"&6生成信息",
+                "&7上下偏移: %.1f格".formatted(dh.getInt(0)/10.0),
+                "&7爆炸延时: %dgt".formatted(dh.getInt(1)),
+                "&e左键 增加偏移 0.1",
+                "&e右键 减少偏移 0.1",
+                "&eshift+左键 增加爆炸延时 1gt",
+                "&eshift+右键 减少爆炸延时 1gt");
+    }
     public DataMenuClickHandler getDataHolder(Block b, BlockMenu inv){
         ChestMenu.MenuClickHandler handler=inv.getMenuClickHandler(DATA_SLOT);
         if(handler instanceof DataMenuClickHandler dh){return dh;}
@@ -165,33 +175,17 @@ public class TntGenerator extends AbstractMachine {
             return dh;
         }
     }
-    public void constructMenu(BlockMenuPreset preset){
-        int[] border=BORDER;
-        int len=border.length;
-        for(int i=0;i<len;i++){
-            preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
-        }
-    }
-    public ItemStack getAdjustmentDisplay(DataMenuClickHandler dh){
-        return new CustomItemStack(Material.COMPASS,"&6生成信息",
-                "&7上下偏移: %.1f格".formatted(dh.getInt(0)/10.0),
-                "&7爆炸延时: %dgt".formatted(dh.getInt(1)),
-                "&e左键 增加偏移 0.1",
-                "&e右键 减少偏移 0.1",
-                "&eshift+左键 增加爆炸延时 1gt",
-                "&eshift+右键 减少爆炸延时 1gt");
-    }
     public ItemStack getDelayDisplay(DataMenuClickHandler dh){
         return new CustomItemStack(Material.CLOCK,"&6生成频率信息",
                 "&7生成间隔: %dgt".formatted(dh.getInt(2)),
                 "&e左键 增加延时 1gt",
                 "&e右键 减少延时 1gt");
     }
-    public void saveData(Location loc,DataMenuClickHandler dh){
-        SlimefunBlockData data=DataCache.safeLoadBlock(loc);
-        DataCache.setCustomData(data,OFFSET_KEY,dh.getInt(0));
-        DataCache.setCustomData(data,FUSE_KEY,dh.getInt(1));
-        DataCache.setCustomData(data,DELAY_KEY,dh.getInt(2));
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
     }
     public void newMenuInstance(BlockMenu menu, Block block){
         SlimefunBlockData data= DataCache.safeLoadBlock(menu.getLocation());
@@ -275,13 +269,19 @@ public class TntGenerator extends AbstractMachine {
         INSTANCES.put(chunk,map);
 
     }
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
-
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
     public void onBreak(BlockBreakEvent e,BlockMenu inv){
         super.onBreak(e,inv);
         Chunk chunk=e.getBlock().getChunk();
         var map= INSTANCES.getOrDefault(chunk,new ConcurrentHashMap<>());
         map.remove(e.getBlock().getLocation());
     }
+    public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
+
+    public void saveData(Location loc,DataMenuClickHandler dh){
+        SlimefunBlockData data=DataCache.safeLoadBlock(loc);
+        DataCache.setCustomData(data,OFFSET_KEY,dh.getInt(0));
+        DataCache.setCustomData(data,FUSE_KEY,dh.getInt(1));
+        DataCache.setCustomData(data,DELAY_KEY,dh.getInt(2));
+    }
+    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 }

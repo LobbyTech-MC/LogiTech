@@ -45,8 +45,20 @@ public class OctaFilter extends AbstractFilter{
         super(itemGroup, item, recipeType, recipe);
 
     }
+    public int[] getBorders(){
+        return BORDER;
+    }
+    public int[] getInputBorders(){
+        return INPUT_BORDER;
+    }
     public int[] getInputSlots(){
         return INPUT_SLOTS;
+    }
+    public int[] getOutputBorders(){
+        return OUTPUT_BORDER;
+    }
+    public ItemStack[] getOutputBordersItem(){
+        return OUTPUT_BORDERS_ITEM;
     }
     public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
@@ -56,18 +68,6 @@ public class OctaFilter extends AbstractFilter{
     }
     public int getTrashSlot(){
         return TRASH_SLOT;
-    }
-    public int[] getInputBorders(){
-        return INPUT_BORDER;
-    }
-    public int[] getBorders(){
-        return BORDER;
-    }
-    public int[] getOutputBorders(){
-        return OUTPUT_BORDER;
-    }
-    public ItemStack[] getOutputBordersItem(){
-        return OUTPUT_BORDERS_ITEM;
     }
 
 }

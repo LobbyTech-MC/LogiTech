@@ -13,13 +13,7 @@ import me.matl114.logitech.Utils.Debug;
 public class ProtectionManager {
     public static Plugin plugin;
     public static PluginManager manager;
-    public static void registerProtection(Plugin plugin,PluginManager manager) {
-        ProtectionManager.plugin = plugin;
-        ProtectionManager. manager = manager;
-        if(StorageSpace.ENABLED){
-            register(STORAGESPACE_PROTECTION_MODULE);
-        }
-    }
+    public static ProtectionModule STORAGESPACE_PROTECTION_MODULE=new StorageWorldProtection();
     public static void register(ProtectionModule module) {
         SchedulePostRegister.addPostRegisterTask(()->{
             try {
@@ -31,5 +25,11 @@ public class ProtectionManager {
             }
         });
     }
-    public static ProtectionModule STORAGESPACE_PROTECTION_MODULE=new StorageWorldProtection();
+    public static void registerProtection(Plugin plugin,PluginManager manager) {
+        ProtectionManager.plugin = plugin;
+        ProtectionManager. manager = manager;
+        if(StorageSpace.ENABLED){
+            register(STORAGESPACE_PROTECTION_MODULE);
+        }
+    }
 }

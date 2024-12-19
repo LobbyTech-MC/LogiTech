@@ -30,26 +30,14 @@ public class SimulateTestGenerator extends AbstractMachine {
     protected final int[] OUTPUT_SLOTS=new int[]{
             2,3,4,5,6,7,8
     };
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
     public final int ENERGY_ABSMAX;
     public final int OUTPUT_MIN;
     public final int OUTPUT_MAX;
     public final ItemStack OUTPUT= AddItem.PARADOX;
     public final int RANDOM_THREASHOLD;
-    public void addInfo(ItemStack stack){
-        stack.setItemMeta(AddUtils.addLore(stack,
-                new StringBuilder("&8⇨ &e⚡ &7").
-                        append(AddUtils.formatDouble(-ENERGY_ABSMAX)).
-                        append(" ~ ").
-                        append(AddUtils.formatDouble(ENERGY_ABSMAX)).append(" J/t").toString()).getItemMeta());
-
-    }
     public final ItemCounter MACHINE_COUNTER= CraftUtils.getCounter(SlimefunItems.ENERGY_REGULATOR);
+    public ItemStack[] OUTPUTS=new ItemStack[]{OUTPUT};
+    protected final int MULTIPLE_TIME=5;
     public SimulateTestGenerator(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                               int energybuffer, int energyAbsMax,
                                  int outputMin, int outputMax){
@@ -66,15 +54,33 @@ public class SimulateTestGenerator extends AbstractMachine {
         );
         this.RANDOM_THREASHOLD= 2*this.ENERGY_ABSMAX+1;
     }
+    public void addInfo(ItemStack stack){
+        stack.setItemMeta(AddUtils.addLore(stack,
+                new StringBuilder("&8⇨ &e⚡ &7").
+                        append(AddUtils.formatDouble(-ENERGY_ABSMAX)).
+                        append(" ~ ").
+                        append(AddUtils.formatDouble(ENERGY_ABSMAX)).append(" J/t").toString()).getItemMeta());
+
+    }
     public void constructMenu(BlockMenuPreset preset){
         preset.addItem(INFO_SLOT,ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler());
     }
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
+    }
+
     public void newMenuInstance(BlockMenu menu, Block block){
     }
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
-
-    public ItemStack[] OUTPUTS=new ItemStack[]{OUTPUT};
-    protected final int MULTIPLE_TIME=5;
+    public void onBreak(BlockBreakEvent event,BlockMenu nb){
+        super.onBreak(event,nb);
+        if(nb!=null){
+            nb.dropItems(nb.getLocation(),MACHINE_SLOT);
+        }
+    }
+    public void process(Block b,BlockMenu inv,SlimefunBlockData data){}
     public void tick(Block b, BlockMenu inv, SlimefunBlockData data,int tick){
         ItemStack stack=inv.getItemInSlot(MACHINE_SLOT);
         if(CraftUtils.matchItemStack(stack,MACHINE_COUNTER,false)){
@@ -108,11 +114,5 @@ public class SimulateTestGenerator extends AbstractMachine {
             }
         }
     }
-    public void process(Block b,BlockMenu inv,SlimefunBlockData data){}
-    public void onBreak(BlockBreakEvent event,BlockMenu nb){
-        super.onBreak(event,nb);
-        if(nb!=null){
-            nb.dropItems(nb.getLocation(),MACHINE_SLOT);
-        }
-    }
+    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 }

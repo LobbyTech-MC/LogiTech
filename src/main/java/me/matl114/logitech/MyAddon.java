@@ -25,7 +25,13 @@ import me.matl114.logitech.SlimefunItem.AddItem;
 import me.matl114.logitech.SlimefunItem.AddSlimefunItems;
 import me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore.MultiBlockTypes;
 import me.matl114.logitech.SlimefunItem.Cargo.Storages;
-import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.SlimefunItem.Cargo.SpaceStorage.StorageSpace;
+import me.matl114.logitech.Utils.BukkitUtils;
+import me.matl114.logitech.Utils.ContainerUtils;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.Debug;
+import me.matl114.logitech.Utils.WorldUtils;
 import me.matl114.logitech.Utils.UtilClass.CommandClass.LogitechMain;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
 import me.matl114.matlib.Utils.Command.CommandGroup.AbstractMainCommand;
@@ -34,19 +40,10 @@ import net.guizhanss.guizhanlibplugin.updater.GuizhanUpdater;
 public class MyAddon extends JavaPlugin implements SlimefunAddon {
     public static boolean testmod=false;
     public static boolean clearConfig=false;
-    public static boolean testmode(){
-        return testmod;
-    }
     private static MyAddon instance;
     private static PluginManager manager;
-
-    public static MyAddon getInstance() {
-        return instance;
-    }
-    public static PluginManager getManager() {
-        return manager;
-    }
     public static String username;
+
     public static String repo;
     public static String branch;
     private static AbstractMainCommand command;
@@ -56,6 +53,61 @@ public class MyAddon extends JavaPlugin implements SlimefunAddon {
         username="m1919810";
         repo="LogiTech";
         branch="master";
+    }
+    public static MyAddon getInstance() {
+        return instance;
+    }
+    public static PluginManager getManager() {
+        return manager;
+    }
+    public static boolean testmode(){
+        return testmod;
+    }
+    public void checkVersion(){
+        if (!getServer().getPluginManager().isPluginEnabled("GuizhanLibPlugin")) {
+            getLogger().log(Level.SEVERE, "本插件需要 鬼斩前置库插件(GuizhanLibPlugin) 才能运行!");
+            getLogger().log(Level.SEVERE, "从此处下载: https://50l.cc/gzlib");
+            getLogger().log(Level.SEVERE, "当出现该报错时,作者对一切后续的报错不负责");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        try {
+            if( !Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_20) ){
+                getLogger().log(Level.SEVERE, "本插件需要在MC 1.20/1.20.x的版本运行");
+                getLogger().log(Level.SEVERE, "当出现该报错时,作者对一切后续的报错不负责");
+            }else{
+                Debug.logger("MC最低版本检测通过");
+            }
+        } catch (NoClassDefFoundError | NoSuchFieldError e) {
+            for (int i = 0; i < 20; i++) {
+                getLogger().severe("你需要更新 Slimefun4 才能进行版本检测！");
+            }
+        }
+
+
+    }
+    @Override
+    public String getBugTrackerURL() {
+        // 你可以在这里返回你的问题追踪器的网址，而不是 null
+        return null;
+    }
+    @Override
+    public JavaPlugin getJavaPlugin() {
+        /*
+         * 你需要返回对你插件的引用。
+         * 如果这是你插件的主类，只需要返回 "this" 即可。
+         */
+        return this;
+    }
+    public String getWikiURL(){
+        return "https://github.com/m1919810/LogiTech/wiki/{0}";
+    }
+
+    @Override
+    public void onDisable() {
+        // 禁用插件的逻辑...
+        Schedules.onDisableSchedules(this);
+        Bukkit.getScheduler().cancelTasks(this);
     }
     @Override
     public void onEnable() {
@@ -145,57 +197,11 @@ public class MyAddon extends JavaPlugin implements SlimefunAddon {
         //注册
         Debug.logger("附属特性注册完毕");
     }
+
     public void tryUpdate() {
         if ( getDescription().getVersion().startsWith("Build")) {
             GuizhanUpdater.start(this, getFile(), username, repo, branch);
         }
-    }
-    public void checkVersion(){
-        if (!getServer().getPluginManager().isPluginEnabled("GuizhanLibPlugin")) {
-            getLogger().log(Level.SEVERE, "本插件需要 鬼斩前置库插件(GuizhanLibPlugin) 才能运行!");
-            getLogger().log(Level.SEVERE, "从此处下载: https://50l.cc/gzlib");
-            getLogger().log(Level.SEVERE, "当出现该报错时,作者对一切后续的报错不负责");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        try {
-            if( !Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_20) ){
-                getLogger().log(Level.SEVERE, "本插件需要在MC 1.20/1.20.x的版本运行");
-                getLogger().log(Level.SEVERE, "当出现该报错时,作者对一切后续的报错不负责");
-            }else{
-                Debug.logger("MC最低版本检测通过");
-            }
-        } catch (NoClassDefFoundError | NoSuchFieldError e) {
-            for (int i = 0; i < 20; i++) {
-                getLogger().severe("你需要更新 Slimefun4 才能进行版本检测！");
-            }
-        }
-
-
-    }
-    @Override
-    public void onDisable() {
-        // 禁用插件的逻辑...
-        Schedules.onDisableSchedules(this);
-        Bukkit.getScheduler().cancelTasks(this);
-    }
-
-    @Override
-    public String getBugTrackerURL() {
-        // 你可以在这里返回你的问题追踪器的网址，而不是 null
-        return null;
-    }
-    public String getWikiURL(){
-        return "https://github.com/m1919810/LogiTech/wiki/{0}";
-    }
-
-    @Override
-    public JavaPlugin getJavaPlugin() {
-        /*
-         * 你需要返回对你插件的引用。
-         * 如果这是你插件的主类，只需要返回 "this" 即可。
-         */
-        return this;
     }
 
 }

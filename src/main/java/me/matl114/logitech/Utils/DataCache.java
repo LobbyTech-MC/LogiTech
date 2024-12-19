@@ -47,17 +47,67 @@ public class DataCache {
             Debug.logger(e);
         }
     }
-    public static void setup(){
+    static final Pattern LOCATION_DE_PATTERN=Pattern.compile("(.*?),(.*?),(.*?),(.*?)");
+    static final String LOCATION_CODE_SPLITER=",";
+    static final String LOCATION_CODE_PATTERN="%s,%d,%d,%d";
 
+    public static final String DISPLAY_PATTERN="[%s,%.0f,%.0f,%.0f]";
+    public static HashSet<SlimefunBlockData> getAllSfItemInChunk(World world,int x,int z){
+        if(INVOKE_LOADEDCHUNK){
+            String chunkkey= world.getName() + ";" + x + ":" +z;
+            try{
+                SlimefunChunkData data=loadedChunkData.get(chunkkey);
+                if(data!=null){
+                    return new HashSet<>(data.getAllBlockData());
+                }
+            }catch (Throwable e){
+                Debug.debug("getAllSfItemInChunk INVOKE FAILED! DISABLING BETTER GETBLOCKFROMCACHE");
+                Debug.debug(e);
+                INVOKE_LOADEDCHUNK=false;
+            }
+        }
+        return new HashSet<>( CONTROLLER.getChunkData(world.getChunkAt(x,z)).getAllBlockData());
     }
-    public static boolean hasData(Location loc){
-        return safeGetBlockDataFromCache(loc)!=null;
+
+    private static String getChunkKey(Location loc) {
+        String var10000 = loc.getWorld().getName();
+        return var10000 + ";" + (loc.getBlockX()>>4) + ":" + (loc.getBlockZ()>>4);
     }
-    public static SlimefunItem getSfItem(Location loc){
+    public static int getCustomData(Location loc,String key,int defaultValue){
+        SlimefunBlockData data= safeLoadBlock(loc);
+        return getCustomData(data,key,defaultValue);
+    }
+    public static int getCustomData(SlimefunBlockData data,String key,int defaultValue){
+        try{
+            String csd= data.getData(key);
+            if(csd!=null)
+                return Integer.parseInt(csd);
+        }catch (Throwable a){
+        }
+        data.setData(key,String.valueOf(defaultValue));
+        return defaultValue;
+    }
+    public static String getCustomString(Location loc,String key,String defaultValue){
+        SlimefunBlockData data= safeLoadBlock(loc);
+        return getCustomString(data,key,defaultValue);
+    }
+    public static String getCustomString(SlimefunBlockData data,String key,String defaultVal){
+        try{
+            String csd= data.getData(key);
+            if(csd!=null)
+                return csd;
+        }catch (Throwable a){
+        }
+        data.setData(key,defaultVal);
+        return defaultVal;
+    }
+    public static Location getLastLocation(Location loc){
         SlimefunBlockData data= safeGetBlockDataFromCache(loc);
-        return data==null?null:SlimefunItem.getById(data.getSfId());
+        return getLastLocation(data);
     }
-
+    public static Location getLastLocation(SlimefunBlockData data){
+        return getLocation("location",data);
+    }
     /**
      * about recipe history get
      * @param loc
@@ -84,26 +134,47 @@ public class DataCache {
             return -1;
         }
     }
-
-    /**
-     * must run in ticks or after data load!
-     * @param loc
-     * @param val
-     */
-    public static void setLastRecipe(Location loc ,int val){
-        SlimefunBlockData data=safeGetBlockDataFromCache(loc);
-        data.setData("recipe", String.valueOf(val));
+    public static String getLastUUID(Location loc){
+        return getLastUUID(safeLoadBlock(loc));
     }
-    /**
-     * must run in ticks or after data load!
-     */
-    public static void setLastRecipe(SlimefunBlockData data ,int val){
+    public static String getLastUUID(SlimefunBlockData data){
 
-        data.setData("recipe", String.valueOf(val));
+        try{
+            String uuid= data.getData("uuid");
+            if(uuid!=null)
+                return uuid;
+        }catch (Throwable a){
+        }
+        safeSetData(data,"uuid","null");
+        return "null";
     }
-    static final Pattern LOCATION_DE_PATTERN=Pattern.compile("(.*?),(.*?),(.*?),(.*?)");
-    static final String LOCATION_CODE_SPLITER=",";
-    static final String LOCATION_CODE_PATTERN="%s,%d,%d,%d";
+    public static Location getLocation(String key,SlimefunBlockData data){
+        if(data==null)return null;
+        String location=data.getData(key);
+        if(location!=null){
+            Location loc=locationFromString(location);
+            return loc;
+        }else{
+            data.setData(key,"null");
+            //important to clone ,dont change origin
+            return null;
+        }
+    }
+    public static BlockMenu getMenu(Location loc) {
+        SlimefunBlockData blockData = safeLoadBlock(loc);
+        if (blockData == null) {
+            return null;
+        } else {
+            return blockData.getBlockMenu();
+        }
+    }
+    public static SlimefunItem getSfItem(Location loc){
+        SlimefunBlockData data= safeGetBlockDataFromCache(loc);
+        return data==null?null:SlimefunItem.getById(data.getSfId());
+    }
+    public static boolean hasData(Location loc){
+        return safeGetBlockDataFromCache(loc)!=null;
+    }
     public static Location locationFromString(String loc){
         try{
             if("null".equals(loc)){
@@ -120,6 +191,9 @@ public class DataCache {
         }
         return null;
     }
+    public static String locationToDisplayString(Location loc){
+        return loc!=null? DISPLAY_PATTERN.formatted(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ()):"null";
+    }
     public static String locationToString(Location loc){
         if(loc==null){
             return "null";
@@ -128,88 +202,20 @@ public class DataCache {
                     .append(loc.getBlockX()).append(',').append(loc.getBlockY()).append(',').append(loc.getBlockZ()).toString();
         }
     }
-    public static final String DISPLAY_PATTERN="[%s,%.0f,%.0f,%.0f]";
-    public static String locationToDisplayString(Location loc){
-        return loc!=null? DISPLAY_PATTERN.formatted(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ()):"null";
-    }
-    public static Location getLocation(String key,SlimefunBlockData data){
-        if(data==null)return null;
-        String location=data.getData(key);
-        if(location!=null){
-            Location loc=locationFromString(location);
-            return loc;
-        }else{
-            data.setData(key,"null");
-            //important to clone ,dont change origin
-            return null;
-        }
-    }
-    public static Location getLastLocation(SlimefunBlockData data){
-        return getLocation("location",data);
-    }
-    public static Location getLastLocation(Location loc){
-        SlimefunBlockData data= safeGetBlockDataFromCache(loc);
-        return getLastLocation(data);
-    }
-    public static void setLocation(String key, SlimefunBlockData data, Location loc2){
-        safeSetData(data,key,locationToString(loc2));
-    }
-    public static void setLocation(String key, Location loc, Location loc2){
-        safeSetData(loc,key,locationToString(loc2));
-    }
-    public static void setLastLocation(Location loc ,Location loc2){
-
-        setLocation("location",loc,loc2);
-    }
-    public static String getLastUUID(SlimefunBlockData data){
-
-        try{
-            String uuid= data.getData("uuid");
-            if(uuid!=null)
-                return uuid;
-        }catch (Throwable a){
-        }
-        safeSetData(data,"uuid","null");
-        return "null";
-    }
-    public static String getLastUUID(Location loc){
-        return getLastUUID(safeLoadBlock(loc));
-    }
-    public static void setLastUUID(Location loc ,String uuid){
-        safeSetData(loc,"uuid",uuid);
-    }
-    public static void runAfterSafeLoad(Location loc,Consumer<SlimefunBlockData> consumer,boolean isSync){
-        SlimefunBlockData data;
-        data= safeGetBlockDataFromCache(loc);
-        if(data!=null)
-            StorageCacheUtils.executeAfterLoad(data,()-> consumer.accept(data),isSync);
-    }
-    private static String getChunkKey(Location loc) {
-        String var10000 = loc.getWorld().getName();
-        return var10000 + ";" + (loc.getBlockX()>>4) + ":" + (loc.getBlockZ()>>4);
-    }
-    private static void safeSetData(SlimefunBlockData data,String key,String value){
-        if(data==null)return;
-        StorageCacheUtils.executeAfterLoad(data,()-> data.setData(key,value),false);
-    }
-    private static void safeSetData(Location loc,String key,String value){
-        runAfterSafeLoad(loc,(data)-> data.setData(key,value),false);
-    }
-    public static HashSet<SlimefunBlockData> getAllSfItemInChunk(World world,int x,int z){
-        if(INVOKE_LOADEDCHUNK){
-            String chunkkey= world.getName() + ";" + x + ":" +z;
-            try{
-                SlimefunChunkData data=loadedChunkData.get(chunkkey);
-                if(data!=null){
-                    return new HashSet<>(data.getAllBlockData());
-                }
-            }catch (Throwable e){
-                Debug.debug("getAllSfItemInChunk INVOKE FAILED! DISABLING BETTER GETBLOCKFROMCACHE");
-                Debug.debug(e);
-                INVOKE_LOADEDCHUNK=false;
+    public static boolean moveSlimefunBlockData(Location loc1,Location loc2){
+        SlimefunBlockData data=safeGetBlockCacheWithLoad(loc1);
+        SlimefunBlockData data2=safeGetBlockCacheWithLoad(loc2);
+        if(data!=null){
+            if(data2!=null){
+                Debug.debug("remove called");
+                CONTROLLER.removeBlock(loc2);
             }
+            CONTROLLER.setBlockDataLocation(data,loc2);
+            return true;
         }
-        return new HashSet<>( CONTROLLER.getChunkData(world.getChunkAt(x,z)).getAllBlockData());
+        else {return false;
+        }
+        //这里是否要发出SlimefunBlockPlaceEvent?
     }
     public static void removeBlockData(Location loc){
         SlimefunItem item=getSfItem(loc);
@@ -217,6 +223,26 @@ public class DataCache {
         if(item instanceof MachineProcessHolder<?> mmp){
             mmp.getMachineProcessor().endOperation(loc);
         }
+    }
+    public static void requestLoad(SlimefunBlockData data){
+        StorageCacheUtils.requestLoad(data);
+    }
+    public static void runAfterSafeLoad(Location loc,Consumer<SlimefunBlockData> consumer,boolean isSync){
+        SlimefunBlockData data;
+        data= safeGetBlockDataFromCache(loc);
+        if(data!=null)
+            StorageCacheUtils.executeAfterLoad(data,()-> consumer.accept(data),isSync);
+    }
+    public static SlimefunBlockData safeGetBlockCacheWithLoad(Location loc){
+        SlimefunBlockData data=safeGetBlockDataFromCache(loc);
+        if (data==null){
+            return null;
+        }
+        if(!data.isDataLoaded()){
+            StorageCacheUtils.requestLoad(data);
+            return data;
+        }
+        return data;
     }
     public static SlimefunBlockData safeGetBlockDataFromCache(Location loc){
         if(INVOKE_LOADEDCHUNK){
@@ -234,17 +260,6 @@ public class DataCache {
         }
         return CONTROLLER.getBlockDataFromCache(loc);
     }
-    public static SlimefunBlockData safeGetBlockCacheWithLoad(Location loc){
-        SlimefunBlockData data=safeGetBlockDataFromCache(loc);
-        if (data==null){
-            return null;
-        }
-        if(!data.isDataLoaded()){
-            StorageCacheUtils.requestLoad(data);
-            return data;
-        }
-        return data;
-    }
     public static SlimefunBlockData safeLoadBlock(Location loc){
         SlimefunBlockData data= safeGetBlockDataFromCache(loc);
         if(data==null){
@@ -257,72 +272,57 @@ public class DataCache {
         }
         return data;
     }
-    public static void requestLoad(SlimefunBlockData data){
-        StorageCacheUtils.requestLoad(data);
+    private static void safeSetData(Location loc,String key,String value){
+        runAfterSafeLoad(loc,(data)-> data.setData(key,value),false);
     }
-    public static boolean moveSlimefunBlockData(Location loc1,Location loc2){
-        SlimefunBlockData data=safeGetBlockCacheWithLoad(loc1);
-        SlimefunBlockData data2=safeGetBlockCacheWithLoad(loc2);
-        if(data!=null){
-            if(data2!=null){
-                Debug.debug("remove called");
-                CONTROLLER.removeBlock(loc2);
-            }
-            CONTROLLER.setBlockDataLocation(data,loc2);
-            return true;
-        }
-        else {return false;
-        }
-        //这里是否要发出SlimefunBlockPlaceEvent?
-    }
-
-
-    public static BlockMenu getMenu(Location loc) {
-        SlimefunBlockData blockData = safeLoadBlock(loc);
-        if (blockData == null) {
-            return null;
-        } else {
-            return blockData.getBlockMenu();
-        }
-    }
-    public static int getCustomData(Location loc,String key,int defaultValue){
-        SlimefunBlockData data= safeLoadBlock(loc);
-        return getCustomData(data,key,defaultValue);
+    private static void safeSetData(SlimefunBlockData data,String key,String value){
+        if(data==null)return;
+        StorageCacheUtils.executeAfterLoad(data,()-> data.setData(key,value),false);
     }
     public static void setCustomData(Location loc ,String key,int value){
         safeSetData(loc,key,String.valueOf(value));
     }
-    public static int getCustomData(SlimefunBlockData data,String key,int defaultValue){
-        try{
-            String csd= data.getData(key);
-            if(csd!=null)
-                return Integer.parseInt(csd);
-        }catch (Throwable a){
-        }
-        data.setData(key,String.valueOf(defaultValue));
-        return defaultValue;
-    }
     public static void setCustomData(SlimefunBlockData data,String key,int value){
         safeSetData(data,key,String.valueOf(value));
     }
-    public static String getCustomString(Location loc,String key,String defaultValue){
-        SlimefunBlockData data= safeLoadBlock(loc);
-        return getCustomString(data,key,defaultValue);
-    }
-    public static String getCustomString(SlimefunBlockData data,String key,String defaultVal){
-        try{
-            String csd= data.getData(key);
-            if(csd!=null)
-                return csd;
-        }catch (Throwable a){
-        }
-        data.setData(key,defaultVal);
-        return defaultVal;
-    }
+
+
     public static void setCustomString(Location loc,String key,String value){
         safeSetData(loc,key,value);
     }
     public static void setCustomString(SlimefunBlockData data,String key,String value){
         safeSetData(data,key,value);
+    }
+    public static void setLastLocation(Location loc ,Location loc2){
+
+        setLocation("location",loc,loc2);
+    }
+    /**
+     * must run in ticks or after data load!
+     * @param loc
+     * @param val
+     */
+    public static void setLastRecipe(Location loc ,int val){
+        SlimefunBlockData data=safeGetBlockDataFromCache(loc);
+        data.setData("recipe", String.valueOf(val));
+    }
+    /**
+     * must run in ticks or after data load!
+     */
+    public static void setLastRecipe(SlimefunBlockData data ,int val){
+
+        data.setData("recipe", String.valueOf(val));
+    }
+    public static void setLastUUID(Location loc ,String uuid){
+        safeSetData(loc,"uuid",uuid);
+    }
+    public static void setLocation(String key, Location loc, Location loc2){
+        safeSetData(loc,key,locationToString(loc2));
+    }
+    public static void setLocation(String key, SlimefunBlockData data, Location loc2){
+        safeSetData(data,key,locationToString(loc2));
+    }
+    public static void setup(){
+
     }
 }

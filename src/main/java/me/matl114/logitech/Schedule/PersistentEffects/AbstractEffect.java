@@ -11,29 +11,29 @@ public abstract class AbstractEffect {
     public AbstractEffect(String name) {
         this.id = AddUtils.idDecorator(name);
     }
+    public abstract void aquireEffect(Player p,int level);
+
+    public String getEffectId() {
+        return id;
+    }
+
     public  void initEffect(Player p){
 
         removeEffect(p,1);
     }
 
-    public abstract void aquireEffect(Player p,int level);
+    public boolean onDeathClear(){
+        return true;
+    }
 
-    public abstract void removeEffect(Player p,int level);
+    public void onDeathEvent(PlayerDeathEvent e,int level) {
 
-    public abstract void tickEffect(Player p,int level);
-
-    public String getEffectId() {
-        return id;
     }
     public AbstractEffect reigster(){
         return ScheduleEffects.registerEffect(this);
     }
 
-    public boolean onDeathClear(){
-        return true;
-    }
-    public void onDeathEvent(PlayerDeathEvent e,int level) {
-
-    }
+    public abstract void removeEffect(Player p,int level);
+    public abstract void tickEffect(Player p,int level);
 
 }

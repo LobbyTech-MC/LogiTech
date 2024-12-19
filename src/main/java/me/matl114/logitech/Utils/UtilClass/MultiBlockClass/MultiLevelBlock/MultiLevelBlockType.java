@@ -14,38 +14,12 @@ import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
 public abstract class MultiLevelBlockType implements AbstractMultiBlockType {
     protected final List<AbstractMultiBlockType> SUBMULTIBLOCKS_LIST;
     protected AbstractMultiBlockType[] SUBMULTIBLOCKS;
-    public AbstractMultiBlockType getSubParts(int index){
-        return SUBMULTIBLOCKS[index];
-    }
     protected int[] SIZES;
     protected int[] INDEXS;
     protected int SUB_NUM;
     protected boolean isSymm;
-    public abstract void init();
     public MultiLevelBlockType(){
         this.SUBMULTIBLOCKS_LIST=new ArrayList<>();
-    }
-    public int getSchemaSize(){
-        return INDEXS[SUB_NUM];
-    }
-    public Vector getSchemaPart(int index){
-        for(int i=0;i<SUB_NUM;++i){
-            if(index<INDEXS[i+1]){
-                return SUBMULTIBLOCKS[i].getSchemaPart(index-INDEXS[i]);
-            }
-        }
-        return null;
-    }
-    public String getSchemaPartId(int index){
-        for(int i=0;i<SUB_NUM;++i){
-            if(index<INDEXS[i+1]){
-                return SUBMULTIBLOCKS[i].getSchemaPartId(index-INDEXS[i]);
-            }
-        }
-        return null;
-    }
-    public boolean isSymmetric(){
-        return  isSymm;
     }
     public MultiLevelBlockType addSubPart(AbstractMultiBlockType type){
         this.SUBMULTIBLOCKS_LIST.add(type);
@@ -78,6 +52,32 @@ public abstract class MultiLevelBlockType implements AbstractMultiBlockType {
             return null;
         }
         return new   MultiLevelBlock(this,level,dir,subparts);
+    }
+    public Vector getSchemaPart(int index){
+        for(int i=0;i<SUB_NUM;++i){
+            if(index<INDEXS[i+1]){
+                return SUBMULTIBLOCKS[i].getSchemaPart(index-INDEXS[i]);
+            }
+        }
+        return null;
+    }
+    public String getSchemaPartId(int index){
+        for(int i=0;i<SUB_NUM;++i){
+            if(index<INDEXS[i+1]){
+                return SUBMULTIBLOCKS[i].getSchemaPartId(index-INDEXS[i]);
+            }
+        }
+        return null;
+    }
+    public int getSchemaSize(){
+        return INDEXS[SUB_NUM];
+    }
+    public AbstractMultiBlockType getSubParts(int index){
+        return SUBMULTIBLOCKS[index];
+    }
+    public abstract void init();
+    public boolean isSymmetric(){
+        return  isSymm;
     }
 
 }

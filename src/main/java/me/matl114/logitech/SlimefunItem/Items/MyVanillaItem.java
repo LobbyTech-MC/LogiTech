@@ -21,23 +21,6 @@ public class MyVanillaItem extends VanillaItem implements RecipeDisplay {
         super(itemGroup, item, id, recipeType, recipe);
         this.useableInWorkbench = false;
     }
-    public List<MachineRecipe> provideDisplayRecipe(){
-        return new ArrayList<>();
-    }
-    public final List<ItemStack> getDisplayRecipes() {
-        if(displayedMemory==null||displayedMemory.isEmpty()) {
-            displayedMemory=_getDisplayRecipes(new ArrayList<>());
-        }
-        return displayedMemory;
-    }
-    public MyVanillaItem addHandler(ItemHandler handler) {
-        this.addItemHandler(handler);
-        return this;
-    }
-    public MyVanillaItem setDisplayRecipes(List<ItemStack> displayRecipes) {
-        this.displayedMemory = displayRecipes;
-        return this;
-    }
     public MyVanillaItem addDisplayRecipe(ItemStack stack) {
         if(displayedMemory==null||displayedMemory.isEmpty()){
             this.displayedMemory=new ArrayList<>();
@@ -45,9 +28,22 @@ public class MyVanillaItem extends VanillaItem implements RecipeDisplay {
         this.displayedMemory.add(stack);
         return this;
     }
-    public MyVanillaItem setOutput(Object obj){
-        this.recipeOutput= AddUtils.resolveItem(obj);
+    public MyVanillaItem addHandler(ItemHandler handler) {
+        this.addItemHandler(handler);
         return this;
+    }
+    public final List<ItemStack> getDisplayRecipes() {
+        if(displayedMemory==null||displayedMemory.isEmpty()) {
+            displayedMemory=_getDisplayRecipes(new ArrayList<>());
+        }
+        return displayedMemory;
+    }
+    public void postRegister(){
+        super.postRegister();
+        this.addWikiPage("");
+    }
+    public List<MachineRecipe> provideDisplayRecipe(){
+        return new ArrayList<>();
     }
     public MyVanillaItem register(){
         if(AddSlimefunItems.INSTANCE!=null){
@@ -57,9 +53,13 @@ public class MyVanillaItem extends VanillaItem implements RecipeDisplay {
         }
         return this;
     }
-    public void postRegister(){
-        super.postRegister();
-        this.addWikiPage("");
+    public MyVanillaItem setDisplayRecipes(List<ItemStack> displayRecipes) {
+        this.displayedMemory = displayRecipes;
+        return this;
+    }
+    public MyVanillaItem setOutput(Object obj){
+        this.recipeOutput= AddUtils.resolveItem(obj);
+        return this;
     }
 
 

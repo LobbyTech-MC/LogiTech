@@ -51,21 +51,6 @@ public class OctaSorter extends AbstractSorter{
             new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6输入槽7","&7货运输入~"),
 
     };
-    public int[] getInputSlots() {
-        return INPUT_SLOT;
-    }
-    public int[] getInputWLSlot() {
-        return INPUTW_SLOT;
-    }
-    public int[] getOutputSlots() {
-        return OUTPUT_SLOT;
-    }
-    public int getChipSlot(){
-        return 13;
-    }
-    public int getInfoSlot(){
-        return 22;
-    }
     public OctaSorter(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(itemGroup, item, recipeType, recipe,8);
     }
@@ -80,5 +65,20 @@ public class OctaSorter extends AbstractSorter{
         for (int i=0;i<len;i++){
             preset.addItem(border[i], INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
         }
+    }
+    public int getChipSlot(){
+        return 13;
+    }
+    public int getInfoSlot(){
+        return 22;
+    }
+    public int[] getInputSlots() {
+        return INPUT_SLOT;
+    }
+    public int[] getInputWLSlot() {
+        return INPUTW_SLOT;
+    }
+    public int[] getOutputSlots() {
+        return OUTPUT_SLOT;
     }
 }

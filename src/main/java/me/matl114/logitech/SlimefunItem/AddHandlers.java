@@ -10,12 +10,6 @@ import io.github.thebusybiscuit.slimefun4.core.handlers.BlockUseHandler;
 import io.github.thebusybiscuit.slimefun4.core.handlers.ItemUseHandler;
 
 public final class AddHandlers {
-    public static void stopUseClick(PlayerRightClickEvent event) {
-        event.cancel();
-    }
-    public static void stopAttackClick(PlayerRightClickEvent e) {
-        e.cancel();
-    }
     public static final ItemUseHandler stopPlacementHandler =AddHandlers::stopUseClick;
     public static final BlockUseHandler stopItemUseHandler =AddHandlers::stopUseClick;
     public static final ItemUseHandler stopAttackHandler =AddHandlers::stopAttackClick;
@@ -25,4 +19,10 @@ public final class AddHandlers {
             e.setCancelled(true);
         }
     };
+    public static void stopAttackClick(PlayerRightClickEvent e) {
+        e.cancel();
+    }
+    public static void stopUseClick(PlayerRightClickEvent event) {
+        event.cancel();
+    }
 }

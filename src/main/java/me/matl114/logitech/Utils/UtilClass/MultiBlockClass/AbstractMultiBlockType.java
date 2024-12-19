@@ -12,16 +12,19 @@ public interface AbstractMultiBlockType {
      */
 
     /**
-     * get schema size,used in hologram type show
-     * @return
-     */
-    public int getSchemaSize();
-
-    /**
      * build structure map into arrays
      * @return
      */
     public AbstractMultiBlockType build();
+
+    /**
+     * try generate an AbstractMultiBlock with given direction,null if failed
+     * @param loc
+     * @param dir
+     * @param hasPrevRecord
+     * @return
+     */
+    public AbstractMultiBlock genMultiBlockFrom(Location loc, MultiBlockService.Direction dir, boolean hasPrevRecord, OutputStream errorStream);
 
     /**
      * add block, when x=y=z=0,ignored
@@ -56,18 +59,15 @@ public interface AbstractMultiBlockType {
     public String getSchemaPartId(int index);
 
     /**
+     * get schema size,used in hologram type show
+     * @return
+     */
+    public int getSchemaSize();
+
+    /**
      * if structure is Symmetric ,if true ,only need to check direction NORTH
      * @return
      */
     public boolean isSymmetric();
-
-    /**
-     * try generate an AbstractMultiBlock with given direction,null if failed
-     * @param loc
-     * @param dir
-     * @param hasPrevRecord
-     * @return
-     */
-    public AbstractMultiBlock genMultiBlockFrom(Location loc, MultiBlockService.Direction dir, boolean hasPrevRecord, OutputStream errorStream);
 
 }

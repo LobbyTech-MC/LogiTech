@@ -11,19 +11,19 @@ import me.matl114.logitech.SlimefunItem.Cargo.SpaceStorage.StorageSpace;
 
 public class StorageWorldProtection implements ProtectionModule {
     Plugin plugin;
-    public void load(){
-        //mamba out
-        this.plugin= MyAddon.getInstance();
-    }
-
     public Plugin getPlugin(){
         return this.plugin;
     }
+
     public boolean hasPermission(OfflinePlayer var1, Location var2, Interaction var3){
         if(StorageSpace.ENABLED&& StorageSpace.STORAGE_WORLD==var2.getWorld()){
             return false;
         }else {
             return true;
         }
+    }
+    public void load(){
+        //mamba out
+        this.plugin= MyAddon.getInstance();
     }
 }

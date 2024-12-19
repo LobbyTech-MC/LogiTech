@@ -26,6 +26,13 @@ import me.matl114.logitech.Utils.Debug;
 import me.matl114.logitech.Utils.WorldUtils;
 
 public class StorageSpace {
+    public static class StorageWorldGen extends ChunkGenerator {
+        public ChunkData generateChunkData(World world, Random random, int chunkx, int chunkz, BiomeGrid biomeGrid){
+            ChunkData chunkData=createChunkData(world);
+            chunkData.setRegion(0, WORLD_MIN_Y,0,16, WORLD_MAX_Y,16, Material.BARRIER);
+            return chunkData;
+        }
+    }
     public static String WORLD_NAME = "logispace";
     public static World STORAGE_WORLD;
     public static int WORLD_MIN_Y =0;
@@ -35,8 +42,8 @@ public class StorageSpace {
     public static int STORAGE_DISTANCE=100;
     public static int STORAGE_MAXSIZE=63;
     protected static String FORMAT_LOC="{%d},{%d},{%d},{%d},{%d}";
-    public static boolean ENABLED = true;
 
+    public static boolean ENABLED = true;
     static {
         if(!ConfigLoader.CONFIG.contains("options.disable-spacestorage")){
             ConfigLoader.CONFIG.setValue("options.disable-spacestorage",false);
@@ -48,28 +55,9 @@ public class StorageSpace {
 
 
     }
-    public static void setup(){
-        if(ENABLED){
-            try{
-                WorldCreator worldCreator = new WorldCreator(WORLD_NAME);
-                worldCreator.generator(new StorageWorldGen());
-                STORAGE_WORLD = worldCreator.createWorld();
-                STORAGE_WORLD.setGameRule(GameRule.DO_MOB_SPAWNING,false);
-                STORAGE_WORLD.setGameRule(GameRule.MOB_GRIEFING,false);
-                STORAGE_WORLD.setGameRule(GameRule.KEEP_INVENTORY,true);
-            }catch(Throwable e){
-                e.printStackTrace();
-                ENABLED=false;
-            }
-        }
-    }
-    public static class StorageWorldGen extends ChunkGenerator {
-        public ChunkData generateChunkData(World world, Random random, int chunkx, int chunkz, BiomeGrid biomeGrid){
-            ChunkData chunkData=createChunkData(world);
-            chunkData.setRegion(0, WORLD_MIN_Y,0,16, WORLD_MAX_Y,16, Material.BARRIER);
-            return chunkData;
-        }
-    }
+    public static byte[] COUNTER_LOCK=new byte[0];
+    public static int SYNC_THREAD_COUNTER=0;
+
     //about Configs and data storage
     public static Pair<Integer, Location> generateNewLocation(int sizeX, int sizeY, int sizeZ){
         int num=ConfigLoader.SPACE_STORAGE.getOrSetDefault("index",0)+1;
@@ -103,20 +91,10 @@ public class StorageSpace {
         ConfigLoader.SPACE_STORAGE.save();
         return new Pair<>(num, new Location(STORAGE_WORLD,dx,0,dz));
     }
-
-    //about execution
-    //should execute Async
-    public static boolean threadRunning(){
-        synchronized (COUNTER_LOCK){
-            return SYNC_THREAD_COUNTER>0;
-        }
-    }
     public static void onSpaceExchange(Player player, Location startLocation,Location endLocation,Location targetLocation,int status,boolean checkPerms){
         BukkitUtils.executeAsync(()->onSpaceExchangeAsync(player,startLocation,endLocation,targetLocation,status,checkPerms));
     }
 
-    public static byte[] COUNTER_LOCK=new byte[0];
-    public static int SYNC_THREAD_COUNTER=0;
     //make sure startlocation<endlocation
     //actually we find that
     //事实上想要挪动粘液方块而不造成刷物是不可能的
@@ -281,5 +259,27 @@ public class StorageSpace {
             Debug.logger("StorageSpace的线程计数器出现异常状态!疑似出现线程死循环,请联系作者");
         }
         SYNC_THREAD_COUNTER=0;
+    }
+    public static void setup(){
+        if(ENABLED){
+            try{
+                WorldCreator worldCreator = new WorldCreator(WORLD_NAME);
+                worldCreator.generator(new StorageWorldGen());
+                STORAGE_WORLD = worldCreator.createWorld();
+                STORAGE_WORLD.setGameRule(GameRule.DO_MOB_SPAWNING,false);
+                STORAGE_WORLD.setGameRule(GameRule.MOB_GRIEFING,false);
+                STORAGE_WORLD.setGameRule(GameRule.KEEP_INVENTORY,true);
+            }catch(Throwable e){
+                e.printStackTrace();
+                ENABLED=false;
+            }
+        }
+    }
+    //about execution
+    //should execute Async
+    public static boolean threadRunning(){
+        synchronized (COUNTER_LOCK){
+            return SYNC_THREAD_COUNTER>0;
+        }
     }
 }

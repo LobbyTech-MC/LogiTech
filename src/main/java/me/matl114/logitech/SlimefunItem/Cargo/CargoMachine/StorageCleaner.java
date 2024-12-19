@@ -29,18 +29,12 @@ public class StorageCleaner extends AbstractMachine {
     protected final int[] OUTPUT_SLOT=new int[]{
             27,28,29,30,31,32,33,34,35
     };
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
-
     protected final int BOTTON_SLOT=22;
     protected final ItemStack BOTTON_ITEM=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a信息",
             "&7上方输入槽,下方输出槽",
             "&7当对应输出槽为空时,将会执行重置操作",
             "&7除去存储外,其余物品也可以被重置");
+
     public StorageCleaner(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(category,item,recipeType,recipe,0,0);
         setDisplayRecipes(Utils.list(
@@ -57,6 +51,12 @@ public class StorageCleaner extends AbstractMachine {
             preset.addItem(slot[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
         }
         preset.addItem(BOTTON_SLOT,BOTTON_ITEM,ChestMenuUtils.getEmptyClickHandler());
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
     }
     public void newMenuInstance(BlockMenu inv, Block block){
     }

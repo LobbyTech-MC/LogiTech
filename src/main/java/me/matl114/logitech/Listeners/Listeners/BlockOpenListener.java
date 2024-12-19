@@ -10,42 +10,50 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.EquipmentSlot;
 
 import io.github.thebusybiscuit.slimefun4.api.events.PlayerRightClickEvent;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import me.matl114.logitech.MyAddon;
 import me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore.MultiBlockPart;
 import me.matl114.logitech.SlimefunItem.Interface.MenuBlock;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.inventory.EquipmentSlot;
-
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Optional;
 
 public class BlockOpenListener implements Listener {
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onRightClick(PlayerRightClickEvent event){
-        boolean itemUsed = event.getHand() == EquipmentSlot.OFF_HAND;
-        if(event.getPlayer().isSneaking()){
-            return ;
-        }
+    @ParametersAreNonnullByDefault
+    private static void openInventory(Player p,  Block clickedBlock, PlayerRightClickEvent event) {
+        try {
+            if (!p.isSneaking() || event.getItem().getType() == Material.AIR) {
+                event.getInteractEvent().setCancelled(true);
 
-        if (!itemUsed && event.useBlock() != Event.Result.DENY && !rightClickBlock(event)) {
-            return;
+                var blockData = DataCache.safeGetBlockCacheWithLoad(clickedBlock.getLocation());
+                if (blockData == null) {
+                    return;
+                }
+                DataCache.runAfterSafeLoad(clickedBlock.getLocation(),(data)->{
+                    if (!p.isOnline()) {
+                        return;
+                    }
+                    openMenu(data.getBlockMenu(), clickedBlock, p);
+                },true);
+            }
+        } catch (Exception | LinkageError x) {
+            SlimefunItem item=DataCache.getSfItem(clickedBlock.getLocation());
+           item.error("An Exception was caught while trying to open the Inventory", x);
+        }
+    }
+    private static void openMenu(BlockMenu menu, Block b, Player p) {
+        if (menu != null) {
+            if (menu.canOpen(b, p)) {
+                menu.open(p);
+            } else {
+                Slimefun.getLocalization().sendMessage(p, "inventory.no-access", true);
+            }
         }
     }
     @ParametersAreNonnullByDefault
@@ -103,35 +111,15 @@ public class BlockOpenListener implements Listener {
 
         return true;
     }
-    @ParametersAreNonnullByDefault
-    private static void openInventory(Player p,  Block clickedBlock, PlayerRightClickEvent event) {
-        try {
-            if (!p.isSneaking() || event.getItem().getType() == Material.AIR) {
-                event.getInteractEvent().setCancelled(true);
-
-                var blockData = DataCache.safeGetBlockCacheWithLoad(clickedBlock.getLocation());
-                if (blockData == null) {
-                    return;
-                }
-                DataCache.runAfterSafeLoad(clickedBlock.getLocation(),(data)->{
-                    if (!p.isOnline()) {
-                        return;
-                    }
-                    openMenu(data.getBlockMenu(), clickedBlock, p);
-                },true);
-            }
-        } catch (Exception | LinkageError x) {
-            SlimefunItem item=DataCache.getSfItem(clickedBlock.getLocation());
-           item.error("An Exception was caught while trying to open the Inventory", x);
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onRightClick(PlayerRightClickEvent event){
+        boolean itemUsed = event.getHand() == EquipmentSlot.OFF_HAND;
+        if(event.getPlayer().isSneaking()){
+            return ;
         }
-    }
-    private static void openMenu(BlockMenu menu, Block b, Player p) {
-        if (menu != null) {
-            if (menu.canOpen(b, p)) {
-                menu.open(p);
-            } else {
-                Slimefun.getLocalization().sendMessage(p, "inventory.no-access", true);
-            }
+
+        if (!itemUsed && event.useBlock() != Event.Result.DENY && !rightClickBlock(event)) {
+            return;
         }
     }
 }

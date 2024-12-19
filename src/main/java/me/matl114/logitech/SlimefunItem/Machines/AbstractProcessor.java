@@ -41,6 +41,7 @@ public abstract class AbstractProcessor extends AbstractMachine implements Machi
     protected final ItemStack progressbar;
     protected final MachineProcessor<SimpleCraftingOperation> processor;
     protected int PROCESSOR_SLOT=22;
+    protected boolean USE_HISTORY=true;
     public AbstractProcessor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                            ItemStack progressItem, int energyConsumption, int energyBuffer,
                              LinkedHashMap<Object, Integer> customRecipes){
@@ -65,39 +66,13 @@ public abstract class AbstractProcessor extends AbstractMachine implements Machi
         }
 
     }
+
     public AbstractProcessor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                              Material progressItem, int energyConsumption, int energyBuffer,
                              LinkedHashMap<Object, Integer> customRecipes){
         this(category,item,recipeType,recipe,new ItemStack(progressItem),energyConsumption,energyBuffer,customRecipes);
     }
 
-    /**
-     * method from MachineProcessorHolder
-     * @return
-     */
-    public MachineProcessor<SimpleCraftingOperation> getMachineProcessor() {
-        return this.processor;
-    }
-
-
-    /**
-     * need implement,  method from MachineProcessorHolder
-     * @return
-     */
-    public ItemStack getProgressBar(){
-        return this.progressbar;
-    }
-
-
-    /**
-     * cancel machineprocessor after break
-     * @param e
-     * @param menu
-     */
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
-        super.onBreak(e,menu);
-        AbstractProcessor.this.processor.endOperation(menu.getLocation());
-    }
 
     /**
      *
@@ -132,25 +107,53 @@ public abstract class AbstractProcessor extends AbstractMachine implements Machi
 
         for(int var4 = 0; var4 < len; ++var4) {
             preset.addMenuClickHandler(border[var4], new ChestMenu.AdvancedMenuClickHandler() {
-                public boolean onClick(Player p, int slot, ItemStack cursor, ClickAction action) {
-                    return false;
-                }
                 public boolean onClick(InventoryClickEvent e, Player p, int slot, ItemStack cursor, ClickAction action) {
                     return cursor == null || cursor.getType() == null || cursor.getType() == Material.AIR;
+                }
+                public boolean onClick(Player p, int slot, ItemStack cursor, ClickAction action) {
+                    return false;
                 }
             });
         }
     }
+
+
     public int[] getInputSlots(){
         return new int[]{19,20};
     }
 
+    /**
+     * method from MachineProcessorHolder
+     * @return
+     */
+    public MachineProcessor<SimpleCraftingOperation> getMachineProcessor() {
+        return this.processor;
+    }
     public int[] getOutputSlots(){
         return new int[]{24,25};
     }
 
+    /**
+     * need implement,  method from MachineProcessorHolder
+     * @return
+     */
+    public ItemStack getProgressBar(){
+        return this.progressbar;
+    }
 
-    protected boolean USE_HISTORY=true;
+
+    /**
+     * cancel machineprocessor after break
+     * @param e
+     * @param menu
+     */
+    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+        super.onBreak(e,menu);
+        AbstractProcessor.this.processor.endOperation(menu.getLocation());
+    }
+    public void preRegister(){
+        super.preRegister();
+    }
     public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         SimpleCraftingOperation currentOperation = (SimpleCraftingOperation)this.processor.getOperation(b);
         ItemConsumer[] fastCraft=null;
@@ -199,9 +202,6 @@ public abstract class AbstractProcessor extends AbstractMachine implements Machi
             }
 
 
-    }
-    public void preRegister(){
-        super.preRegister();
     }
 
 }

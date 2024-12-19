@@ -45,14 +45,14 @@ public class BlockBreakListener implements Listener {
         e.getEntity().setHealth(e.getEntity().getMaxHealth());
     }
     @EventHandler
+    public void onPlayerDeath2(PlayerDeathEvent e){
+        e.getEntity().getLastDamageCause().getDamageSource();
+
+    }
+    @EventHandler
     public  void onPlayerPortal(EntityPortalEnterEvent e){
         if(e.getEntity() instanceof Player){
             Debug.logger("loc at ",e.getLocation());
         }
-    }
-    @EventHandler
-    public void onPlayerDeath2(PlayerDeathEvent e){
-        e.getEntity().getLastDamageCause().getDamageSource();
-
     }
 }

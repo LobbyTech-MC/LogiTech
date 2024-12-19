@@ -8,6 +8,10 @@ import org.bukkit.inventory.ItemStack;
 
 public class EqProRandomStack extends RandomItemStack  {
     public Random rand=new Random();
+    public EqProRandomStack(LinkedHashMap<ItemStack,Integer> itemSettings) {
+        super(itemSettings);
+    }
+
     public EqProRandomStack(LinkedHashSet<ItemStack> itemSettings) {
         super(new LinkedHashMap<>(){{
            itemSettings.forEach(item -> {
@@ -15,19 +19,15 @@ public class EqProRandomStack extends RandomItemStack  {
            });
         }});
     }
-
-    public EqProRandomStack(LinkedHashMap<ItemStack,Integer> itemSettings) {
-        super(itemSettings);
+    
+    public ItemStack clone(){
+        return this.itemList[rand.nextInt(this.sum)].clone();
     }
     
     public EqProRandomStack copy(){
         EqProRandomStack stack = new EqProRandomStack(itemSettings);
         return stack;
 
-    }
-    
-    public ItemStack clone(){
-        return this.itemList[rand.nextInt(this.sum)].clone();
     }
     public ItemStack getInstance(){
         ItemStack it= this.itemList[rand.nextInt(this.sum)];

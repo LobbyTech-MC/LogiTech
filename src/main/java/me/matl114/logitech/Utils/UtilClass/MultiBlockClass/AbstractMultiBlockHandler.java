@@ -4,39 +4,33 @@ import org.bukkit.Location;
 
 public interface AbstractMultiBlockHandler {
     /**
-     * location of core
-     * @return
+     * accept in core ticks,check if active and return boolean value,when active is down, return false,
+     * the service method will call the  destroy method
+     *  @return
      */
-    public Location getCore() ;
-    public MultiBlockService.Direction getDirection();
-    public AbstractMultiBlock getMultiBlock();
-    /**
-     * is multiblock be build
-     * @return
-     */
-    public boolean isActive();
-    //响应部件信号
-    public void toggleOff(MultiBlockService.DeleteCause cause);
+    public boolean acceptCoreRequest();
     /**
      * accept in part ticks
      * @param loc
      */
     public void acceptPartRequest(Location loc);
     //响应主核信号 返回是否还正常
-
     /**
-     * accept in core ticks,check if active and return boolean value,when active is down, return false,
-     * the service method will call the  destroy method
-     *  @return
-     */
-    public boolean acceptCoreRequest();
-
-    /**
-     * return the size of structure
+     * strict check if the multiblock matches,not suggested in tickers
      * @return
      */
-    public int getSize();
-
+    public int checkIfComplete();
+    /**
+     * random check if the multiblock matches,suggested in tickers
+     * @return
+     */
+    default int checkIfCompleteRandom(){
+        return checkIfComplete();
+    }
+    /**
+     * this method should called onMultiBlockDisable for CORE and reset blockdata!
+     */
+    public void destroy(MultiBlockService.DeleteCause cause);
     /**
      * return the index th block in structure
      * @param index
@@ -45,18 +39,22 @@ public interface AbstractMultiBlockHandler {
     public Location getBlockLoc(int index);
 
     /**
-     * strict check if the multiblock matches,not suggested in tickers
+     * location of core
      * @return
      */
-    public int checkIfComplete();
+    public Location getCore() ;
+
+    public MultiBlockService.Direction getDirection();
+
+    public MultiBlockService.DeleteCause getLastDeleteCause();
+
+    public AbstractMultiBlock getMultiBlock();
 
     /**
-     * random check if the multiblock matches,suggested in tickers
+     * return the size of structure
      * @return
      */
-    default int checkIfCompleteRandom(){
-        return checkIfComplete();
-    }
+    public int getSize();
 
     /**
      * get handler uid
@@ -65,9 +63,11 @@ public interface AbstractMultiBlockHandler {
     public String getUid();
 
     /**
-     * this method should called onMultiBlockDisable for CORE and reset blockdata!
+     * is multiblock be build
+     * @return
      */
-    public void destroy(MultiBlockService.DeleteCause cause);
+    public boolean isActive();
 
-    public MultiBlockService.DeleteCause getLastDeleteCause();
+    //响应部件信号
+    public void toggleOff(MultiBlockService.DeleteCause cause);
 }

@@ -22,21 +22,32 @@ import me.matl114.logitech.Utils.Utils;
 import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
 
 public class ReplaceCard extends DistinctiveCustomItemStack {
-    public final static String LOC_DISPLAY_PREFIX = AddUtils.resolveColor("&x&E&B&3&3&E&B替代的物品: &f");
-    public final static NamespacedKey KEY_LOC = AddUtils.getNameKey("rep_mat_id");
     public enum ReplaceType{
         MATERIAL(i->new ItemStack(Material.getMaterial(i)),i->i.getType().toString()),
         SLIMEFUN(i-> new ItemStack(SlimefunItem.getById(i).getItem()),i->SlimefunItem.getByItem(i).getId()),
         UNKNOWN((i)->null,(i)->null);
+        public Function<String,ItemStack> deserializeFunc;
+        public Function<ItemStack,String> serializeFunc;
         ReplaceType(Function<String,ItemStack> deserializeFunc,Function<ItemStack,String> serializeFunc) {
             this.deserializeFunc = deserializeFunc;
             this.serializeFunc = serializeFunc;
         }
-        public Function<String,ItemStack> deserializeFunc;
-        public Function<ItemStack,String> serializeFunc;
+    }
+    public final static String LOC_DISPLAY_PREFIX = AddUtils.resolveColor("&x&E&B&3&3&E&B替代的物品: &f");
+    public final static NamespacedKey KEY_LOC = AddUtils.getNameKey("rep_mat_id");
+    static HashSet<ReplaceCard> instances=new HashSet<>();
+    public static ItemStack getAllCardReplacement(ItemStack item){
+        ItemStack result;
+        for(ReplaceCard replaceCard:instances){
+            result=replaceCard.getCardReplacement(item);
+            if(result!=item){
+                return result;
+            }
+        }
+        return item;
     }
     ReplaceType type=ReplaceType.UNKNOWN;
-    static HashSet<ReplaceCard> instances=new HashSet<>();
+
     public ReplaceCard(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,ReplaceType type) {
         super(itemGroup, item, recipeType, recipe);
         this.setDisplayRecipes(
@@ -49,7 +60,24 @@ public class ReplaceCard extends DistinctiveCustomItemStack {
         this.type=type;
         instances.add(this);
     }
-
+    public ItemStack getCardReplacement(ItemStack item) {
+        if(item!=null&&item.getType()==this.getItem().getType()&&item.hasItemMeta()){
+            ItemMeta meta=item.getItemMeta();
+            PersistentDataContainer container=meta.getPersistentDataContainer();
+            if(container.has(KEY_LOC)){
+                try {
+                    String id = container.get(KEY_LOC, PersistentDataType.STRING);
+                    ItemStack newStack=type.deserializeFunc.apply(id);
+                    if(newStack!=null){
+                        newStack.setAmount(item.getAmount());
+                        return newStack;
+                    }
+                }catch (Throwable e){
+                }
+            }
+        }
+        return item;
+    }
     public  ItemStack getReplaceCard(Material item) {
         String id=item.toString();
         return getReplaceCard(id,ItemStackHelper.getDisplayName(new ItemStack(item)));
@@ -72,34 +100,6 @@ public class ReplaceCard extends DistinctiveCustomItemStack {
         meta.setDisplayName(name);
         stack.setItemMeta(meta);
         return stack;
-    }
-    public static ItemStack getAllCardReplacement(ItemStack item){
-        ItemStack result;
-        for(ReplaceCard replaceCard:instances){
-            result=replaceCard.getCardReplacement(item);
-            if(result!=item){
-                return result;
-            }
-        }
-        return item;
-    }
-    public ItemStack getCardReplacement(ItemStack item) {
-        if(item!=null&&item.getType()==this.getItem().getType()&&item.hasItemMeta()){
-            ItemMeta meta=item.getItemMeta();
-            PersistentDataContainer container=meta.getPersistentDataContainer();
-            if(container.has(KEY_LOC)){
-                try {
-                    String id = container.get(KEY_LOC, PersistentDataType.STRING);
-                    ItemStack newStack=type.deserializeFunc.apply(id);
-                    if(newStack!=null){
-                        newStack.setAmount(item.getAmount());
-                        return newStack;
-                    }
-                }catch (Throwable e){
-                }
-            }
-        }
-        return item;
     }
     @Override
     public  void preRegister(){

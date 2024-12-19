@@ -90,36 +90,13 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
     protected final  ItemStack WORLD_UNKNOWN_ITEM=new CustomItemStack(Material.GRASS_BLOCK,"&6当前环境: &b???","&7不可以跑图");
     protected final int FLY_PROGRESS_SLOT=19;
     protected final int FOOD_PROGRESS_SLOT=25;
-    protected ItemStack getInfoItem(int progress,int totalProgress,long predictSeed,int speed,int foodlevel,int totalFoodlevel,boolean isFly){
-        if(foodlevel>=0){
-            if(speed>0){
-                if(isFly){
-                    return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a跑图中","&7当前饱食进度: %s/%s".formatted(String.valueOf(foodlevel),String.valueOf(totalFoodlevel)),"&7当前跑图速度: %s".formatted(String.valueOf(speed)),"&7当前预测种子: %s".formatted(String.valueOf(predictSeed)),"&7当前跑图进度: %s/%s".formatted(String.valueOf(progress),String.valueOf(totalProgress)));
-                }else {
-                    return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a挖掘中","&7当前饱食进度: %s/%s".formatted(String.valueOf(foodlevel),String.valueOf(totalFoodlevel)),"&7当前挖掘速度: %s".formatted(String.valueOf(speed)),"&7当前预测种子: %s".formatted(String.valueOf(predictSeed)),"&7当前挖掘进度: %s/%s".formatted(String.valueOf(progress),String.valueOf(totalProgress)));
-                }
-            }else {
-                return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c未工作","&7进度速度=0");
-            }
-        }else {
-            return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c未工作","&7食物不足!");
-        }
-    }
     protected final Random rand=new Random();
-    protected int getRandFlyProgress(){
-        return rand.nextInt(1000,1600);
-    }
     protected final int MINE_PROGRESS=4;
     protected MachineProcessor<CustomMachineOperation> mainProcessor;
     protected MachineProcessor<CustomMachineOperation>  foodProcessor;
     protected MachineProcessor<CustomMachineOperation> rockectProcessor;
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
     protected final String KEY_SEED="sed";
+    HashMap<Location, OfflinePlayer> placer=new HashMap<>();
     public VirtualExplorer(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                               int energybuffer, int energyConsumption){
         super(category, item, recipeType, recipe, energybuffer, energyConsumption);
@@ -140,68 +117,6 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
         preset.addItem(ELYTRA_SLOT,ELYTRA_ITEM);
         preset.addItem(FOOD_SLOT,FOOD_ITEM);
         preset.addItem(SEED_SLOT,SEED_ITEM);
-    }
-    public void newMenuInstance(BlockMenu menu, Block block){
-        menu.addMenuClickHandler(SEED_SLOT,((player, i, itemStack, clickAction) -> {
-            AddUtils.sendMessage(player,"&6[&7自动跑图机&6]&a 请输入种子:");
-            player.closeInventory();
-            ChatUtils.awaitInput(player,(str)->{
-                try{
-                    long seed = Long.parseLong(str);
-                    DataCache.setCustomString(menu.getLocation(),KEY_SEED,str);
-                    if(menu.getLocation().getWorld().getSeed()==seed){
-                        AddUtils.sendMessage(player,"&6[&7自动跑图机&6]&a 种子正确!");
-                    }else {
-                        AddUtils.sendMessage(player,"&6[&7自动跑图机&6]&c 种子错误!");
-                    }
-                }catch (Throwable e){
-                    AddUtils.sendMessage(player,"&6[&7自动跑图机&6]&a 这并不是有效的LongType!");
-                }
-            });
-            return false;
-        }));
-        ItemStack env= switch (menu.getLocation().getWorld().getEnvironment()){
-            case NETHER -> WORLD_NETHER_ITEM;
-            case CUSTOM -> WORLD_UNKNOWN_ITEM;
-            case NORMAL -> WORLD_WORLD_ITEM;
-            case THE_END -> WORLD_END_ITEM;
-        };
-        menu.replaceExistingItem(WORLD_SLOT,env);
-    }
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
-    protected int isFood(ItemStack item){
-        if(item==null||!item.isSimilar(new ItemStack(item.getType()))){
-            return 0;
-        }else {
-            Material material=item.getType();
-            if(WorldUtils.FOOD_SATURATION_MUL_10.containsKey(material)){
-                return WorldUtils.FOOD_SATURATION_MUL_10.get(material);
-            }
-            return 0;
-        }
-    }
-    protected ItemStack useElytra(ItemStack item){
-        if(item.getType()==Material.ELYTRA){
-            ItemMeta meta=item.getItemMeta();
-            if(meta.isUnbreakable()){
-                return item;
-            }else {
-                int level=meta.getEnchantLevel(Enchantment.UNBREAKING);
-                if(rand.nextInt(0,level+1)==0){
-                    if(meta instanceof Damageable dm){
-                        int damage=dm.getDamage()+1;
-                        if(dm.getDamage()==item.getType().getMaxDurability()){
-                            return null;
-                        }else {
-                            dm.setDamage(damage);
-                        }
-                    }
-                    item.setItemMeta(meta);
-                }
-                return item;
-            }
-        }
-        return item;
     }
     protected int consumeFly(BlockMenu inv,CustomMachineOperation foodOperation){
         ItemStack flyItem=inv.getItemInSlot(INPUT_SLOTS[0]);
@@ -263,63 +178,107 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
             }
         }
     }
-    HashMap<Location, OfflinePlayer> placer=new HashMap<>();
-    protected void summonRandLoottable(BlockMenu menu){
-        Location loc=menu.getLocation();
-
-        List<LootTables> tables= switch (loc.getWorld().getEnvironment()){
-            case NORMAL -> WorldUtils.OVERWORLD_STRUCTURE_CHESTS;
-            case NETHER -> WorldUtils.NETHER_STRUCTURE_CHESTS;
-            case THE_END -> WorldUtils.END_STRUCTURE_CHESTS;
-            default -> List.of();
-        };
-        int size=tables.size();
-        if(size==0)return;
-        HashSet<ItemConsumer> counters=new HashSet<>();
-
-        int randIndex=rand.nextInt(0,size);
-        LootTables table=tables.get(randIndex);
-        OfflinePlayer player=placer.computeIfAbsent(loc,(loc2)->{
-            String uid=DataCache.getLastUUID(loc2);
-            if("null".equals(uid)){
-                return null;
+    protected ItemStack getInfoItem(int progress,int totalProgress,long predictSeed,int speed,int foodlevel,int totalFoodlevel,boolean isFly){
+        if(foodlevel>=0){
+            if(speed>0){
+                if(isFly){
+                    return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a跑图中","&7当前饱食进度: %s/%s".formatted(String.valueOf(foodlevel),String.valueOf(totalFoodlevel)),"&7当前跑图速度: %s".formatted(String.valueOf(speed)),"&7当前预测种子: %s".formatted(String.valueOf(predictSeed)),"&7当前跑图进度: %s/%s".formatted(String.valueOf(progress),String.valueOf(totalProgress)));
+                }else {
+                    return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a挖掘中","&7当前饱食进度: %s/%s".formatted(String.valueOf(foodlevel),String.valueOf(totalFoodlevel)),"&7当前挖掘速度: %s".formatted(String.valueOf(speed)),"&7当前预测种子: %s".formatted(String.valueOf(predictSeed)),"&7当前挖掘进度: %s/%s".formatted(String.valueOf(progress),String.valueOf(totalProgress)));
+                }
             }else {
-                try{
-                    UUID uuid=UUID.fromString(uid);
-                    return Bukkit.getOfflinePlayer(uuid);
-                }catch (Throwable t){
-                    return null;
-                }
+                return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c未工作","&7进度速度=0");
             }
-        });
-        final HumanEntity entity=player==null?null:player.getPlayer();
-        Schedules.launchSchedules(()->{
-            try{
-                Collection<ItemStack> loot= table.getLootTable().populateLoot(rand, new LootContext.Builder(loc).luck(114).lootedEntity(entity).build());
-                loot.forEach((item)->{
-                    if(item!=null&&!item.getType().isAir()){
-                        for(ItemCounter counter:counters){
-                            if(CraftUtils.matchItemStack(item,counter,true)){
-                                counter.addAmount(item.getAmount());
-                                return;
-                            }
-                        }
-                        counters.add(CraftUtils.getConsumer(item));
-                    }
-                });
-            }catch(Exception e){
-                if(entity!=null){
-                    Debug.logger("An error occurred while generating loot table ",table.name());
-                    Debug.logger("player : ",entity);
-                }
-            }
-            CraftUtils.forcePush(counters.toArray(ItemConsumer[]::new),menu,OUTPUT_SLOTS);
-        },0,true,0);
-
-
-
+        }else {
+            return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c未工作","&7食物不足!");
+        }
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+    @Nonnull
+    @Override
+    public MachineProcessor<CustomMachineOperation> getMachineProcessor() {
+        return this.mainProcessor;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
+    }
+    protected int getRandFlyProgress(){
+        return rand.nextInt(1000,1600);
+    }
+    @Override
+    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
+        if(flow==ItemTransportFlow.WITHDRAW)return OUTPUT_SLOTS;
+        if(item==null||item.getType().isAir()){
+            return INPUT_SLOTS;
+        }
+        if(WorldUtils.FOOD_SATURATION_MUL_10.containsKey(item.getType())){
+            return new int[]{INPUT_SLOTS[2]};
+        }else if(item.getType()==Material.ELYTRA||item.getType()==Material.NETHER_STAR){
+            return new int[]{INPUT_SLOTS[0]};
+        }else {
+            return new int[]{INPUT_SLOTS[1]};
+        }
 
     }
+    protected int isFood(ItemStack item){
+        if(item==null||!item.isSimilar(new ItemStack(item.getType()))){
+            return 0;
+        }else {
+            Material material=item.getType();
+            if(WorldUtils.FOOD_SATURATION_MUL_10.containsKey(material)){
+                return WorldUtils.FOOD_SATURATION_MUL_10.get(material);
+            }
+            return 0;
+        }
+    }
+    public void newMenuInstance(BlockMenu menu, Block block){
+        menu.addMenuClickHandler(SEED_SLOT,((player, i, itemStack, clickAction) -> {
+            AddUtils.sendMessage(player,"&6[&7自动跑图机&6]&a 请输入种子:");
+            player.closeInventory();
+            ChatUtils.awaitInput(player,(str)->{
+                try{
+                    long seed = Long.parseLong(str);
+                    DataCache.setCustomString(menu.getLocation(),KEY_SEED,str);
+                    if(menu.getLocation().getWorld().getSeed()==seed){
+                        AddUtils.sendMessage(player,"&6[&7自动跑图机&6]&a 种子正确!");
+                    }else {
+                        AddUtils.sendMessage(player,"&6[&7自动跑图机&6]&c 种子错误!");
+                    }
+                }catch (Throwable e){
+                    AddUtils.sendMessage(player,"&6[&7自动跑图机&6]&a 这并不是有效的LongType!");
+                }
+            });
+            return false;
+        }));
+        ItemStack env= switch (menu.getLocation().getWorld().getEnvironment()){
+            case NETHER -> WORLD_NETHER_ITEM;
+            case CUSTOM -> WORLD_UNKNOWN_ITEM;
+            case NORMAL -> WORLD_WORLD_ITEM;
+            case THE_END -> WORLD_END_ITEM;
+        };
+        menu.replaceExistingItem(WORLD_SLOT,env);
+    }
+    @Override
+    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+        super.onBreak(e, menu);
+        if(menu!=null){
+            this.mainProcessor.endOperation(menu.getLocation());
+            this.foodProcessor.endOperation(menu.getLocation());
+            this.rockectProcessor.endOperation(menu.getLocation());
+            placer.remove(menu.getLocation());
+        }
+    }
+    @Override
+    public void onPlace(BlockPlaceEvent e, Block b) {
+        super.onPlace(e, b);
+        if(e.getPlayer()!=null){
+            DataCache.setLastUUID(b.getLocation(),e.getPlayer().getUniqueId().toString());
+            placer.put(b.getLocation(),e.getPlayer());
+        }
+    }
+
     public void process(Block b, BlockMenu menu, SlimefunBlockData data){
         //check food processor
         Location loc=menu.getLocation();
@@ -402,45 +361,86 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
         }
     }
 
-    @Nonnull
-    @Override
-    public MachineProcessor<CustomMachineOperation> getMachineProcessor() {
-        return this.mainProcessor;
+    protected void summonRandLoottable(BlockMenu menu){
+        Location loc=menu.getLocation();
+
+        List<LootTables> tables= switch (loc.getWorld().getEnvironment()){
+            case NORMAL -> WorldUtils.OVERWORLD_STRUCTURE_CHESTS;
+            case NETHER -> WorldUtils.NETHER_STRUCTURE_CHESTS;
+            case THE_END -> WorldUtils.END_STRUCTURE_CHESTS;
+            default -> List.of();
+        };
+        int size=tables.size();
+        if(size==0)return;
+        HashSet<ItemConsumer> counters=new HashSet<>();
+
+        int randIndex=rand.nextInt(0,size);
+        LootTables table=tables.get(randIndex);
+        OfflinePlayer player=placer.computeIfAbsent(loc,(loc2)->{
+            String uid=DataCache.getLastUUID(loc2);
+            if("null".equals(uid)){
+                return null;
+            }else {
+                try{
+                    UUID uuid=UUID.fromString(uid);
+                    return Bukkit.getOfflinePlayer(uuid);
+                }catch (Throwable t){
+                    return null;
+                }
+            }
+        });
+        final HumanEntity entity=player==null?null:player.getPlayer();
+        Schedules.launchSchedules(()->{
+            try{
+                Collection<ItemStack> loot= table.getLootTable().populateLoot(rand, new LootContext.Builder(loc).luck(114).lootedEntity(entity).build());
+                loot.forEach((item)->{
+                    if(item!=null&&!item.getType().isAir()){
+                        for(ItemCounter counter:counters){
+                            if(CraftUtils.matchItemStack(item,counter,true)){
+                                counter.addAmount(item.getAmount());
+                                return;
+                            }
+                        }
+                        counters.add(CraftUtils.getConsumer(item));
+                    }
+                });
+            }catch(Exception e){
+                if(entity!=null){
+                    Debug.logger("An error occurred while generating loot table ",table.name());
+                    Debug.logger("player : ",entity);
+                }
+            }
+            CraftUtils.forcePush(counters.toArray(ItemConsumer[]::new),menu,OUTPUT_SLOTS);
+        },0,true,0);
+
+
+
+
     }
 
-    @Override
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
-        if(flow==ItemTransportFlow.WITHDRAW)return OUTPUT_SLOTS;
-        if(item==null||item.getType().isAir()){
-            return INPUT_SLOTS;
-        }
-        if(WorldUtils.FOOD_SATURATION_MUL_10.containsKey(item.getType())){
-            return new int[]{INPUT_SLOTS[2]};
-        }else if(item.getType()==Material.ELYTRA||item.getType()==Material.NETHER_STAR){
-            return new int[]{INPUT_SLOTS[0]};
-        }else {
-            return new int[]{INPUT_SLOTS[1]};
-        }
+    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 
-    }
-
-    @Override
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
-        super.onBreak(e, menu);
-        if(menu!=null){
-            this.mainProcessor.endOperation(menu.getLocation());
-            this.foodProcessor.endOperation(menu.getLocation());
-            this.rockectProcessor.endOperation(menu.getLocation());
-            placer.remove(menu.getLocation());
+    protected ItemStack useElytra(ItemStack item){
+        if(item.getType()==Material.ELYTRA){
+            ItemMeta meta=item.getItemMeta();
+            if(meta.isUnbreakable()){
+                return item;
+            }else {
+                int level=meta.getEnchantLevel(Enchantment.UNBREAKING);
+                if(rand.nextInt(0,level+1)==0){
+                    if(meta instanceof Damageable dm){
+                        int damage=dm.getDamage()+1;
+                        if(dm.getDamage()==item.getType().getMaxDurability()){
+                            return null;
+                        }else {
+                            dm.setDamage(damage);
+                        }
+                    }
+                    item.setItemMeta(meta);
+                }
+                return item;
+            }
         }
-    }
-
-    @Override
-    public void onPlace(BlockPlaceEvent e, Block b) {
-        super.onPlace(e, b);
-        if(e.getPlayer()!=null){
-            DataCache.setLastUUID(b.getLocation(),e.getPlayer().getUniqueId().toString());
-            placer.put(b.getLocation(),e.getPlayer());
-        }
+        return item;
     }
 }

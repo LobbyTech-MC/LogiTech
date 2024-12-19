@@ -31,26 +31,6 @@ public abstract class CustomSlimefunItem extends SlimefunItem implements RecipeD
         }
     }
 
-    public void addInfo(ItemStack stack){
-
-    }
-    public List<MachineRecipe> provideDisplayRecipe(){
-        return new ArrayList<>();
-    }
-    public final List<ItemStack> getDisplayRecipes() {
-        if(displayedMemory==null||displayedMemory.isEmpty()) {
-            displayedMemory=_getDisplayRecipes(originalMemory);
-        }
-        return displayedMemory;
-    }
-    public CustomSlimefunItem addHandler(ItemHandler handler) {
-        this.addItemHandler(handler);
-        return this;
-    }
-    public CustomSlimefunItem setDisplayRecipes(List<ItemStack> displayRecipes) {
-        this.originalMemory = displayRecipes;
-        return this;
-    }
     public CustomSlimefunItem addDisplayRecipe(ItemStack stack) {
         if(originalMemory==null||originalMemory.isEmpty()) {
             originalMemory = new ArrayList<>();
@@ -58,9 +38,30 @@ public abstract class CustomSlimefunItem extends SlimefunItem implements RecipeD
         this.originalMemory.add(stack);
         return this;
     }
-    public CustomSlimefunItem setOutput(Object obj){
-        this.recipeOutput= AddUtils.resolveItem(obj);
+    public CustomSlimefunItem addHandler(ItemHandler handler) {
+        this.addItemHandler(handler);
         return this;
+    }
+    public void addInfo(ItemStack stack){
+
+    }
+    public final List<ItemStack> getDisplayRecipes() {
+        if(displayedMemory==null||displayedMemory.isEmpty()) {
+            displayedMemory=_getDisplayRecipes(originalMemory);
+        }
+        return displayedMemory;
+    }
+    public void postRegister(){
+        super.postRegister();
+        this.addWikiPage("");
+    }
+    public void preRegister(){
+        super.preRegister();
+        addInfo(this.getItem());
+
+    }
+    public List<MachineRecipe> provideDisplayRecipe(){
+        return new ArrayList<>();
     }
     public CustomSlimefunItem register(){
         if(AddSlimefunItems.INSTANCE!=null){
@@ -70,14 +71,13 @@ public abstract class CustomSlimefunItem extends SlimefunItem implements RecipeD
         }
         return this;
     }
-    public void preRegister(){
-        super.preRegister();
-        addInfo(this.getItem());
-
+    public CustomSlimefunItem setDisplayRecipes(List<ItemStack> displayRecipes) {
+        this.originalMemory = displayRecipes;
+        return this;
     }
-    public void postRegister(){
-        super.postRegister();
-        this.addWikiPage("");
+    public CustomSlimefunItem setOutput(Object obj){
+        this.recipeOutput= AddUtils.resolveItem(obj);
+        return this;
     }
 
 }

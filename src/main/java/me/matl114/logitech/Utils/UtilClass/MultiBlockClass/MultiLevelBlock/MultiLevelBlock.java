@@ -29,24 +29,12 @@ public class MultiLevelBlock implements AbstractMultiBlock {
             this.INDEXS[i+1]=this.INDEXS[i]+this.SIZES[i];
         }
     }
-    public MultiLevelBlockType getType(){
-        return this.schema;
-    }
     public MultiBlockService.Direction getDirection() {
         return direction;
     }
     public int getLevel(){
         return level;
     }
-
-    /**
-     * get structure size
-     * @return
-     */
-    public int getStructureSize(){
-        return INDEXS[level];
-    }
-
     /**
      * get structure i th block, should be rotated by DIRECTION
      * @param index
@@ -73,5 +61,17 @@ public class MultiLevelBlock implements AbstractMultiBlock {
             }
         }
         return null;
+    }
+
+    /**
+     * get structure size
+     * @return
+     */
+    public int getStructureSize(){
+        return INDEXS[level];
+    }
+
+    public MultiLevelBlockType getType(){
+        return this.schema;
     }
 }

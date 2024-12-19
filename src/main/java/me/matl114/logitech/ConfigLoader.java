@@ -18,27 +18,6 @@ import me.matl114.logitech.Utils.Debug;
 public class ConfigLoader {
     public static boolean TESTMODE = MyAddon.testmode();
 
-    public static void load(Plugin plugin) {
-        ConfigLoader.plugin=plugin;
-        init();
-        //final File scAddonFile = new File(plugin.getDataFolder(), "language.yml");
-        //copyFile(scAddonFile, "language");
-        CONFIG=loadExternalConfig("config");
-        INNERCONFIG=loadInternalConfig("config");
-        if(INNERCONFIG.getBoolean("options.test")) {
-            MyAddon.testmod=true;
-            TESTMODE=true;
-            Debug.debug("Addon is running on TEST MODE");
-        }
-        if(INNERCONFIG.getBoolean("options.clear-old-config")) {
-            MyAddon.testmod=true;
-        }
-        LANGUAGE=loadInternalConfig("language");   //new Config(plugin,"language.yml");
-        MACHINES=loadExternalConfig("machines");
-        INNER_MACHINES=loadInternalConfig("addon-machines");
-        SPACE_STORAGE= loadExternalConfig("space-storage");
-
-    }
     public static Plugin plugin;
     public static Config CONFIG;
     public static Config INNERCONFIG;
@@ -47,9 +26,6 @@ public class ConfigLoader {
     public static Config INNER_MACHINES;
     public static Config SPACE_STORAGE;
     public static Config SERVER_CONFIG;
-    public static void init() {
-        SERVER_CONFIG=new Config(plugin);
-    }
     public static void copyFile(File file, String name) {
         if(MyAddon.clearConfig){
 
@@ -78,6 +54,36 @@ public class ConfigLoader {
 
         }
     }
+    public static void init() {
+        SERVER_CONFIG=new Config(plugin);
+    }
+    public static void load(Plugin plugin) {
+        ConfigLoader.plugin=plugin;
+        init();
+        //final File scAddonFile = new File(plugin.getDataFolder(), "language.yml");
+        //copyFile(scAddonFile, "language");
+        CONFIG=loadExternalConfig("config");
+        INNERCONFIG=loadInternalConfig("config");
+        if(INNERCONFIG.getBoolean("options.test")) {
+            MyAddon.testmod=true;
+            TESTMODE=true;
+            Debug.debug("Addon is running on TEST MODE");
+        }
+        if(INNERCONFIG.getBoolean("options.clear-old-config")) {
+            MyAddon.testmod=true;
+        }
+        LANGUAGE=loadInternalConfig("language");   //new Config(plugin,"language.yml");
+        MACHINES=loadExternalConfig("machines");
+        INNER_MACHINES=loadInternalConfig("addon-machines");
+        SPACE_STORAGE= loadExternalConfig("space-storage");
+
+    }
+    public static Config loadExternalConfig(String name){
+        FileConfiguration config = new YamlConfiguration();
+        final File cfgFile = new File(plugin.getDataFolder(), "%s.yml".formatted(name));
+        copyFile(cfgFile, name);
+        return new Config(plugin, "%s.yml".formatted(name));
+    }
     public static Config loadInternalConfig(String name){
         FileConfiguration config = new YamlConfiguration();
         try{
@@ -88,12 +94,6 @@ public class ConfigLoader {
             return null;
         }
         return new Config(null,config);
-    }
-    public static Config loadExternalConfig(String name){
-        FileConfiguration config = new YamlConfiguration();
-        final File cfgFile = new File(plugin.getDataFolder(), "%s.yml".formatted(name));
-        copyFile(cfgFile, name);
-        return new Config(plugin, "%s.yml".formatted(name));
     }
 
 

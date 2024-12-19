@@ -4,25 +4,11 @@ import org.bukkit.util.Vector;
 
 public interface AbstractMultiBlock {
     /**
-     * get AbstractMultiBlockType
-     * @return
-     */
-    public AbstractMultiBlockType getType();
-
-    /**
      * get direction
      * @return
      */
     default MultiBlockService.Direction getDirection() {
         return MultiBlockService.Direction.NORTH;
-    }
-
-    /**
-     * get structure size
-     * @return
-     */
-    default int getStructureSize(){
-        return getType().getSchemaSize();
     }
 
     /**
@@ -43,4 +29,18 @@ public interface AbstractMultiBlock {
 
         return getType().getSchemaPartId(index);
     }
+
+    /**
+     * get structure size
+     * @return
+     */
+    default int getStructureSize(){
+        return getType().getSchemaSize();
+    }
+
+    /**
+     * get AbstractMultiBlockType
+     * @return
+     */
+    public AbstractMultiBlockType getType();
 }

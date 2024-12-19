@@ -1,24 +1,5 @@
 package me.matl114.logitech.SlimefunItem.Cargo.StorageMachines;
 
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-
-import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
-import me.matl114.logitech.Language;
-import me.matl114.logitech.SlimefunItem.AddItem;
-import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SmithWorkShop.SWAmplifyComponent;
-import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
-import me.matl114.logitech.Utils.*;
-import me.matl114.logitech.Utils.UtilClass.StorageClass.ItemStorageCache;
-import me.matl114.logitech.SlimefunItem.Cargo.Storages;
-
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusher;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -38,6 +19,7 @@ import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import me.matl114.logitech.Language;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
 import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.CraftUtils;
 import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.Settings;
 import me.matl114.logitech.Utils.TransportUtils;
@@ -49,6 +31,25 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 //TODO 实现 代理+货运
 //TODO 检查均衡性是否出问题
 public abstract class AbstractIOPort extends AbstractMachine {
+    public static final String ITEM_DISPLAY_INFO_1="&8奇点中存储的物品样式";
+    public static final ItemStack ITEM_DISPLAY_NULL=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c未检测到物品存储!");
+    protected static final ItemStack INFO_ITEM=new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6将奇点置于下方","&a机器将自动检测奇点内容并运行");
+    public static int getStorageAmount(Location loc){
+        return DataCache.getCustomData(loc,"amt",-1);
+    }
+    protected static void setAmount(SlimefunBlockData data,int t){
+        DataCache.setCustomData(data,"amt",t);
+    }
+    public static void setStorageAmount(Location loc,int t,boolean withException){
+        SlimefunBlockData data=DataCache.safeGetBlockCacheWithLoad(loc);
+        if(data!=null&&SlimefunItem.getById(data.getSfId()) instanceof AbstractIOPort){
+            setAmount(data,t);
+
+        }else {
+            if(withException)
+                throw new IllegalArgumentException("该位置的粘液数据不是AbstractIOPort!");
+        }
+    }
     public AbstractIOPort(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(category, item, recipeType, recipe,0,0);
         this.setDisplayRecipes(
@@ -76,30 +77,34 @@ public abstract class AbstractIOPort extends AbstractMachine {
              )
         );
     }
-    public static final String ITEM_DISPLAY_INFO_1="&8奇点中存储的物品样式";
-    public static final ItemStack ITEM_DISPLAY_NULL=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c未检测到物品存储!");
-    protected static final ItemStack INFO_ITEM=new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6将奇点置于下方","&a机器将自动检测奇点内容并运行");
     public abstract void addInfo(ItemStack item);
     public abstract void constructMenu(BlockMenuPreset preset);
+    public abstract int getDisplaySlot();
     public abstract int[] getInputSlots();
     public abstract int[] getOutputSlots();
     public abstract int getStorageSlot();
-    public abstract int getDisplaySlot();
-    public void updateMenu(BlockMenu inv, Block b, Settings mod){
-        Location loc = inv.getLocation();
-        ItemStorageCache cache= ItemStorageCache.getCache(loc);
-        if(cache!=null){
-            //保证newInstance的时候也会call到该方法
-                cache.setPersistent(false);
-                cache.updateMenu(inv);
-                cache.setPersistent(true);
-            if(cache.getItem()!=null&&getDisplaySlot()>=0){
-                ItemStack tmp=AddUtils.addLore(cache.getItem(),ITEM_DISPLAY_INFO_1);
-                inv.replaceExistingItem(getDisplaySlot(),tmp );
+
+    @Override
+    public void listenDragClick(BlockMenu inv,InventoryDragEvent e) {
+        if(e.getRawSlots().contains(getStorageSlot())){
+            e.setCancelled(true);
+        }
+    }
+    @Override
+    public void listenOriginClick(BlockMenu inv, InventoryClickEvent e) {
+        super.listenOriginClick(inv, e);
+        if(e.isCancelled()){return;}
+        if(e.getClick()== ClickType.SHIFT_LEFT||e.getClick()== ClickType.SHIFT_RIGHT){
+            if(e.getRawSlot()>=inv.getInventory().getSize()){
+                ItemStack stack=e.getCurrentItem();
+                ItemStack storage=inv.getItemInSlot(getStorageSlot());
+                if(storage!=null&&stack!=null&&CraftUtils.matchItemStack(stack,storage,false)){
+                    e.setCancelled(true);
+                }
             }
         }
-
     }
+
     public void newMenuInstance(BlockMenu inv,Block b){
         inv.addMenuOpeningHandler(player -> {
             updateMenu(inv,b,Settings.RUN);
@@ -164,48 +169,17 @@ public abstract class AbstractIOPort extends AbstractMachine {
         }
 
     }
-    public boolean useAdvancedMenu(){
-        return true;
-    }
-
-    @Override
-    public void listenDragClick(BlockMenu inv,InventoryDragEvent e) {
-        if(e.getRawSlots().contains(getStorageSlot())){
-            e.setCancelled(true);
+    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+        Location loc = menu.getLocation();
+        ItemStorageCache cache= ItemStorageCache.removeCache(loc);
+        if(cache!=null){
+            cache.setPersistent(false);
+            cache.updateMenu(menu);
         }
+        menu.dropItems(loc,getStorageSlot());
+        //
+        super.onBreak(e, menu);
     }
-    @Override
-    public void listenOriginClick(BlockMenu inv, InventoryClickEvent e) {
-        super.listenOriginClick(inv, e);
-        if(e.isCancelled()){return;}
-        if(e.getClick()== ClickType.SHIFT_LEFT||e.getClick()== ClickType.SHIFT_RIGHT){
-            if(e.getRawSlot()>=inv.getInventory().getSize()){
-                ItemStack stack=e.getCurrentItem();
-                ItemStack storage=inv.getItemInSlot(getStorageSlot());
-                if(storage!=null&&stack!=null&&CraftUtils.matchItemStack(stack,storage,false)){
-                    e.setCancelled(true);
-                }
-            }
-        }
-    }
-
-    public static int getStorageAmount(Location loc){
-        return DataCache.getCustomData(loc,"amt",-1);
-    }
-    public static void setStorageAmount(Location loc,int t,boolean withException){
-        SlimefunBlockData data=DataCache.safeGetBlockCacheWithLoad(loc);
-        if(data!=null&&SlimefunItem.getById(data.getSfId()) instanceof AbstractIOPort){
-            setAmount(data,t);
-
-        }else {
-            if(withException)
-                throw new IllegalArgumentException("该位置的粘液数据不是AbstractIOPort!");
-        }
-    }
-    protected static void setAmount(SlimefunBlockData data,int t){
-        DataCache.setCustomData(data,"amt",t);
-    }
-
     public void process(Block b, BlockMenu menu, SlimefunBlockData data){
         //先确认存储cache
         ItemStack stack=menu.getItemInSlot(getStorageSlot());
@@ -273,15 +247,23 @@ public abstract class AbstractIOPort extends AbstractMachine {
         }
     }
 
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
-        Location loc = menu.getLocation();
-        ItemStorageCache cache= ItemStorageCache.removeCache(loc);
+    public void updateMenu(BlockMenu inv, Block b, Settings mod){
+        Location loc = inv.getLocation();
+        ItemStorageCache cache= ItemStorageCache.getCache(loc);
         if(cache!=null){
-            cache.setPersistent(false);
-            cache.updateMenu(menu);
+            //保证newInstance的时候也会call到该方法
+                cache.setPersistent(false);
+                cache.updateMenu(inv);
+                cache.setPersistent(true);
+            if(cache.getItem()!=null&&getDisplaySlot()>=0){
+                ItemStack tmp=AddUtils.addLore(cache.getItem(),ITEM_DISPLAY_INFO_1);
+                inv.replaceExistingItem(getDisplaySlot(),tmp );
+            }
         }
-        menu.dropItems(loc,getStorageSlot());
-        //
-        super.onBreak(e, menu);
+
+    }
+
+    public boolean useAdvancedMenu(){
+        return true;
     }
 }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -24,30 +25,20 @@ import me.matl114.logitech.SlimefunItem.Interface.ChunkLimit;
 import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.WorldUtils;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.*;
 
 public class ChunkEnergyCharger extends AbstractEnergyCharger implements ChunkLimit {
 
     HashMap<Chunk, Location> MACHINE_POSITION=new HashMap<>();
-    public HashMap<Chunk,Location> getRecords(){
-        return MACHINE_POSITION;
-    }
+    protected final String PARTICLE_TICK="pt";
 
+    protected final int PERIOD=8;
+    private final int PARTICLE_SLOT=0;
+    private ItemStack PARTICLE_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&a点击切换粒子效果","&7当前状态: &c关");
+    private ItemStack PARTICLE_ON=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a点击切换粒子效果","&7当前状态: &a开");
     public ChunkEnergyCharger(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                               int energybuffer){
         super(category, item, recipeType, recipe, energybuffer);
     }
-    protected final String PARTICLE_TICK="pt";
-    protected final int PERIOD=8;
     public Collection<SlimefunBlockData> getChargeRange(BlockMenu inv,Block block,SlimefunBlockData data){
         Location loc=block.getLocation();
         Schedules.launchSchedules(()->{
@@ -64,9 +55,13 @@ public class ChunkEnergyCharger extends AbstractEnergyCharger implements ChunkLi
         },0,false,0);
         return DataCache.getAllSfItemInChunk(loc.getWorld(),loc.getBlockX()>>4,loc.getBlockZ()>>4);
     }
-    private final int PARTICLE_SLOT=0;
-    private ItemStack PARTICLE_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&a点击切换粒子效果","&7当前状态: &c关");
-    private ItemStack PARTICLE_ON=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a点击切换粒子效果","&7当前状态: &a开");
+    public int getMaxChargeAmount(){
+        return 114514;
+    }
+    public HashMap<Chunk,Location> getRecords(){
+        return MACHINE_POSITION;
+    }
+
     @Override
     public boolean[] getStatus(BlockMenu inv) {
         ItemStack itemStack=inv.getItemInSlot(PARTICLE_SLOT);
@@ -76,21 +71,12 @@ public class ChunkEnergyCharger extends AbstractEnergyCharger implements ChunkLi
             return new boolean[]{super.getStatus(inv)[0],false};
         }
     }
-
-    @Override
-    public void toggleStatus(BlockMenu inv, boolean... result) {
-        super.toggleStatus(inv, result[0]);
-        if(result.length==2){
-            if(result[1]){
-                inv.replaceExistingItem(PARTICLE_SLOT,PARTICLE_ON);
-            }else {
-                inv.replaceExistingItem(PARTICLE_SLOT,PARTICLE_OFF);
-            }
-        }
-    }
     @Override
     public boolean isBorder(int i) {
         return super.isBorder(i)&&i!=PARTICLE_SLOT;
+    }
+    protected boolean isChargeable(SlimefunItem that){
+        return !(that instanceof AbstractEnergyMachine);
     }
     public void newMenuInstance(BlockMenu menu, Block block){
         if(!onChunkPlace(menu.getLocation(),ChunkEnergyCharger.class)){
@@ -113,12 +99,6 @@ public class ChunkEnergyCharger extends AbstractEnergyCharger implements ChunkLi
             return false;
         }));
     }
-    protected boolean isChargeable(SlimefunItem that){
-        return !(that instanceof AbstractEnergyMachine);
-    }
-    public int getMaxChargeAmount(){
-        return 114514;
-    }
     @Override
     public void onBreak(BlockBreakEvent e, BlockMenu menu) {
         super.onBreak(e, menu);
@@ -137,6 +117,17 @@ public class ChunkEnergyCharger extends AbstractEnergyCharger implements ChunkLi
                 event.setCancelled(true);
             }
         });
+    }
+    @Override
+    public void toggleStatus(BlockMenu inv, boolean... result) {
+        super.toggleStatus(inv, result[0]);
+        if(result.length==2){
+            if(result[1]){
+                inv.replaceExistingItem(PARTICLE_SLOT,PARTICLE_ON);
+            }else {
+                inv.replaceExistingItem(PARTICLE_SLOT,PARTICLE_OFF);
+            }
+        }
     }
 
 

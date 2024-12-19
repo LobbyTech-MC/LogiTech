@@ -32,87 +32,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
 public class SpaceTower extends AbstractMachine {
-    protected final int[] INPUT_SLOTS=new int[]{
-            22
-    };
-    protected final int[] OUTPUT_SLOTS=new int[0];
-    protected final int[] BORDER=new int[]{
-            0,1,2,3,  5,6,7,8,9,10,11,12,  14,15,16,17,18,19,20,21,  23,24,25,26
-    };
-    protected final int OPERATE_SLOT=4;
-    protected final int INFO_SLOT=13;
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
-
-    public SpaceTower(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
-                      int energybuffer, int energyConsumption) {
-        super(category, item, recipeType, recipe, energybuffer, energyConsumption);
-    }
-    protected final int MAX_SIZE=63;
-    public void addInfo(ItemStack stack){
-        stack.setItemMeta(AddUtils.addLore(stack, LoreBuilder.powerBuffer(energybuffer), "&8⇨ &e⚡ &7" + AddUtils.formatDouble(energyConsumption) + " J/方块").getItemMeta());
-    }
-    public void constructMenu(BlockMenuPreset preset){
-        int[] border=BORDER;
-        int len=border.length;
-        for (int i=0;i<len;i++){
-            preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
-        }
-        preset.addItem(OPERATE_SLOT,new CustomItemStack(Material.PURPLE_STAINED_GLASS_PANE,"&6点击进行空间IO操作","&7单位体积耗电: %dJ".formatted(energyConsumption),"&e请确保你已经阅读机器说明"));
-        preset.addItem(INFO_SLOT, new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6状态","&c未检测出延申的空间塔框架"));
-    }
-    public void newMenuInstance(BlockMenu menu, Block block){
-        menu.addMenuClickHandler(OPERATE_SLOT, ((player, i, itemStack, clickAction) -> {
-            onStorage(player,menu);
-            return false;
-        }));
-        menu.addMenuClickHandler(INFO_SLOT,((player, i, itemStack, clickAction) -> {
-            updateMenu(menu, block, Settings.RUN);
-            return false;
-        }));
-        menu.addMenuOpeningHandler(player -> updateMenu(menu,block,Settings.RUN));
-        menu.addMenuCloseHandler(player -> updateMenu(menu,block,Settings.RUN));
-    }
-    public void onStorage(Player player,BlockMenu inv){
-        Location loc=inv.getLocation();
-        ItemStack storageCard=inv.getItemInSlot(INPUT_SLOTS[0]);
-
-        if(storageCard==null){
-            AddUtils.sendMessage(player,"&c磁盘槽位为空!");
-            return;
-        }
-        inv.replaceExistingItem(INPUT_SLOTS[0],storageCard);
-        //防止数据保存不上!
-        storageCard=MenuUtils.syncSlot(inv,INPUT_SLOTS[0]);
-        var locationInfo=getSpaceTowerRange(loc);
-        if(locationInfo==null){
-            AddUtils.sendMessage(player,"&c未检测到延申的空间塔框架");
-            return;
-        }else {
-            Location start=locationInfo.getFirstValue();
-            Location end=locationInfo.getSecondValue();
-            int dx=end.getBlockX()-start.getBlockX();
-            int dy=end.getBlockY()-start.getBlockY();
-            int dz=end.getBlockZ()-start.getBlockZ();
-            int volumn=dx*dy*dz;
-            int charge=this.getCharge(loc);
-            if(charge>=volumn* this.energyConsumption){
-                if(StorageSpace.threadRunning()){
-                    AddUtils.sendMessage(player,"&c当前正在有空间塔进行IO操作,请稍后再试");
-                    return;
-                }else {
-                    onStorageOperation(()->this.setCharge(loc,charge-volumn* this.energyConsumption),player,start,end,storageCard);
-                }
-            }else {
-                AddUtils.sendMessage(player,"&c电力不足! %d/%dJ".formatted(charge,volumn*this.energyConsumption));
-                return;
-            }
-        }
-    }
     public static boolean onStorageOperation(Runnable cost, Player player, Location startLocation, Location endLocation, ItemStack storageCard){
         ItemMeta meta=storageCard.getItemMeta();
         SlimefunItem item= CraftUtils.parseSfItem(meta);
@@ -183,6 +102,39 @@ public class SpaceTower extends AbstractMachine {
             return false;
         }
     }
+    protected final int[] INPUT_SLOTS=new int[]{
+            22
+    };
+    protected final int[] OUTPUT_SLOTS=new int[0];
+    protected final int[] BORDER=new int[]{
+            0,1,2,3,  5,6,7,8,9,10,11,12,  14,15,16,17,18,19,20,21,  23,24,25,26
+    };
+    protected final int OPERATE_SLOT=4;
+    protected final int INFO_SLOT=13;
+    protected final int MAX_SIZE=63;
+
+    public SpaceTower(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
+                      int energybuffer, int energyConsumption) {
+        super(category, item, recipeType, recipe, energybuffer, energyConsumption);
+    }
+    public void addInfo(ItemStack stack){
+        stack.setItemMeta(AddUtils.addLore(stack, LoreBuilder.powerBuffer(energybuffer), "&8⇨ &e⚡ &7" + AddUtils.formatDouble(energyConsumption) + " J/方块").getItemMeta());
+    }
+    public void constructMenu(BlockMenuPreset preset){
+        int[] border=BORDER;
+        int len=border.length;
+        for (int i=0;i<len;i++){
+            preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
+        }
+        preset.addItem(OPERATE_SLOT,new CustomItemStack(Material.PURPLE_STAINED_GLASS_PANE,"&6点击进行空间IO操作","&7单位体积耗电: %dJ".formatted(energyConsumption),"&e请确保你已经阅读机器说明"));
+        preset.addItem(INFO_SLOT, new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6状态","&c未检测出延申的空间塔框架"));
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
+    }
     public Pair<Location,Location> getSpaceTowerRange(Location loc){
         Location testLocation1=loc.clone().add(1,0,0);
         Location testLocation2=loc.clone().add(-1,0,0);
@@ -252,6 +204,62 @@ public class SpaceTower extends AbstractMachine {
         int maxZ= dx<0? loc.getBlockZ():loc.getBlockZ()+length;
         return new Pair<>(new Location(loc.getWorld(),minX,minY,minZ),new Location(loc.getWorld(),maxX,maxY,maxZ));
     }
+    public void newMenuInstance(BlockMenu menu, Block block){
+        menu.addMenuClickHandler(OPERATE_SLOT, ((player, i, itemStack, clickAction) -> {
+            onStorage(player,menu);
+            return false;
+        }));
+        menu.addMenuClickHandler(INFO_SLOT,((player, i, itemStack, clickAction) -> {
+            updateMenu(menu, block, Settings.RUN);
+            return false;
+        }));
+        menu.addMenuOpeningHandler(player -> updateMenu(menu,block,Settings.RUN));
+        menu.addMenuCloseHandler(player -> updateMenu(menu,block,Settings.RUN));
+    }
+    public void onStorage(Player player,BlockMenu inv){
+        Location loc=inv.getLocation();
+        ItemStack storageCard=inv.getItemInSlot(INPUT_SLOTS[0]);
+
+        if(storageCard==null){
+            AddUtils.sendMessage(player,"&c磁盘槽位为空!");
+            return;
+        }
+        inv.replaceExistingItem(INPUT_SLOTS[0],storageCard);
+        //防止数据保存不上!
+        storageCard=MenuUtils.syncSlot(inv,INPUT_SLOTS[0]);
+        var locationInfo=getSpaceTowerRange(loc);
+        if(locationInfo==null){
+            AddUtils.sendMessage(player,"&c未检测到延申的空间塔框架");
+            return;
+        }else {
+            Location start=locationInfo.getFirstValue();
+            Location end=locationInfo.getSecondValue();
+            int dx=end.getBlockX()-start.getBlockX();
+            int dy=end.getBlockY()-start.getBlockY();
+            int dz=end.getBlockZ()-start.getBlockZ();
+            int volumn=dx*dy*dz;
+            int charge=this.getCharge(loc);
+            if(charge>=volumn* this.energyConsumption){
+                if(StorageSpace.threadRunning()){
+                    AddUtils.sendMessage(player,"&c当前正在有空间塔进行IO操作,请稍后再试");
+                    return;
+                }else {
+                    onStorageOperation(()->this.setCharge(loc,charge-volumn* this.energyConsumption),player,start,end,storageCard);
+                }
+            }else {
+                AddUtils.sendMessage(player,"&c电力不足! %d/%dJ".formatted(charge,volumn*this.energyConsumption));
+                return;
+            }
+        }
+    }
+    public void process(Block b, BlockMenu menu, SlimefunBlockData data){
+    }
+
+    public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
+        if(menu.hasViewer()){
+            updateMenu(menu,b,Settings.RUN);
+        }
+    }
     public void updateMenu(BlockMenu menu, Block block, Settings mod){
         var locationInfo=getSpaceTowerRange(menu.getLocation());
         if(locationInfo==null){
@@ -266,13 +274,5 @@ public class SpaceTower extends AbstractMachine {
                     "&7位置1(包含): "+DataCache.locationToDisplayString(start),"&7位置2(不包含): "+DataCache.locationToDisplayString(end),
                     "&7空间大小: "+String.join("x",String.valueOf(dx),String.valueOf(dy),String.valueOf(dz))));
         }
-    }
-
-    public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
-        if(menu.hasViewer()){
-            updateMenu(menu,b,Settings.RUN);
-        }
-    }
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){
     }
 }

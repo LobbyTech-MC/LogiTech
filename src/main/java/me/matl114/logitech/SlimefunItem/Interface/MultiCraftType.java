@@ -8,6 +8,20 @@ import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import me.matl114.logitech.Utils.DataCache;
 
 public interface MultiCraftType extends RecipeLock {
+    /**
+     * force clean RecipeLock data and save val
+     * @param loc
+     * @param val
+     */
+    static void forceSetRecipeTypeIndex(Location loc, int val){
+        StorageCacheUtils.setData(loc, "craftType", String.valueOf(val));
+        DataCache.setLastRecipe(loc,-1);
+    }
+    static void forceSetRecipeTypeIndex(SlimefunBlockData data, int val){
+        data.setData("craftType", String.valueOf(val));
+        DataCache.setLastRecipe(data,-1);
+    }
+
     static int getRecipeTypeIndex(Location loc){
         try{
             String a= StorageCacheUtils.getData(loc,"craftType");
@@ -30,19 +44,6 @@ public interface MultiCraftType extends RecipeLock {
     }
 
     /**
-     * will not care about RecipeLock data
-     * @param loc
-     * @param val
-     */
-    static void setRecipeTypeIndex(Location loc ,int val){
-
-        StorageCacheUtils.setData(loc, "craftType", String.valueOf(val));
-    }
-    static void setRecipeTypeIndex(SlimefunBlockData data ,int val){
-        data.setData("craftType", String.valueOf(val));
-    }
-
-    /**
      * if val not change ,will not clean RecipeLock data
      * @param loc
      * @param val
@@ -61,16 +62,15 @@ public interface MultiCraftType extends RecipeLock {
     }
 
     /**
-     * force clean RecipeLock data and save val
+     * will not care about RecipeLock data
      * @param loc
      * @param val
      */
-    static void forceSetRecipeTypeIndex(Location loc, int val){
+    static void setRecipeTypeIndex(Location loc ,int val){
+
         StorageCacheUtils.setData(loc, "craftType", String.valueOf(val));
-        DataCache.setLastRecipe(loc,-1);
     }
-    static void forceSetRecipeTypeIndex(SlimefunBlockData data, int val){
+    static void setRecipeTypeIndex(SlimefunBlockData data ,int val){
         data.setData("craftType", String.valueOf(val));
-        DataCache.setLastRecipe(data,-1);
     }
 }

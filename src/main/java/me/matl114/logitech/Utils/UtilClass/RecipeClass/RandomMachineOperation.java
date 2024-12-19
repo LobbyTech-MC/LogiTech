@@ -3,6 +3,7 @@ package me.matl114.logitech.Utils.UtilClass.RecipeClass;
 import java.util.Random;
 
 public class RandomMachineOperation implements CustomMachineOperation {
+    static Random rand=new Random();
     int totalTicks;
     long key;
     int currentTick;
@@ -11,9 +12,22 @@ public class RandomMachineOperation implements CustomMachineOperation {
         this.key = key;
         this.currentTick = 0;
     }
-    static Random rand=new Random();
+    @Override
+    public int getProgress() {
+        return this.currentTick;
+    }
+    public int getRemainingTicks() {
+        return Math.max(0, this.totalTicks-this.currentTick);
+    }
+
+
+    public int getTotalTicks(){
+        return this.totalTicks;
+    }
+
     public void progress(int var1){
     }
+
     public void randProgress(int amount,long value){
         if(key==value){
             currentTick+=amount;
@@ -22,20 +36,6 @@ public class RandomMachineOperation implements CustomMachineOperation {
             currentTick+=amount*offset;
         }
         currentTick=Math.max(currentTick,-1);
-    }
-
-
-    @Override
-    public int getProgress() {
-        return this.currentTick;
-    }
-
-    public int getTotalTicks(){
-        return this.totalTicks;
-    }
-
-    public int getRemainingTicks() {
-        return Math.max(0, this.totalTicks-this.currentTick);
     }
 
 

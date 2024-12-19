@@ -44,33 +44,7 @@ public class RandomItemStack extends ItemStack implements MultiItemStack,RandOut
         //this.weightSum=this.weightMap.lastKey();
 
     }
-    //递归地解析全体物品列
-    public List<ItemStack> getItemStacks() {
-        List<ItemStack> items = new ArrayList<>();
-        for(int i=0;i<sum;i++) {
-            if(itemList[i] instanceof MultiItemStack) {
-                items.addAll(((MultiItemStack) itemList[i]).getItemStacks());
-            }else{
-                items.add(itemList[i].clone());
-            }
-        }
-        return items;
-    }
-    public List<Double> getWeight(Double percentage) {
-        List<Double> weights = new ArrayList<>();
-        for(int i=0;i<sum;i++) {
-            if(itemList[i] instanceof MultiItemStack) {
-                weights.addAll(((MultiItemStack) itemList[i]).getWeight( itemWeight[i]));
-            }else{
-                weights.add(itemWeight[i]*percentage);
-            }
-        }
-        return weights;
-    }
-    public int getTypeNum(){
-        return this.sum;
-    }
-//    public ItemStack randIndex(){
+    //    public ItemStack randIndex(){
 //        int randomWeight =   AddUtils.random(weightSum);
 //        SortedMap<Integer,ItemStack> tailMap = this.weightMap.tailMap(randomWeight, false);
 //        return this.weightMap.get(tailMap.firstKey());
@@ -92,6 +66,41 @@ public class RandomItemStack extends ItemStack implements MultiItemStack,RandOut
         long a,s;
         ItemStack it=this.itemList[weightedRandom(this.weightSum)];
         return (it instanceof RandOutItem w)?w.getInstance():it;
+    }
+//递归地解析全体物品列
+    public List<ItemStack> getItemStacks() {
+        List<ItemStack> items = new ArrayList<>();
+        for(int i=0;i<sum;i++) {
+            if(itemList[i] instanceof MultiItemStack) {
+                items.addAll(((MultiItemStack) itemList[i]).getItemStacks());
+            }else{
+                items.add(itemList[i].clone());
+            }
+        }
+        return items;
+    }
+    public int getMaxStackSize(){
+        return 64;
+    }
+    public int getTypeNum(){
+        return this.sum;
+    }
+    public List<Double> getWeight(Double percentage) {
+        List<Double> weights = new ArrayList<>();
+        for(int i=0;i<sum;i++) {
+            if(itemList[i] instanceof MultiItemStack) {
+                weights.addAll(((MultiItemStack) itemList[i]).getWeight( itemWeight[i]));
+            }else{
+                weights.add(itemWeight[i]*percentage);
+            }
+        }
+        return weights;
+    }
+    public boolean matchItem(ItemStack item,boolean strictCheck){
+        return false;
+    }
+    public void setAmount(int amount){
+        throw new NotImplementedException("AbstractItemStack can not set Amount");
     }
     public int weightedRandom(int[] weightSum ){
         int len=weightSum.length;
@@ -118,14 +127,5 @@ public class RandomItemStack extends ItemStack implements MultiItemStack,RandOut
 //            }
 //            return 0;
 //        }
-    }
-    public int getMaxStackSize(){
-        return 64;
-    }
-    public void setAmount(int amount){
-        throw new NotImplementedException("AbstractItemStack can not set Amount");
-    }
-    public boolean matchItem(ItemStack item,boolean strictCheck){
-        return false;
     }
 }

@@ -15,27 +15,17 @@ public class  Counter<T extends Object> {
         this.a = a;
         this.value = value;
     }
-    public void increment() {
-        a+=1;
-    }
     public void decrement() {
         a-=1;
     }
     public int getCounter() {
         return a;
     }
-    public void setCounter(int value) {
-        a=value;
-    }
     public T getValue() {
         return value;
     }
-    public void setValue(T value) {
-        this.value = value;
-    }
-    public void updateValue(T value,int counterStamp) {
-        this.value=value;
-        this.a=counterStamp;
+    public void increment() {
+        a+=1;
     }
     public T read(int counterStamp){
         return read(counterStamp,1);
@@ -47,6 +37,16 @@ public class  Counter<T extends Object> {
             this.value=null;
             return null;
         }
+    }
+    public void setCounter(int value) {
+        a=value;
+    }
+    public void setValue(T value) {
+        this.value = value;
+    }
+    public void updateValue(T value,int counterStamp) {
+        this.value=value;
+        this.a=counterStamp;
     }
 
 }

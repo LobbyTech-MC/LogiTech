@@ -47,6 +47,47 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
 
 public class StackMachine extends AbstractAdvancedProcessor implements MultiCraftType, ImportRecipes {
+    protected static final List<SlimefunItem> BW_LIST=new ArrayList<>();
+    protected static int[] BW_LIST_ENERGYCOMSUME;
+    protected static int BWSIZE;
+    protected static MenuFactory MACHINE_LIST_MENU;
+    static{
+        SchedulePostRegister.addPostRegisterTask(()->{
+            getMachineList();
+            MACHINE_LIST_MENU=MenuUtils.createMachineListDisplay(getMachineList(),null).setBack(1);
+        });
+    }
+    public static boolean hasInit=false;
+    public static int getEnergy(int index){
+        if(BW_LIST_ENERGYCOMSUME==null||BW_LIST_ENERGYCOMSUME.length==0){
+            getMachineList();
+        }
+        return BW_LIST_ENERGYCOMSUME[index];
+    }
+    public static final int getListSize(){
+        if(BW_LIST==null||BWSIZE==0){
+            BWSIZE=getMachineList().size();
+        }
+        return BWSIZE;
+    }
+    public static List<SlimefunItem> getMachineList(){
+        if(!hasInit)
+        synchronized (BW_LIST){
+            if(BW_LIST.isEmpty()){
+                RecipeSupporter.init();
+                BWSIZE=RecipeSupporter.STACKMACHINE_LIST.size();
+                BW_LIST_ENERGYCOMSUME=new int[BWSIZE];
+                int i=0;
+                for(Map.Entry<SlimefunItem,Integer> e:RecipeSupporter.STACKMACHINE_LIST.entrySet()){
+                    BW_LIST.add(e.getKey());
+                    BW_LIST_ENERGYCOMSUME[i]=e.getValue();
+                    ++i;
+                }
+                hasInit=true;
+            }
+        }
+        return BW_LIST;
+    }
     protected final int[] BORDER={
             12,14,21,23,30,31,32,39,41,48,49,50
     };
@@ -56,15 +97,6 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
     protected final int[] OUTPUT_SLOT={
             6,7,8,15,16,17,24,25,26,33,34,35,42,43,44,51,52,53
     };
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
-    protected static final List<SlimefunItem> BW_LIST=new ArrayList<>();
-    protected static int[] BW_LIST_ENERGYCOMSUME;
-    protected static int BWSIZE;
     protected final int MACHINE_SLOT=13;
     protected final int MINFO_SLOT=40;
     protected final int INFO_SLOT=4;
@@ -76,24 +108,9 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
     protected final int RECIPEMENU_SLOT=5;
     protected final ItemStack MACHINEMENU_ICON=new CustomItemStack(Material.BLAST_FURNACE,"&b该机器支持的机器列表","&6点击打开菜单");
     protected final ItemStack RECIPEMENU_ICON=new CustomItemStack(Material.KNOWLEDGE_BOOK,"&b当前模拟的机器配方列表","&6点击打开菜单");
-    protected ItemStack getInfoItem(int craftlimit,int energyCost,int charge,double efficiency,String name){
-        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a机器信息",AddUtils.concat("&7当前模拟的机器名称: ",(name)),
-                "&7当前并行处理数: %-3d".formatted(craftlimit),"&7当前每刻耗电量: %sJ/t".formatted(AddUtils.formatDouble(energyCost)),"&7当前电量: %sJ".formatted(AddUtils.formatDouble(charge)),
-                AddUtils.concat("&7当前工作效率: ",AddUtils.getPercentFormat(efficiency)));
-    }
-    protected ItemStack getInfoOffItem(int craftlimit ,int energyCost,int charge,String name){
-        return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c机器信息","&c缺少电力!",AddUtils.concat("&7当前模拟的机器名称: ",(name)),
-                "&7当前并行处理数: %-3d".formatted(craftlimit),"&7当前每刻耗电量: %sJ/t".formatted(AddUtils.formatDouble(energyCost)),"&7当前电量: %sJ".formatted(AddUtils.formatDouble(charge)));
-    }
     protected Double efficiency;
-    protected static MenuFactory MACHINE_LIST_MENU;
-    static{
-        SchedulePostRegister.addPostRegisterTask(()->{
-            getMachineList();
-            MACHINE_LIST_MENU=MenuUtils.createMachineListDisplay(getMachineList(),null).setBack(1);
-        });
-    }
     protected ItemPusherProvider MACHINE_PROVIDER=CraftUtils.getpusher;
+    public final int DATA_SLOT=4;
     public StackMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                         Material progressItem, int energyConsumption, int energyBuffer,double efficiency) {
         super(category, item, recipeType, recipe, progressItem, energyConsumption, energyBuffer, null);
@@ -113,64 +130,6 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
     }
     public void addInfo(ItemStack stack){
         stack.setItemMeta( AddUtils.capacitorInfoAdd(stack,energybuffer).getItemMeta());
-    }
-    public static boolean hasInit=false;
-    public static List<SlimefunItem> getMachineList(){
-        if(!hasInit)
-        synchronized (BW_LIST){
-            if(BW_LIST.isEmpty()){
-                RecipeSupporter.init();
-                BWSIZE=RecipeSupporter.STACKMACHINE_LIST.size();
-                BW_LIST_ENERGYCOMSUME=new int[BWSIZE];
-                int i=0;
-                for(Map.Entry<SlimefunItem,Integer> e:RecipeSupporter.STACKMACHINE_LIST.entrySet()){
-                    BW_LIST.add(e.getKey());
-                    BW_LIST_ENERGYCOMSUME[i]=e.getValue();
-                    ++i;
-                }
-                hasInit=true;
-            }
-        }
-        return BW_LIST;
-    }
-    public static final int getListSize(){
-        if(BW_LIST==null||BWSIZE==0){
-            BWSIZE=getMachineList().size();
-        }
-        return BWSIZE;
-    }
-    public static int getEnergy(int index){
-        if(BW_LIST_ENERGYCOMSUME==null||BW_LIST_ENERGYCOMSUME.length==0){
-            getMachineList();
-        }
-        return BW_LIST_ENERGYCOMSUME[index];
-    }
-    public ItemStack getProgressBar() {
-        return progressbar;
-    }
-
-    public MachineRecipe getRecordRecipe(SlimefunBlockData data){
-        List<MachineRecipe> lst=getMachineRecipes(data);
-        int size=lst.size();
-        if(size>0){
-            int index=DataCache.getLastRecipe(data);
-            if(index>=0&&index<size){
-                return lst.get(index);
-            }
-        }
-        return null;
-    }
-
-    public List<MachineRecipe> getMachineRecipes(Block b, BlockMenu inv){
-        return getMachineRecipes(DataCache.safeLoadBlock(inv.getLocation()));
-    }
-    public List<MachineRecipe> getMachineRecipes(SlimefunBlockData data){
-        int index= MultiCraftType.getRecipeTypeIndex(data);
-        if(index>=0&&index<getListSize()){
-            List<MachineRecipe> lst= RecipeSupporter.MACHINE_RECIPELIST.get(getMachineList().get(index ));
-            return lst!=null?lst:new ArrayList<>();
-        }
-        return new ArrayList<>();
     }
     //该方法一般只有updateMenu的时候调用
     //有没有可能就是
@@ -194,6 +153,80 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         preset.addItem(MINFO_SLOT,MINFO_ITEM_OFF,ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(PROCESSOR_SLOT, MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
     }
+    public DataMenuClickHandler createDataHolder(){
+        return new DataMenuClickHandler() {
+            //0 为 数量 1 为 电力
+            int[] intdata=new int[2];
+            public int getInt(int i){
+                return intdata[i];
+            }
+            @Override
+            public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
+                return false;
+            }
+            public void setInt(int i, int val){
+                intdata[i]=val;
+            }
+        };
+    }
+    public final int getCraftLimit(Block b,BlockMenu inv){
+       return (int)(this.efficiency*getDataHolder(b,inv).getInt(0));
+    }
+
+    public DataMenuClickHandler getDataHolder(Block b, BlockMenu inv){
+        ChestMenu.MenuClickHandler handler=inv.getMenuClickHandler(DATA_SLOT);
+        if(handler instanceof DataMenuClickHandler dh){return dh;}
+        else{
+            DataMenuClickHandler dh=createDataHolder();
+            inv.addMenuClickHandler(DATA_SLOT,dh);
+            Schedules.launchSchedules(()->{
+                updateMenu(  inv,b,Settings.INIT);
+            },20,false,0);
+            return dh;
+        }
+    }
+
+    protected ItemStack getInfoItem(int craftlimit,int energyCost,int charge,double efficiency,String name){
+        return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a机器信息",AddUtils.concat("&7当前模拟的机器名称: ",(name)),
+                "&7当前并行处理数: %-3d".formatted(craftlimit),"&7当前每刻耗电量: %sJ/t".formatted(AddUtils.formatDouble(energyCost)),"&7当前电量: %sJ".formatted(AddUtils.formatDouble(charge)),
+                AddUtils.concat("&7当前工作效率: ",AddUtils.getPercentFormat(efficiency)));
+    }
+    protected ItemStack getInfoOffItem(int craftlimit ,int energyCost,int charge,String name){
+        return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c机器信息","&c缺少电力!",AddUtils.concat("&7当前模拟的机器名称: ",(name)),
+                "&7当前并行处理数: %-3d".formatted(craftlimit),"&7当前每刻耗电量: %sJ/t".formatted(AddUtils.formatDouble(energyCost)),"&7当前电量: %sJ".formatted(AddUtils.formatDouble(charge)));
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public List<MachineRecipe> getMachineRecipes(Block b, BlockMenu inv){
+        return getMachineRecipes(DataCache.safeLoadBlock(inv.getLocation()));
+    }
+    public List<MachineRecipe> getMachineRecipes(SlimefunBlockData data){
+        int index= MultiCraftType.getRecipeTypeIndex(data);
+        if(index>=0&&index<getListSize()){
+            List<MachineRecipe> lst= RecipeSupporter.MACHINE_RECIPELIST.get(getMachineList().get(index ));
+            return lst!=null?lst:new ArrayList<>();
+        }
+        return new ArrayList<>();
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public ItemStack getProgressBar() {
+        return progressbar;
+    }
+    public MachineRecipe getRecordRecipe(SlimefunBlockData data){
+        List<MachineRecipe> lst=getMachineRecipes(data);
+        int size=lst.size();
+        if(size>0){
+            int index=DataCache.getLastRecipe(data);
+            if(index>=0&&index<size){
+                return lst.get(index);
+            }
+        }
+        return null;
+    }
+
     public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuOpeningHandler((player -> {
             updateMenu(inv,block,Settings.RUN);
@@ -227,38 +260,13 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
 
         updateMenu(inv,block,Settings.INIT);
     }
-    public DataMenuClickHandler createDataHolder(){
-        return new DataMenuClickHandler() {
-            //0 为 数量 1 为 电力
-            int[] intdata=new int[2];
-            public int getInt(int i){
-                return intdata[i];
-            }
-            public void setInt(int i, int val){
-                intdata[i]=val;
-            }
-            @Override
-            public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
-                return false;
-            }
-        };
-    }
-    public final int DATA_SLOT=4;
-    public DataMenuClickHandler getDataHolder(Block b, BlockMenu inv){
-        ChestMenu.MenuClickHandler handler=inv.getMenuClickHandler(DATA_SLOT);
-        if(handler instanceof DataMenuClickHandler dh){return dh;}
-        else{
-            DataMenuClickHandler dh=createDataHolder();
-            inv.addMenuClickHandler(DATA_SLOT,dh);
-            Schedules.launchSchedules(()->{
-                updateMenu(  inv,b,Settings.INIT);
-            },20,false,0);
-            return dh;
+    public void onBreak(BlockBreakEvent e,BlockMenu inv){
+        if(inv!=null){
+            Location loc=inv.getLocation();
+            inv.dropItems(loc,MACHINE_SLOT);
         }
-    }
+        super.onBreak(e,inv);
 
-    public final int getCraftLimit(Block b,BlockMenu inv){
-       return (int)(this.efficiency*getDataHolder(b,inv).getInt(0));
     }
     public void progressorCost(Block b, BlockMenu inv){
         DataMenuClickHandler dh=getDataHolder(b,inv);
@@ -266,6 +274,39 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         int machineCnt=dh.getInt(0);
         int consumption=Math.min(charge*machineCnt ,this.energybuffer);
         this.removeCharge(inv.getLocation(),consumption);
+    }
+
+    public void tick(Block b, @Nullable BlockMenu inv, SlimefunBlockData data, int tickCount){
+        //首先 加载
+        if(inv.hasViewer()){
+            updateMenu(inv,b,Settings.RUN);
+        }
+        int index=MultiCraftType.getRecipeTypeIndex(data);
+        if(index>=0&&index<getListSize()){//有效机器
+            DataMenuClickHandler db=this.getDataHolder(b,inv);
+            int charge=db.getInt(1);
+            int craftLimit=db.getInt(0);
+            int consumption=Math.min(craftLimit*charge,this.energybuffer);
+            int energy=this.getCharge(inv.getLocation(),data);
+            if(energy>=consumption){
+                if(inv.hasViewer()){
+                    inv.replaceExistingItem(MINFO_SLOT,getInfoItem((int)(craftLimit*efficiency),consumption,energy,this.efficiency,
+                            ItemStackHelper.getDisplayName(this.MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,this.MACHINE_SLOT).getItem())));
+                }
+                process(b,inv,data);
+            }else {
+                //没电
+                if(inv.hasViewer()){
+                    inv.replaceExistingItem(MINFO_SLOT,getInfoOffItem((int)(craftLimit*efficiency),consumption,energy,
+                            ItemStackHelper.getDisplayName(this.MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,this.MACHINE_SLOT).getItem())));
+                }
+            }
+
+        }else {
+            if(inv.hasViewer()){
+                inv.replaceExistingItem(MINFO_SLOT,MINFO_ITEM_OFF);
+            }
+        }
     }
     public void updateMenu(BlockMenu inv, Block block, Settings mod){
         SlimefunBlockData data=DataCache.safeGetBlockCacheWithLoad(inv.getLocation());
@@ -341,47 +382,6 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         //拿走机器,想逃?
         this.processor.endOperation(inv.getLocation());
         inv.replaceExistingItem(PROCESSOR_SLOT, MenuUtils.PROCESSOR_NULL);
-    }
-
-    public void tick(Block b, @Nullable BlockMenu inv, SlimefunBlockData data, int tickCount){
-        //首先 加载
-        if(inv.hasViewer()){
-            updateMenu(inv,b,Settings.RUN);
-        }
-        int index=MultiCraftType.getRecipeTypeIndex(data);
-        if(index>=0&&index<getListSize()){//有效机器
-            DataMenuClickHandler db=this.getDataHolder(b,inv);
-            int charge=db.getInt(1);
-            int craftLimit=db.getInt(0);
-            int consumption=Math.min(craftLimit*charge,this.energybuffer);
-            int energy=this.getCharge(inv.getLocation(),data);
-            if(energy>=consumption){
-                if(inv.hasViewer()){
-                    inv.replaceExistingItem(MINFO_SLOT,getInfoItem((int)(craftLimit*efficiency),consumption,energy,this.efficiency,
-                            ItemStackHelper.getDisplayName(this.MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,this.MACHINE_SLOT).getItem())));
-                }
-                process(b,inv,data);
-            }else {
-                //没电
-                if(inv.hasViewer()){
-                    inv.replaceExistingItem(MINFO_SLOT,getInfoOffItem((int)(craftLimit*efficiency),consumption,energy,
-                            ItemStackHelper.getDisplayName(this.MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,this.MACHINE_SLOT).getItem())));
-                }
-            }
-
-        }else {
-            if(inv.hasViewer()){
-                inv.replaceExistingItem(MINFO_SLOT,MINFO_ITEM_OFF);
-            }
-        }
-    }
-    public void onBreak(BlockBreakEvent e,BlockMenu inv){
-        if(inv!=null){
-            Location loc=inv.getLocation();
-            inv.dropItems(loc,MACHINE_SLOT);
-        }
-        super.onBreak(e,inv);
-
     }
 
 }

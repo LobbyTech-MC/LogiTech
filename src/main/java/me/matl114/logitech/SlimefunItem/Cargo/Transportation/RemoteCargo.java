@@ -39,12 +39,6 @@ public class RemoteCargo extends AbstractCargo {
             3,5
     };
     protected final String[] savedKeys=new String[0];
-    public String[] getSaveKeys(){
-        return savedKeys;
-    }
-    public int[] getDirectionSlots(){
-        return new int[0];
-    }
     protected final ItemStack[] INFO_ITEM=new ItemStack[]{
             new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&b机制",
                     "&7在左侧配置源方方块超链接","&7在中间的槽位插入[%s]".formatted(Language.get("Items.CARGO_CONFIG.Name")),"&7在下方放入黑/白名单物品",
@@ -56,18 +50,7 @@ public class RemoteCargo extends AbstractCargo {
     protected final int[] LOCATION_SLOT=new int[]{
             10,16
     };
-    public int[] getBWListSlot(){
-        return BWSLOT;
-    }
-    public int[] getInputSlots(){
-        return new int[0];
-    }
-    public int[] getOutputSlots(){
-        return new int[0];
-    }
-    public int getConfigSlot(){
-        return 4;
-    }
+    protected boolean transportSmarter=false;
     public RemoteCargo(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, List<ItemStack> displayList) {
         super(itemGroup, item, recipeType, recipe, displayList);
         setDisplayRecipes(
@@ -85,49 +68,6 @@ public class RemoteCargo extends AbstractCargo {
         );
 
     }
-    public void constructMenu(BlockMenuPreset preset){
-        int[] border=BORDER;
-        int len=border.length;
-        for (int i=0;i<len;++i){
-            preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
-        }
-        border=INFO_SLOT;
-        len=border.length;
-        for (int i=0;i<len;++i){
-            preset.addItem(INFO_SLOT[i],INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
-        }
-    }
-    public void newMenuInstance(BlockMenu inv, Block b){
-        inv.addMenuOpeningHandler((player -> {
-            updateMenu(inv,b,Settings.RUN);
-        }));
-        inv.addMenuCloseHandler(player -> {
-            updateMenu(inv,b,Settings.RUN);
-        });
-
-        updateMenu(inv,b, Settings.INIT);
-    }
-    public Location getLocation(String saveKey,SlimefunBlockData data){
-        return DataCache.getLocation(saveKey,data);
-    }
-    public void updateLocationSlot(String saveKey, BlockMenu blockMenu,int slot){
-        ItemStack it=blockMenu.getItemInSlot(slot);
-        if(it!=null){
-            ItemMeta meta=it.getItemMeta();
-            if(HyperLink.isLink(meta)){
-                Location loc=HyperLink.getLink(meta);
-                DataCache.setLocation(saveKey,blockMenu.getLocation(),loc);
-                return;
-            }
-        }
-        DataCache.setLocation(saveKey,blockMenu.getLocation(),null);
-    }
-    public void updateMenu(BlockMenu inv ,Block b,Settings mod){
-        loadConfig(inv,b);
-        updateLocationSlot("from_dir",inv,LOCATION_SLOT[0]);
-        updateLocationSlot("to_dir",inv,LOCATION_SLOT[1]);
-    }
-    protected boolean transportSmarter=false;
     public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
         //Location loc=menu.getLocation();
         Location from_dir=getLocation("from_dir",data);
@@ -149,12 +89,72 @@ public class RemoteCargo extends AbstractCargo {
         }
         ContainerUtils.transferWithContainer(from_dir,to_dir,configCode,bwset,transportSmarter);
     }
+    public void constructMenu(BlockMenuPreset preset){
+        int[] border=BORDER;
+        int len=border.length;
+        for (int i=0;i<len;++i){
+            preset.addItem(border[i], ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
+        }
+        border=INFO_SLOT;
+        len=border.length;
+        for (int i=0;i<len;++i){
+            preset.addItem(INFO_SLOT[i],INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
+        }
+    }
+    public int[] getBWListSlot(){
+        return BWSLOT;
+    }
+    public int getConfigSlot(){
+        return 4;
+    }
+    public int[] getDirectionSlots(){
+        return new int[0];
+    }
+    public int[] getInputSlots(){
+        return new int[0];
+    }
+    public Location getLocation(String saveKey,SlimefunBlockData data){
+        return DataCache.getLocation(saveKey,data);
+    }
+    public int[] getOutputSlots(){
+        return new int[0];
+    }
+    public String[] getSaveKeys(){
+        return savedKeys;
+    }
+    public void newMenuInstance(BlockMenu inv, Block b){
+        inv.addMenuOpeningHandler((player -> {
+            updateMenu(inv,b,Settings.RUN);
+        }));
+        inv.addMenuCloseHandler(player -> {
+            updateMenu(inv,b,Settings.RUN);
+        });
+
+        updateMenu(inv,b, Settings.INIT);
+    }
     public void onBreak(BlockBreakEvent e, BlockMenu menu){
         super.onBreak(e, menu);
         if(menu!=null){
             Location loc=menu.getLocation();
             menu.dropItems(loc,LOCATION_SLOT);
         }
+    }
+    public void updateLocationSlot(String saveKey, BlockMenu blockMenu,int slot){
+        ItemStack it=blockMenu.getItemInSlot(slot);
+        if(it!=null){
+            ItemMeta meta=it.getItemMeta();
+            if(HyperLink.isLink(meta)){
+                Location loc=HyperLink.getLink(meta);
+                DataCache.setLocation(saveKey,blockMenu.getLocation(),loc);
+                return;
+            }
+        }
+        DataCache.setLocation(saveKey,blockMenu.getLocation(),null);
+    }
+    public void updateMenu(BlockMenu inv ,Block b,Settings mod){
+        loadConfig(inv,b);
+        updateLocationSlot("from_dir",inv,LOCATION_SLOT[0]);
+        updateLocationSlot("to_dir",inv,LOCATION_SLOT[1]);
     }
 
 }

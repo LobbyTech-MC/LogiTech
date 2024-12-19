@@ -9,8 +9,8 @@ import me.matl114.logitech.Utils.DataCache;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 public interface ChipControllable {
-    public  int getChipSlot();
     static final String CCODEKEY="ccmd";
+    public  int getChipSlot();
     default String getKey(){
         return CCODEKEY;
     }

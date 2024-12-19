@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 
@@ -27,29 +28,15 @@ import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.WorldUtils;
 import me.matl114.logitech.Utils.UtilClass.CargoClass.Directions;
 import me.matl114.logitech.Utils.UtilClass.PdcClass.AbstractStringList;
-import me.matl114.logitech.Utils.WorldUtils;
-import org.bukkit.NamespacedKey;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-
-import javax.swing.text.html.Option;
-import javax.xml.crypto.Data;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 public class ConfigCopier extends CustomProps{
 
-    public ConfigCopier(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
-        super(itemGroup, item, recipeType, recipe);
-    }
     private NamespacedKey KEY_DIR= AddUtils.getNameKey("dir-cfg");
     private NamespacedKey KEY_SET= AddUtils.getNameKey("tog-set");
     private NamespacedKey KEY_BWL= AddUtils.getNameKey("bwl-cfg");
+    public ConfigCopier(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+        super(itemGroup, item, recipeType, recipe);
+    }
     @Override
     public void onClickAction(PlayerRightClickEvent event) {
         Optional<Block> optional=event.getClickedBlock();

@@ -42,20 +42,6 @@ public class ChipCardCode {
         stack.setItemMeta(createCard(1431655765));
         return stack;
     }).get();
-    private static ItemMeta createCard(int code){
-        ItemMeta it=meta.clone();
-        setConfig(it,code);
-        return it;
-    }
-    public static ItemMeta getCard(int code){
-        ItemMeta it=chip0meta.clone();
-        setConfigCode(it,code);
-        updateConfigCodeDisplay(it,code);
-        return it;
-    }
-    public static boolean isConfig(ItemMeta meta) {
-        return meta.getPersistentDataContainer().has(KEY_LOC);
-    }
     public static boolean canConfig(ItemMeta meta) {
         String it= CraftUtils.parseSfId(meta);
         if(it==null) return false;
@@ -63,14 +49,6 @@ public class ChipCardCode {
     }
     public static boolean canConfig(SlimefunItem sfitem){
         return sfitem instanceof ChipCard;
-    }
-    public static int getConfig(ItemMeta meta) {
-        try{
-            Integer code= meta.getPersistentDataContainer().get(KEY_LOC, PersistentDataType.INTEGER);
-            return code!=null?code:0;
-        }catch(Throwable ex){
-            return 0;
-        }
     }
     public static void clearConfig(ItemMeta meta) {
         meta.getPersistentDataContainer().remove(KEY_LOC);
@@ -87,6 +65,28 @@ public class ChipCardCode {
             }
             meta.setLore(lore);
         }
+    }
+    private static ItemMeta createCard(int code){
+        ItemMeta it=meta.clone();
+        setConfig(it,code);
+        return it;
+    }
+    public static ItemMeta getCard(int code){
+        ItemMeta it=chip0meta.clone();
+        setConfigCode(it,code);
+        updateConfigCodeDisplay(it,code);
+        return it;
+    }
+    public static int getConfig(ItemMeta meta) {
+        try{
+            Integer code= meta.getPersistentDataContainer().get(KEY_LOC, PersistentDataType.INTEGER);
+            return code!=null?code:0;
+        }catch(Throwable ex){
+            return 0;
+        }
+    }
+    public static boolean isConfig(ItemMeta meta) {
+        return meta.getPersistentDataContainer().has(KEY_LOC);
     }
     public static void setConfig(ItemMeta meta, int code) {
         if(code!=-1) {

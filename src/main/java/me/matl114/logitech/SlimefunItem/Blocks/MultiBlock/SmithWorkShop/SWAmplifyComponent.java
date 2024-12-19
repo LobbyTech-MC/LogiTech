@@ -1,6 +1,12 @@
 package me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SmithWorkShop;
 
+import java.util.HashMap;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
 import com.google.common.base.Preconditions;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -8,13 +14,12 @@ import lombok.Getter;
 import me.matl114.logitech.SlimefunItem.Items.MaterialItem;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.Utils;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.HashMap;
 
 public class SWAmplifyComponent extends MaterialItem {
     static HashMap<Material,SWAmplifyComponent> materialJudgement=new HashMap<>();
+    public static SWAmplifyComponent getComponentType(ItemStack item){
+        return item==null?null: materialJudgement.get(item.getType());
+    }
     @Getter
     private Material type;
     public SWAmplifyComponent(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
@@ -29,8 +34,5 @@ public class SWAmplifyComponent extends MaterialItem {
                 this.getItem().clone()
         ));
 
-    }
-    public static SWAmplifyComponent getComponentType(ItemStack item){
-        return item==null?null: materialJudgement.get(item.getType());
     }
 }

@@ -28,15 +28,6 @@ public class EMachine extends AbstractProcessor implements ImportRecipes {
     }
     public EMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                     Material processbar, int energyConsumption, int energyBuffer,
-                     Supplier<List<MachineRecipe>> machineRecipeSupplier) {
-        super(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,null);
-        this.machineRecipeSupplier=machineRecipeSupplier;
-        SchedulePostRegister.addPostRegisterTask(()->{
-            getMachineRecipes();
-        });
-    }
-    public EMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
-                    Material processbar, int energyConsumption, int energyBuffer,
                     RecipeType... recipeTypes) {
        this(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,()->{
            if(recipeTypes==null||recipeTypes.length==0){
@@ -53,6 +44,15 @@ public class EMachine extends AbstractProcessor implements ImportRecipes {
                 return mr;
            }
        });
+    }
+    public EMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
+                    Material processbar, int energyConsumption, int energyBuffer,
+                     Supplier<List<MachineRecipe>> machineRecipeSupplier) {
+        super(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,null);
+        this.machineRecipeSupplier=machineRecipeSupplier;
+        SchedulePostRegister.addPostRegisterTask(()->{
+            getMachineRecipes();
+        });
     }
 
     public void addInfo(ItemStack stack){

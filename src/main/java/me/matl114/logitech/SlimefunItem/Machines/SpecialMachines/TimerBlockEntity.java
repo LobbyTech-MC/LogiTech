@@ -1,64 +1,42 @@
 package me.matl114.logitech.SlimefunItem.Machines.SpecialMachines;
 
-import com.google.common.base.Preconditions;
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
-import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
-import lombok.Getter;
-import me.matl114.logitech.Schedule.SchedulePostRegister;
-import me.matl114.logitech.Schedule.Schedules;
-import me.matl114.logitech.SlimefunItem.Interface.MenuTogglableBlock;
-import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.NMSUtils;
-import me.matl114.logitech.Utils.UtilClass.TickerClass.Ticking;
-import me.matl114.logitech.Utils.WorldUtils;
-import me.matl114.matlib.Utils.Reflect.MethodAccess;
-import me.matl114.matlib.Utils.Reflect.ReflectUtils;
-import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.lang.reflect.Method;
-import java.sql.Ref;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
+
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import lombok.Getter;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.NMSUtils;
+import me.matl114.logitech.Utils.WorldUtils;
+import me.matl114.matlib.Utils.Reflect.ReflectUtils;
 
 public class TimerBlockEntity extends AbstractTimerRange  {
+    @Getter
+    private static TimerBlockEntity instance=null;
+    private static boolean running=false;
+    private static int TIMER=50;
+
+    private static Consumer<String> errorOut=(s)->{
+        //Debug.logger(s);
+    };
     public static boolean isEnable(){
         return instance!=null;
     }
-    @Getter
-    private static TimerBlockEntity instance=null;
     public TimerBlockEntity(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, int energybuffer, int energyConsumption) {
         super(category, item, recipeType, recipe,7,50, energybuffer, energyConsumption);
         instance=this;
     }
-
-    private static boolean running=false;
-    private static int TIMER=50;
-    private static Consumer<String> errorOut=(s)->{
-        //Debug.logger(s);
-    };
+    @Override
+    public boolean blockPredicate(Block block) {
+        return DataCache.getMenu(block.getLocation())==null&&WorldUtils.isEntityBlock(block.getType());
+    }
     public Runnable getTickTask(Location loc,Location center){
         AtomicReference<Runnable> result=new AtomicReference<>(null);
         Block bb=loc.getBlock();
@@ -115,10 +93,6 @@ public class TimerBlockEntity extends AbstractTimerRange  {
             },()->{errorOut.accept("failed getPositionMethod");},bb);
         },()->{errorOut.accept("failed getHandle");},bb);
         return result.get();
-    }
-    @Override
-    public boolean blockPredicate(Block block) {
-        return DataCache.getMenu(block.getLocation())==null&&WorldUtils.isEntityBlock(block.getType());
     }
 
 

@@ -26,6 +26,25 @@ public class AbstractSpawner extends AbstractBlock{
         super(itemGroup, item, recipeType, recipe);
         this.addItemSetting(allowSpawnEggs);
     }
+    public boolean canStack(ItemMeta meta1, ItemMeta meta2){
+        if(!super.canStack(meta1,meta2)){
+            return false;
+        }
+        if(meta1 instanceof BlockStateMeta bsm1 &&meta2 instanceof BlockStateMeta bsm2){
+            return bsm1.getBlockState().equals(bsm2.getBlockState());
+        }
+        return false;
+    }
+    public Collection<ItemStack> getDrops() {
+        /**
+         * There should be no drops by default since drops are handled by listener
+         */
+        return new ArrayList<>();
+    }
+    public void onBreak(BlockBreakEvent event, BlockMenu e) {
+        super.onBreak(event, e);
+        onSpawnerBreak(event);
+    }
     public void onPlace(BlockPlaceEvent event, Block e) {
         super.onPlace(event, e);
         BlockState data =e.getState();
@@ -45,40 +64,21 @@ public class AbstractSpawner extends AbstractBlock{
             }
         }
     }
-    public void onBreak(BlockBreakEvent event, BlockMenu e) {
-        super.onBreak(event, e);
-        onSpawnerBreak(event);
+   public void onSpawnerBreak(BlockBreakEvent event){
+    BlockState data =event.getBlock().getState();
+    if(data instanceof CreatureSpawner cs){
+        event.getBlock().getWorld().dropItemNaturally(
+                event.getBlock().getLocation(),
+                EntityFeat.generateSpawnerFrom(cs.getSpawnedType(),cs.getMinSpawnDelay(),
+                        cs.getMaxNearbyEntities(),cs.getRequiredPlayerRange(),cs.getSpawnRange(),cs.getSpawnCount(),true)
+        );
+        event.getBlock().setType(Material.AIR);
+        event.setDropItems(false);
+        event.setExpToDrop(0);
     }
-    public void onSpawnerBreak(BlockBreakEvent event){
-        BlockState data =event.getBlock().getState();
-        if(data instanceof CreatureSpawner cs){
-            event.getBlock().getWorld().dropItemNaturally(
-                    event.getBlock().getLocation(),
-                    EntityFeat.generateSpawnerFrom(cs.getSpawnedType(),cs.getMinSpawnDelay(),
-                            cs.getMaxNearbyEntities(),cs.getRequiredPlayerRange(),cs.getSpawnRange(),cs.getSpawnCount(),true)
-            );
-            event.getBlock().setType(Material.AIR);
-            event.setDropItems(false);
-            event.setExpToDrop(0);
-        }
-    }
-    public Collection<ItemStack> getDrops() {
-        /**
-         * There should be no drops by default since drops are handled by listener
-         */
-        return new ArrayList<>();
-    }
-   public void preRegister(){
-        super.preRegister();
-        this.handleBlock(this);
-   }
-    public boolean canStack(ItemMeta meta1, ItemMeta meta2){
-        if(!super.canStack(meta1,meta2)){
-            return false;
-        }
-        if(meta1 instanceof BlockStateMeta bsm1 &&meta2 instanceof BlockStateMeta bsm2){
-            return bsm1.getBlockState().equals(bsm2.getBlockState());
-        }
-        return false;
-    }
+}
+    public void preRegister(){
+	        super.preRegister();
+	        this.handleBlock(this);
+	   }
 }

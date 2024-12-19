@@ -36,6 +36,16 @@ public class SupportedPluginManager {
         SchedulePostRegister.addPostRegisterTask(this::firstTickRegistrations);
     }
 
+    private void firstTickRegistrations() {
+        this.wildChests = Bukkit.getPluginManager().isPluginEnabled("WildChests");
+        this.mcMMO = Bukkit.getPluginManager().isPluginEnabled("mcMMO");
+        this.roseStacker = Bukkit.getPluginManager().isPluginEnabled("RoseStacker");
+        if (roseStacker) {
+            this.roseStackerAPI = RoseStackerAPI.getInstance();
+        }
+        this.wildStacker = Bukkit.getPluginManager().isPluginEnabled("WildStacker");
+    }
+
     public int getStackAmount(Item item) {
         try{
             if (isWildStacker()) {
@@ -66,15 +76,5 @@ public class SupportedPluginManager {
         }catch (Throwable e){
             item.getItemStack().setAmount(amount);
         }
-    }
-
-    private void firstTickRegistrations() {
-        this.wildChests = Bukkit.getPluginManager().isPluginEnabled("WildChests");
-        this.mcMMO = Bukkit.getPluginManager().isPluginEnabled("mcMMO");
-        this.roseStacker = Bukkit.getPluginManager().isPluginEnabled("RoseStacker");
-        if (roseStacker) {
-            this.roseStackerAPI = RoseStackerAPI.getInstance();
-        }
-        this.wildStacker = Bukkit.getPluginManager().isPluginEnabled("WildStacker");
     }
 }

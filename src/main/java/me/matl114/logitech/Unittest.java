@@ -1,9 +1,5 @@
 package me.matl114.logitech;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-
 public class Unittest {
     //为什么要单开一个文件夹？
     //好问题

@@ -21,19 +21,6 @@ public class MultiPart extends AbstractBlock implements MultiBlockPart {
     public String getPartId(){
         return BLOCKID;
     }
-    public boolean redirectMenu(){
-        return true;
-    }
-
-    public void tick(Block b,BlockMenu menu,int tickCount) {
-        //donig nothing
-    }
-    public void processPart(Block b, BlockMenu menu,Location core){
-        //doing nothing
-    }
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){
-        //doing nothing
-    }
     public void preRegister(){
 //        if(redirectMenu()){
 //            this.addHandler((BlockUseHandler)this::onMenuRedirect);
@@ -41,5 +28,18 @@ public class MultiPart extends AbstractBlock implements MultiBlockPart {
         super.preRegister();
         handleMultiBlockPart(this);
        // registerTick(this);
+    }
+
+    public void process(Block b, BlockMenu menu, SlimefunBlockData data){
+        //doing nothing
+    }
+    public void processPart(Block b, BlockMenu menu,Location core){
+        //doing nothing
+    }
+    public boolean redirectMenu(){
+        return true;
+    }
+    public void tick(Block b,BlockMenu menu,int tickCount) {
+        //donig nothing
     }
 }

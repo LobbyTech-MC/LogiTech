@@ -7,10 +7,10 @@ import org.bukkit.inventory.ItemStack;
 import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedException;
 
 public interface MultiItemStack extends AbstractItemStack {
-    public List<ItemStack> getItemStacks();
     default ItemStack clone()  {
         throw new NotImplementedException(".clone() method not implemented");
     }
+    public List<ItemStack> getItemStacks();
     public int getTypeNum();
     public List<Double> getWeight(Double percent);
 

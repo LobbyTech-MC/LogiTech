@@ -38,6 +38,50 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
 public class RandomEditor extends AbstractMachine implements FinalAltarCore.FinalAltarChargable , Laser.LaserChargable {
+    protected static Enchantment[] registeredEnchantments;
+    protected static Attribute[] registeredAttributes=Attribute.values();
+    protected static EquipmentSlot[] equipmentSlots=EquipmentSlot.values();
+    protected static int totalAmount;
+    protected static String PREFIX="re";
+    protected static Field amountField=null;
+    protected static boolean getAmountField=false;
+    protected final static HashSet<Material> HELMET_MATERIALS=new HashSet<>();
+    protected final static HashSet<Material> CHESTPLATE_MATERIALS=new HashSet<>();
+    protected final static HashSet<Material> LEGGINGS_MATERIALS=new HashSet<>();
+    protected final static HashSet<Material> BOOTS_MATERIALS=new HashSet<>();
+    static{
+        try{
+            amountField= ReflectUtils.getDeclaredFieldsRecursively(AttributeModifier.class,"amount").getFirstValue();
+            amountField.setAccessible(true);
+            getAmountField=true;
+            Debug.debug("INVOKE ATTRIBUTEMODIFIER TRUE");
+        }catch (Throwable e){
+            Debug.logger(e);
+        }
+        for(Material material:Material.values()){
+            if(material.isItem()){
+                if(material.toString().endsWith("HELMET")){
+                    Debug.debug("helmet ",material.toString());
+                    HELMET_MATERIALS.add(material);
+                }
+                if(material.toString().endsWith("CHESTPLATE")){
+                    Debug.debug("chestplate ",material.toString());
+                    CHESTPLATE_MATERIALS.add(material);
+
+                }
+                if(material.toString().endsWith("LEGGINGS")){
+                    Debug.debug("leggings ",material.toString());
+                    LEGGINGS_MATERIALS.add(material);
+                }
+                if(material.toString().endsWith("BOOTS")){
+                    Debug.debug("boots ",material.toString());
+                    BOOTS_MATERIALS.add(material);
+                }
+            }
+        }
+        HELMET_MATERIALS.add(Material.TURTLE_HELMET);
+        CHESTPLATE_MATERIALS.add(Material.ELYTRA);
+    }
     protected final int[] BORDER=new int[0];
     protected final int[] INPUT_BORDER=new int[]{
             0,1,2,3,5,6,7,8
@@ -56,16 +100,11 @@ public class RandomEditor extends AbstractMachine implements FinalAltarCore.Fina
             45,46,47,48,49,50,51,52,53
     };
     protected final int[] OUTPUT_SLOT=new int[0];
-    public int[] getInputSlots(){
-        return OUTPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
     protected final int STATUS_SLOT=4;
     protected final ItemStack STATUS_ON=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6机器信息","&7状态: &a已激活");
     protected final ItemStack STATUS_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6机器信息","&7状态: &c未激活");
     protected final int MAX_UPGRADE_ONE_TIME=3;
+    private Random rand=new Random();
     public RandomEditor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                           int energybuffer, int energyConsumption){
         super(category, item, recipeType, recipe, energybuffer, energyConsumption);
@@ -118,71 +157,11 @@ public class RandomEditor extends AbstractMachine implements FinalAltarCore.Fina
         preset.addItem(STATUS_SLOT,STATUS_OFF,ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(INFO_SLOT,INFO_ITEM,ChestMenuUtils.getEmptyClickHandler());
     }
-    public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
-        if(menu==null)return;
-        if(conditionHandle(b,menu)&& FinalFeature.isFinalAltarCharged(this,data)){
-            if(menu.hasViewer()){
-                menu.replaceExistingItem(STATUS_SLOT,STATUS_ON);
-            }
-            process(b,menu,data);
-        }else {
-            if(menu.hasViewer()){
-                menu.replaceExistingItem(STATUS_SLOT,STATUS_OFF );
-            }
-        }
-
+    public int[] getInputSlots(){
+        return OUTPUT_SLOT;
     }
-    private Random rand=new Random();
-    protected static Enchantment[] registeredEnchantments;
-    protected static Attribute[] registeredAttributes=Attribute.values();
-    protected static EquipmentSlot[] equipmentSlots=EquipmentSlot.values();
-    protected static int totalAmount;
-    protected static String PREFIX="re";
-    protected static Field amountField=null;
-    protected static boolean getAmountField=false;
-    protected final static HashSet<Material> HELMET_MATERIALS=new HashSet<>();
-    protected final static HashSet<Material> CHESTPLATE_MATERIALS=new HashSet<>();
-    protected final static HashSet<Material> LEGGINGS_MATERIALS=new HashSet<>();
-    protected final static HashSet<Material> BOOTS_MATERIALS=new HashSet<>();
-    public Enchantment[] getRegisteredEnchantments(){
-        if(registeredEnchantments==null||registeredEnchantments.length==0){
-            registeredEnchantments=Enchantment.values();
-            totalAmount=registeredEnchantments.length+registeredAttributes.length;
-        }
-        return registeredEnchantments;
-    }
-    static{
-        try{
-            amountField= ReflectUtils.getDeclaredFieldsRecursively(AttributeModifier.class,"amount").getFirstValue();
-            amountField.setAccessible(true);
-            getAmountField=true;
-            Debug.debug("INVOKE ATTRIBUTEMODIFIER TRUE");
-        }catch (Throwable e){
-            Debug.logger(e);
-        }
-        for(Material material:Material.values()){
-            if(material.isItem()){
-                if(material.toString().endsWith("HELMET")){
-                    Debug.debug("helmet ",material.toString());
-                    HELMET_MATERIALS.add(material);
-                }
-                if(material.toString().endsWith("CHESTPLATE")){
-                    Debug.debug("chestplate ",material.toString());
-                    CHESTPLATE_MATERIALS.add(material);
-
-                }
-                if(material.toString().endsWith("LEGGINGS")){
-                    Debug.debug("leggings ",material.toString());
-                    LEGGINGS_MATERIALS.add(material);
-                }
-                if(material.toString().endsWith("BOOTS")){
-                    Debug.debug("boots ",material.toString());
-                    BOOTS_MATERIALS.add(material);
-                }
-            }
-        }
-        HELMET_MATERIALS.add(Material.TURTLE_HELMET);
-        CHESTPLATE_MATERIALS.add(Material.ELYTRA);
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
     }
     public EquipmentSlot getRandAttributeModifierSlots(Material material,int randIndex){
         if(material.getMaxStackSize()!=1){
@@ -202,6 +181,28 @@ public class RandomEditor extends AbstractMachine implements FinalAltarCore.Fina
             }
             return (randIndex%2==0)?EquipmentSlot.HAND:EquipmentSlot.OFF_HAND;
         }
+    }
+    public Enchantment[] getRegisteredEnchantments(){
+        if(registeredEnchantments==null||registeredEnchantments.length==0){
+            registeredEnchantments=Enchantment.values();
+            totalAmount=registeredEnchantments.length+registeredAttributes.length;
+        }
+        return registeredEnchantments;
+    }
+    public void process(Block b, BlockMenu inv, SlimefunBlockData data) {
+        int len=ITEM_SLOT.length;
+        Schedules.launchSchedules(()->{
+            for (int i=0;i<len;++i){
+                ItemStack it=inv.getItemInSlot(ITEM_SLOT[i]);
+                if(it==null||it.getAmount()!=1){
+                    continue;
+                }else {
+                    ItemMeta meta=it.getItemMeta();
+                    randomEdit(meta,it.getType());
+                    it.setItemMeta(meta);
+                }
+            }
+        },0,false,0);
     }
     public void randomEdit(ItemMeta meta, Material material){
         int index=rand.nextInt(totalAmount);
@@ -239,19 +240,18 @@ public class RandomEditor extends AbstractMachine implements FinalAltarCore.Fina
             }
         }
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data) {
-        int len=ITEM_SLOT.length;
-        Schedules.launchSchedules(()->{
-            for (int i=0;i<len;++i){
-                ItemStack it=inv.getItemInSlot(ITEM_SLOT[i]);
-                if(it==null||it.getAmount()!=1){
-                    continue;
-                }else {
-                    ItemMeta meta=it.getItemMeta();
-                    randomEdit(meta,it.getType());
-                    it.setItemMeta(meta);
-                }
+    public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
+        if(menu==null)return;
+        if(conditionHandle(b,menu)&& FinalFeature.isFinalAltarCharged(this,data)){
+            if(menu.hasViewer()){
+                menu.replaceExistingItem(STATUS_SLOT,STATUS_ON);
             }
-        },0,false,0);
+            process(b,menu,data);
+        }else {
+            if(menu.hasViewer()){
+                menu.replaceExistingItem(STATUS_SLOT,STATUS_OFF );
+            }
+        }
+
     }
 }

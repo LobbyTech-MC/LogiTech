@@ -1,7 +1,6 @@
 package me.matl114.logitech.SlimefunItem.Machines.WorkBenchs;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -13,16 +12,13 @@ import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.Language;
-import me.matl114.logitech.Schedule.SchedulePostRegister;
 import me.matl114.logitech.SlimefunItem.AddItem;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractWorkBench;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.CraftUtils;
 import me.matl114.logitech.Utils.MachineRecipeUtils;
-import me.matl114.logitech.Utils.RecipeSupporter;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.ImportRecipes;
 import me.matl114.matlib.Implements.Slimefun.core.CustomRecipeType;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
@@ -75,6 +71,22 @@ public class BugCrafter extends AbstractWorkBench implements ImportRecipes {
         preset.addItem(CRAFT_SLOT,CRAFT_ITEM);
         preset.addItem(getRecipeMenuSlot(),AbstractWorkBench.RECIPEBOOK_SHOW_ITEM);
     }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public int getRecipeMenuSlot(){
+        return MENU_SLOT;
+    }
+    public int[] getRecipeSlots(){
+        return INPUT_SLOT;
+    }
+    public boolean isConflict(){
+        return false;
+    }
     public void newMenuInstance(BlockMenu menu, Block block){
         menu.addMenuClickHandler(CRAFT_SLOT,
                 (player, i, itemStack, clickAction)->{
@@ -87,21 +99,5 @@ public class BugCrafter extends AbstractWorkBench implements ImportRecipes {
             getRecipeMenu(block,menu).build().setBackHandler(((player1, i1, itemStack1, clickAction1) -> {menu.open(player);return false;})).open(player);
             return false;
         }));
-    }
-
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
-    public int[] getRecipeSlots(){
-        return INPUT_SLOT;
-    }
-    public int getRecipeMenuSlot(){
-        return MENU_SLOT;
-    }
-    public boolean isConflict(){
-        return false;
     }
 }

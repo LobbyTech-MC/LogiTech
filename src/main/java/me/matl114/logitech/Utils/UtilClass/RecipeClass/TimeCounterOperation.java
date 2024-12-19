@@ -7,10 +7,6 @@ public class TimeCounterOperation implements CustomMachineOperation {
         this.totalTime = totalTick;
         this.currentTime = 0;
     }
-    public void progress(int k){
-        currentTime += k;
-    }
-
     @Override
     public int getProgress() {
         return currentTime;
@@ -19,5 +15,9 @@ public class TimeCounterOperation implements CustomMachineOperation {
     @Override
     public int getTotalTicks() {
         return totalTime;
+    }
+
+    public void progress(int k){
+        currentTime += k;
     }
 }

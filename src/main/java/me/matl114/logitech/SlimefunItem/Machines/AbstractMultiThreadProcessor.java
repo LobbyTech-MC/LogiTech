@@ -67,15 +67,6 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
     protected final int[] PROCESSOR_SLOT=new int[]{
             18,19,20,21,22,23,24,25,26
     };
-    public int[] getInputSlots(){
-        return INPUT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT;
-    }
-    public int[] getProcessorSlots(){
-        return PROCESSOR_SLOT;
-    }
     protected final ItemStack progressbar;
     protected final MachineProcessor<SimpleCraftingOperation>[] processor;
     protected int THREAD_NUM=9;
@@ -111,37 +102,6 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
                              LinkedHashMap<Object, Integer> customRecipes){
         this(category,item,recipeType,recipe,new ItemStack(progressItem),energyConsumption,energyBuffer,customRecipes);
     }
-
-    /**
-     * method from MachineProcessorHolder
-     * @return
-     */
-    public MachineProcessor<SimpleCraftingOperation> getMachineProcessor() {
-        return this.processor[0];
-    }
-
-
-    /**
-     * need implement,  method from MachineProcessorHolder
-     * @return
-     */
-    public ItemStack getProgressBar(){
-        return this.progressbar;
-    }
-
-
-    /**
-     * cancel machineprocessor after break
-     * @param e
-     * @param menu
-     */
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
-        super.onBreak(e,menu);
-        for (int i=0;i<THREAD_NUM;i++){
-            processor[i].endOperation(menu.getLocation());
-        }
-    }
-
     /**
      *
      * @param preset
@@ -169,7 +129,50 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
             preset.addItem(PROCESSOR_SLOT[var4], MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
         }
     }
+    public int[] getInputSlots(){
+        return INPUT;
+    }
+    /**
+     * method from MachineProcessorHolder
+     * @return
+     */
+    public MachineProcessor<SimpleCraftingOperation> getMachineProcessor() {
+        return this.processor[0];
+    }
 
+    public int[] getOutputSlots(){
+        return OUTPUT;
+    }
+
+
+    public int[] getProcessorSlots(){
+        return PROCESSOR_SLOT;
+    }
+
+
+    /**
+     * need implement,  method from MachineProcessorHolder
+     * @return
+     */
+    public ItemStack getProgressBar(){
+        return this.progressbar;
+    }
+
+    /**
+     * cancel machineprocessor after break
+     * @param e
+     * @param menu
+     */
+    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+        super.onBreak(e,menu);
+        for (int i=0;i<THREAD_NUM;i++){
+            processor[i].endOperation(menu.getLocation());
+        }
+    }
+
+    public void preRegister(){
+        super.preRegister();
+    }
     public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         int run=0;
         boolean hasViewer=inv.hasViewer();
@@ -219,8 +222,5 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
             }
         }
         this.removeCharge(inv.getLocation(),this.energyConsumption*run);
-    }
-    public void preRegister(){
-        super.preRegister();
     }
 }

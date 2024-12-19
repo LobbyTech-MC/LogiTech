@@ -141,12 +141,6 @@ public class FinalConvertor extends AbstractMachine implements FinalAltarCore.Fi
             41,42,43,44,
             50,51,52,53
     };
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
     protected final int STATUS_SLOT=4;
     protected final ItemStack STATUS_ON=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&6机器信息","&7状态: &a已激活");
     protected final ItemStack STATUS_OFF=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6机器信息","&7状态: &c未激活");
@@ -196,24 +190,16 @@ public class FinalConvertor extends AbstractMachine implements FinalAltarCore.Fi
         }
         preset.addItem(STATUS_SLOT,STATUS_OFF,ChestMenuUtils.getEmptyClickHandler());
     }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
     public List<MachineRecipe> getMachineRecipes(){
         List<MachineRecipe> recipes=new ArrayList<>();
         recipes.add(RECIPE_FOR_DISPLAY);
         return recipes;
     }
-    public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
-        if(menu==null)return;
-        if(conditionHandle(b,menu)&& FinalFeature.isFinalAltarCharged(this,data)){
-            if(menu.hasViewer()){
-                menu.replaceExistingItem(STATUS_SLOT,STATUS_ON);
-            }
-            process(b,menu,data);
-        }else {
-            if(menu.hasViewer()){
-                menu.replaceExistingItem(STATUS_SLOT,STATUS_OFF );
-            }
-        }
-
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
     }
     public void process(Block b, BlockMenu inv, SlimefunBlockData data) {
         int hasPutOutput=0;
@@ -245,6 +231,20 @@ public class FinalConvertor extends AbstractMachine implements FinalAltarCore.Fi
             inv.replaceExistingItem(INPUT_SLOT[hasPutInput-1],null);
             progressorCost(b,inv);
             break ;
+        }
+
+    }
+    public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
+        if(menu==null)return;
+        if(conditionHandle(b,menu)&& FinalFeature.isFinalAltarCharged(this,data)){
+            if(menu.hasViewer()){
+                menu.replaceExistingItem(STATUS_SLOT,STATUS_ON);
+            }
+            process(b,menu,data);
+        }else {
+            if(menu.hasViewer()){
+                menu.replaceExistingItem(STATUS_SLOT,STATUS_OFF );
+            }
         }
 
     }

@@ -43,87 +43,7 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 
 public class AdvancedManual extends AbstractBlock {
-    //ManualCrafterGui arguments
-    private int[] BORDER=new int[]{
-            10,19,28,37,48,49,51,42,53,44
-    };
-    private int[] rTypeIconSlot =new int[]{
-            0,9,18,27,36,45
-    };
-    private int[] recipelistDisplaySlot=new int[]{
-            2,3,4,5,11,12,13,14,20,21,22,23,29,30,31,32,38,39,40,41
-    };
-    private int[] recipeDisplaySlot=new int[]{
-            6,7,8,15,16,17,24,25,26
-    };
-    private int outputSlot=34;
-    private int prevRtype=1;
-    private int nextRtype=46;
-    private int prevRecipe=47;
-    private int nextRecipe=50;
-    private int prevSelect=33;
-    private int nextSelect=35;
-    private int craftOne=43;
-    private int craftMul=52;
-    private ItemStack nullRtype=new CustomItemStack(Material.STRUCTURE_VOID," "," ");
-    private ItemStack nullRecipe=new CustomItemStack(Material.BARRIER," "," ");
-    private ItemStack nullIngredient=new CustomItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE," "," ");
-    private List<RecipeType> supportedRtype=List.of(
-            BukkitUtils.VANILLA_CRAFTTABLE,
-            BukkitUtils.VANILLA_FURNACE,
-            RecipeType.ENHANCED_CRAFTING_TABLE,
-            RecipeType.MAGIC_WORKBENCH,
-            RecipeType.ANCIENT_ALTAR,
-            RecipeType.SMELTERY,
-            RecipeType.GRIND_STONE,
-            RecipeType.GOLD_PAN,
-            RecipeType.ORE_WASHER,
-            RecipeType.ORE_CRUSHER,
-            RecipeType.COMPRESSOR,
-            RecipeType.HEATED_PRESSURE_CHAMBER,
-            RecipeType.ARMOR_FORGE,
-            RecipeType.JUICER
-    );
-    private int rtypeAmount=supportedRtype.size();
-    private ItemStack displayBorder=new CustomItemStack(Material.YELLOW_STAINED_GLASS_PANE," "," ");
-    protected static final ItemStack CRAFT_ONE=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,
-            "&3单次合成","&6左键&b合成 &d1次 &b当前物品","&6右键&b合成 &d16次 &b当前物品");
-    protected static final ItemStack CRAFT_MUL=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,
-            "&3批量合成","&6左键&b合成 &d64次 &b当前物品","&6右键&b合成 &d3456次 &b当前物品");
-    private int[] craftableSlots=IntStream.range(0,36).toArray();
-
-    public AdvancedManual(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
-        super(itemGroup, item, recipeType, recipe);
-    }
-    public void preRegister() {
-        super.preRegister();
-        this.registerBlockMenu(this);
-    }
-    public void constructMenu(BlockMenuPreset preset){
-        preset.setSize(9);
-    }
-    @Override
-    public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
-        blockMenu.addMenuOpeningHandler(this::openManulGui);
-    }
-    private HashMap<UUID,ManualCrafterGui> PLAYER_MANUALGUIS=new HashMap<>();
-    public void openManulGui(Player player){
-        PLAYER_MANUALGUIS.computeIfAbsent(player.getUniqueId(),(uuid -> new ManualCrafterGui(getItemName()))).open(player);
-    }
-    private ItemStack displayedBook=new ItemStack(Material.WRITTEN_BOOK);
-    public void onPlace(BlockPlaceEvent e,Block b){
-        if(b.getState() instanceof Lectern lt){
-            if(lt.getInventory() instanceof LecternInventory ltiv){
-                ltiv.setItem(0,displayedBook);
-            }
-        }
-    }
-    protected ItemPusherProvider CRAFT_PROVIDER= FinalFeature.MANUAL_CARD_READER;
     public class ManualCrafterGui extends ChestMenu {
-        public ManualCrafterGui(String title) {
-            super(title);
-            setup();
-        }
         //配方类型选择的图标偏移
         private int rtypeDisplayOffset=0;
         //上次选中的图标 记录在MENU中的位置
@@ -142,6 +62,16 @@ public class AdvancedManual extends AbstractBlock {
         private int selectedRecipeIndex=-1;
         private Player executor=null;
         AtomicReference<BukkitRunnable> asyncUpdateMenuTask=new AtomicReference<>(null);
+        public ManualCrafterGui(String title) {
+            super(title);
+            setup();
+        }
+        private void addRecipeOffset(int offset){
+            if(this.recipeDisplayOffset+offset>=0&&this.recipeDisplayOffset+offset+recipelistDisplaySlot.length<=lastlySearchedRecipeIndex.size()){
+                recipeDisplayOffset+=offset;
+                listMatchedRecipes();
+            }
+        }
         //上下文切换，点击icon列的上/下切换
         private void addRtypeOffset(int offset){//should be +-1 in case of safety
             if(rtypeDisplayOffset+offset>=0&&rtypeDisplayOffset+offset+rTypeIconSlot.length<=rtypeAmount){
@@ -161,38 +91,6 @@ public class AdvancedManual extends AbstractBlock {
                 if(last>=0&&lastlySelectedTypeSlotIndex<0){
                     setRecipeType(null);
                 }
-            }
-        }
-        //重置配方选择icon，一般在初始化或者上下文切换时使用
-        private void resetTypeSlot(){
-            //重新绘制icon
-            for(int i = 0; i< rTypeIconSlot.length; ++i){
-                if(rtypeDisplayOffset+i<rtypeAmount){
-                    setTypeSlot(i,supportedRtype.get(rtypeDisplayOffset+i));
-                }else{
-                    setTypeSlot(i,null);
-                }
-            }
-            //重新绘制光标
-            int last=lastlySelectedTypeSlotIndex;
-            lastlySelectedTypeSlotIndex=-1;
-            changeSelectedTypeSlot(last);
-        }
-        //设置配方类型 generally的
-        //切换类型的时候需要做到重置下方的所有内容
-        private void setRecipeType(RecipeType type){
-            if(selectedType!=type){
-                selectedType=type;
-                //主要触发修改物品展示界面 切换的时候需要全部删除
-                this.clearRecordOnTypeChange();
-                this.reloadRecipeType();
-            }
-        }
-        private void reloadRecipeType(){
-            if(this.selectedType!=null){
-                this.selectedTypeRecipes=RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(this.selectedType);
-            }else {
-                this.selectedTypeRecipes=null;
             }
         }
         //仅用于在handler中设置配方类型的光标的及时切换
@@ -221,22 +119,6 @@ public class AdvancedManual extends AbstractBlock {
                 this.lastlySelectedTypeSlotIndex=-1;
             }
         }
-        //仅用于构造配方类型的icon列
-        private void setTypeSlot(int index,RecipeType type) {
-            if(index>6)return;
-            if(type!=null){
-                this.replaceExistingItem(rTypeIconSlot[index], RecipeSupporter.RECIPETYPE_ICON.getOrDefault(type,nullRtype));
-                this.addMenuClickHandler(rTypeIconSlot[index],((player, i, itemStack, clickAction) -> {
-                    //修改真实选项
-                    setRecipeType(type);
-                    changeSelectedTypeSlot(index);
-                    return false;
-                }));
-            }else{
-                this.replaceExistingItem(rTypeIconSlot[index],nullRtype);
-                this.addMenuClickHandler(rTypeIconSlot[index],ChestMenuUtils.getEmptyClickHandler());
-            }
-        }
         //顾名思义
         private void clearRecordOnTypeChange(){
             this.lastlySelectedRecipeSlot=-1;
@@ -248,10 +130,57 @@ public class AdvancedManual extends AbstractBlock {
             //刷新配方列表展示
             listMatchedRecipes();
         }
-        private void addRecipeOffset(int offset){
-            if(this.recipeDisplayOffset+offset>=0&&this.recipeDisplayOffset+offset+recipelistDisplaySlot.length<=lastlySearchedRecipeIndex.size()){
-                recipeDisplayOffset+=offset;
-                listMatchedRecipes();
+        public void craft(Player player,int limit){
+            this.executor=player;
+            MachineRecipe recipe=getRecipe();
+            if(recipe==null){
+                AddUtils.sendMessage(player,"&6[高级快捷合成台] &c请先选择一个配方");
+            }else{
+                BlockMenu inv=ContainerUtils.getPlayerBackPackWrapper(player);
+                Pair<ItemGreedyConsumer[],ItemGreedyConsumer[]> results=CraftUtils.countMultiRecipe(inv,craftableSlots,craftableSlots,recipe,limit,CRAFT_PROVIDER);
+                int count=0;
+                if(results!=null){
+                    count=CraftUtils.calMaxCraftTime(results.getSecondValue(),limit);
+                    CraftUtils.multiUpdateInputMenu(results.getFirstValue(),inv);
+                    CraftUtils.multiUpdateOutputMenu(results.getSecondValue(),inv);
+                    CompletableFuture.supplyAsync(()->{
+                        this.onMenuRefreshByPlayerAsync(player);
+                        return null;
+                    });
+                }
+                AddUtils.sendMessage(player,"&6[高级快捷合成台] &a成功合成 %d 次".formatted(count));
+            }
+        }
+        //仅用于点击handler即时切换配方选择光标
+        private void forceChangeSelectedRecipeSlot(int index){
+
+            if(lastlySelectedRecipeSlot!=-1){
+                //只有非0且与之前不一样才需要取消之前的附魔光效
+                if(lastlySelectedRecipeSlot!=index){
+                    ItemStack stack=this.getItemInSlot(lastlySelectedRecipeSlot);
+                    if(stack!=null){
+                        AddUtils.removeGlow(stack);
+                    }
+                }
+            }
+            //强制再来一遍附魔光效，用于tick刷新时无需调用
+            if(index!=-1){
+                ItemStack stack=this.getItemInSlot(index);
+                if(stack!=null){
+                    AddUtils.addGlow(stack);
+                }
+            }
+            this.lastlySelectedRecipeSlot=index;
+
+        }
+        private MachineRecipe getRecipe(){
+            return getRecipe(this.selectedRecipeIndex);
+        }
+        private MachineRecipe getRecipe(int idx){
+            if(this.selectedTypeRecipes==null||idx>=this.selectedTypeRecipes.size()||idx<0){
+                return null;
+            }else {
+                return this.selectedTypeRecipes.get(idx);
             }
         }
         //理论上这个是用于刷新所有配方展示的
@@ -287,48 +216,36 @@ public class AdvancedManual extends AbstractBlock {
                 }
             }
         }
-        //仅用于点击handler即时切换配方选择光标
-        private void forceChangeSelectedRecipeSlot(int index){
-
-            if(lastlySelectedRecipeSlot!=-1){
-                //只有非0且与之前不一样才需要取消之前的附魔光效
-                if(lastlySelectedRecipeSlot!=index){
-                    ItemStack stack=this.getItemInSlot(lastlySelectedRecipeSlot);
-                    if(stack!=null){
-                        AddUtils.removeGlow(stack);
-                    }
+        private void onMenuRefreshByPlayerAsync(Player player){
+            if(this.selectedType!=null){
+                if(this.selectedTypeRecipes==null){
+                    this.reloadRecipeType();
                 }
+                this.lastlySearchedRecipeIndex=searchAllMatchedIndex(player,this.selectedTypeRecipes,2*recipelistDisplaySlot.length);
             }
-            //强制再来一遍附魔光效，用于tick刷新时无需调用
-            if(index!=-1){
-                ItemStack stack=this.getItemInSlot(index);
-                if(stack!=null){
-                    AddUtils.addGlow(stack);
-                }
-            }
-            this.lastlySelectedRecipeSlot=index;
-
+            this.listMatchedRecipes();
         }
-        //set Recipe Slot
-        //return if this recipeIndex matches selected
-        private boolean setRecipeSlot(int index,int recipeIndex,MachineRecipe recipe){
-            if(recipe!=null){
-                ItemStack icon=AddUtils.addLore( recipe.getOutput()[0],"&a点击选择该配方","&8配方编号: " + recipeIndex);
-                this.replaceExistingItem(index,icon);
-                this.addMenuClickHandler(index,((player, i, itemStack, clickAction) -> {
-                    this.forceChangeSelectedRecipeSlot(index);
-                    this.setRecipe(recipeIndex,true);
-                    return false;
-                }));
-                if(this.selectedRecipeIndex==recipeIndex){
-                    forceChangeSelectedRecipeSlot(index);
-                }
-                return this.selectedRecipeIndex==recipeIndex;
+        private void reloadRecipeType(){
+            if(this.selectedType!=null){
+                this.selectedTypeRecipes=RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(this.selectedType);
             }else {
-                this.replaceExistingItem(index,nullRecipe);
-                this.addMenuClickHandler(index,ChestMenuUtils.getEmptyClickHandler());
-                return false;
+                this.selectedTypeRecipes=null;
             }
+        }
+        //重置配方选择icon，一般在初始化或者上下文切换时使用
+        private void resetTypeSlot(){
+            //重新绘制icon
+            for(int i = 0; i< rTypeIconSlot.length; ++i){
+                if(rtypeDisplayOffset+i<rtypeAmount){
+                    setTypeSlot(i,supportedRtype.get(rtypeDisplayOffset+i));
+                }else{
+                    setTypeSlot(i,null);
+                }
+            }
+            //重新绘制光标
+            int last=lastlySelectedTypeSlotIndex;
+            lastlySelectedTypeSlotIndex=-1;
+            changeSelectedTypeSlot(last);
         }
         //该方法用于generally的设置选中的配方项
         private void setRecipe(int index,boolean force){
@@ -359,24 +276,52 @@ public class AdvancedManual extends AbstractBlock {
                 }
             }
         }
-        private MachineRecipe getRecipe(){
-            return getRecipe(this.selectedRecipeIndex);
-        }
-        private MachineRecipe getRecipe(int idx){
-            if(this.selectedTypeRecipes==null||idx>=this.selectedTypeRecipes.size()||idx<0){
-                return null;
-            }else {
-                return this.selectedTypeRecipes.get(idx);
-            }
-        }
-        private void onMenuRefreshByPlayerAsync(Player player){
-            if(this.selectedType!=null){
-                if(this.selectedTypeRecipes==null){
-                    this.reloadRecipeType();
+        //set Recipe Slot
+        //return if this recipeIndex matches selected
+        private boolean setRecipeSlot(int index,int recipeIndex,MachineRecipe recipe){
+            if(recipe!=null){
+                ItemStack icon=AddUtils.addLore( recipe.getOutput()[0],"&a点击选择该配方","&8配方编号: " + recipeIndex);
+                this.replaceExistingItem(index,icon);
+                this.addMenuClickHandler(index,((player, i, itemStack, clickAction) -> {
+                    this.forceChangeSelectedRecipeSlot(index);
+                    this.setRecipe(recipeIndex,true);
+                    return false;
+                }));
+                if(this.selectedRecipeIndex==recipeIndex){
+                    forceChangeSelectedRecipeSlot(index);
                 }
-                this.lastlySearchedRecipeIndex=searchAllMatchedIndex(player,this.selectedTypeRecipes,2*recipelistDisplaySlot.length);
+                return this.selectedRecipeIndex==recipeIndex;
+            }else {
+                this.replaceExistingItem(index,nullRecipe);
+                this.addMenuClickHandler(index,ChestMenuUtils.getEmptyClickHandler());
+                return false;
             }
-            this.listMatchedRecipes();
+        }
+        //设置配方类型 generally的
+        //切换类型的时候需要做到重置下方的所有内容
+        private void setRecipeType(RecipeType type){
+            if(selectedType!=type){
+                selectedType=type;
+                //主要触发修改物品展示界面 切换的时候需要全部删除
+                this.clearRecordOnTypeChange();
+                this.reloadRecipeType();
+            }
+        }
+        //仅用于构造配方类型的icon列
+        private void setTypeSlot(int index,RecipeType type) {
+            if(index>6)return;
+            if(type!=null){
+                this.replaceExistingItem(rTypeIconSlot[index], RecipeSupporter.RECIPETYPE_ICON.getOrDefault(type,nullRtype));
+                this.addMenuClickHandler(rTypeIconSlot[index],((player, i, itemStack, clickAction) -> {
+                    //修改真实选项
+                    setRecipeType(type);
+                    changeSelectedTypeSlot(index);
+                    return false;
+                }));
+            }else{
+                this.replaceExistingItem(rTypeIconSlot[index],nullRtype);
+                this.addMenuClickHandler(rTypeIconSlot[index],ChestMenuUtils.getEmptyClickHandler());
+            }
         }
         //todo 好多bug。
         public void setup(){
@@ -445,28 +390,83 @@ public class AdvancedManual extends AbstractBlock {
                 }
             });
         }
-        public void craft(Player player,int limit){
-            this.executor=player;
-            MachineRecipe recipe=getRecipe();
-            if(recipe==null){
-                AddUtils.sendMessage(player,"&6[高级快捷合成台] &c请先选择一个配方");
-            }else{
-                BlockMenu inv=ContainerUtils.getPlayerBackPackWrapper(player);
-                Pair<ItemGreedyConsumer[],ItemGreedyConsumer[]> results=CraftUtils.countMultiRecipe(inv,craftableSlots,craftableSlots,recipe,limit,CRAFT_PROVIDER);
-                int count=0;
-                if(results!=null){
-                    count=CraftUtils.calMaxCraftTime(results.getSecondValue(),limit);
-                    CraftUtils.multiUpdateInputMenu(results.getFirstValue(),inv);
-                    CraftUtils.multiUpdateOutputMenu(results.getSecondValue(),inv);
-                    CompletableFuture.supplyAsync(()->{
-                        this.onMenuRefreshByPlayerAsync(player);
-                        return null;
-                    });
-                }
-                AddUtils.sendMessage(player,"&6[高级快捷合成台] &a成功合成 %d 次".formatted(count));
+
+    }
+    protected static final ItemStack CRAFT_ONE=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,
+            "&3单次合成","&6左键&b合成 &d1次 &b当前物品","&6右键&b合成 &d16次 &b当前物品");
+    protected static final ItemStack CRAFT_MUL=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,
+            "&3批量合成","&6左键&b合成 &d64次 &b当前物品","&6右键&b合成 &d3456次 &b当前物品");
+    //ManualCrafterGui arguments
+    private int[] BORDER=new int[]{
+            10,19,28,37,48,49,51,42,53,44
+    };
+    private int[] rTypeIconSlot =new int[]{
+            0,9,18,27,36,45
+    };
+    private int[] recipelistDisplaySlot=new int[]{
+            2,3,4,5,11,12,13,14,20,21,22,23,29,30,31,32,38,39,40,41
+    };
+    private int[] recipeDisplaySlot=new int[]{
+            6,7,8,15,16,17,24,25,26
+    };
+    private int outputSlot=34;
+    private int prevRtype=1;
+    private int nextRtype=46;
+    private int prevRecipe=47;
+    private int nextRecipe=50;
+    private int prevSelect=33;
+    private int nextSelect=35;
+    private int craftOne=43;
+    private int craftMul=52;
+    private ItemStack nullRtype=new CustomItemStack(Material.STRUCTURE_VOID," "," ");
+    private ItemStack nullRecipe=new CustomItemStack(Material.BARRIER," "," ");
+    private ItemStack nullIngredient=new CustomItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE," "," ");
+    private List<RecipeType> supportedRtype=List.of(
+            BukkitUtils.VANILLA_CRAFTTABLE,
+            BukkitUtils.VANILLA_FURNACE,
+            RecipeType.ENHANCED_CRAFTING_TABLE,
+            RecipeType.MAGIC_WORKBENCH,
+            RecipeType.ANCIENT_ALTAR,
+            RecipeType.SMELTERY,
+            RecipeType.GRIND_STONE,
+            RecipeType.GOLD_PAN,
+            RecipeType.ORE_WASHER,
+            RecipeType.ORE_CRUSHER,
+            RecipeType.COMPRESSOR,
+            RecipeType.HEATED_PRESSURE_CHAMBER,
+            RecipeType.ARMOR_FORGE,
+            RecipeType.JUICER
+    );
+    private int rtypeAmount=supportedRtype.size();
+    private ItemStack displayBorder=new CustomItemStack(Material.YELLOW_STAINED_GLASS_PANE," "," ");
+
+    private int[] craftableSlots=IntStream.range(0,36).toArray();
+    private HashMap<UUID,ManualCrafterGui> PLAYER_MANUALGUIS=new HashMap<>();
+    private ItemStack displayedBook=new ItemStack(Material.WRITTEN_BOOK);
+    protected ItemPusherProvider CRAFT_PROVIDER= FinalFeature.MANUAL_CARD_READER;
+    public AdvancedManual(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+        super(itemGroup, item, recipeType, recipe);
+    }
+    public void constructMenu(BlockMenuPreset preset){
+        preset.setSize(9);
+    }
+    @Override
+    public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
+        blockMenu.addMenuOpeningHandler(this::openManulGui);
+    }
+    public void onPlace(BlockPlaceEvent e,Block b){
+        if(b.getState() instanceof Lectern lt){
+            if(lt.getInventory() instanceof LecternInventory ltiv){
+                ltiv.setItem(0,displayedBook);
             }
         }
-
+    }
+    public void openManulGui(Player player){
+        PLAYER_MANUALGUIS.computeIfAbsent(player.getUniqueId(),(uuid -> new ManualCrafterGui(getItemName()))).open(player);
+    }
+    public void preRegister() {
+        super.preRegister();
+        this.registerBlockMenu(this);
     }
     private List<Integer> searchAllMatchedIndex(Player player,List<MachineRecipe> recipeList,int maxAmount){
         BlockMenu playerContainerImpl= ContainerUtils.getPlayerBackPackWrapper(player);

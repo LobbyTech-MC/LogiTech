@@ -42,47 +42,8 @@ public enum CargoConfigs {
 
 
     ;
-    int bit;
-    int bitPos;
-    int blank;
-    int valueTemplate;
-    int codeTemplate;
-    CargoConfigs(int bit,int len){
-        this.bit = bit;
-        this.bitPos = 1<<this.bit;
-        this.valueTemplate = (1<<len) -1;
-        this.codeTemplate = this.valueTemplate<<this.bit;
-        this.blank = ~(this.codeTemplate);
-    }
-    CargoConfigs(int bit){
-        this(bit,1);
-    }
-    public int getConfigInt(int code){
-        return (code>>this.bit)&this.valueTemplate;
-    }
-    public boolean getConfig(int code){
-        return (code&this.codeTemplate)!=0;
-    }
-    public int setConfig(int code,boolean value){
-        int valueInt=value?this.bitPos:0;
-        code=code&this.blank;
-        code=code|valueInt;
-        return code;
-
-    }
-    public int setConfig(int code,int value){
-        value=(value&this.valueTemplate)<<this.bit;
-        code=code&this.blank;
-        code =code|value;
-        return code;
-    }
-    public static int setConfigBit(int code ,int value,int bit){
-        for(CargoConfigs c:CargoConfigs.values()){
-            if(c.bit==bit){
-                return c.setConfig(code,value);
-            }
-        }
-        return 0;
+    public static int getDefaultConfig(){
+        return 8192;
     }
     public static int setAllConfig(boolean symm,boolean isnull,boolean islazy,boolean blklst,boolean fromInput,boolean toOutput,boolean reverse,int limit){
         int code=0;
@@ -96,7 +57,46 @@ public enum CargoConfigs {
         code=TRANSLIMIT.setConfig(code,limit);
         return code;
     }
-    public static int getDefaultConfig(){
-        return 8192;
+    public static int setConfigBit(int code ,int value,int bit){
+        for(CargoConfigs c:CargoConfigs.values()){
+            if(c.bit==bit){
+                return c.setConfig(code,value);
+            }
+        }
+        return 0;
+    }
+    int bit;
+    int bitPos;
+    int blank;
+    int valueTemplate;
+    int codeTemplate;
+    CargoConfigs(int bit){
+        this(bit,1);
+    }
+    CargoConfigs(int bit,int len){
+        this.bit = bit;
+        this.bitPos = 1<<this.bit;
+        this.valueTemplate = (1<<len) -1;
+        this.codeTemplate = this.valueTemplate<<this.bit;
+        this.blank = ~(this.codeTemplate);
+    }
+    public boolean getConfig(int code){
+        return (code&this.codeTemplate)!=0;
+    }
+    public int getConfigInt(int code){
+        return (code>>this.bit)&this.valueTemplate;
+    }
+    public int setConfig(int code,boolean value){
+        int valueInt=value?this.bitPos:0;
+        code=code&this.blank;
+        code=code|valueInt;
+        return code;
+
+    }
+    public int setConfig(int code,int value){
+        value=(value&this.valueTemplate)<<this.bit;
+        code=code&this.blank;
+        code =code|value;
+        return code;
     }
 }

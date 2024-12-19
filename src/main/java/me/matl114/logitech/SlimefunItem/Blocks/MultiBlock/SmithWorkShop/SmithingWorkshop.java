@@ -1,6 +1,18 @@
 package me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SmithWorkShop;
 
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.stream.IntStream;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.inventory.ItemStack;
+
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -13,23 +25,14 @@ import me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore.MultiCore;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.Settings;
-import me.matl114.logitech.Utils.UtilClass.FunctionalClass.OutputStream;
-import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.*;
 import me.matl114.logitech.Utils.Utils;
+import me.matl114.logitech.Utils.UtilClass.FunctionalClass.OutputStream;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.AbstractMultiBlockHandler;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockHandler;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockType;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.stream.IntStream;
 
 public class SmithingWorkshop extends MultiCore {
     protected final int[] BORDER=new int[]{0,1,2,3,5,6,7};
@@ -59,12 +62,11 @@ public class SmithingWorkshop extends MultiCore {
 
         //????
     }};
-    public int[] getInputSlots(){
-        return new int[0];
-    }
-    public int[] getOutputSlots(){
-        return new int[0];
-    }
+    public MultiBlockService.MultiBlockBuilder BUILDER=( (core, type, uid) -> {
+        AbstractMultiBlockHandler blockHandler= MultiBlockHandler.createHandler(core,type,uid);
+       // AbstractMultiBlock block=blockHandler.getMultiBlock();
+        return blockHandler;
+    });
     public SmithingWorkshop(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType,
                           ItemStack[] recipe, String blockId){
         super(itemGroup, item, recipeType, recipe, blockId);
@@ -74,20 +76,54 @@ public class SmithingWorkshop extends MultiCore {
                         "&7")
         ));
     }
-    public MultiBlockType getMultiBlockType(){
-        return MBTYPE;
+    public void constructMenu(BlockMenuPreset inv) {
+        int[] border = BORDER;
+        int len = border.length;
+        for (int i = 0; i < len; i++) {
+            inv.addItem(border[i], ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler());
+        }
+        inv.addItem(HOLOGRAM_SLOT, HOLOGRAM_ITEM_OFF);
+        IntStream.range(9,18).forEach(i->{
+            inv.addItem(i,ChestMenuUtils.getInputSlotTexture(),ChestMenuUtils.getEmptyClickHandler());
+        });
+        IntStream.range(27,36).forEach(i->{
+            inv.addItem(i,ChestMenuUtils.getInputSlotTexture(),ChestMenuUtils.getEmptyClickHandler());
+        });
     }
-    public MultiBlockService.MultiBlockBuilder BUILDER=( (core, type, uid) -> {
-        AbstractMultiBlockHandler blockHandler= MultiBlockHandler.createHandler(core,type,uid);
-       // AbstractMultiBlock block=blockHandler.getMultiBlock();
-        return blockHandler;
-    });
+    public int getAmplifyCompentLevel(Location loc,SWAmplifyComponent component){
+        BlockMenu inv=DataCache.getMenu(loc);
+        Material type=component.getType();
+        return (int)Arrays.stream(PLUG_SLOT).filter(i->{
+            var a=inv.getItemInSlot(i);
+            return a!=null&&a.getType()==type;
+        }).count();
+    }
     public MultiBlockService.MultiBlockBuilder getBuilder(){
         return BUILDER;
     }
-    public boolean useAdvancedMenu(){
-        return true;
+    public int[] getInputSlots(){
+        return new int[0];
     }
+    public MultiBlockType getMultiBlockType(){
+        return MBTYPE;
+    }
+
+    public int[] getOutputSlots(){
+        return new int[0];
+    }
+    public boolean hasAmplifyCompentLevel(Location loc,SWAmplifyComponent component){
+        BlockMenu inv=DataCache.getMenu(loc);
+        Material type=component.getType();
+        for (int i:PLUG_SLOT) {
+            var a=inv.getItemInSlot(i);
+            if(a!=null&&a.getType()==type){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
     @Override
     public void listenDragClick(BlockMenu inv, InventoryDragEvent e) {
@@ -132,54 +168,6 @@ public class SmithingWorkshop extends MultiCore {
                 }
             }
         }
-    }
-
-
-
-    public void constructMenu(BlockMenuPreset inv) {
-        int[] border = BORDER;
-        int len = border.length;
-        for (int i = 0; i < len; i++) {
-            inv.addItem(border[i], ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler());
-        }
-        inv.addItem(HOLOGRAM_SLOT, HOLOGRAM_ITEM_OFF);
-        IntStream.range(9,18).forEach(i->{
-            inv.addItem(i,ChestMenuUtils.getInputSlotTexture(),ChestMenuUtils.getEmptyClickHandler());
-        });
-        IntStream.range(27,36).forEach(i->{
-            inv.addItem(i,ChestMenuUtils.getInputSlotTexture(),ChestMenuUtils.getEmptyClickHandler());
-        });
-    }
-    public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
-        super.onMultiBlockDisable(loc,handler,cause);
-        //这里也要清除,lvl数据 防止上面重新读取回来
-        //要设置上面的机器,清除里面的force level数据
-        BlockMenu inv= DataCache.getMenu(loc);
-        if(inv!=null){
-            inv.replaceExistingItem(STATUS_SLOT,STATUS_ITEM_OFF);
-        }
-    }
-    public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
-        super.onMultiBlockEnable(loc,handler);
-        BlockMenu inv= DataCache.getMenu(loc);
-        if(inv!=null){
-            updateMenu(inv,loc.getBlock(),Settings.RUN);
-        }
-    }
-    public void updateMenu(BlockMenu inv, Block block, Settings mod){
-        int holoStatus=DataCache.getCustomData(inv.getLocation(),MultiBlockService.getHologramKey(),0);
-        if(holoStatus==0){
-            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_OFF);
-
-        }else if(holoStatus<=4&&holoStatus>0){
-            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_ON[holoStatus-1]);
-
-        }else{
-            DataCache.getCustomData(inv.getLocation(),MultiBlockService.getHologramKey(),0);
-            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_OFF);
-        }
-        int status=MultiBlockService.getStatus(inv.getLocation());
-        inv.replaceExistingItem(STATUS_SLOT,status==0?STATUS_ITEM_OFF:STATUS_ITEM_ON);
     }
     public void newMenuInstance(BlockMenu inv, Block block){
         Location loc2=block.getLocation();
@@ -268,38 +256,53 @@ public class SmithingWorkshop extends MultiCore {
         });
         updateMenu(inv,block,Settings.RUN);
     }
-
-    public int getAmplifyCompentLevel(Location loc,SWAmplifyComponent component){
-        BlockMenu inv=DataCache.getMenu(loc);
-        Material type=component.getType();
-        return (int)Arrays.stream(PLUG_SLOT).filter(i->{
-            var a=inv.getItemInSlot(i);
-            return a!=null&&a.getType()==type;
-        }).count();
-    }
-    public boolean hasAmplifyCompentLevel(Location loc,SWAmplifyComponent component){
-        BlockMenu inv=DataCache.getMenu(loc);
-        Material type=component.getType();
-        for (int i:PLUG_SLOT) {
-            var a=inv.getItemInSlot(i);
-            if(a!=null&&a.getType()==type){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void processCore(Block b, BlockMenu menu){
-        if(menu.hasViewer()){
-            updateMenu(menu,b,Settings.RUN);
-        }
-    }
-
     @Override
     public void onBreak(BlockBreakEvent e, BlockMenu menu) {
         super.onBreak(e, menu);
         if (menu!=null){
             menu.dropItems(menu.getLocation(),PLUG_SLOT);
         }
+    }
+    public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
+        super.onMultiBlockDisable(loc,handler,cause);
+        //这里也要清除,lvl数据 防止上面重新读取回来
+        //要设置上面的机器,清除里面的force level数据
+        BlockMenu inv= DataCache.getMenu(loc);
+        if(inv!=null){
+            inv.replaceExistingItem(STATUS_SLOT,STATUS_ITEM_OFF);
+        }
+    }
+
+    public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
+        super.onMultiBlockEnable(loc,handler);
+        BlockMenu inv= DataCache.getMenu(loc);
+        if(inv!=null){
+            updateMenu(inv,loc.getBlock(),Settings.RUN);
+        }
+    }
+    public void processCore(Block b, BlockMenu menu){
+        if(menu.hasViewer()){
+            updateMenu(menu,b,Settings.RUN);
+        }
+    }
+
+    public void updateMenu(BlockMenu inv, Block block, Settings mod){
+        int holoStatus=DataCache.getCustomData(inv.getLocation(),MultiBlockService.getHologramKey(),0);
+        if(holoStatus==0){
+            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_OFF);
+
+        }else if(holoStatus<=4&&holoStatus>0){
+            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_ON[holoStatus-1]);
+
+        }else{
+            DataCache.getCustomData(inv.getLocation(),MultiBlockService.getHologramKey(),0);
+            inv.replaceExistingItem(HOLOGRAM_SLOT,HOLOGRAM_ITEM_OFF);
+        }
+        int status=MultiBlockService.getStatus(inv.getLocation());
+        inv.replaceExistingItem(STATUS_SLOT,status==0?STATUS_ITEM_OFF:STATUS_ITEM_ON);
+    }
+
+    public boolean useAdvancedMenu(){
+        return true;
     }
 }

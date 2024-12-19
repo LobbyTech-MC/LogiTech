@@ -39,13 +39,6 @@ public enum CustomHead {
     TOURUYA("246e3280c2ffe194ccb6e6b16e33eb67127317e9929b8839bc2dd8f7138abccb"),
     MOYU("422b6e29c36cfa7a421f3e096a96086667672f22e04694b48486dd529f596276")
     ;
-    private ItemStack item;
-    public ItemStack getItem() {
-        return item;
-    }
-    CustomHead(String hashcode){
-        item= new CustomItemStack(SlimefunUtils.getCustomHead(hashcode));
-    }
     public static String getHash(ItemStack item){
         if(item!=null&&(item.getType()== Material.PLAYER_HEAD||item.getType()==Material.PLAYER_WALL_HEAD)){
             ItemMeta meta=item.getItemMeta();
@@ -67,5 +60,12 @@ public enum CustomHead {
         }catch (Throwable t){
             return new ItemStack(Material.PLAYER_HEAD);
         }
+    }
+    private ItemStack item;
+    CustomHead(String hashcode){
+        item= new CustomItemStack(SlimefunUtils.getCustomHead(hashcode));
+    }
+    public ItemStack getItem() {
+        return item;
     }
 }

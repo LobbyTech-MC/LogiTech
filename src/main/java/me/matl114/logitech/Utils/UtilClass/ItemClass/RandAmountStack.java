@@ -14,21 +14,21 @@ public class RandAmountStack extends ItemStack implements AbstractItemStack,Rand
         this.len = max-min+1;
 
     }
-    public int getMin() {
-        return min;
-    }
-    public int getMax(){
-        return len+min-1;
-    }
     public ItemStack clone(){
         ItemStack clone =super.clone();
         clone.setAmount(min+ rand.nextInt(len));
         return clone;
     }
+    public RandAmountStack copy(){
+        return new RandAmountStack(this,min,min+len-1);
+    }
     public ItemStack getInstance(){
         return this.clone();
     }
-    public RandAmountStack copy(){
-        return new RandAmountStack(this,min,min+len-1);
+    public int getMax(){
+        return len+min-1;
+    }
+    public int getMin() {
+        return min;
     }
 }

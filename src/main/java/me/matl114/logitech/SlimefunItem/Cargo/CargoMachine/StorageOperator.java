@@ -40,15 +40,6 @@ public class StorageOperator extends AbstractMachine {
     protected final int[] INFO_SLOTS=new int[]{
             2,6,38,42,13
     };
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
-
-
-
     protected final ItemStack[] INFO_ITEMS=new ItemStack[]{
             new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&a输入槽1"),
             new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&a输入槽2"),
@@ -58,6 +49,9 @@ public class StorageOperator extends AbstractMachine {
                     "&7转移结果将输入至输出槽","&7操作之前请保证输出槽内不存在物品")
     };
     protected final int BOTTON_SLOT=22;
+
+
+
     protected final ItemStack BOTTON_ITEM=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a操作按钮",
             "&7点击按钮 将会试图将输入槽2中存储的物品转移至输入槽1中的存储",
             "&7shift点击按钮 将会试图将输入槽1,2中的存储物品数量调至其平均数",
@@ -91,6 +85,12 @@ public class StorageOperator extends AbstractMachine {
             preset.addItem(slot[i],INFO_ITEMS[i],ChestMenuUtils.getEmptyClickHandler());
         }
         preset.addItem(BOTTON_SLOT,BOTTON_ITEM);
+    }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
     }
     public void newMenuInstance(BlockMenu inv, Block block){
 
@@ -146,10 +146,10 @@ public class StorageOperator extends AbstractMachine {
             return false;
         }));
     }
-    public void registerTick(SlimefunItem it ){
-        //doing nothing
-    }
     public void process(Block b, BlockMenu preset, SlimefunBlockData data){
         //doing nothings
+    }
+    public void registerTick(SlimefunItem it ){
+        //doing nothing
     }
 }

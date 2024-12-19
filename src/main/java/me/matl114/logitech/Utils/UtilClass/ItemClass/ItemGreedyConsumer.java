@@ -14,18 +14,67 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
  * this consumer have NO cnt limit, when  calling symmetricDiff they will grab allllllll they can get and count num
  */
 public class ItemGreedyConsumer extends ItemCounter implements Comparable<ItemGreedyConsumer> {
-    private int matchAmount;
-    private int maxStackCnt;
-    private List<ItemPusher> targetConsumers;
     private static ItemGreedyConsumer INSTANCE=new ItemGreedyConsumer(new ItemStack(Material.STONE));
-    public ItemGreedyConsumer(ItemStack itemStack) {
-        super(itemStack);
-        matchAmount = 0;
-    }
     public static ItemGreedyConsumer get(ItemStack itemStack) {
         ItemGreedyConsumer consumer =  INSTANCE.clone();
         consumer.init(itemStack);
         return consumer;
+    }
+    private int matchAmount;
+    private int maxStackCnt;
+    private List<ItemPusher> targetConsumers;
+    public ItemGreedyConsumer(ItemStack itemStack) {
+        super(itemStack);
+        matchAmount = 0;
+    }
+    /**
+     * add total amount of matching items
+     * @param matchAmount
+     */
+    public void addMatchAmount(int matchAmount) {
+        this.matchAmount = MathUtils.safeAdd(this.matchAmount, matchAmount);
+        dirty=true;
+    }
+public void addRelate(ItemPusher target){
+        getTargetConsumers().add(target);
+        target.dirty=true;
+    }
+    /**
+     */
+    public void clearRelated(){
+        if(targetConsumers!=null)
+            targetConsumers.clear();
+    }
+    protected ItemGreedyConsumer clone(){
+        return (ItemGreedyConsumer) super.clone();
+    }
+
+    public  int compareTo(ItemGreedyConsumer o) {
+        return this.getStackNum()-o.getStackNum();
+    }
+    /**
+     * add record of match amount from targte amount ,will not modify target
+     * @param other
+     */
+    public void consume(ItemPusher other){
+        this.matchAmount = MathUtils.safeAdd(this.matchAmount, other.getAmount());
+        addRelate(other);
+    }
+
+    /**
+     * get total amount of matching items
+     * @return
+     */
+    public int getMatchAmount() {
+        return matchAmount;
+    }
+
+    /**
+     * get pieces of stack matched in total amount
+     * @return
+     */
+    public int getStackNum(){
+        return MathUtils.safeDivide(this.matchAmount,this.cnt);
     }
     private List<ItemPusher> getTargetConsumers(){
         if(targetConsumers==null){
@@ -33,7 +82,19 @@ public class ItemGreedyConsumer extends ItemCounter implements Comparable<ItemGr
         }
         return targetConsumers;
     }
-//    public ItemMeta getMeta() {
+
+    /**
+     * operate on the match Amount,grab, add match Amount from target
+     * @param target
+     */
+    public void grab(ItemPusher target){
+        int tmp=cnt;
+        cnt=MathUtils.safeAdd(target.getAmount(),tmp);
+        dirty=true;
+        target.addAmount(tmp-cnt);
+    }
+
+    //    public ItemMeta getMeta() {
 //        if(item.hasItemMeta()){
 //            if (meta==null){
 //                //check if const item stack
@@ -51,54 +112,9 @@ public class ItemGreedyConsumer extends ItemCounter implements Comparable<ItemGr
         super.init( itemStack);
         this.matchAmount = 0;
     }
+
     public int maxStackSize(){
         return this.maxStackCnt;
-    }
-    /**
-     * get total amount of matching items
-     * @return
-     */
-    public int getMatchAmount() {
-        return matchAmount;
-    }
-
-    /**
-     * add total amount of matching items
-     * @param matchAmount
-     */
-    public void addMatchAmount(int matchAmount) {
-        this.matchAmount = MathUtils.safeAdd(this.matchAmount, matchAmount);
-        dirty=true;
-    }
-    public void setMatchAmount(int matchAmount) {
-        this.matchAmount = matchAmount;
-        dirty=true;
-    }
-
-    /**
-     * get pieces of stack matched in total amount
-     * @return
-     */
-    public int getStackNum(){
-        return MathUtils.safeDivide(this.matchAmount,this.cnt);
-    }
-
-    public void setStackNum(int stackNum){
-        //TODO may overflow
-        matchAmount = stackNum*cnt  ;
-    }
-    public void addRelate(ItemPusher target){
-        getTargetConsumers().add(target);
-        target.dirty=true;
-    }
-
-    /**
-     * add record of match amount from targte amount ,will not modify target
-     * @param other
-     */
-    public void consume(ItemPusher other){
-        this.matchAmount = MathUtils.safeAdd(this.matchAmount, other.getAmount());
-        addRelate(other);
     }
 
     /**
@@ -115,31 +131,28 @@ public class ItemGreedyConsumer extends ItemCounter implements Comparable<ItemGr
 
     }
 
-    /**
-     * operate on the match Amount,grab, add match Amount from target
-     * @param target
-     */
-    public void grab(ItemPusher target){
-        int tmp=cnt;
-        cnt=MathUtils.safeAdd(target.getAmount(),tmp);
+    public void setMatchAmount(int matchAmount) {
+        this.matchAmount = matchAmount;
         dirty=true;
-        target.addAmount(tmp-cnt);
     }
 
-    /**
-     */
-    public void clearRelated(){
-        if(targetConsumers!=null)
-            targetConsumers.clear();
+    public void setStackNum(int stackNum){
+        //TODO may overflow
+        matchAmount = stackNum*cnt  ;
     }
 
     public void syncData(){
         matchAmount = 0;
         super.syncData();
     }
-
-    public  int compareTo(ItemGreedyConsumer o) {
-        return this.getStackNum()-o.getStackNum();
+    public void syncItems(){
+        if(targetConsumers==null){
+            return;
+        }
+        int len=targetConsumers.size();
+        for(int i=0;i<len;i++){
+            targetConsumers.get(i).syncData();
+        }
     }
 
     /**
@@ -154,15 +167,6 @@ public class ItemGreedyConsumer extends ItemCounter implements Comparable<ItemGr
         int len=targetConsumers.size();
         for(int i=0;i<len;i++){
             targetConsumers.get(i).updateMenu(inv);
-        }
-    }
-    public void syncItems(){
-        if(targetConsumers==null){
-            return;
-        }
-        int len=targetConsumers.size();
-        for(int i=0;i<len;i++){
-            targetConsumers.get(i).syncData();
         }
     }
 
@@ -203,10 +207,6 @@ public class ItemGreedyConsumer extends ItemCounter implements Comparable<ItemGr
         }
         matchAmount=cnt;
         cnt=s;
-    }
-
-    protected ItemGreedyConsumer clone(){
-        return (ItemGreedyConsumer) super.clone();
     }
 
 }

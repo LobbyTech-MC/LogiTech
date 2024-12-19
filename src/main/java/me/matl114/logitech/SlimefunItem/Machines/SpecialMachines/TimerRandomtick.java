@@ -1,16 +1,9 @@
 package me.matl114.logitech.SlimefunItem.Machines.SpecialMachines;
 
-import com.google.common.base.Preconditions;
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import lombok.Getter;
-import me.matl114.logitech.Schedule.Schedules;
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.NMSUtils;
-import me.matl114.logitech.Utils.WorldUtils;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -20,24 +13,51 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Animals;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import lombok.Getter;
+import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.Utils.NMSUtils;
+import me.matl114.logitech.Utils.WorldUtils;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 public class TimerRandomtick extends AbstractTimerRange{
+    @Getter
+    private static TimerRandomtick instance=null;
+    //    Method
+//    @Override
+    private static Consumer<String> errorOut=(s)->{};
     public static boolean isEnable(){
         return instance!=null;
     }
-    @Getter
-    private static TimerRandomtick instance=null;
+private HashSet<Material> SPEED_UP_PLANTS=new HashSet<>(){{
+        add(Material.CARROTS);
+        add(Material.NETHER_WART);
+        add(Material.SUGAR_CANE);
+        add(Material.PUMPKIN_STEM);
+        add(Material.COCOA);
+        add(Material.MELON_STEM);
+        add(Material.BEETROOTS);
+        add(Material.POTATOES);
+        add(Material.CACTUS);
+        add(Material.WHEAT);
+        add(Material.SWEET_BERRY_BUSH);
+    }};
     public TimerRandomtick(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, int energybuffer, int energyConsumption) {
         super(category, item, recipeType, recipe,10,1, energybuffer, energyConsumption);
         instance=this;
     }
-//    Method
-//    @Override
-    private static Consumer<String> errorOut=(s)->{};
+    @Override
+    public boolean blockPredicate(Block block) {
+        return typePredicate(block.getType());
+    }
+    @Override
+    public Particle getParticle() {
+        return Particle.WAX_ON  ;
+    }
     public Runnable getTickTask(Location location, Location center) {
         Block bb=location.getBlock();
         AtomicReference<Runnable> task=new AtomicReference<>(null);
@@ -60,6 +80,14 @@ public class TimerRandomtick extends AbstractTimerRange{
         },()->{errorOut.accept("failed getNMS");},bb);
         return task.get();
     }
+
+    public void operateGrowable(Block bb){
+        BlockData data=bb.getBlockData();
+        if(data instanceof Ageable ageable){
+            ageable.setAge(ageable.getMaximumAge());
+            bb.setBlockData(ageable);
+        }
+    }
     @Override
     public void process(Block b, BlockMenu preset, SlimefunBlockData data) {
         //do Animal speed up logic
@@ -76,37 +104,8 @@ public class TimerRandomtick extends AbstractTimerRange{
             }));
         },true);
     }
-    private HashSet<Material> SPEED_UP_PLANTS=new HashSet<>(){{
-        add(Material.CARROTS);
-        add(Material.NETHER_WART);
-        add(Material.SUGAR_CANE);
-        add(Material.PUMPKIN_STEM);
-        add(Material.COCOA);
-        add(Material.MELON_STEM);
-        add(Material.BEETROOTS);
-        add(Material.POTATOES);
-        add(Material.CACTUS);
-        add(Material.WHEAT);
-        add(Material.SWEET_BERRY_BUSH);
-    }};
-    public void operateGrowable(Block bb){
-        BlockData data=bb.getBlockData();
-        if(data instanceof Ageable ageable){
-            ageable.setAge(ageable.getMaximumAge());
-            bb.setBlockData(ageable);
-        }
-    }
 
-    @Override
-    public boolean blockPredicate(Block block) {
-        return typePredicate(block.getType());
-    }
     public boolean typePredicate(Material type){
         return WorldUtils.isRandomTickable(type);
-    }
-
-    @Override
-    public Particle getParticle() {
-        return Particle.WAX_ON  ;
     }
 }

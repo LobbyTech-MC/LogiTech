@@ -1,15 +1,15 @@
 package me.matl114.logitech.Utils;
 
-import lombok.Getter;
-import me.matl114.matlib.Utils.Reflect.FieldAccess;
-import me.matl114.matlib.Utils.Reflect.MethodAccess;
-import me.matl114.matlib.Utils.Reflect.ReflectUtils;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+
+import lombok.Getter;
+import me.matl114.matlib.Utils.Reflect.FieldAccess;
+import me.matl114.matlib.Utils.Reflect.MethodAccess;
+import me.matl114.matlib.Utils.Reflect.ReflectUtils;
 
 public class NMSUtils {
     public static final MethodAccess getHandleMethodAccess=MethodAccess.ofName("getHandle");

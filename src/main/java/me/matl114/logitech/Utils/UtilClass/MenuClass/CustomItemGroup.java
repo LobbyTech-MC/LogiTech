@@ -42,43 +42,6 @@ public abstract class CustomItemGroup extends FlexItemGroup {
     protected List<ItemGroup> subGroups;
     protected int[] subGroupIndex;
     protected boolean isVisible;
-    @Override
-    public ItemStack getItem(Player p){
-        return this.item;
-    }
-
-    /**
-     * construct normal ItemGroup
-     * @param key
-     * @param title
-     * @param item
-     * @param size
-     * @param inventorylen
-     * @param subGroup
-     */
-//    public CustomItemGroup(NamespacedKey key, String title, ItemStack item, int size,int inventorylen, List<ItemGroup> subGroup){
-//        super(key,item);
-//
-//        assert size>=27&&size%9==0;
-//        this.subGroups=subGroup;
-//        this.contentPerPage=size-18;
-//        this.pages=1+(inventorylen-1)/contentPerPage;
-//        this.isVisible=true;
-//        if(title==null){
-//            title=item.getItemMeta().getDisplayName();
-//        }
-//        this.menuFactory=new MenuFactory(MenuUtils.SIMPLE_MENU.setSize(size),title,this.pages) {
-//            @Override
-//            public void init() {
-//                setDefaultNPSlots();
-//            }
-//        };
-//        init(menuFactory);
-//        addItemGroups();
-//        this.size=size;
-//
-//    }
-
     /**
      * this type of ItemGroup has custom ItemGroup Position
      * @param key
@@ -126,11 +89,38 @@ public abstract class CustomItemGroup extends FlexItemGroup {
         menuFactory.makeFinal();
         this.size=size;
     }
+
     /**
-     * used to init menuFactory ,set common Inventory and handlers ,used to set common params
-     * @param menuFactory
+     * construct normal ItemGroup
+     * @param key
+     * @param title
+     * @param item
+     * @param size
+     * @param inventorylen
+     * @param subGroup
      */
-    protected abstract void init(MenuFactory menuFactory);
+//    public CustomItemGroup(NamespacedKey key, String title, ItemStack item, int size,int inventorylen, List<ItemGroup> subGroup){
+//        super(key,item);
+//
+//        assert size>=27&&size%9==0;
+//        this.subGroups=subGroup;
+//        this.contentPerPage=size-18;
+//        this.pages=1+(inventorylen-1)/contentPerPage;
+//        this.isVisible=true;
+//        if(title==null){
+//            title=item.getItemMeta().getDisplayName();
+//        }
+//        this.menuFactory=new MenuFactory(MenuUtils.SIMPLE_MENU.setSize(size),title,this.pages) {
+//            @Override
+//            public void init() {
+//                setDefaultNPSlots();
+//            }
+//        };
+//        init(menuFactory);
+//        addItemGroups();
+//        this.size=size;
+//
+//    }
 
     /**
      * used to set menuFactory parts related to SFguide,set sf-guide based handlers like menu-back-redirect-to-guidePage handlers,
@@ -142,46 +132,6 @@ public abstract class CustomItemGroup extends FlexItemGroup {
      * @param pages
      */
     protected abstract void addGuideRelated(ChestMenu menu, Player p, PlayerProfile profile, SlimefunGuideMode mode, int pages);
-    protected int[] getSubGroupIndex(){
-        return subGroupIndex;
-    }
-    protected List<ItemGroup> getItemGroup(){
-        return this.subGroups;
-    }
-    protected void setVisble(boolean visble){
-        this.isVisible=visble;
-    }
-
-    /**
-     * used to set menu parts related to menu,
-     * called after menu construct
-     * default doing nothing,
-     * @param menu
-     * @param p
-     * @param profile
-     * @param mode
-     * @param pages
-     */
-
-    /**
-     * get a preview slotPlan of ItemGroups, will init subGroupIndex, can modify slot to custom subGroup position
-     * @return
-     */
-    protected int[] previewGroupSlot(){
-        List<ItemGroup> subGroups=this.subGroups;
-        int i=0;
-        this.subGroupIndex=new int[subGroups.size()];
-        int groupSize=subGroups.size();
-        for(int j=0;j<groupSize;j++){
-            //非空,会一直寻找直到找到一个空的位置
-            while(!(menuFactory.getInventory(i)==null&&(menuFactory.getHandler(i)==null||menuFactory.getHandler(i)== ChestMenuUtils.getEmptyClickHandler()))){
-                ++i;
-            }
-            this.subGroupIndex[j]=i;
-            ++i;
-        }
-        return this.subGroupIndex;
-    }
     private void addItemGroups(){
         int i=0;
         if(this.subGroupIndex==null||this.subGroupIndex.length!=subGroups.size()){
@@ -203,11 +153,114 @@ public abstract class CustomItemGroup extends FlexItemGroup {
 
         }
     }
-    public boolean isVisible(Player var1, PlayerProfile var2, SlimefunGuideMode var3){
-        return isVisible;
+
+    private void displaySlimefunItem(ChestMenu menu, ItemGroup itemGroup, Player p, PlayerProfile profile, SlimefunItem sfitem, SlimefunGuideMode mode, int page, int index) {
+        Research research = sfitem.getResearch();
+        if (SlimefunGuideMode.CHEAT_MODE!=mode && !Slimefun.getPermissionsService().hasPermission(p, sfitem)) {
+            List<String> message = Slimefun.getPermissionsService().getLore(sfitem);
+            menu.addItem(index, new CustomItemStack(ChestMenuUtils.getNoPermissionItem(), sfitem.getItemName(), (String[])message.toArray(new String[0])));
+            menu.addMenuClickHandler(index, ChestMenuUtils.getEmptyClickHandler());
+        } else if (SlimefunGuideMode.CHEAT_MODE!=mode&& research != null && !profile.hasUnlocked(research)) {
+            String lore;
+            if (VaultIntegration.isEnabled()) {
+                Object[] var10001 = new Object[]{research.getCurrencyCost()};
+                lore = String.format("%.2f", var10001) + " 游戏币";
+            } else {
+                lore = research.getLevelCost() + " 级经验";
+            }
+
+            menu.addItem(index, new CustomItemStack(new CustomItemStack(ChestMenuUtils.getNoPermissionItem(), "&f" + ItemUtils.getItemName(sfitem.getItem()), new String[]{"&7" + sfitem.getId(), "&4&l" + Slimefun.getLocalization().getMessage(p, "guide.locked"), "", "&a> 单击解锁", "", "&7需要 &b", lore})));
+            menu.addMenuClickHandler(index, (pl, slot, item, action) -> {
+                research.unlockFromGuide(Slimefun.getRegistry().getSlimefunGuide(mode), p, profile, sfitem, itemGroup, page);
+                return false;
+            });
+        } else {
+            menu.addItem(index, sfitem.getItem());
+            menu.addMenuClickHandler(index, (pl, slot, item, action) -> {
+                try {
+                    if (SlimefunGuideMode.CHEAT_MODE!=mode) {
+                        Slimefun.getRegistry().getSlimefunGuide(mode).displayItem(profile, sfitem, true);
+                    } else if (pl.hasPermission("slimefun.cheat.items")) {
+                        if (sfitem instanceof MultiBlockMachine) {
+                            Slimefun.getLocalization().sendMessage(pl, "guide.cheat.no-multiblocks");
+                        } else {
+                            ItemStack clonedItem = sfitem.getItem().clone();
+                            if (action.isShiftClicked()) {
+                                clonedItem.setAmount(clonedItem.getMaxStackSize());
+                            }
+
+                            pl.getInventory().addItem(new ItemStack[]{clonedItem});
+                        }
+                    } else {
+                        Slimefun.getLocalization().sendMessage(pl, "messages.no-permission", true);
+                    }
+                } catch (LinkageError | Exception var8) {
+                    Throwable x = var8;
+                    p.sendMessage(ChatColor.DARK_RED + "An internal server error has occurred. Please inform an admin, check the console for further info.");
+                    sfitem.error("This item has caused an error message to be thrown while viewing it in the Slimefun guide.", x);
+                }
+
+                return false;
+            });
+        }
+
     }
+    @Override
+    public ItemStack getItem(Player p){
+        return this.item;
+    }
+    protected List<ItemGroup> getItemGroup(){
+        return this.subGroups;
+    }
+    //modified from guizhan Infinity Expansion 2
+    private int getLastPage(Player var1, PlayerProfile var2, SlimefunGuideMode var3){
+        try{
+            Class clazz= GuideHistory.class;
+            Method getEntryMethod=clazz.getDeclaredMethod("getLastEntry",boolean.class);
+            getEntryMethod.setAccessible(true);
+            Object entry=getEntryMethod.invoke(var2.getGuideHistory(),false);
+            Class entryClass= Class.forName("io.github.thebusybiscuit.slimefun4.core.guide.GuideEntry");
+            Method entryGetObjMethod=entryClass.getDeclaredMethod("getIndexedObject");
+            entryGetObjMethod.setAccessible(true);
+            Object obj=entryGetObjMethod.invoke(entry);
+            if(obj instanceof CustomItemGroup){
+                Method entryGetPageMethod=entryClass.getDeclaredMethod("getPage");
+                entryGetPageMethod.setAccessible(true);
+                return (Integer)entryGetPageMethod.invoke(entry);
+            }else{
+                return 1;
+            }
+
+        }catch (Throwable e){
+            return 1;
+        }
+
+    }
+
+    /**
+     * used to set menu parts related to menu,
+     * called after menu construct
+     * default doing nothing,
+     * @param menu
+     * @param p
+     * @param profile
+     * @param mode
+     * @param pages
+     */
+
+    protected int[] getSubGroupIndex(){
+        return subGroupIndex;
+    }
+    /**
+     * used to init menuFactory ,set common Inventory and handlers ,used to set common params
+     * @param menuFactory
+     */
+    protected abstract void init(MenuFactory menuFactory);
     public boolean isHidden(Player p) {
         return !isVisible;
+    }
+    public boolean isVisible(Player var1, PlayerProfile var2, SlimefunGuideMode var3){
+        return isVisible;
     }
     public void open(Player var1, PlayerProfile var2, SlimefunGuideMode var3){
         int page=getLastPage(var1,var2,var3);
@@ -269,79 +322,26 @@ public abstract class CustomItemGroup extends FlexItemGroup {
 
         menu.open(var1);
     }
-    private void displaySlimefunItem(ChestMenu menu, ItemGroup itemGroup, Player p, PlayerProfile profile, SlimefunItem sfitem, SlimefunGuideMode mode, int page, int index) {
-        Research research = sfitem.getResearch();
-        if (SlimefunGuideMode.CHEAT_MODE!=mode && !Slimefun.getPermissionsService().hasPermission(p, sfitem)) {
-            List<String> message = Slimefun.getPermissionsService().getLore(sfitem);
-            menu.addItem(index, new CustomItemStack(ChestMenuUtils.getNoPermissionItem(), sfitem.getItemName(), (String[])message.toArray(new String[0])));
-            menu.addMenuClickHandler(index, ChestMenuUtils.getEmptyClickHandler());
-        } else if (SlimefunGuideMode.CHEAT_MODE!=mode&& research != null && !profile.hasUnlocked(research)) {
-            String lore;
-            if (VaultIntegration.isEnabled()) {
-                Object[] var10001 = new Object[]{research.getCurrencyCost()};
-                lore = String.format("%.2f", var10001) + " 游戏币";
-            } else {
-                lore = research.getLevelCost() + " 级经验";
+    /**
+     * get a preview slotPlan of ItemGroups, will init subGroupIndex, can modify slot to custom subGroup position
+     * @return
+     */
+    protected int[] previewGroupSlot(){
+        List<ItemGroup> subGroups=this.subGroups;
+        int i=0;
+        this.subGroupIndex=new int[subGroups.size()];
+        int groupSize=subGroups.size();
+        for(int j=0;j<groupSize;j++){
+            //非空,会一直寻找直到找到一个空的位置
+            while(!(menuFactory.getInventory(i)==null&&(menuFactory.getHandler(i)==null||menuFactory.getHandler(i)== ChestMenuUtils.getEmptyClickHandler()))){
+                ++i;
             }
-
-            menu.addItem(index, new CustomItemStack(new CustomItemStack(ChestMenuUtils.getNoPermissionItem(), "&f" + ItemUtils.getItemName(sfitem.getItem()), new String[]{"&7" + sfitem.getId(), "&4&l" + Slimefun.getLocalization().getMessage(p, "guide.locked"), "", "&a> 单击解锁", "", "&7需要 &b", lore})));
-            menu.addMenuClickHandler(index, (pl, slot, item, action) -> {
-                research.unlockFromGuide(Slimefun.getRegistry().getSlimefunGuide(mode), p, profile, sfitem, itemGroup, page);
-                return false;
-            });
-        } else {
-            menu.addItem(index, sfitem.getItem());
-            menu.addMenuClickHandler(index, (pl, slot, item, action) -> {
-                try {
-                    if (SlimefunGuideMode.CHEAT_MODE!=mode) {
-                        Slimefun.getRegistry().getSlimefunGuide(mode).displayItem(profile, sfitem, true);
-                    } else if (pl.hasPermission("slimefun.cheat.items")) {
-                        if (sfitem instanceof MultiBlockMachine) {
-                            Slimefun.getLocalization().sendMessage(pl, "guide.cheat.no-multiblocks");
-                        } else {
-                            ItemStack clonedItem = sfitem.getItem().clone();
-                            if (action.isShiftClicked()) {
-                                clonedItem.setAmount(clonedItem.getMaxStackSize());
-                            }
-
-                            pl.getInventory().addItem(new ItemStack[]{clonedItem});
-                        }
-                    } else {
-                        Slimefun.getLocalization().sendMessage(pl, "messages.no-permission", true);
-                    }
-                } catch (LinkageError | Exception var8) {
-                    Throwable x = var8;
-                    p.sendMessage(ChatColor.DARK_RED + "An internal server error has occurred. Please inform an admin, check the console for further info.");
-                    sfitem.error("This item has caused an error message to be thrown while viewing it in the Slimefun guide.", x);
-                }
-
-                return false;
-            });
+            this.subGroupIndex[j]=i;
+            ++i;
         }
-
+        return this.subGroupIndex;
     }
-    //modified from guizhan Infinity Expansion 2
-    private int getLastPage(Player var1, PlayerProfile var2, SlimefunGuideMode var3){
-        try{
-            Class clazz= GuideHistory.class;
-            Method getEntryMethod=clazz.getDeclaredMethod("getLastEntry",boolean.class);
-            getEntryMethod.setAccessible(true);
-            Object entry=getEntryMethod.invoke(var2.getGuideHistory(),false);
-            Class entryClass= Class.forName("io.github.thebusybiscuit.slimefun4.core.guide.GuideEntry");
-            Method entryGetObjMethod=entryClass.getDeclaredMethod("getIndexedObject");
-            entryGetObjMethod.setAccessible(true);
-            Object obj=entryGetObjMethod.invoke(entry);
-            if(obj instanceof CustomItemGroup){
-                Method entryGetPageMethod=entryClass.getDeclaredMethod("getPage");
-                entryGetPageMethod.setAccessible(true);
-                return (Integer)entryGetPageMethod.invoke(entry);
-            }else{
-                return 1;
-            }
-
-        }catch (Throwable e){
-            return 1;
-        }
-
+    protected void setVisble(boolean visble){
+        this.isVisible=visble;
     }
 }

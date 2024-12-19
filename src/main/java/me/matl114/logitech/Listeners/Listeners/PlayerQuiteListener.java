@@ -10,11 +10,10 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerQuiteListener implements Listener {
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent e) {
-        Player p = e.getPlayer();
-        for (Consumer<Player> handler:handlers){
-            handler.accept(p);
+    static HashSet<Consumer<Player>> handlers = new HashSet<>();
+    public static void addHandler(Consumer<Player> handler) {
+        synchronized (handlers) {
+            handlers.add(handler);
         }
     }
     @EventHandler
@@ -24,10 +23,11 @@ public class PlayerQuiteListener implements Listener {
             handler.accept(p);
         }
     }
-    static HashSet<Consumer<Player>> handlers = new HashSet<>();
-    public static void addHandler(Consumer<Player> handler) {
-        synchronized (handlers) {
-            handlers.add(handler);
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        Player p = e.getPlayer();
+        for (Consumer<Player> handler:handlers){
+            handler.accept(p);
         }
     }
 }

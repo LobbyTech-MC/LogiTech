@@ -41,6 +41,37 @@ public class NetWorkQuantumMethod {
         }
         return getAmount;
     }
+    //TODO  get cache map
+    public static Map getCacheMap(SlimefunItem itemInstance){
+        if(NetworkCacheMap==null&&!hasFailedCachemap){
+            try{
+                Field field= itemInstance.getClass().getDeclaredField("CACHES");
+                field.setAccessible(true);
+                NetworkCacheMap=(Map)field.get(itemInstance);
+            }catch (Throwable e){
+                Debug.debug("invoke failed getCacheMap");
+                hasFailedCachemap=true;
+            }
+        }
+        return NetworkCacheMap;
+    }
+    public static Method getItemStackMethod(Object t){
+        if(getItemStack==null&&!hasFailedgetItemStack){
+            try{
+                getItemStack=t.getClass().getSuperclass().getDeclaredMethod("getItemStack");
+                getItemStack.setAccessible(true);
+            }catch(Throwable e){
+                Debug.debug("invoke failed getItemStack");
+                Debug.debug(t.getClass().getSuperclass().getName());
+                Method[] a=t.getClass().getSuperclass().getDeclaredMethods();
+                for(Method m:a){
+                    Debug.debug(m.getName());
+                }
+                hasFailedgetItemStack=true;
+            }
+        }
+        return getItemStack;
+    }
     public static Method getLimitMethod(Object t){
         if(getLimit==null&&!hasFailedLimit){
             try{
@@ -65,23 +96,6 @@ public class NetWorkQuantumMethod {
         }
         return setAmount;
     }
-    public static Method getItemStackMethod(Object t){
-        if(getItemStack==null&&!hasFailedgetItemStack){
-            try{
-                getItemStack=t.getClass().getSuperclass().getDeclaredMethod("getItemStack");
-                getItemStack.setAccessible(true);
-            }catch(Throwable e){
-                Debug.debug("invoke failed getItemStack");
-                Debug.debug(t.getClass().getSuperclass().getName());
-                Method[] a=t.getClass().getSuperclass().getDeclaredMethods();
-                for(Method m:a){
-                    Debug.debug(m.getName());
-                }
-                hasFailedgetItemStack=true;
-            }
-        }
-        return getItemStack;
-    }
     public static Method getSetItemStackMethod(Object t){
         if(setItemStack==null&&!hasFailedsetItemStack){
             try {
@@ -93,32 +107,6 @@ public class NetWorkQuantumMethod {
             }
         }
         return setItemStack;
-    }
-    public static Method getUpdateMetaLore(Object t){
-        if(updateMetaLore==null&&!hasFailedupdateMetaLore){
-            try {
-                updateMetaLore=t.getClass().getDeclaredMethod("updateMetaLore", ItemMeta.class);
-                updateMetaLore.setAccessible(true);
-            }catch (Throwable e){
-                Debug.debug("invoke failed updateMetaLore");
-                hasFailedupdateMetaLore=true;
-            }
-        }
-        return updateMetaLore;
-    }
-    //TODO  get cache map
-    public static Map getCacheMap(SlimefunItem itemInstance){
-        if(NetworkCacheMap==null&&!hasFailedCachemap){
-            try{
-                Field field= itemInstance.getClass().getDeclaredField("CACHES");
-                field.setAccessible(true);
-                NetworkCacheMap=(Map)field.get(itemInstance);
-            }catch (Throwable e){
-                Debug.debug("invoke failed getCacheMap");
-                hasFailedCachemap=true;
-            }
-        }
-        return NetworkCacheMap;
     }
     public static Method getSyncBlock(SlimefunItem itemInstance){
         if(syncBlock==null&&!hasFailedSyncBlock){
@@ -132,5 +120,17 @@ public class NetWorkQuantumMethod {
             }
         }
         return syncBlock;
+    }
+    public static Method getUpdateMetaLore(Object t){
+        if(updateMetaLore==null&&!hasFailedupdateMetaLore){
+            try {
+                updateMetaLore=t.getClass().getDeclaredMethod("updateMetaLore", ItemMeta.class);
+                updateMetaLore.setAccessible(true);
+            }catch (Throwable e){
+                Debug.debug("invoke failed updateMetaLore");
+                hasFailedupdateMetaLore=true;
+            }
+        }
+        return updateMetaLore;
     }
 }

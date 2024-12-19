@@ -85,10 +85,6 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
         }
     }
 
-    public MachineRecipe getRecordRecipe(Location loc){
-        return getMachineRecipes().get(getNowRecordRecipe(loc));
-    }
-    public MachineRecipe getRecordRecipe(SlimefunBlockData data){return getMachineRecipes().get(getNowRecordRecipe(data));}
     public void constructMenu(BlockMenuPreset preset){
         preset.addItem(30,PREV);
         preset.addItem(32,NEXT);
@@ -100,36 +96,42 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
         preset.addItem(49, CRAFT_MUL);
         preset.addItem(50, BORDER, ChestMenuUtils.getEmptyClickHandler());
     }
-    public void updateMenu(BlockMenu inv,Block block,Settings mod){
-        if(mod==Settings.INIT){
-            orderSearchRecipe(inv,Settings.SEQUNTIAL);
-        }else{
+    public void craft(Player player,BlockMenu inv,int limit){
+        if(preCraft(inv,player,true)){
             Location  loc=inv.getLocation();
-            MachineRecipe getRecipe=CraftUtils.matchNextRecipe(inv,getInputSlots(),getMachineRecipes(block,inv),true,Settings.SEQUNTIAL,CRAFT_PROVIDER);
-            if(getRecipe==null){
-                DataCache.setLastRecipe(loc,-1);
+            int recordIndex=getNowRecordRecipe(loc);
+            List<MachineRecipe> mRecipe=getMachineRecipes(null,inv);
+            //没有匹配配方会直接返回失败
+            if(recordIndex<0||recordIndex>=mRecipe.size()){
+                return;
             }
-        }
-        Location  loc=inv.getLocation();
-        int index= DataCache.getLastRecipe(loc);
-        int indexRecord=getNowRecordRecipe(loc);
-        if(index!=-1){
-            MachineRecipe getRecipe=getMachineRecipes(block,inv).get(index);
-            inv.replaceExistingItem(31, AddUtils.addLore(getRecipe.getOutput()[0],
-                    "&8匹配的产物", "&8若有多输出则显示第一个", "&8配方编号: " + index));
-            if(index!=indexRecord||mod==Settings.INIT) {
+            MachineRecipe recordRecipe=mRecipe.get(recordIndex);
+            //计算电力
 
-
-               setNowRecordRecipe(loc,index);
+            Pair<ItemGreedyConsumer[],ItemGreedyConsumer[]> results=
+                    CraftUtils.countMultiRecipe(inv,getInputSlots(),getOutputSlots(),recordRecipe,limit,CRAFT_PROVIDER);
+            //输出满了会返回null
+            if(results==null){
+                return;
             }
-        }
-        else{
-            if(indexRecord!=-1||mod==Settings.INIT){
-                inv.replaceExistingItem(31,DISPLAY_NOMATCH);
-               setNowRecordRecipe(loc,-1);
+            if(this.energyConsumption>0){
+                int craftTime=CraftUtils.calMaxCraftTime(results.getSecondValue(),limit);
+                this.removeCharge(loc,craftTime*this.energyConsumption);
             }
+            CraftUtils.multiUpdateInputMenu(results.getFirstValue(),inv);
+            CraftUtils.multiUpdateOutputMenu(results.getSecondValue(),inv);
         }
     }
+    public int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public MachineRecipe getRecordRecipe(Location loc){
+        return getMachineRecipes().get(getNowRecordRecipe(loc));
+    }
+    public MachineRecipe getRecordRecipe(SlimefunBlockData data){return getMachineRecipes().get(getNowRecordRecipe(data));}
     public void newMenuInstance(BlockMenu menu,Block block){
         menu.addMenuOpeningHandler((player -> {
             AbstractManual.this.updateMenu(menu,block,Settings.RUN);
@@ -226,31 +228,9 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
     public boolean preCraft(BlockMenu inv, Player player, boolean sendMessage){
         return true;
     }
-    public void craft(Player player,BlockMenu inv,int limit){
-        if(preCraft(inv,player,true)){
-            Location  loc=inv.getLocation();
-            int recordIndex=getNowRecordRecipe(loc);
-            List<MachineRecipe> mRecipe=getMachineRecipes(null,inv);
-            //没有匹配配方会直接返回失败
-            if(recordIndex<0||recordIndex>=mRecipe.size()){
-                return;
-            }
-            MachineRecipe recordRecipe=mRecipe.get(recordIndex);
-            //计算电力
 
-            Pair<ItemGreedyConsumer[],ItemGreedyConsumer[]> results=
-                    CraftUtils.countMultiRecipe(inv,getInputSlots(),getOutputSlots(),recordRecipe,limit,CRAFT_PROVIDER);
-            //输出满了会返回null
-            if(results==null){
-                return;
-            }
-            if(this.energyConsumption>0){
-                int craftTime=CraftUtils.calMaxCraftTime(results.getSecondValue(),limit);
-                this.removeCharge(loc,craftTime*this.energyConsumption);
-            }
-            CraftUtils.multiUpdateInputMenu(results.getFirstValue(),inv);
-            CraftUtils.multiUpdateOutputMenu(results.getSecondValue(),inv);
-        }
+    public void preRegister(){
+        super.preRegister();
     }
     /**
      * manual machine main tick,check recipe and update data,
@@ -263,15 +243,35 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
             updateMenu(inv ,b,Settings.RUN);
         }
     }
+    public void updateMenu(BlockMenu inv,Block block,Settings mod){
+        if(mod==Settings.INIT){
+            orderSearchRecipe(inv,Settings.SEQUNTIAL);
+        }else{
+            Location  loc=inv.getLocation();
+            MachineRecipe getRecipe=CraftUtils.matchNextRecipe(inv,getInputSlots(),getMachineRecipes(block,inv),true,Settings.SEQUNTIAL,CRAFT_PROVIDER);
+            if(getRecipe==null){
+                DataCache.setLastRecipe(loc,-1);
+            }
+        }
+        Location  loc=inv.getLocation();
+        int index= DataCache.getLastRecipe(loc);
+        int indexRecord=getNowRecordRecipe(loc);
+        if(index!=-1){
+            MachineRecipe getRecipe=getMachineRecipes(block,inv).get(index);
+            inv.replaceExistingItem(31, AddUtils.addLore(getRecipe.getOutput()[0],
+                    "&8匹配的产物", "&8若有多输出则显示第一个", "&8配方编号: " + index));
+            if(index!=indexRecord||mod==Settings.INIT) {
 
-    public void preRegister(){
-        super.preRegister();
-    }
-    public int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
+
+               setNowRecordRecipe(loc,index);
+            }
+        }
+        else{
+            if(indexRecord!=-1||mod==Settings.INIT){
+                inv.replaceExistingItem(31,DISPLAY_NOMATCH);
+               setNowRecordRecipe(loc,-1);
+            }
+        }
     }
 
 }

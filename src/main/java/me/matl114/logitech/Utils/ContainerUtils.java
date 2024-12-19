@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
@@ -24,41 +25,33 @@ import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 
 public class ContainerUtils {
-    public static void setup(){
-        ContainerBlockMenuWrapper.setup();
-    }
     private static int[][] preCalculatedSlots= IntStream.range(0,73).mapToObj(i->{
         if(i<9||i%9==0){
             return IntStream.range(0,i).toArray();
         }else return null;
     }).toArray(int[][]::new);
-    private static int[] getSlotAccess(int size){
-        if(preCalculatedSlots[size]==null){
-            return IntStream.range(0,size).toArray();
-        }else return preCalculatedSlots[size];
-    }
     @Getter
     protected static BlockMenuPreset containerWrapperMenuPreset =new BlockMenuPreset("LOGITECH_FUNCTIONAL_BLOCKMENU","&c容器") {
         @Override
-        public void init() {
-            for(int i=0;i<54;++i){
-                this.addMenuClickHandler(i, ChestMenuUtils.getEmptyClickHandler());
-            }
-            this.setSize(54);
-        }
-        @Override
         public boolean canOpen(@Nonnull Block block, @Nonnull Player player) {
             return false;
+        }
+        public int[] getSlotsAccessedByItemTransport(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
+            if(menu instanceof ContainerBlockMenuWrapper impl){
+                return getSlotAccess(impl.getSlotSize());
+            }else return getSlotsAccessedByItemTransport(flow);
         }
 
         @Override
         public int[] getSlotsAccessedByItemTransport(ItemTransportFlow itemTransportFlow) {
             return new int[0];
         }
-        public int[] getSlotsAccessedByItemTransport(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
-            if(menu instanceof ContainerBlockMenuWrapper impl){
-                return getSlotAccess(impl.getSlotSize());
-            }else return getSlotsAccessedByItemTransport(flow);
+        @Override
+        public void init() {
+            for(int i=0;i<54;++i){
+                this.addMenuClickHandler(i, ChestMenuUtils.getEmptyClickHandler());
+            }
+            this.setSize(54);
         };
         public void newInstance(@Nonnull BlockMenu menu, @Nonnull Location l) {
             //do nothing
@@ -95,6 +88,20 @@ public class ContainerUtils {
                 });
             }
         });
+    }
+    public static BlockMenu getPlayerBackPackWrapper(Player p){
+        return ContainerBlockMenuWrapper.getContainerBlockMenu(p.getInventory(),p.getLocation(),36);
+    }
+    public static BlockMenu getPlayerInventoryWrapper(Player p){
+        return ContainerBlockMenuWrapper.getContainerBlockMenu(p.getInventory(),p.getLocation());
+    }
+    private static int[] getSlotAccess(int size){
+        if(preCalculatedSlots[size]==null){
+            return IntStream.range(0,size).toArray();
+        }else return preCalculatedSlots[size];
+    }
+    public static void setup(){
+        ContainerBlockMenuWrapper.setup();
     }
     //todo add Material check
     //todo add InventoryType slotAccess
@@ -136,11 +143,5 @@ public class ContainerUtils {
                 }
             }
         }
-    }
-    public static BlockMenu getPlayerBackPackWrapper(Player p){
-        return ContainerBlockMenuWrapper.getContainerBlockMenu(p.getInventory(),p.getLocation(),36);
-    }
-    public static BlockMenu getPlayerInventoryWrapper(Player p){
-        return ContainerBlockMenuWrapper.getContainerBlockMenu(p.getInventory(),p.getLocation());
     }
 }

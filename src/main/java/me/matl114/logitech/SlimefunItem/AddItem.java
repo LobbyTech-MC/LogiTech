@@ -16,21 +16,10 @@ import me.matl114.logitech.Utils.AddUtils;
 
 public class AddItem {
 
-    public static void registerItemStack(){
-        for (ItemStack it :ADDGLOW){
-            AddUtils.addGlow(it);
-        }
-        AddItem.TRACE_ARROW.addUnsafeEnchantment(Enchantment.INFINITY,1);
-        AddUtils.hideAllFlags(CARGO_CONFIG);
-        AddUtils.hideAllFlags(ENTITY_FEAT);
-        AddUtils.hideAllFlags(SPACE_CARD);
-        AddUtils.hideAllFlags(REPLACE_SF_CARD);
-        AddUtils.setUnbreakable(UNBREAKING_SHIELD,true);
-    }
-
     //Groups
     public static final ItemStack ROOT=new CustomItemStack(Material.BUDDING_AMETHYST,
             Language.get("Groups.ROOT.Name"),Language.getList("Groups.ROOT.Lore"));
+
     public static final ItemStack INFO=AddUtils.themed(Material.PAPER,AddUtils.Theme.INFO1,
             Language.get("Groups.INFO.Name"), Language.getList("Groups.INFO.Lore"));
     public static final ItemStack MATERIAL=AddUtils.themed(Material.END_CRYSTAL,AddUtils.Theme.CATEGORY2,
@@ -109,11 +98,11 @@ public class AddItem {
             Language.get("Groups.FEAT8.Name"),Language.getList("Groups.FEAT8.Lore"));
     public static final ItemStack FEAT9=AddUtils.themed(Material.BOOK, AddUtils.Theme.NONE,
             Language.get("Groups.FEAT9.Name"),Language.getList("Groups.FEAT9.Lore"));
-
-
     //items
     public static final SlimefunItemStack ENTITY_FEAT=AddUtils.themed("ENTITY_FEAT",Material.SPAWNER,AddUtils.Theme.ITEM1,
             Language.get("Items.ENTITY_FEAT.Name"),Language.getList("Items.ENTITY_FEAT.Lore"));
+
+
     public static final SlimefunItemStack BUG= AddUtils.themed("BUG", Material.BONE_MEAL, AddUtils.Theme.ITEM1,
             Language.get("Items.BUG.Name"),Language.getList("Items.BUG.Lore"));
     public static final SlimefunItemStack MATL114 = AddUtils.themed("MATL114", CustomHead.MATL114.getItem(), AddUtils.Theme.ITEM1,
@@ -132,10 +121,10 @@ public class AddItem {
             Language.get("Items.FALSE_.Name"),Language.getList("Items.FALSE_.Lore"));
     public static final SlimefunItemStack LOGIGATE=AddUtils.themed("LOGIGATE",Material.COMPARATOR,AddUtils.Theme.ITEM1,
             Language.get("Items.LOGIGATE.Name"),Language.getList("Items.LOGIGATE.Lore"));
-        //generated items
+    //generated items
     public static final SlimefunItemStack EXISTE=AddUtils.themed("EXISTE",Material.SLIME_BALL,AddUtils.Theme.ITEM1,
             Language.get("Items.EXISTE.Name"),Language.getList("Items.EXISTE.Lore"));
-    public static final SlimefunItemStack UNIQUE=AddUtils.themed("UNIQUE",Material.MAGMA_CREAM,AddUtils.Theme.ITEM1,
+        public static final SlimefunItemStack UNIQUE=AddUtils.themed("UNIQUE",Material.MAGMA_CREAM,AddUtils.Theme.ITEM1,
             Language.get("Items.UNIQUE.Name"),Language.getList("Items.UNIQUE.Lore"));
     public static final SlimefunItemStack PARADOX=AddUtils.themed("PARADOX",Material.NAUTILUS_SHELL,AddUtils.Theme.ITEM1,
             Language.get("Items.PARADOX.Name"),Language.getList("Items.PARADOX.Lore"));
@@ -195,9 +184,9 @@ public class AddItem {
             Language.get("Items.END_FEAT.Name"),Language.getList("Items.END_FEAT.Lore"));
     public static final SlimefunItemStack STACKFRAME=AddUtils.themed("STACKFRAME",Material.BEDROCK,AddUtils.Theme.ITEM1,
             Language.get("Items.STACKFRAME.Name"),Language.getList("Items.STACKFRAME.Lore"));
-
     public static final SlimefunItemStack STAR_GOLD_INGOT=AddUtils.themed("STAR_GOLD_INGOT",Material.GOLD_INGOT,AddUtils.Theme.ITEM1,
             Language.get("Items.STAR_GOLD_INGOT.Name"),Language.getList("Items.STAR_GOLD_INGOT.Lore"));
+
     public static final SlimefunItemStack ABSTRACT_INGOT=AddUtils.themed("ABSTRACT_INGOT",Material.IRON_INGOT,AddUtils.Theme.ITEM1,
             Language.get("Items.ABSTRACT_INGOT.Name"),Language.getList("Items.ABSTRACT_INGOT.Lore"));
     public static final SlimefunItemStack PDCECDMD=AddUtils.themed("PDCECDMD",CustomHead.BUSHIGEMEN.getItem(), AddUtils.Theme.ITEM1,
@@ -206,9 +195,9 @@ public class AddItem {
             Language.get("Items.REINFORCED_CHIP_INGOT.Name"),Language.getList("Items.REINFORCED_CHIP_INGOT.Lore"));
     public static final SlimefunItemStack ATOM_INGOT=AddUtils.themed("ATOM_INGOT",Material.ECHO_SHARD,AddUtils.Theme.ITEM1,
             Language.get("Items.ATOM_INGOT.Name"),Language.getList("Items.ATOM_INGOT.Lore"));
-
     public static final SlimefunItemStack LMOTOR=AddUtils.themed("LMOTOR",CustomHead.MOTOR.getItem(),AddUtils.Theme.ITEM1,
             Language.get("Items.LMOTOR.Name"),Language.getList("Items.LMOTOR.Lore"));
+
     public static final SlimefunItemStack LPLATE=AddUtils.themed("LPLATE",Material.PAPER,AddUtils.Theme.ITEM1,
             Language.get("Items.LPLATE.Name"),Language.getList("Items.LPLATE.Lore"));
     public static final SlimefunItemStack METAL_CORE=AddUtils.themed("METAL_CORE",Material.NETHERITE_BLOCK,AddUtils.Theme.ITEM1,
@@ -229,9 +218,9 @@ public class AddItem {
             Language.get("Items.REDSTONE_ENGINE.Name"),Language.getList("Items.REDSTONE_ENGINE.Lore"));
     public static final SlimefunItemStack HYPER_LINK=AddUtils.themed("HYPER_LINK",Material.NETHER_STAR,AddUtils.Theme.ITEM1,
             Language.get("Items.HYPER_LINK.Name"),Language.getList("Items.HYPER_LINK.Lore"));
-
     public static final SlimefunItemStack SAMPLE_HEAD=AddUtils.themed("SAMPLE_HEAD",Material.PLAYER_HEAD,AddUtils.Theme.ITEM1,
             Language.get("Items.SAMPLE_HEAD.Name"),Language.getList("Items.SAMPLE_HEAD.Lore"));
+
     public static final SlimefunItemStack CHIP=AddUtils.themed("CHIP",Material.NAME_TAG,AddUtils.Theme.ITEM1,
             Language.get("Items.CHIP.Name"),Language.getList("Items.CHIP.Lore"));
     public static final SlimefunItemStack CHIP_CORE=AddUtils.themed("CHIP_CORE",CustomHead.CORE.getItem(), AddUtils.Theme.ITEM1,
@@ -309,9 +298,9 @@ public class AddItem {
             Language.get("Machines.SPECIAL_CRAFTER.Name"),Language.getList("Machines.SPECIAL_CRAFTER.Lore"));
     public static final SlimefunItemStack STAR_SMELTERY=AddUtils.themed("STAR_SMELTERY",Material.BLAST_FURNACE,AddUtils.Theme.MACHINE1,
             Language.get("Machines.STAR_SMELTERY.Name"),Language.getList("Machines.STAR_SMELTERY.Lore"));
-
     public static final SlimefunItemStack INFINITY_AUTOCRAFT=AddUtils.themed("INFINITY_AUTOCRAFT",Material.CRYING_OBSIDIAN,AddUtils.Theme.MACHINE1,
             Language.get("Machines.INFINITY_AUTOCRAFT.Name"),Language.getList("Machines.INFINITY_AUTOCRAFT.Lore"));
+
     public static final SlimefunItemStack CHIP_MAKER=AddUtils.themed("CHIP_MAKER",Material.CHISELED_BOOKSHELF,AddUtils.Theme.MACHINE1,
             Language.get("Machines.CHIP_MAKER.Name"),Language.getList("Machines.CHIP_MAKER.Lore"));
     public static final SlimefunItemStack CHIP_CONSUMER=AddUtils.themed("CHIP_CONSUMER",Material.TORCH,AddUtils.Theme.MACHINE1,
@@ -416,12 +405,12 @@ public class AddItem {
             Language.get("Machines.TIMER_RD.Name"),Language.getList("Machines.TIMER_RD.Lore"));
     public static final SlimefunItemStack TIMER_SF=AddUtils.themed("TIMER_SF",Material.SOUL_TORCH,AddUtils.Theme.MACHINE1,
             Language.get("Machines.TIMER_SF.Name"),Language.getList("Machines.TIMER_SF.Lore"));
-//    public static final SlimefunItemStack TIMER_SF_SEQ=AddUtils.themed("TIMER_SF_SEQ",Material.SOUL_TORCH,AddUtils.Theme.MACHINE1,
+    //    public static final SlimefunItemStack TIMER_SF_SEQ=AddUtils.themed("TIMER_SF_SEQ",Material.SOUL_TORCH,AddUtils.Theme.MACHINE1,
 //            Language.get("Machines.TIMER_SF_SEQ.Name"),Language.getList("Machines.TIMER_SF_SEQ.Lore"));
     //manuals
     public static final SlimefunItemStack MANUAL_CORE=AddUtils.themed("MANUAL_CORE",Material.AMETHYST_SHARD,AddUtils.Theme.ITEM1,
             Language.get("Manuals.MANUAL_CORE.Name"),Language.getList("Manuals.MANUAL_CORE.Lore"));
-    public static final SlimefunItemStack CRAFT_MANUAL=AddUtils.themed("CRAFT_MANUAL",Material.CRAFTING_TABLE,AddUtils.Theme.MANUAL1,
+public static final SlimefunItemStack CRAFT_MANUAL=AddUtils.themed("CRAFT_MANUAL",Material.CRAFTING_TABLE,AddUtils.Theme.MANUAL1,
             Language.get("Manuals.CRAFT_MANUAL.Name"),Language.getList("Manuals.CRAFT_MANUAL.Lore"));
     public static final SlimefunItemStack FURNACE_MANUAL=AddUtils.themed("FURNACE_MANUAL",Material.FURNACE,AddUtils.Theme.MANUAL1,
             Language.get("Manuals.FURNACE_MANUAL.Name"),Language.getList("Manuals.FURNACE_MANUAL.Lore"));
@@ -641,14 +630,14 @@ public class AddItem {
             AddUtils.themed("AUTOCRAFT_SMELT",new ItemStack(Material.FURNACE),AddUtils.Theme.MANUAL1,"测试AutoCraft","冶炼炉");
     public static final SlimefunItemStack AUTO_INF=
             AddUtils.themed("AUTOCRAFT_INF",new ItemStack(Material.RESPAWN_ANCHOR),AddUtils.Theme.MANUAL1,"测试定向合成机","无尽工作台");
-
-//    public static final SlimefunItemStack INPORT=
+    //    public static final SlimefunItemStack INPORT=
 //            AddUtils.themed("INPORT",new ItemStack(Material.END_STONE),AddUtils.Theme.CARGO1,"存入接口","较快的将物品存入奇点...");
 //    public static final SlimefunItemStack OUTPORT=
 //            AddUtils.themed("OUTPORT",new ItemStack(Material.END_STONE),AddUtils.Theme.CARGO1,"取出接口","较快的将物品取出奇点...");
     public static final SlimefunItemStack TESTUNIT1=
             AddUtils.themed("TESTUNIT1",new ItemStack(Material.GLASS),AddUtils.Theme.CARGO1,"测试存储单元","啥用都没");
-    public static final SlimefunItemStack TESTUNIT2=
+
+public static final SlimefunItemStack TESTUNIT2=
             AddUtils.themed("TESTUNIT2",new ItemStack(Material.GLASS),AddUtils.Theme.CARGO1,"测试存储单元2","啥用都没");
     public static final SlimefunItemStack TESTUNIT3=
             AddUtils.themed("TESTUNIT3",new ItemStack(Material.GLASS),AddUtils.Theme.CARGO1,"测试存储单元3","啥用都没");
@@ -661,21 +650,21 @@ public class AddItem {
     //final
     public static final SlimefunItemStack FINAL_SEQUENTIAL=AddUtils.themed("FINAL_SEQUENTIAL",Material.STRIPPED_BAMBOO_BLOCK,AddUtils.Theme.MACHINE1,
             Language.get("Machines.FINAL_SEQUENTIAL.Name"),Language.getList("Machines.FINAL_SEQUENTIAL.Lore"));
-
     public static final SlimefunItemStack FINAL_STACKMACHINE=AddUtils.themed("FINAL_STACKMACHINE",Material.BLAST_FURNACE,AddUtils.Theme.MACHINE1,
             Language.get("Machines.FINAL_STACKMACHINE.Name"),Language.getList("Machines.FINAL_STACKMACHINE.Lore"));
+
     public static final SlimefunItemStack FINAL_STACKMGENERATOR=AddUtils.themed("FINAL_STACKMGENERATOR",Material.POLISHED_ANDESITE,AddUtils.Theme.MACHINE2,
             Language.get("Generators.FINAL_STACKMGENERATOR.Name"),Language.getList("Generators.FINAL_STACKMGENERATOR.Lore"));
     public static final SlimefunItemStack FINAL_STONE_MG=AddUtils.themed("FINAL_STONE_MG",Material.DEEPSLATE_TILES,AddUtils.Theme.MACHINE2,
             Language.get("Generators.FINAL_STONE_MG.Name"),Language.getList("Generators.FINAL_STONE_MG.Lore"));
-
     public static final SlimefunItemStack TESTPART=AddUtils.themed("TEST_MPART",Material.OBSIDIAN,AddUtils.Theme.MACHINE1,"测试多方块部件","测试测试");
+
     public static final SlimefunItemStack TESTCORE=AddUtils.themed("TEST_MCORE",Material.IRON_BLOCK,AddUtils.Theme.MACHINE1,"测试多方块核心","测试测试");
     public static final SlimefunItemStack TEST_SEQ=AddUtils.themed("TEST_SEQ",Material.LOOM,AddUtils.Theme.MACHINE1,
             Language.get("Items.TEST_SEQ.Name"),Language.getList("Items.TEST_SEQ.Lore"));
-
     //tmp占位符
     public static final SlimefunItemStack TMP1= new SlimefunItemStack("TMP1",Material.STONE,"&b占位符","&7暂未开发");
+
     public static final SlimefunItemStack RESOLVE_FAILED=AddUtils.themed("RESOLVE_FAILED",Material.STRUCTURE_VOID,AddUtils.Theme.NONE,
             Language.get("Items.RESOLVE_FAILED.Name"),Language.getList("Items.RESOLVE_FAILED.Lore"));
     public static final SlimefunItemStack SHELL=AddUtils.themed("SHELL",Material.BOOK,AddUtils.Theme.ITEM1,
@@ -728,4 +717,15 @@ public class AddItem {
         add(CONFIGURE);
         add(TOOLS);
     }};
+    public static void registerItemStack(){
+        for (ItemStack it :ADDGLOW){
+            AddUtils.addGlow(it);
+        }
+        AddItem.TRACE_ARROW.addUnsafeEnchantment(Enchantment.INFINITY,1);
+        AddUtils.hideAllFlags(CARGO_CONFIG);
+        AddUtils.hideAllFlags(ENTITY_FEAT);
+        AddUtils.hideAllFlags(SPACE_CARD);
+        AddUtils.hideAllFlags(REPLACE_SF_CARD);
+        AddUtils.setUnbreakable(UNBREAKING_SHIELD,true);
+    }
 }

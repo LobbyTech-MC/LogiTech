@@ -58,11 +58,8 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 
 public class RecipeSupporter {
-    public static void init(){
-
-    }
     public static final SlimefunAddon PLUGIN= MyAddon.getInstance();
-//    public static final RecipeType VANILLA_MERCHANT=new RecipeType(AddUtils.getNameKey("vanilla_merchant"),
+    //    public static final RecipeType VANILLA_MERCHANT=new RecipeType(AddUtils.getNameKey("vanilla_merchant"),
 //            new CustomItemStack(Material.PLAYER_HEAD,"交易内容","","村民交易项目"));
     private static final ArrayList<MachineRecipe> GOLDPAN_RECIPE = new ArrayList<>(){{
         add(MachineRecipeUtils.stackFrom(-1,
@@ -99,7 +96,7 @@ public class RecipeSupporter {
                 }
         ));
     }};
-    private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(){{
+private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(){{
         add(MachineRecipeUtils.stackFrom(-1,
                 new ItemStack[]{SlimefunItems.SIFTED_ORE},
                 new ItemStack[] {
@@ -142,12 +139,12 @@ public class RecipeSupporter {
             add(MachineRecipeUtils.stackFrom(-1,Utils.array(new ItemStack(plank)),Utils.array(new ItemStack(Material.STICK,4))));
         }
     }};
-
     /**
      * stored shaped machine recipe pieces
      * be careful ,ticks of these MachineRecipe are -1 ! not able to use directly in machine
      */
     public static final HashMap<RecipeType,List<MachineRecipe>> PROVIDED_SHAPED_RECIPES = new LinkedHashMap<>();
+
     /**
      * stored Unshaped machine recipe pieces
      * be careful ,ticks of these MachineRecipe are -1 ! not able to use directly in machine
@@ -207,14 +204,14 @@ public class RecipeSupporter {
         add(RecipeType.INTERACT);
         add(RecipeType.GEO_MINER);
     }};
-
     //被禁用的多方块
     public static final HashSet<MultiBlockMachine> BLACKLIST_MULTIBLOCK = new HashSet<>(){{
     }};
+
     //检测全部为MultiBlockMachine的机器 并抓取配方
     public static final HashMap<MultiBlockMachine,List<MachineRecipe>> MULTIBLOCK_RECIPES = new LinkedHashMap<>();
-
     public static final HashMap<EntityType,ItemStack[]> ENTITY_DROPLIST=new LinkedHashMap<>();
+
     public static final List<MachineRecipe> UNUSTACKABLE_ITEM_RECIPES=new ArrayList<>(){{
         // 桶
         add(MachineRecipeUtils.shapeFrom(-1,Utils.recipe("BUCKET",null,null,null,null,null,null,null,null),Utils.recipe(AddSlimefunItems.REPLACE_CARD.getReplaceCard(Material.WATER_BUCKET))));
@@ -320,312 +317,21 @@ public class RecipeSupporter {
     public static final HashSet<SlimefunItem> MGENERATOR_FORCELIST=new LinkedHashSet<>();
     public static final HashMap<SlimefunItem,Integer> STACKMACHINE_LIST=new LinkedHashMap<>();
     public static final HashMap<SlimefunItem,Integer> STACKMGENERATOR_LIST=new LinkedHashMap<>();
-    public static List<MachineRecipe> getStackedRecipes(RecipeType type) {
-        if(SUPPORTED_UNSHAPED_RECIPETYPE.contains(type)) {
-            if(PROVIDED_UNSHAPED_RECIPES.get(type) == null|| PROVIDED_UNSHAPED_RECIPES.get(type).size() == 0) {
-                initUnshapedRecipes(type);
-            }
-            return PROVIDED_UNSHAPED_RECIPES.get(type);
-        }
-        return  null;
+    /**
+     * invoke recursively
+     * @param target
+     * @param mod
+     * @return
+     */
+    private static boolean hasInit=false;
+    static{
+        Debug.logger("配方供应器开始初始化...");
+        initRecipeSupportor();
     }
-    public static boolean tryModifyStandardMachineRecipe(SlimefunItem item,List<MachineRecipe> sourceRecipe,boolean append){
-        String fieldName=null;
-        boolean isMethod=false;
-        Object machineRecipes=null;
-        if (fieldName == null) {
-            machineRecipes = ReflectUtils.invokeGetRecursively(item, Settings.FIELD, "recipes");
-            if (machineRecipes != null) {
-                fieldName = "recipes";
-            }
-        }
-        if (fieldName == null) {
-            machineRecipes = ReflectUtils.invokeGetRecursively(item, Settings.FIELD, "machineRecipes");
-            if (machineRecipes != null) {
-                fieldName= "machineRecipes";
-            }
-        }
-        if (fieldName == null) {
-            machineRecipes = ReflectUtils.invokeGetRecursively(item, Settings.METHOD, "getMachineRecipes");
-            if (machineRecipes != null) {
-                fieldName = "getMachineRecipes";
-                isMethod=true;
-            }
-        }
-        if(machineRecipes==null){
-            return false;
-        }
-        try{
-            List<MachineRecipe> result=new ArrayList<>();
-
-            if(append){
-                List<MachineRecipe> origin=(List<MachineRecipe>) machineRecipes;
-                result.addAll(origin);
-            }
-            result.addAll(sourceRecipe);
-            ReflectUtils.invokeSetRecursively(item,fieldName,result);
-            return true;
-        }catch (Throwable e){
-            try{
-                List<MachineRecipe> origin=(List<MachineRecipe>) machineRecipes;
-                origin.addAll(sourceRecipe);
-                return  true;
-            }catch (Throwable e1){
-                return false;
-            }
-        }
-    }
-    public static void loadMachineModification(Config config,String root,boolean withWarning){
-        if(MyAddon.testmode())
-            withWarning=true;
-        Set<String > keySets=config.getKeys(root);
-        for (String machineId:keySets){
-            String machinepath=root+"."+machineId;
-            SlimefunItem machine;
-            try{
-                machine= SlimefunItem.getById(machineId);
-                machine.getId();
-            }catch(Throwable e){
-                if(withWarning)
-                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: not valid item  %s".formatted(machineId));
-                continue;
-            }
-            boolean append=false;
-            boolean applyToMachine=false;
-            boolean isGenerator=false;
-            Set<String> machineRecipe=null;
-            String recipeType=null;
-            int commonTick=0;
-            try{
-                String method=config.getString(machinepath+".mode");
-                append=method.startsWith("a");
-                applyToMachine=method.endsWith("+");
-                if(config.contains(machinepath+".recipetype")){
-                    recipeType=config.getString(machinepath+".recipetype");
-                    commonTick=config.getInt(machinepath+".time");
-                }else{
-                    machineRecipe=config.getKeys(machinepath+".recipe");
-                }
-                isGenerator=config.getString(machinepath+".type").startsWith("gen");
-            }catch(Throwable e){
-                if(withWarning)
-                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: Error config format in %s ".formatted(machineId));
-                Debug.debug(e);
-            }
-            List<MachineRecipe> recipes=new ArrayList<>(12);
-            if(recipeType!=null){
-                try{
-                    RecipeType type=null;
-                    for(RecipeType rp:RECIPE_TYPES){
-                        if(recipeType.equalsIgnoreCase(rp.getKey().toString())){
-                            type=rp;
-                            break;
-                        }
-                    }
-                    if(type==null){
-                        if(withWarning)
-                            Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: RecipeType %s not found".formatted(recipeType));
-                        continue;
-                    }
-                    try {
-                        List<MachineRecipe> rplist = PROVIDED_UNSHAPED_RECIPES.get(type);
-                        for(MachineRecipe mr:rplist){
-                            recipes.add(MachineRecipeUtils.stackFrom(commonTick,mr.getInput(),mr.getOutput()));
-                        }
-                    }catch (Throwable e){
-                        if(withWarning){
-
-                            Debug.logger("ERROR WHILE LOADING RECIPETYPE MACHINELIST: RecipeType %s".formatted(recipeType));
-                        }
-                    }
-                }catch(Throwable e){}
-            }else{
-                if(machineRecipe==null){
-                    continue;
-                }
-                try{
-                    recipeloop:
-                    for(String recipe:machineRecipe){
-                        String ippath=AddUtils.concat(machinepath,".recipe.",recipe,".input");
-                        String oppath=AddUtils.concat(machinepath,".recipe.",recipe,".output");
-                        Set<String> inputKey=config.getKeys(ippath);
-                        Set<String> outputKey=config.getKeys(oppath);
-    //                    List<String> inputlist=config.getStringList(rcpath+".input");
-    //                    List<String> outputlist=config.getStringList(rcpath+".output");
-                        int tick=config.getInt(AddUtils.concat(machinepath,".recipe.",recipe,".tick"));
-                        ItemStack[] input=new ItemStack[inputKey.size()];
-                        ItemStack[] output=new ItemStack[outputKey.size()];
-                        int len=0;
-                        if(inputKey.size()>0){
-                            for(String skey:inputKey){
-                                ItemStack it=loadItemStack(config,AddUtils.concat(ippath,".",skey));
-                                if(it==null){
-                                    if(withWarning)
-                                        Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: failed to load recipe output %s".formatted(recipe));
-                                    it= AddItem.RESOLVE_FAILED.clone();
-                                }
-                                input[len]=it;
-                                ++len;
-                            }
-                        }else{
-                            Debug.debug("empty input");
-                        }
-                        int len2=0;
-                        if(outputKey.size()>0){
-                            for(String skey:outputKey){
-                                ItemStack it=loadItemStack(config,AddUtils.concat(oppath,".",skey));
-                                if(it==null){
-                                    if(withWarning)
-                                        Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: failed to load recipe output %s".formatted(recipe));
-                                    it= AddItem.RESOLVE_FAILED.clone();
-                                }
-                                output[len2]=it;
-                                ++len2;
-                            }
-                        }else{
-                            Debug.debug("empty output");
-                        }
-                        if(isGenerator){
-                            recipes.add(MachineRecipeUtils.mgFrom(tick,input,output));
-                        }else{
-                            recipes.add(MachineRecipeUtils.stackFrom(tick,input,output));
-                        }
-                    }
-                }catch(Throwable e){
-                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: error recipe format in %s".formatted(machineId));
-                    Debug.debug(e);
-                }
-            }
-
-            List<MachineRecipe> recipe=MACHINE_RECIPELIST.get(machine);
-            if(recipe==null){
-                recipe=new ArrayList<>(12);
-                MACHINE_RECIPELIST.put(machine,recipe);
-            }
-            if(!append){
-                recipe.clear();
-            }//加入机器列表
-            recipe.addAll(recipes);
-            if(applyToMachine&&!isGenerator){
-                if(!tryModifyStandardMachineRecipe(machine,recipes,append)){
-                    Debug.logger("WARNING: %s 不是标准的机器,尝试修改机器配方列表失败,禁用该物品 + 模式".formatted(machineId));
-
-                }
-            }
-        }
-    }
-    public static ItemStack loadItemStack(Config config,String fatherPath){
-
-        if( !config.contains(AddUtils.concat(fatherPath,".type"))){
-            String it=config.getString(fatherPath);
-            return AddUtils.resolveItem(it);
-        }
-
-        try {
-            Debug.debug("abstract itemstack found");
-            String s = config.getString(AddUtils.concat(fatherPath, ".type"));
-            String itemPath=AddUtils.concat(fatherPath,".item");
-            Set<String> keys=config.getKeys(itemPath);
-            List<ItemStack> stack=new ArrayList<>(keys.size());
-            for(String key:keys){
-                stack.add(loadItemStack(config,AddUtils.concat(itemPath,".",key)));
-            }
-            if(stack.isEmpty()){
-                throw  new IllegalArgumentException("illegal config format %s".formatted(AddUtils.concat(itemPath,".")));
-            }
-            String weightPath=AddUtils.concat(fatherPath,".weight");
-            List<Integer> weights=new ArrayList<>(stack.size());
-            keys=config.getKeys(weightPath);
-            Debug.debug(weightPath);
-            Debug.debug(keys);
-            for(String key:keys){
-                Debug.debug(key);
-                weights.add(config.getInt(AddUtils.concat(weightPath,".",key)));
-            }
-            if(s.startsWith("eq")){//input eq
-                return AddUtils.equalItemStackFactory(stack,weights.isEmpty()?1:weights.get(0));
-            }else{
-
-                if(s.startsWith("ra")){
-                    return AddUtils.randItemStackFactory(stack,weights);
-                }else if(s.startsWith("rp")){
-                    double prob=((double)weights.get(0))/100;
-                    return new ProbItemStack(stack.get(0),prob);
-                }else if(s.startsWith("rc")){
-                   // Debug.debug(config.getInt(AddUtils.concat(weightPath,".1")));
-                    int min=weights.get(0);
-                    int max=weights.get(1);
-                    if(min>max){
-                        int t=min;
-                        min=max;
-                        max=t;
-                    }else if(min==max){
-                        return stack.get(0);
-                    }
-                    return AddUtils.randAmountItemFactory(stack.get(0),min,max);
-                }else{
-                    throw new IllegalArgumentException("unsupported item type: "+s);
-                }
-            }
-        }catch(Throwable e1){
-            Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: error item format in %s".formatted(fatherPath));
-            Debug.debug(e1);
-            return AddItem.RESOLVE_FAILED.clone();
-        }
-    }
-    public static void loadStackMachineConfig(Config config,String root,boolean replaceEnergy,boolean forceload){
-        Set<String > keySets=config.getKeys(root);
-        for (String machineId:keySets){
-            String machinepath=root+"."+machineId;
-            SlimefunItem machine;
-            try{
-                machine= SlimefunItem.getById(machineId);
-                machine.getId();
-            }catch (Throwable e){
-                if(forceload)
-                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: not valid item  %s".formatted(machineId));
-                continue;
-            }
-            String type=null;
-            int energy=-1;
-
-            try{
-                type=config.getString(machinepath+".type");
-                energy=config.getInt(machinepath+".energy");
-            }catch(Throwable e){
-                if(forceload)
-                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: error config format in %s".formatted(machineId));
-            }
-            if(type==null){
-                continue;
-            }
-            if(type.startsWith("gen")){
-                Integer en= STACKMACHINE_LIST.remove(machine);
-                if(replaceEnergy){
-                    STACKMGENERATOR_LIST.put(machine,energy);
-                }else {
-                    Integer en2=STACKMGENERATOR_LIST.get(machine);
-                    en=en2!=null?en2:(en!=null?en:-1);
-                    if(en==-1){
-                        STACKMGENERATOR_LIST.put(machine,energy);
-                    }
-                }
-            }else if(type.startsWith("mach")){
-                Integer en= STACKMGENERATOR_LIST.remove(machine);
-                if(replaceEnergy){
-                    STACKMACHINE_LIST.put(machine,energy);
-                }else {
-                    Integer en2=STACKMACHINE_LIST.get(machine);
-                    en=en2!=null?en2:(en!=null?en:-1);
-                    if(en==-1){
-                        STACKMACHINE_LIST.put(machine,energy);
-                    }
-                }
-            }else if(type.startsWith("no")){
-                STACKMACHINE_LIST.remove(machine);
-                STACKMGENERATOR_LIST.remove(machine);
-            }
-        }
+    public static ItemStack getRecipeTypeIcon(RecipeType type){
+        ItemStack icon=type.toItem();
+        if(icon==null)return new ItemStack(Material.AIR);
+        return icon;
     }
     private static double getRscChance(Integer chance) {
         if (chance == null) return 0d;
@@ -635,149 +341,40 @@ public class RecipeSupporter {
 
         return  ((double)chance)/100;
     }
-    public static MachineRecipe transferRSCRecipes(MachineRecipe rsc){
-        if(!rsc.getClass().getName().endsWith("CustomMachineRecipe")){
-            return rsc;
+    public static List<MachineRecipe> getStackedRecipes(RecipeType type) {
+        if(SUPPORTED_UNSHAPED_RECIPETYPE.contains(type)) {
+            if(PROVIDED_UNSHAPED_RECIPES.get(type) == null|| PROVIDED_UNSHAPED_RECIPES.get(type).size() == 0) {
+                initUnshapedRecipes(type);
+            }
+            return PROVIDED_UNSHAPED_RECIPES.get(type);
         }
-        try{
-            boolean isDisplay=(Boolean) ReflectUtils.invokeGetRecursively(rsc,Settings.FIELD,"forDisplay");
-            if(isDisplay){
-                //是用于展示的配方？
-                return null;
-            }
-            List<Integer> chances=(List<Integer>) ReflectUtils.invokeGetRecursively(rsc,Settings.FIELD,"chances");
-            ItemStack[] input=rsc.getInput();
-            ItemStack[] output=rsc.getOutput();
-            List<ItemStack> outputlist=new ArrayList<>(output.length);
-            for(int i=0;i<output.length;i++){
-                double chance=getRscChance(chances.get(i));
-                if(chance>0.99){
-                    outputlist.add(output[i]);
-                }else {
-                    outputlist.add(new ProbItemStack(output[i],chance));
-                }
-            }
-            if(outputlist.isEmpty())return null;
-            MachineRecipe result;
-            boolean isRandStack=(Boolean)ReflectUtils.invokeGetRecursively(rsc,Settings.FIELD,"chooseOneIfHas");
-            if(isRandStack){
-                ItemStack outputRand=AddUtils.eqRandItemStackFactory(outputlist);
-                result=MachineRecipeUtils.stackFrom(rsc.getTicks(),input,new ItemStack[]{outputRand});
-            }else {
-                result=MachineRecipeUtils.stackFrom(rsc.getTicks(),input,outputlist.toArray(new ItemStack[outputlist.size()]));
-            }
-            return result;
-        }catch(Throwable e){
-            Debug.debug("generate an exception while transfer rsc recipes %s".formatted(rsc.getClass().getName()));
-            if(MyAddon.testmode())
-                e.printStackTrace();
-            return null;
-        }
+        return  null;
     }
-    public static int tryGetMachineEnergy(SlimefunItem item){
-        int energyComsumption=-1;
-        if(!(item instanceof EnergyNetComponent)){
-            return 0;
-        }
-        if(item instanceof AContainer container){
-            return container.getEnergyConsumption();
-        }else{
-            Object energy=null;
-            String methodName=null;
-            try{
-                try{
-                    if(methodName==null){
-                        energy=ReflectUtils.invokeGetRecursively(item,Settings.METHOD,"getEnergyConsumption");
-                        if(energy!=null){
-                            energyComsumption=(Integer)energy;
-                            methodName="getEnergyConsumption() method";
-                        }
-                    }
-                }
-                catch(Throwable e){
+    public static void init(){
 
-                }
-                try{
-                if(methodName==null){
-
-                    energy=ReflectUtils.invokeGetRecursively(item,Settings.FIELD,"EnergyConsumption");
-                    if(energy!=null){
-                        energyComsumption=(Integer)energy;
-                        methodName="EnergyConsumption field";
-                    }
-                }
-                }
-                catch(Throwable e){
-
-                    }
-                try{
-                    if(methodName==null){
-
-                        energy=ReflectUtils.invokeGetRecursively(item,Settings.FIELD,"energyConsumption");
-                        if(energy!=null){
-                            energyComsumption=(Integer)energy;
-                            methodName="energyConsumption field";
-                        }
-                    }
-                }
-                catch(Throwable e){
-
-                }
-                try{
-                if(methodName==null){
-                    energy=ReflectUtils.invokeGetRecursively(item,Settings.FIELD,"energyConsumedPerTick");
-                    if(energy!=null){
-                        energyComsumption=(Integer)energy;
-                        methodName="energyConsumedPerTick field";
-                    }
-                }
-                }
-                catch(Throwable e){
-
-                }
-                try{
-                if(methodName==null){
-                    energy=ReflectUtils.invokeGetRecursively(item,Settings.FIELD,"energyPerTick");
-                    if(energy!=null){
-                        energyComsumption=(Integer)energy;
-                        methodName="energyPerTick field";
-                    }
-                }
-                }
-                catch(Throwable e){
-
-                }
-                try{
-                if(methodName==null){
-                    energy=ReflectUtils.invokeGetRecursively(item,Settings.FIELD,"per");
-                    if(energy!=null){
-                        energyComsumption=(Integer)energy;
-                        methodName="per";
-                    }
-                }
-                }
-
-                catch(Throwable e){
-
-                }
-                if(energyComsumption==-1){
-                    Debug.debug("find no energy declared");
-                }
-            }catch (Throwable exp){
-                Debug.debug("exception generate while invoking ",item);
-                Debug.debug(exp);
-            }
-            return energyComsumption;
-        }
     }
+    //not finished yet
+    public static void initMachinieRecipeWithRecipeType(List<MachineRecipe> machineRecipes,RecipeType... craftType){
+        if(machineRecipes.isEmpty()||craftType!=null) {
+            if(craftType.length<=0){
+                return ;
+            }
+            else if(craftType.length==1){
+                machineRecipes = RecipeSupporter.getStackedRecipes(craftType[0]);
 
-    /**
-     * invoke recursively
-     * @param target
-     * @param mod
-     * @return
-     */
-    private static boolean hasInit=false;
+            }else{
+                machineRecipes=new ArrayList<>();
+                for(RecipeType rt : craftType){
+                    if(rt!=null)
+                        machineRecipes.addAll(RecipeSupporter.getStackedRecipes(rt));
+                }
+            }
+            if(machineRecipes==null) {
+                machineRecipes = new ArrayList<>();
+            }
+        }
+
+    }
     public static void initRecipeSupportor(){
         if(hasInit){
             throw new RuntimeException("RecipeSupporter start register task before server start!! register abort");
@@ -1350,9 +947,279 @@ public class RecipeSupporter {
 
         Debug.logger("配方供应器工作完成, 耗时 "+(System.nanoTime()-a)+ " 纳秒");
     }
-    static{
-        Debug.logger("配方供应器开始初始化...");
-        initRecipeSupportor();
+    private static void initUnshapedRecipes(RecipeType type) {
+        List<MachineRecipe> recipes_test = PROVIDED_UNSHAPED_RECIPES.get(type);
+        if(recipes_test == null|| recipes_test.size() == 0|| SUPPORTED_UNSHAPED_RECIPETYPE.contains(type)) {
+            PROVIDED_UNSHAPED_RECIPES.put(type,new ArrayList<>());
+            List<MachineRecipe> recipes = PROVIDED_UNSHAPED_RECIPES.get(type);
+            for (SlimefunItem item : Slimefun.getRegistry().getEnabledSlimefunItems()) {
+                RecipeType recipeType = item.getRecipeType();
+                if (recipeType==type ) {
+
+                    recipes.add(MachineRecipeUtils.stackFromRecipe(item)) ;
+                }
+            }
+
+        }
+    }
+
+    public static void invokeMachineRecipes(){
+
+    }
+    public static ItemStack loadItemStack(Config config,String fatherPath){
+
+        if( !config.contains(AddUtils.concat(fatherPath,".type"))){
+            String it=config.getString(fatherPath);
+            return AddUtils.resolveItem(it);
+        }
+
+        try {
+            Debug.debug("abstract itemstack found");
+            String s = config.getString(AddUtils.concat(fatherPath, ".type"));
+            String itemPath=AddUtils.concat(fatherPath,".item");
+            Set<String> keys=config.getKeys(itemPath);
+            List<ItemStack> stack=new ArrayList<>(keys.size());
+            for(String key:keys){
+                stack.add(loadItemStack(config,AddUtils.concat(itemPath,".",key)));
+            }
+            if(stack.isEmpty()){
+                throw  new IllegalArgumentException("illegal config format %s".formatted(AddUtils.concat(itemPath,".")));
+            }
+            String weightPath=AddUtils.concat(fatherPath,".weight");
+            List<Integer> weights=new ArrayList<>(stack.size());
+            keys=config.getKeys(weightPath);
+            Debug.debug(weightPath);
+            Debug.debug(keys);
+            for(String key:keys){
+                Debug.debug(key);
+                weights.add(config.getInt(AddUtils.concat(weightPath,".",key)));
+            }
+            if(s.startsWith("eq")){//input eq
+                return AddUtils.equalItemStackFactory(stack,weights.isEmpty()?1:weights.get(0));
+            }else{
+
+                if(s.startsWith("ra")){
+                    return AddUtils.randItemStackFactory(stack,weights);
+                }else if(s.startsWith("rp")){
+                    double prob=((double)weights.get(0))/100;
+                    return new ProbItemStack(stack.get(0),prob);
+                }else if(s.startsWith("rc")){
+                   // Debug.debug(config.getInt(AddUtils.concat(weightPath,".1")));
+                    int min=weights.get(0);
+                    int max=weights.get(1);
+                    if(min>max){
+                        int t=min;
+                        min=max;
+                        max=t;
+                    }else if(min==max){
+                        return stack.get(0);
+                    }
+                    return AddUtils.randAmountItemFactory(stack.get(0),min,max);
+                }else{
+                    throw new IllegalArgumentException("unsupported item type: "+s);
+                }
+            }
+        }catch(Throwable e1){
+            Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: error item format in %s".formatted(fatherPath));
+            Debug.debug(e1);
+            return AddItem.RESOLVE_FAILED.clone();
+        }
+    }
+    public static void loadMachineModification(Config config,String root,boolean withWarning){
+        if(MyAddon.testmode())
+            withWarning=true;
+        Set<String > keySets=config.getKeys(root);
+        for (String machineId:keySets){
+            String machinepath=root+"."+machineId;
+            SlimefunItem machine;
+            try{
+                machine= SlimefunItem.getById(machineId);
+                machine.getId();
+            }catch(Throwable e){
+                if(withWarning)
+                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: not valid item  %s".formatted(machineId));
+                continue;
+            }
+            boolean append=false;
+            boolean applyToMachine=false;
+            boolean isGenerator=false;
+            Set<String> machineRecipe=null;
+            String recipeType=null;
+            int commonTick=0;
+            try{
+                String method=config.getString(machinepath+".mode");
+                append=method.startsWith("a");
+                applyToMachine=method.endsWith("+");
+                if(config.contains(machinepath+".recipetype")){
+                    recipeType=config.getString(machinepath+".recipetype");
+                    commonTick=config.getInt(machinepath+".time");
+                }else{
+                    machineRecipe=config.getKeys(machinepath+".recipe");
+                }
+                isGenerator=config.getString(machinepath+".type").startsWith("gen");
+            }catch(Throwable e){
+                if(withWarning)
+                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: Error config format in %s ".formatted(machineId));
+                Debug.debug(e);
+            }
+            List<MachineRecipe> recipes=new ArrayList<>(12);
+            if(recipeType!=null){
+                try{
+                    RecipeType type=null;
+                    for(RecipeType rp:RECIPE_TYPES){
+                        if(recipeType.equalsIgnoreCase(rp.getKey().toString())){
+                            type=rp;
+                            break;
+                        }
+                    }
+                    if(type==null){
+                        if(withWarning)
+                            Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: RecipeType %s not found".formatted(recipeType));
+                        continue;
+                    }
+                    try {
+                        List<MachineRecipe> rplist = PROVIDED_UNSHAPED_RECIPES.get(type);
+                        for(MachineRecipe mr:rplist){
+                            recipes.add(MachineRecipeUtils.stackFrom(commonTick,mr.getInput(),mr.getOutput()));
+                        }
+                    }catch (Throwable e){
+                        if(withWarning){
+
+                            Debug.logger("ERROR WHILE LOADING RECIPETYPE MACHINELIST: RecipeType %s".formatted(recipeType));
+                        }
+                    }
+                }catch(Throwable e){}
+            }else{
+                if(machineRecipe==null){
+                    continue;
+                }
+                try{
+                    recipeloop:
+                    for(String recipe:machineRecipe){
+                        String ippath=AddUtils.concat(machinepath,".recipe.",recipe,".input");
+                        String oppath=AddUtils.concat(machinepath,".recipe.",recipe,".output");
+                        Set<String> inputKey=config.getKeys(ippath);
+                        Set<String> outputKey=config.getKeys(oppath);
+    //                    List<String> inputlist=config.getStringList(rcpath+".input");
+    //                    List<String> outputlist=config.getStringList(rcpath+".output");
+                        int tick=config.getInt(AddUtils.concat(machinepath,".recipe.",recipe,".tick"));
+                        ItemStack[] input=new ItemStack[inputKey.size()];
+                        ItemStack[] output=new ItemStack[outputKey.size()];
+                        int len=0;
+                        if(inputKey.size()>0){
+                            for(String skey:inputKey){
+                                ItemStack it=loadItemStack(config,AddUtils.concat(ippath,".",skey));
+                                if(it==null){
+                                    if(withWarning)
+                                        Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: failed to load recipe output %s".formatted(recipe));
+                                    it= AddItem.RESOLVE_FAILED.clone();
+                                }
+                                input[len]=it;
+                                ++len;
+                            }
+                        }else{
+                            Debug.debug("empty input");
+                        }
+                        int len2=0;
+                        if(outputKey.size()>0){
+                            for(String skey:outputKey){
+                                ItemStack it=loadItemStack(config,AddUtils.concat(oppath,".",skey));
+                                if(it==null){
+                                    if(withWarning)
+                                        Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: failed to load recipe output %s".formatted(recipe));
+                                    it= AddItem.RESOLVE_FAILED.clone();
+                                }
+                                output[len2]=it;
+                                ++len2;
+                            }
+                        }else{
+                            Debug.debug("empty output");
+                        }
+                        if(isGenerator){
+                            recipes.add(MachineRecipeUtils.mgFrom(tick,input,output));
+                        }else{
+                            recipes.add(MachineRecipeUtils.stackFrom(tick,input,output));
+                        }
+                    }
+                }catch(Throwable e){
+                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: error recipe format in %s".formatted(machineId));
+                    Debug.debug(e);
+                }
+            }
+
+            List<MachineRecipe> recipe=MACHINE_RECIPELIST.get(machine);
+            if(recipe==null){
+                recipe=new ArrayList<>(12);
+                MACHINE_RECIPELIST.put(machine,recipe);
+            }
+            if(!append){
+                recipe.clear();
+            }//加入机器列表
+            recipe.addAll(recipes);
+            if(applyToMachine&&!isGenerator){
+                if(!tryModifyStandardMachineRecipe(machine,recipes,append)){
+                    Debug.logger("WARNING: %s 不是标准的机器,尝试修改机器配方列表失败,禁用该物品 + 模式".formatted(machineId));
+
+                }
+            }
+        }
+    }
+    public static void loadStackMachineConfig(Config config,String root,boolean replaceEnergy,boolean forceload){
+        Set<String > keySets=config.getKeys(root);
+        for (String machineId:keySets){
+            String machinepath=root+"."+machineId;
+            SlimefunItem machine;
+            try{
+                machine= SlimefunItem.getById(machineId);
+                machine.getId();
+            }catch (Throwable e){
+                if(forceload)
+                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: not valid item  %s".formatted(machineId));
+                continue;
+            }
+            String type=null;
+            int energy=-1;
+
+            try{
+                type=config.getString(machinepath+".type");
+                energy=config.getInt(machinepath+".energy");
+            }catch(Throwable e){
+                if(forceload)
+                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: error config format in %s".formatted(machineId));
+            }
+            if(type==null){
+                continue;
+            }
+            if(type.startsWith("gen")){
+                Integer en= STACKMACHINE_LIST.remove(machine);
+                if(replaceEnergy){
+                    STACKMGENERATOR_LIST.put(machine,energy);
+                }else {
+                    Integer en2=STACKMGENERATOR_LIST.get(machine);
+                    en=en2!=null?en2:(en!=null?en:-1);
+                    if(en==-1){
+                        STACKMGENERATOR_LIST.put(machine,energy);
+                    }
+                }
+            }else if(type.startsWith("mach")){
+                Integer en= STACKMGENERATOR_LIST.remove(machine);
+                if(replaceEnergy){
+                    STACKMACHINE_LIST.put(machine,energy);
+                }else {
+                    Integer en2=STACKMACHINE_LIST.get(machine);
+                    en=en2!=null?en2:(en!=null?en:-1);
+                    if(en==-1){
+                        STACKMACHINE_LIST.put(machine,energy);
+                    }
+                }
+            }else if(type.startsWith("no")){
+                STACKMACHINE_LIST.remove(machine);
+                STACKMGENERATOR_LIST.remove(machine);
+            }
+        }
+    }
+    public static MGeneratorRecipe resolveGrowingMachineRecipe(Object recipe, SlimefunItem machine){
+        return null;
     }
     public static MachineRecipe resolveInfinityMachineBlockRecipe(Object recipe, SlimefunItem machine){
         int ticks=0;
@@ -1384,6 +1251,7 @@ public class RecipeSupporter {
             return MachineRecipeUtils.stackFrom(ticks,input,new ItemStack[]{stack});
         }catch (Throwable e){return null;}
     }
+
     public static boolean resolveSpecialGenerators(SlimefunItem item,List<MachineRecipe> recipes){
 
         if(ReflectUtils.isExtendedFrom(item.getClass(),"GrowingMachine") ){
@@ -1502,54 +1370,186 @@ public class RecipeSupporter {
         }
         return false;
     }
-    public static MGeneratorRecipe resolveGrowingMachineRecipe(Object recipe, SlimefunItem machine){
-        return null;
-    }
-
-    private static void initUnshapedRecipes(RecipeType type) {
-        List<MachineRecipe> recipes_test = PROVIDED_UNSHAPED_RECIPES.get(type);
-        if(recipes_test == null|| recipes_test.size() == 0|| SUPPORTED_UNSHAPED_RECIPETYPE.contains(type)) {
-            PROVIDED_UNSHAPED_RECIPES.put(type,new ArrayList<>());
-            List<MachineRecipe> recipes = PROVIDED_UNSHAPED_RECIPES.get(type);
-            for (SlimefunItem item : Slimefun.getRegistry().getEnabledSlimefunItems()) {
-                RecipeType recipeType = item.getRecipeType();
-                if (recipeType==type ) {
-
-                    recipes.add(MachineRecipeUtils.stackFromRecipe(item)) ;
+    public static MachineRecipe transferRSCRecipes(MachineRecipe rsc){
+        if(!rsc.getClass().getName().endsWith("CustomMachineRecipe")){
+            return rsc;
+        }
+        try{
+            boolean isDisplay=(Boolean) ReflectUtils.invokeGetRecursively(rsc,Settings.FIELD,"forDisplay");
+            if(isDisplay){
+                //是用于展示的配方？
+                return null;
+            }
+            List<Integer> chances=(List<Integer>) ReflectUtils.invokeGetRecursively(rsc,Settings.FIELD,"chances");
+            ItemStack[] input=rsc.getInput();
+            ItemStack[] output=rsc.getOutput();
+            List<ItemStack> outputlist=new ArrayList<>(output.length);
+            for(int i=0;i<output.length;i++){
+                double chance=getRscChance(chances.get(i));
+                if(chance>0.99){
+                    outputlist.add(output[i]);
+                }else {
+                    outputlist.add(new ProbItemStack(output[i],chance));
                 }
             }
-
+            if(outputlist.isEmpty())return null;
+            MachineRecipe result;
+            boolean isRandStack=(Boolean)ReflectUtils.invokeGetRecursively(rsc,Settings.FIELD,"chooseOneIfHas");
+            if(isRandStack){
+                ItemStack outputRand=AddUtils.eqRandItemStackFactory(outputlist);
+                result=MachineRecipeUtils.stackFrom(rsc.getTicks(),input,new ItemStack[]{outputRand});
+            }else {
+                result=MachineRecipeUtils.stackFrom(rsc.getTicks(),input,outputlist.toArray(new ItemStack[outputlist.size()]));
+            }
+            return result;
+        }catch(Throwable e){
+            Debug.debug("generate an exception while transfer rsc recipes %s".formatted(rsc.getClass().getName()));
+            if(MyAddon.testmode())
+                e.printStackTrace();
+            return null;
         }
     }
-    //not finished yet
-    public static void initMachinieRecipeWithRecipeType(List<MachineRecipe> machineRecipes,RecipeType... craftType){
-        if(machineRecipes.isEmpty()||craftType!=null) {
-            if(craftType.length<=0){
-                return ;
-            }
-            else if(craftType.length==1){
-                machineRecipes = RecipeSupporter.getStackedRecipes(craftType[0]);
-
-            }else{
-                machineRecipes=new ArrayList<>();
-                for(RecipeType rt : craftType){
-                    if(rt!=null)
-                        machineRecipes.addAll(RecipeSupporter.getStackedRecipes(rt));
+    public static int tryGetMachineEnergy(SlimefunItem item){
+        int energyComsumption=-1;
+        if(!(item instanceof EnergyNetComponent)){
+            return 0;
+        }
+        if(item instanceof AContainer container){
+            return container.getEnergyConsumption();
+        }else{
+            Object energy=null;
+            String methodName=null;
+            try{
+                try{
+                    if(methodName==null){
+                        energy=ReflectUtils.invokeGetRecursively(item,Settings.METHOD,"getEnergyConsumption");
+                        if(energy!=null){
+                            energyComsumption=(Integer)energy;
+                            methodName="getEnergyConsumption() method";
+                        }
+                    }
                 }
+                catch(Throwable e){
+
+                }
+                try{
+                if(methodName==null){
+
+                    energy=ReflectUtils.invokeGetRecursively(item,Settings.FIELD,"EnergyConsumption");
+                    if(energy!=null){
+                        energyComsumption=(Integer)energy;
+                        methodName="EnergyConsumption field";
+                    }
+                }
+                }
+                catch(Throwable e){
+
+                    }
+                try{
+                    if(methodName==null){
+
+                        energy=ReflectUtils.invokeGetRecursively(item,Settings.FIELD,"energyConsumption");
+                        if(energy!=null){
+                            energyComsumption=(Integer)energy;
+                            methodName="energyConsumption field";
+                        }
+                    }
+                }
+                catch(Throwable e){
+
+                }
+                try{
+                if(methodName==null){
+                    energy=ReflectUtils.invokeGetRecursively(item,Settings.FIELD,"energyConsumedPerTick");
+                    if(energy!=null){
+                        energyComsumption=(Integer)energy;
+                        methodName="energyConsumedPerTick field";
+                    }
+                }
+                }
+                catch(Throwable e){
+
+                }
+                try{
+                if(methodName==null){
+                    energy=ReflectUtils.invokeGetRecursively(item,Settings.FIELD,"energyPerTick");
+                    if(energy!=null){
+                        energyComsumption=(Integer)energy;
+                        methodName="energyPerTick field";
+                    }
+                }
+                }
+                catch(Throwable e){
+
+                }
+                try{
+                if(methodName==null){
+                    energy=ReflectUtils.invokeGetRecursively(item,Settings.FIELD,"per");
+                    if(energy!=null){
+                        energyComsumption=(Integer)energy;
+                        methodName="per";
+                    }
+                }
+                }
+
+                catch(Throwable e){
+
+                }
+                if(energyComsumption==-1){
+                    Debug.debug("find no energy declared");
+                }
+            }catch (Throwable exp){
+                Debug.debug("exception generate while invoking ",item);
+                Debug.debug(exp);
             }
-            if(machineRecipes==null) {
-                machineRecipes = new ArrayList<>();
+            return energyComsumption;
+        }
+    }
+
+    public static boolean tryModifyStandardMachineRecipe(SlimefunItem item,List<MachineRecipe> sourceRecipe,boolean append){
+        String fieldName=null;
+        boolean isMethod=false;
+        Object machineRecipes=null;
+        if (fieldName == null) {
+            machineRecipes = ReflectUtils.invokeGetRecursively(item, Settings.FIELD, "recipes");
+            if (machineRecipes != null) {
+                fieldName = "recipes";
             }
         }
+        if (fieldName == null) {
+            machineRecipes = ReflectUtils.invokeGetRecursively(item, Settings.FIELD, "machineRecipes");
+            if (machineRecipes != null) {
+                fieldName= "machineRecipes";
+            }
+        }
+        if (fieldName == null) {
+            machineRecipes = ReflectUtils.invokeGetRecursively(item, Settings.METHOD, "getMachineRecipes");
+            if (machineRecipes != null) {
+                fieldName = "getMachineRecipes";
+                isMethod=true;
+            }
+        }
+        if(machineRecipes==null){
+            return false;
+        }
+        try{
+            List<MachineRecipe> result=new ArrayList<>();
 
-    }
-    public static ItemStack getRecipeTypeIcon(RecipeType type){
-        ItemStack icon=type.toItem();
-        if(icon==null)return new ItemStack(Material.AIR);
-        return icon;
-    }
-
-    public static void invokeMachineRecipes(){
-
+            if(append){
+                List<MachineRecipe> origin=(List<MachineRecipe>) machineRecipes;
+                result.addAll(origin);
+            }
+            result.addAll(sourceRecipe);
+            ReflectUtils.invokeSetRecursively(item,fieldName,result);
+            return true;
+        }catch (Throwable e){
+            try{
+                List<MachineRecipe> origin=(List<MachineRecipe>) machineRecipes;
+                origin.addAll(sourceRecipe);
+                return  true;
+            }catch (Throwable e1){
+                return false;
+            }
+        }
     }
 }

@@ -15,9 +15,6 @@ import me.matl114.logitech.Schedule.Schedules;
 import me.matl114.logitech.Utils.AddUtils;
 
 public class RadiationRegion {
-    public static void setup(){
-
-    }
     protected static final byte[] lock = new byte[0];
     protected static final LinkedHashMap<Location,BukkitRunnable> RADIATION_THREAD=new LinkedHashMap<>();
     static{
@@ -26,6 +23,25 @@ public class RadiationRegion {
                 it.cancel();
             }
         });
+    }
+    public static void addRadiation(Location loc, int range,int period,int speed,int level){
+        removeRadiation(loc);
+        BukkitRunnable task=new BukkitRunnable(){
+            public int radiation=period;
+            Location center=loc.clone();
+            public void run(){
+                if(radiation>0){
+                    --radiation;
+                    runRadiation(center,range,level);
+                }else {
+                    cancel();
+                }
+            }
+        };
+        synchronized (lock){
+            RADIATION_THREAD.put(loc,task);
+        }
+        Schedules.launchSchedules(task,speed,true,speed);
     }
     public static boolean removeNearRadiation(Location loc,double radius){
         synchronized(lock){
@@ -55,26 +71,6 @@ public class RadiationRegion {
             return false;
         }
     }
-    public static void addRadiation(Location loc, int range,int period,int speed,int level){
-        removeRadiation(loc);
-        BukkitRunnable task=new BukkitRunnable(){
-            public int radiation=period;
-            Location center=loc.clone();
-            public void run(){
-                if(radiation>0){
-                    --radiation;
-                    runRadiation(center,range,level);
-                }else {
-                    cancel();
-                }
-            }
-        };
-        synchronized (lock){
-            RADIATION_THREAD.put(loc,task);
-        }
-        Schedules.launchSchedules(task,speed,true,speed);
-    }
-
     /**
      * must run in sync thread
       * @param loc
@@ -92,5 +88,9 @@ public class RadiationRegion {
                         player,level,60,(player1 -> true));
             }
         }
+    }
+
+    public static void setup(){
+
     }
 }

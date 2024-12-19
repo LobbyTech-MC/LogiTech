@@ -13,11 +13,6 @@ import me.matl114.logitech.Utils.ReflectUtils;
 import me.matl114.logitech.Utils.Settings;
 
 public class DependencyInfinity {
-    public static void  init(){
-        if(AddDepends.hasInfiniteExpansion){
-            Debug.logger("已检测到无尽附属");
-        }
-    }
     static {
         AddDepends.hasInfiniteExpansion = Bukkit.getPluginManager().isPluginEnabled("InfinityExpansion");
         if(AddDepends.hasInfiniteExpansion){
@@ -56,6 +51,11 @@ public class DependencyInfinity {
             }
         }
 
+    }
+    public static void  init(){
+        if(AddDepends.hasInfiniteExpansion){
+            Debug.logger("已检测到无尽附属");
+        }
     }
 
 }

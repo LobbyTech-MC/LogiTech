@@ -42,14 +42,26 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
 public class Laser extends AbstractMachine implements MultiBlockPart, FinalAltarCore.FinalAltarChargable, MenuBlock.MenuNotAccessible {
-    public int[] getInputSlots(){
-        return new int[0];
+    public interface LaserChargable{
+        static void setCharged(SlimefunBlockData data ,Directions dir,int charge){
+            DataCache.setCustomData(data,Laser.DIR_KEYS.get(dir),charge);
+        }
+        default int hasCharged(SlimefunBlockData data,Directions dir){
+            return DataCache.getCustomData(data,Laser.DIR_KEYS.get(dir),0);
+        }
     }
-    public int[] getOutputSlots(){
-        return new int[0];
-    }
+    protected static final HashMap<Directions,String> DIR_KEYS=new LinkedHashMap<>(){{
+       for(Directions dir:Directions.values()) {
+           put(dir, AddUtils.concat("f_",dir.toString()));
+       }
+    }};
 
     public final String PARTID;
+    public String POWERED_KEY="po";
+    public String DIRECTION="dir";
+    public int MAX_SEARCH_LEN=32;
+    protected final int DEFAULT_LVL=3;
+    protected final int FORCE_INCREASE=6;
     public Laser(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                                        int energybuffer, int energyConsumption,String partId) {
         super(category, item, recipeType, recipe, energybuffer, energyConsumption);
@@ -70,29 +82,38 @@ public class Laser extends AbstractMachine implements MultiBlockPart, FinalAltar
                         "&7一般用于机器激活的前置条件"),null
         ));
     }
+    public void constructMenu(BlockMenuPreset preset){
+
+    }
+    public int[] getInputSlots(){
+        return new int[0];
+    }
+    public int[] getOutputSlots(){
+        return new int[0];
+    }
     public String getPartId(){
         return PARTID;
     }
-    public String POWERED_KEY="po";
-    public String DIRECTION="dir";
-    public int MAX_SEARCH_LEN=32;
+    public void onBreak(BlockBreakEvent event,BlockMenu menu ){
+        super.onBreak(event,menu);
+    }
+    public void onPlace(BlockPlaceEvent e,Block b){
+        super.onPlace(e,b);
+        BlockData data1=b.getBlockData();
+        if(data1 instanceof Directional dp){
+            DataCache.setCustomData(b.getLocation(),DIRECTION,Directions.fromBlockFace(dp.getFacing()).toInt());
+        }
+    }
     public void process(Block b, @Nullable BlockMenu menu, SlimefunBlockData data){
 
     }
-    protected final int DEFAULT_LVL=3;
-    protected final int FORCE_INCREASE=6;
-    protected static final HashMap<Directions,String> DIR_KEYS=new LinkedHashMap<>(){{
-       for(Directions dir:Directions.values()) {
-           put(dir, AddUtils.concat("f_",dir.toString()));
-       }
-    }};
-    public interface LaserChargable{
-        default int hasCharged(SlimefunBlockData data,Directions dir){
-            return DataCache.getCustomData(data,Laser.DIR_KEYS.get(dir),0);
-        }
-        static void setCharged(SlimefunBlockData data ,Directions dir,int charge){
-            DataCache.setCustomData(data,Laser.DIR_KEYS.get(dir),charge);
-        }
+    public boolean redirectMenu(){
+        return false;
+    }
+    public void registerBlockMenu(SlimefunItem that){
+        //handle blockPlaceEvent
+        handleBlock(that);
+        handleMultiBlockPart(this);
     }
     //FIXME powered wrongly
     //FIXME charge machine wrongly
@@ -160,27 +181,6 @@ public class Laser extends AbstractMachine implements MultiBlockPart, FinalAltar
 
             },0,false,0);
         }
-    }
-    public void onPlace(BlockPlaceEvent e,Block b){
-        super.onPlace(e,b);
-        BlockData data1=b.getBlockData();
-        if(data1 instanceof Directional dp){
-            DataCache.setCustomData(b.getLocation(),DIRECTION,Directions.fromBlockFace(dp.getFacing()).toInt());
-        }
-    }
-    public void onBreak(BlockBreakEvent event,BlockMenu menu ){
-        super.onBreak(event,menu);
-    }
-    public boolean redirectMenu(){
-        return false;
-    }
-    public void constructMenu(BlockMenuPreset preset){
-
-    }
-    public void registerBlockMenu(SlimefunItem that){
-        //handle blockPlaceEvent
-        handleBlock(that);
-        handleMultiBlockPart(this);
     }
 
 }

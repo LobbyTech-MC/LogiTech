@@ -22,10 +22,36 @@ public interface DirectionalBlock {
             AddUtils.addGlow( new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6点击切换方向","&3当前方向: 向上")),
             AddUtils.addGlow( new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6点击切换方向","&3当前方向: 向下"))
     };
-    //keep index num
-    String[] getSaveKeys();
-    //leave -1 in array if skip update
-    int[] getDirectionSlots();
+    default boolean canModify(){
+        return true;
+    }
+    default Directions[] copyDirectionSettings(SlimefunBlockData data){
+        if(this.canModify()){
+            String[] saveKeys=getSaveKeys();
+            Directions[] dir=new Directions[saveKeys.length];
+            for (int i=0;i<saveKeys.length;i++){
+                dir[i]=getDirection(saveKeys[i],data);
+            }
+            return dir;
+        }else return null;
+    }
+    default Directions getDirection(int index,SlimefunBlockData data){
+        return getDirection(getSaveKeys()[index],data);
+    }
+    /**
+     * used in cargoTask
+     * @param saveKey
+     * @param data
+     * @return
+     */
+    default Directions getDirection(String saveKey,SlimefunBlockData data){
+        int direction=DataCache.getCustomData(data,saveKey,0);
+        return Directions.fromInt(direction);
+    }
+
+    default ChestMenu.MenuClickHandler getDirectionHandler(int index, BlockMenu blockMenu){
+        return getDirectionHandler(getSaveKeys()[index],blockMenu);
+    }
     default ChestMenu.MenuClickHandler getDirectionHandler(String saveKey, BlockMenu blockMenu){
         return ((player, i, itemStack, clickAction) -> {
             SlimefunBlockData data= DataCache.safeLoadBlock(blockMenu.getLocation());
@@ -39,22 +65,25 @@ public interface DirectionalBlock {
             return false;
         });
     }
-    default ChestMenu.MenuClickHandler getDirectionHandler(int index, BlockMenu blockMenu){
-        return getDirectionHandler(getSaveKeys()[index],blockMenu);
-    }
-
-    /**
-     * used in cargoTask
-     * @param saveKey
-     * @param data
-     * @return
-     */
-    default Directions getDirection(String saveKey,SlimefunBlockData data){
-        int direction=DataCache.getCustomData(data,saveKey,0);
-        return Directions.fromInt(direction);
-    }
-    default Directions getDirection(int index,SlimefunBlockData data){
-        return getDirection(getSaveKeys()[index],data);
+    //leave -1 in array if skip update
+    int[] getDirectionSlots();
+    //keep index num
+    String[] getSaveKeys();
+    //返回拷贝的数量
+    default int pasteDirectionSettings(SlimefunBlockData data ,Directions[] dir){
+        if(this.canModify()){
+            String[] saveKeys=getSaveKeys();
+            int[] slots=getDirectionSlots();
+            int len=Math.min(saveKeys.length,dir.length);
+            int slotlens=slots.length;
+            BlockMenu menu=data.getBlockMenu();
+            for (int i=0;i<len;i++){
+                setDirection(saveKeys[i],data,dir[i]);
+                if(i<slotlens)
+                    updateSlot(menu,slots[i],dir[i]);
+            }
+            return len;
+        }else return -1;
     }
     default void setDirection(String saveKey,SlimefunBlockData data,Directions dir){
         DataCache.setCustomData(data,saveKey,dir.toInt());
@@ -74,34 +103,5 @@ public interface DirectionalBlock {
         if(menu!=null&&iSlot>=0){
             menu.replaceExistingItem(iSlot,DirectionalBlock.DIRECTION_ITEM[dir.toInt()]);
         }
-    }
-    default boolean canModify(){
-        return true;
-    }
-    //返回拷贝的数量
-    default int pasteDirectionSettings(SlimefunBlockData data ,Directions[] dir){
-        if(this.canModify()){
-            String[] saveKeys=getSaveKeys();
-            int[] slots=getDirectionSlots();
-            int len=Math.min(saveKeys.length,dir.length);
-            int slotlens=slots.length;
-            BlockMenu menu=data.getBlockMenu();
-            for (int i=0;i<len;i++){
-                setDirection(saveKeys[i],data,dir[i]);
-                if(i<slotlens)
-                    updateSlot(menu,slots[i],dir[i]);
-            }
-            return len;
-        }else return -1;
-    }
-    default Directions[] copyDirectionSettings(SlimefunBlockData data){
-        if(this.canModify()){
-            String[] saveKeys=getSaveKeys();
-            Directions[] dir=new Directions[saveKeys.length];
-            for (int i=0;i<saveKeys.length;i++){
-                dir[i]=getDirection(saveKeys[i],data);
-            }
-            return dir;
-        }else return null;
     }
 }

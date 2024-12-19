@@ -42,30 +42,9 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class AddGroups {
-    public static void registerGroups(SlimefunAddon plugin){
-        ROOT.register(plugin);
-        INFO.register(plugin);
-        MATERIAL.register(plugin);
-        BASIC.register(plugin);
-        CARGO.register(plugin);
-        SINGULARITY.register(plugin);
-        ADVANCED.register(plugin);
-        BEYOND.register(plugin);
-        VANILLA.register(plugin);
-        MANUAL.register(plugin);
-        SPECIAL.register(plugin);
-        SPACE.register(plugin);
-        GENERATORS.register(plugin);
-        ENERGY.register(plugin);
-        FUNCTIONAL.register(plugin);
-        TOOLS.register(plugin);
-
-        ROOT.setTier(0);
-    }
     // 给你的分类提供一个独一无二的ID
     protected static  final NamespacedKey itemGroupId = AddUtils.getNameKey("addon_category");
     protected static final NamespacedKey bugcrafterId = AddUtils.getNameKey("bugcrafter");
-
     public static final ItemGroup MATERIAL =new DummyItemGroup(AddUtils.getNameKey("material" ), AddItem.MATERIAL);
 
     public static final ItemGroup BASIC =new DummyItemGroup(AddUtils.getNameKey("basic" ), AddItem.BASIC);
@@ -93,7 +72,13 @@ public class AddGroups {
     public static final ItemGroup TOOLS=new DummyItemGroup(AddUtils.getNameKey("tools"),AddItem.TOOLS);
 
     public static final ItemGroup FUNCTIONAL=new DummyItemGroup(AddUtils.getNameKey("functional"),AddItem.FUNCTIONAL);
+
     public static ItemGroup MORE2=new CustomItemGroup(AddUtils.getNameKey("more2"),AddUtils.color("宇宙安全说明"),AddItem.MORE2,54,36,new LinkedHashMap<>()) {
+        @Override
+        protected void addGuideRelated(ChestMenu menu, Player p, PlayerProfile profile, SlimefunGuideMode mode, int pages) {
+
+        }
+
         @Override
         protected void init(MenuFactory menuFactory) {
             menuFactory.addInventory(0,AddUtils.getInfoShow("&f宇宙安全说明",
@@ -153,13 +138,13 @@ public class AddGroups {
                     "&7当您对号入座时,请不要坐岔了,谢谢."
                     ));
         }
-
+    };
+    public static ItemGroup UPDATELOG=new CustomItemGroup(AddUtils.getNameKey("log"),AddUtils.colorful("更新日志"),AddItem.UPDATELOG,54,36,new LinkedHashMap<>()) {
         @Override
         protected void addGuideRelated(ChestMenu menu, Player p, PlayerProfile profile, SlimefunGuideMode mode, int pages) {
 
         }
-    };
-    public static ItemGroup UPDATELOG=new CustomItemGroup(AddUtils.getNameKey("log"),AddUtils.colorful("更新日志"),AddItem.UPDATELOG,54,36,new LinkedHashMap<>()) {
+
         @Override
         protected void init(MenuFactory factory) {
             factory.addInventory(0,AddUtils.getInfoShow("&f更新日志","&7此页为简易的更新日志","&7你或许可以找到你想要的新特性"));
@@ -357,11 +342,6 @@ public class AddGroups {
                     "&7加入了"
             ));
         }
-
-        @Override
-        protected void addGuideRelated(ChestMenu menu, Player p, PlayerProfile profile, SlimefunGuideMode mode, int pages) {
-
-        }
     };
     public static ItemGroup BUGCRAFTER=new CustomItemGroup(bugcrafterId,AddUtils.colorful(AddUtils.ADDON_NAME),AddItem.ALLBIGRECIPES,54,36,new LinkedHashMap<>()) {
         public PlayerHistoryRecord<CustomMenu> historyHandler=new PlayerHistoryRecord<CustomMenu>() {
@@ -373,19 +353,6 @@ public class AddGroups {
                         records.remove(uid);
                     }
                 });
-            }
-            public  CustomMenu getRecord(Player player){
-                UUID uuid=player.getUniqueId();
-                synchronized(records){
-                    List<CustomMenu> list=records.get(uuid);
-                    if(list==null){
-                        list=new ArrayList<CustomMenu>();
-                    }
-                    if(list.isEmpty()){
-                        return null;
-                    }
-                    return list.get(list.size()-1);
-                }
             }
             public void addRecord(Player player, CustomMenu record){
                 UUID uuid=player.getUniqueId();
@@ -409,11 +376,24 @@ public class AddGroups {
                     return list.remove(list.size()-1);
                 }
             }
+            public  CustomMenu getRecord(Player player){
+                UUID uuid=player.getUniqueId();
+                synchronized(records){
+                    List<CustomMenu> list=records.get(uuid);
+                    if(list==null){
+                        list=new ArrayList<CustomMenu>();
+                    }
+                    if(list.isEmpty()){
+                        return null;
+                    }
+                    return list.get(list.size()-1);
+                }
+            }
         };
         MenuFactory subRecipes=null;
-        public void initCustomMenus(){
-            subRecipes=MenuUtils.createMRecipeListDisplay(AddItem.BUG_CRAFTER,RecipeSupporter.PROVIDED_SHAPED_RECIPES.get(BugCrafter.TYPE),
-                    null,historyHandler,MenuUtils::createMRecipeDisplay,true);
+        @Override
+        protected void addGuideRelated(ChestMenu menu, Player p, PlayerProfile profile, SlimefunGuideMode mode, int pages) {
+
         }
         public MenuFactory getSubRecipes() {
             if(subRecipes==null){
@@ -433,6 +413,10 @@ public class AddGroups {
             factory.setBackGround(menuBackGround);
             SchedulePostRegister.addPostRegisterTask(this::initCustomMenus);
         }
+        public void initCustomMenus(){
+            subRecipes=MenuUtils.createMRecipeListDisplay(AddItem.BUG_CRAFTER,RecipeSupporter.PROVIDED_SHAPED_RECIPES.get(BugCrafter.TYPE),
+                    null,historyHandler,MenuUtils::createMRecipeDisplay,true);
+        }
         public void openPage(Player var1, PlayerProfile var2, SlimefunGuideMode var3,int page){
 
             var2.getGuideHistory().add(this,1);
@@ -450,13 +434,24 @@ public class AddGroups {
             }));
             menu2.openPages(var1,1);
         }
+    };
+    public static final ItemGroup INFO =new CustomItemGroup(AddUtils.getNameKey("info"),null, AddItem.INFO,54,36,new LinkedHashMap<>()) {
         @Override
         protected void addGuideRelated(ChestMenu menu, Player p, PlayerProfile profile, SlimefunGuideMode mode, int pages) {
-
+            for(int s=0;s<2;++s){
+                int rand=AddUtils.random(36);
+                if(menu.getItemInSlot(rand+9)==null){
+                    menu.replaceExistingItem(rand+9,AddUtils.getWithoutId( AddItem.BUG));
+                    menu.addMenuClickHandler(rand+9,((player, i, itemStack, clickAction) -> {
+                        AddUtils.forceGive(player,AddItem.BUG,1);
+                        menu.replaceExistingItem(rand+9,null);
+                        menu.addMenuClickHandler(rand+9,ChestMenuUtils.getEmptyClickHandler());
+                        return false;
+                    }));
+                    break;
+                }
+            }
         }
-    };
-
-    public static final ItemGroup INFO =new CustomItemGroup(AddUtils.getNameKey("info"),null, AddItem.INFO,54,36,new LinkedHashMap<>()) {
         @Override
         protected void init(MenuFactory factory) {
             this.setVisble(false);
@@ -484,23 +479,8 @@ public class AddGroups {
             factory.addInventory(35,AddItem.FEAT9);
             factory.addOverrides(4,AddItem.MATL114);
         }
-        @Override
-        protected void addGuideRelated(ChestMenu menu, Player p, PlayerProfile profile, SlimefunGuideMode mode, int pages) {
-            for(int s=0;s<2;++s){
-                int rand=AddUtils.random(36);
-                if(menu.getItemInSlot(rand+9)==null){
-                    menu.replaceExistingItem(rand+9,AddUtils.getWithoutId( AddItem.BUG));
-                    menu.addMenuClickHandler(rand+9,((player, i, itemStack, clickAction) -> {
-                        AddUtils.forceGive(player,AddItem.BUG,1);
-                        menu.replaceExistingItem(rand+9,null);
-                        menu.addMenuClickHandler(rand+9,ChestMenuUtils.getEmptyClickHandler());
-                        return false;
-                    }));
-                    break;
-                }
-            }
-        }
     };
+
     public static final ItemGroup ROOT=new CustomItemGroup(itemGroupId,AddUtils.colorful(AddUtils.ADDON_NAME), AddItem.ROOT,54,108,
                 new LinkedHashMap<>(){{
                     put(2,MATERIAL);
@@ -524,11 +504,39 @@ public class AddGroups {
             ){
         public MenuFactory MACHINEMENU=null;
         public MenuFactory RECIPEMENU=null;
-        public void initCustomMenus(){
-            MACHINEMENU=MenuUtils.createMachineListDisplay(RecipeSupporter.MACHINE_RECIPELIST.keySet().stream().toList(),null).setBack(1);
-            RECIPEMENU=MenuUtils.createRecipeTypeDisplay(RecipeSupporter.RECIPE_TYPES.stream().toList(),null).setBack(1);
-//            BUGCRAFTER=MenuUtils.createMRecipeListDisplay(AddItem.BUG_CRAFTER,RecipeSupporter.PROVIDED_SHAPED_RECIPES.get(BugCrafter.TYPE),
-//                    null,MenuUtils::createMRecipeDisplay);
+        final ItemMeta s1=new CustomItemStack(CustomHead.getHead("fd524332cdb381c9e51f77d4cec9bc6d4d1c5bdec1499d206d8383e9176bdfb0"),AddUtils.color("haiman"),"&7haiman科技作者","&7海曼科技会为你提供足够的物质支持").getItemMeta();
+        final ItemMeta s2=new CustomItemStack(CustomHead.getHead("a9b046531a6182de634d6fed1f3b4f885ee99bfe2bc0c1684f7b97d396c2059f"),AddUtils.color("mmmjjkx"),"&7rsc开发者","&3纯大蛇\uD83D\uDE0B").getItemMeta();
+        final ItemMeta s3=new CustomItemStack(Material.REPEATING_COMMAND_BLOCK,AddUtils.color("tinalness"),"&7大香蕉的本质是命令方块\uD83D\uDE0B(确信","&7但是你或许会需要他的网络拓展").getItemMeta();
+final ItemMeta s4=new CustomItemStack(CustomHead.SUPPORTER2.getItem(),AddUtils.color("HgTlPbBi"),"&7逻辑工艺的支持者","&7提出了很多有用的点子").getItemMeta();
+        final ItemMeta s5=new CustomItemStack(CustomHead.getHead("8e434215b5616bf37dccbacdb240bd16de59507e62a5371ceca80327b398e65"),AddUtils.color("Tmatsuki_rui"),"&7凉城服的祸源","&7纯傻逼,给爷死啊\uD83D\uDE21").getItemMeta();
+        final ItemMeta s6=new CustomItemStack(CustomHead.BUSHIGEMEN.getItem(),"  ","&7看得出你的视力很好","&7所以一定要仔细阅读","&7版本说明与机器说明哦").getItemMeta();
+        final ItemStack head=new CustomItemStack(Material.PLAYER_HEAD,AddUtils.color("逝者的头颅"));
+        final ItemMeta s7=new CustomItemStack(CustomHead.TOURUYA.getItem(),AddUtils.color("TouRuya"),"&7人机服腐竹","&7纯人迹","&3\"堆叠开局 怎么输?\uD83D\uDE0B\"").getItemMeta();
+        final ItemMeta s8=new CustomItemStack(CustomHead.BIG_SNAKE.getItem(),AddUtils.color("taitaia"),"&7刷物?你在想屁吃\uD83D\uDE0B").getItemMeta();
+        final ItemMeta s9 =new CustomItemStack(Material.CHORUS_PLANT,AddUtils.color("xiaoUI1"),"&7知名服务器-&b魔芋&7 的腐竹","&7感谢UI对本项目的支持").getItemMeta();
+        ItemMeta[] smetas;
+        final HashMap<UUID,String> LASTLY_CALCUATED_DATE=new HashMap<>();
+        //used to set GUIDE based handlers,an interface to adapt CustomMenu menus
+        public void addGuideRelated(ChestMenu menu, Player p, PlayerProfile profile, SlimefunGuideMode mode, int page){
+            //加入实例化之后的handler和item,同打开玩家等数据有关的handler
+            if(page==1){
+                menu.addMenuClickHandler(27 ,((Player player1, int i1, ItemStack itemstack1, ClickAction clickAction) -> {
+                    getRecipeMenu().build().setBackHandler(((player, i, itemStack, clickAction1) -> {
+                        this.openPage(player1,profile,mode,page);
+                        return false;
+                    })).open(player1);
+                    return false;
+                }));
+                menu.addMenuClickHandler(18,((Player player1, int i1, ItemStack itemstack1, ClickAction clickAction) -> {
+                    getMachineMenu().build().setBackHandler(((player, i, itemStack, clickAction1) -> {
+                        this.openPage(player1,profile,mode,page);
+                        return false;
+                    })).open(player1);
+                    return false;
+                }));
+            }else if(page==2){
+
+            }
         }
         public MenuFactory getMachineMenu(){
             if(MACHINEMENU==null){
@@ -542,7 +550,7 @@ public class AddGroups {
             }
             return RECIPEMENU;
         }
-//        public MenuFactory getBugCrafterMenu(){
+        //        public MenuFactory getBugCrafterMenu(){
 //            if(BUGCRAFTER==null){
 //                initCustomMenus();
 //            }
@@ -752,41 +760,33 @@ public class AddGroups {
                 return false    ;
             }));
         }
-        final ItemMeta s1=new CustomItemStack(CustomHead.getHead("fd524332cdb381c9e51f77d4cec9bc6d4d1c5bdec1499d206d8383e9176bdfb0"),AddUtils.color("haiman"),"&7haiman科技作者","&7海曼科技会为你提供足够的物质支持").getItemMeta();
-        final ItemMeta s2=new CustomItemStack(CustomHead.getHead("a9b046531a6182de634d6fed1f3b4f885ee99bfe2bc0c1684f7b97d396c2059f"),AddUtils.color("mmmjjkx"),"&7rsc开发者","&3纯大蛇\uD83D\uDE0B").getItemMeta();
-        final ItemMeta s3=new CustomItemStack(Material.REPEATING_COMMAND_BLOCK,AddUtils.color("tinalness"),"&7大香蕉的本质是命令方块\uD83D\uDE0B(确信","&7但是你或许会需要他的网络拓展").getItemMeta();
-        final ItemMeta s4=new CustomItemStack(CustomHead.SUPPORTER2.getItem(),AddUtils.color("HgTlPbBi"),"&7逻辑工艺的支持者","&7提出了很多有用的点子").getItemMeta();
-        final ItemMeta s5=new CustomItemStack(CustomHead.getHead("8e434215b5616bf37dccbacdb240bd16de59507e62a5371ceca80327b398e65"),AddUtils.color("Tmatsuki_rui"),"&7凉城服的祸源","&7纯傻逼,给爷死啊\uD83D\uDE21").getItemMeta();
-        final ItemMeta s6=new CustomItemStack(CustomHead.BUSHIGEMEN.getItem(),"  ","&7看得出你的视力很好","&7所以一定要仔细阅读","&7版本说明与机器说明哦").getItemMeta();
-        final ItemStack head=new CustomItemStack(Material.PLAYER_HEAD,AddUtils.color("逝者的头颅"));
-        final ItemMeta s7=new CustomItemStack(CustomHead.TOURUYA.getItem(),AddUtils.color("TouRuya"),"&7人机服腐竹","&7纯人迹","&3\"堆叠开局 怎么输?\uD83D\uDE0B\"").getItemMeta();
-        final ItemMeta s8=new CustomItemStack(CustomHead.BIG_SNAKE.getItem(),AddUtils.color("taitaia"),"&7刷物?你在想屁吃\uD83D\uDE0B").getItemMeta();
-        final ItemMeta s9 =new CustomItemStack(Material.CHORUS_PLANT,AddUtils.color("xiaoUI1"),"&7知名服务器-&b魔芋&7 的腐竹","&7感谢UI对本项目的支持").getItemMeta();
-        ItemMeta[] smetas;
-        final HashMap<UUID,String> LASTLY_CALCUATED_DATE=new HashMap<>();
-        //used to set GUIDE based handlers,an interface to adapt CustomMenu menus
-        public void addGuideRelated(ChestMenu menu, Player p, PlayerProfile profile, SlimefunGuideMode mode, int page){
-            //加入实例化之后的handler和item,同打开玩家等数据有关的handler
-            if(page==1){
-                menu.addMenuClickHandler(27 ,((Player player1, int i1, ItemStack itemstack1, ClickAction clickAction) -> {
-                    getRecipeMenu().build().setBackHandler(((player, i, itemStack, clickAction1) -> {
-                        this.openPage(player1,profile,mode,page);
-                        return false;
-                    })).open(player1);
-                    return false;
-                }));
-                menu.addMenuClickHandler(18,((Player player1, int i1, ItemStack itemstack1, ClickAction clickAction) -> {
-                    getMachineMenu().build().setBackHandler(((player, i, itemStack, clickAction1) -> {
-                        this.openPage(player1,profile,mode,page);
-                        return false;
-                    })).open(player1);
-                    return false;
-                }));
-            }else if(page==2){
-
-            }
+        public void initCustomMenus(){
+            MACHINEMENU=MenuUtils.createMachineListDisplay(RecipeSupporter.MACHINE_RECIPELIST.keySet().stream().toList(),null).setBack(1);
+            RECIPEMENU=MenuUtils.createRecipeTypeDisplay(RecipeSupporter.RECIPE_TYPES.stream().toList(),null).setBack(1);
+//            BUGCRAFTER=MenuUtils.createMRecipeListDisplay(AddItem.BUG_CRAFTER,RecipeSupporter.PROVIDED_SHAPED_RECIPES.get(BugCrafter.TYPE),
+//                    null,MenuUtils::createMRecipeDisplay);
         }
     };
+    public static void registerGroups(SlimefunAddon plugin){
+        ROOT.register(plugin);
+        INFO.register(plugin);
+        MATERIAL.register(plugin);
+        BASIC.register(plugin);
+        CARGO.register(plugin);
+        SINGULARITY.register(plugin);
+        ADVANCED.register(plugin);
+        BEYOND.register(plugin);
+        VANILLA.register(plugin);
+        MANUAL.register(plugin);
+        SPECIAL.register(plugin);
+        SPACE.register(plugin);
+        GENERATORS.register(plugin);
+        ENERGY.register(plugin);
+        FUNCTIONAL.register(plugin);
+        TOOLS.register(plugin);
+
+        ROOT.setTier(0);
+    }
 
 
 

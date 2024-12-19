@@ -27,6 +27,9 @@ public class AbstractGeoResource extends SlimefunItem implements GEOResource {
     protected final HashMap<Biome,Integer> BIOME_MAP;
     protected final HashMap<World.Environment,HashMap<Biome,Integer>> CUSTOMWORLD_MAP;
     public List<ItemStack> displayedMemory;
+    public AbstractGeoResource(ItemGroup itemGroup, SlimefunItemStack item, ItemStack[] recipe,  int maxDeviation,HashMap<Biome,Integer> biomeMap) {
+        this(itemGroup,item,recipe,maxDeviation,biomeMap,null);
+    }
     public AbstractGeoResource(ItemGroup itemGroup, SlimefunItemStack item,ItemStack[] recipe,    int maxDeviation,HashMap<Biome,Integer> biomeMap,HashMap<World.Environment,HashMap<Biome,Integer>>CustomWorld) {
         super(itemGroup, item,RecipeType.GEO_MINER,recipe);
         this.MAXDEVIATION=maxDeviation;
@@ -34,9 +37,6 @@ public class AbstractGeoResource extends SlimefunItem implements GEOResource {
         this.NSKEY=AddUtils.getNameKey(item.getItemId());
         this.BIOME_MAP=biomeMap!=null?biomeMap:new HashMap<>();
         this.CUSTOMWORLD_MAP=CustomWorld!=null?CustomWorld:new HashMap<>();
-    }
-    public AbstractGeoResource(ItemGroup itemGroup, SlimefunItemStack item, ItemStack[] recipe,  int maxDeviation,HashMap<Biome,Integer> biomeMap) {
-        this(itemGroup,item,recipe,maxDeviation,biomeMap,null);
     }
     public int getDefaultSupply(@Nonnull World.Environment var1, @Nonnull Biome var2){
         if(var1!=World.Environment.CUSTOM){
@@ -58,26 +58,27 @@ public class AbstractGeoResource extends SlimefunItem implements GEOResource {
         }
     }
 
+    @Nonnull
+    public ItemStack getItem(){
+        return super.getItem().clone();
+    }
+    public NamespacedKey getKey(){
+        return NSKEY;
+    }
     public int getMaxDeviation(){
         return MAXDEVIATION;
-    }
-    public AbstractGeoResource setDisplayRecipes(List<ItemStack> displayRecipes) {
-        this.displayedMemory = displayRecipes;
-        return this;
     }
     @Nonnull
     public String getName(){
         return NAME;
     }
-    @Nonnull
-    public ItemStack getItem(){
-        return super.getItem().clone();
-    }
     public boolean isObtainableFromGEOMiner(){
         return true;
     }
-    public NamespacedKey getKey(){
-        return NSKEY;
+    public  void preRegister(){
+        super.preRegister();
+        addItemHandler(AddHandlers.stopAttackHandler);
+        addItemHandler(AddHandlers.stopPlacementHandler);
     }
     public SlimefunItem registerGeo(){
         if(AddSlimefunItems.INSTANCE!=null){
@@ -88,9 +89,8 @@ public class AbstractGeoResource extends SlimefunItem implements GEOResource {
         register();
         return this;
     }
-    public  void preRegister(){
-        super.preRegister();
-        addItemHandler(AddHandlers.stopAttackHandler);
-        addItemHandler(AddHandlers.stopPlacementHandler);
+    public AbstractGeoResource setDisplayRecipes(List<ItemStack> displayRecipes) {
+        this.displayedMemory = displayRecipes;
+        return this;
     }
 }

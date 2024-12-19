@@ -39,26 +39,34 @@ public abstract class CubeMultiBlockType implements AbstractMultiBlockType {
     protected boolean isSymmetric=false;
 
 
-    public abstract void init();
     public CubeMultiBlockType() {
         this.BOTTOM_MAP = new LinkedHashMap<BlockVector,String>();
         this.PLATE_MAP=new LinkedHashMap<>();
         this.TOP_MAP=new LinkedHashMap<>();
     }
+    public CubeMultiBlockType addBottom(int x, int y, int z,String id) {
+        if(x==0 && y==0 && z==0){
+            return this;
+        }
+        BOTTOM_MAP.put(new BlockVector(x,y,z),id);
+        return this;
+    }
 
-    public BlockVector getSchemaPart(int index){
-        return index<this.sizeB?BOTTOM_LOC[index].clone():((index<this.sizeB+this.sizeP)?PLATE_LOC[index-this.sizeB].clone():TOP_LOC[index-this.sizeP-this.sizeB].clone());
+    public CubeMultiBlockType addPlate(int x, int y, int z,String id) {
+        if(x==0 && y==0 && z==0){
+            return this;
+        }
+        PLATE_MAP.put(new BlockVector(x,y,z),id);
+        return this;
     }
 
 
-    public String getSchemaPartId(int index) {
-        return index<this.sizeB?BOTTOM_IDS[index]:((index<this.sizeB+this.sizeP)?PLATE_IDS[index-this.sizeB]:TOP_IDS[index-this.sizeP-this.sizeB]);
-    }
-    public int getSchemaSize(){
-        return this.defaultSize;
-    }
-    public boolean isSymmetric(){
-        return isSymmetric;
+    public CubeMultiBlockType addTop(int x, int y, int z,String id) {
+        if(x==0 && y==0 && z==0){
+            return this;
+        }
+        TOP_MAP.put(new BlockVector(x,y,z),id);
+        return this;
     }
     public CubeMultiBlockType build(){
         init();
@@ -96,30 +104,6 @@ public abstract class CubeMultiBlockType implements AbstractMultiBlockType {
         this.defaultSize=this.sizeB+this.sizeP+this.sizeT;
         return this;
     }
-    public CubeMultiBlockType addBottom(int x, int y, int z,String id) {
-        if(x==0 && y==0 && z==0){
-            return this;
-        }
-        BOTTOM_MAP.put(new BlockVector(x,y,z),id);
-        return this;
-    }
-    public CubeMultiBlockType addPlate(int x, int y, int z,String id) {
-        if(x==0 && y==0 && z==0){
-            return this;
-        }
-        PLATE_MAP.put(new BlockVector(x,y,z),id);
-        return this;
-    }
-    public CubeMultiBlockType addTop(int x, int y, int z,String id) {
-        if(x==0 && y==0 && z==0){
-            return this;
-        }
-        TOP_MAP.put(new BlockVector(x,y,z),id);
-        return this;
-    }
-
-
-
     public AbstractMultiBlock genMultiBlockFrom(Location loc, MultiBlockService.Direction dir, boolean hasPrevRecord, OutputStream errorOut){
         int len=this.sizeB;
         //底部匹配
@@ -223,5 +207,21 @@ public abstract class CubeMultiBlockType implements AbstractMultiBlockType {
         }
         //  Debug.logger("check finished ,return value ",this.getSchemaSize(),"and req ",REQUIREMENT_MAP.size());
         return new CubeMultiBlock(this,dir,height);
+    }
+    public BlockVector getSchemaPart(int index){
+        return index<this.sizeB?BOTTOM_LOC[index].clone():((index<this.sizeB+this.sizeP)?PLATE_LOC[index-this.sizeB].clone():TOP_LOC[index-this.sizeP-this.sizeB].clone());
+    }
+    public String getSchemaPartId(int index) {
+        return index<this.sizeB?BOTTOM_IDS[index]:((index<this.sizeB+this.sizeP)?PLATE_IDS[index-this.sizeB]:TOP_IDS[index-this.sizeP-this.sizeB]);
+    }
+    public int getSchemaSize(){
+        return this.defaultSize;
+    }
+    public abstract void init();
+
+
+
+    public boolean isSymmetric(){
+        return isSymmetric;
     }
 }

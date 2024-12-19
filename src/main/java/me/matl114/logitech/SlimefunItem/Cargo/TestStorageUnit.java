@@ -31,6 +31,16 @@ public class TestStorageUnit extends AbstractMachine {
             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
             41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53};
 
+    /**
+     * cargo and IO
+     * @return
+     */
+    public static ItemStack rand= AddUtils.randItemStackFactory(
+            new LinkedHashMap<>(){{
+                put("COBBLESTONE",1);
+                put("DIAMOND",1);
+            }}
+    );
     public TestStorageUnit(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                             int energybuffer, int energyConsumption){
         super(category,item , recipeType, recipe,energybuffer,energyConsumption);
@@ -63,6 +73,16 @@ public class TestStorageUnit extends AbstractMachine {
             Debug.logger("override success");
             return false;
         });
+    }
+    public  int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public boolean isSync(){
+        return true;
     }
     public void newMenuInstance(BlockMenu inv,Block bLock){
 //        DataCache.setLastRecipe(inv.getLocation(),-1);
@@ -106,23 +126,6 @@ public class TestStorageUnit extends AbstractMachine {
             return false;
         }));
     }
-    public  int[] getInputSlots(){
-        return INPUT_SLOT;
-    }
-
-    /**
-     * cargo and IO
-     * @return
-     */
-    public static ItemStack rand= AddUtils.randItemStackFactory(
-            new LinkedHashMap<>(){{
-                put("COBBLESTONE",1);
-                put("DIAMOND",1);
-            }}
-    );
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOT;
-    }
     public void process(Block b, BlockMenu menu, SlimefunBlockData data){
         Block c=b.getRelative(BlockFace.UP);
         if (c!=null){
@@ -136,9 +139,6 @@ public class TestStorageUnit extends AbstractMachine {
                 Debug.logger(c.getState().getData().getClass());
             }
         }
-    }
-    public boolean isSync(){
-        return true;
     }
 
 }

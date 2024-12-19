@@ -32,42 +32,6 @@ public class SequenceCraftingOperation implements CustomMachineOperation {
         this.currentSeqTicks=0;
 
     }
-    public void progress(int var1){
-        if(this.currentSeqTicks<this.tickPerSeq){
-            this.currentSeqTicks+=var1;
-        }
-        if(this.currentSeqTicks>=this.tickPerSeq&&this.inputItems[this.currentTicks].getAmount()<=0){
-            this.currentTicks += 1;
-            this.currentSeqTicks=0;
-        }
-    }
-
-    public int getProgress(){
-        return this.currentSeqTicks;
-    }
-    public int getTotalTicks(){
-        return this.tickPerSeq;
-    }
-
-    public int getRemainingTicks() {
-        return this.tickPerSeq-this.currentSeqTicks;
-    }
-
-    public boolean isFinished() {
-        return this.totalTicks<=this.currentTicks;
-    }
-    public ItemStack[] getResults(){
-        return this.recipe.getOutput();
-    }
-    public ItemConsumer getRequiredItem(){
-        return this.inputItems[this.currentTicks];
-    }
-    public int getSeqCount(){
-        return this.totalTicks;
-    }
-    public int getNowSeq(){
-        return this.currentTicks;
-    }
     public ItemStack getDisplays(){
         List<String > lines = new ArrayList<>();
         lines.add("&7当前进程信息:");
@@ -87,5 +51,41 @@ public class SequenceCraftingOperation implements CustomMachineOperation {
             return it;
         }else
             return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a阶段输入进程","&7当前进程信息","&c错误!使用的不是有序输入配方");
+    }
+
+    public int getNowSeq(){
+        return this.currentTicks;
+    }
+    public int getProgress(){
+        return this.currentSeqTicks;
+    }
+
+    public int getRemainingTicks() {
+        return this.tickPerSeq-this.currentSeqTicks;
+    }
+
+    public ItemConsumer getRequiredItem(){
+        return this.inputItems[this.currentTicks];
+    }
+    public ItemStack[] getResults(){
+        return this.recipe.getOutput();
+    }
+    public int getSeqCount(){
+        return this.totalTicks;
+    }
+    public int getTotalTicks(){
+        return this.tickPerSeq;
+    }
+    public boolean isFinished() {
+        return this.totalTicks<=this.currentTicks;
+    }
+    public void progress(int var1){
+        if(this.currentSeqTicks<this.tickPerSeq){
+            this.currentSeqTicks+=var1;
+        }
+        if(this.currentSeqTicks>=this.tickPerSeq&&this.inputItems[this.currentTicks].getAmount()<=0){
+            this.currentTicks += 1;
+            this.currentSeqTicks=0;
+        }
     }
 }

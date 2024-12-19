@@ -46,26 +46,6 @@ public class HeadAnalyzer extends AbstractMachine{
     protected final ItemStack ENCODE_DISPLAY_NULL=new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c空","&c暂未输入hash或者不是有效的hash");
     protected final ItemStack DECODE_ITEM=new CustomItemStack(Material.KNOWLEDGE_BOOK,"&e点击解析下方头颅","&7若下方为有效物品,则显示hash","&3hash: &f空");
     protected final ItemMeta BLANK_SKULL=new ItemStack(Material.PLAYER_HEAD).getItemMeta();
-    private String getHash(ItemStack item){
-        String st= CustomHead.getHash(item);
-        if(st!=null)
-            return "&3hash: &f"+st;
-        else
-            return "&3hash: &f空";
-    }
-    private ItemStack getSkull(String string){
-        try{
-            return new CustomItemStack(SlimefunUtils.getCustomHead(string),"&a头颅样式展示品","&7这是一个展示头颅","&3hash: &f"+string);
-        }catch (Throwable t){
-            return ENCODE_DISPLAY_NULL.clone();
-        }
-    }
-    public int[] getInputSlots(){
-        return new int[0];
-    }
-    public int[] getOutputSlots(){
-        return new int[0];
-    }
     public HeadAnalyzer(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(category, item, recipeType, recipe, 0,0);
     }
@@ -84,13 +64,27 @@ public class HeadAnalyzer extends AbstractMachine{
         preset.addItem(ENCODE_SLOT,ENCODE_ITEM, ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(CHANGE_SLOT,CHANGE_ITEM, ChestMenuUtils.getEmptyClickHandler());
     }
-
-    public void process(Block b, BlockMenu preset, SlimefunBlockData data){
-
+    private String getHash(ItemStack item){
+        String st= CustomHead.getHash(item);
+        if(st!=null)
+            return "&3hash: &f"+st;
+        else
+            return "&3hash: &f空";
     }
-    public void registerTick(SlimefunItem item){
-        //no ticker
+    public int[] getInputSlots(){
+        return new int[0];
     }
+    public int[] getOutputSlots(){
+        return new int[0];
+    }
+    private ItemStack getSkull(String string){
+        try{
+            return new CustomItemStack(SlimefunUtils.getCustomHead(string),"&a头颅样式展示品","&7这是一个展示头颅","&3hash: &f"+string);
+        }catch (Throwable t){
+            return ENCODE_DISPLAY_NULL.clone();
+        }
+    }
+
     public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
         blockMenu.addMenuClickHandler(ENCODE_SLOT,((player, i, itemStack, clickAction) -> {
             player.closeInventory();
@@ -155,6 +149,12 @@ public class HeadAnalyzer extends AbstractMachine{
             }
             return false;
         }));
+    }
+    public void process(Block b, BlockMenu preset, SlimefunBlockData data){
+
+    }
+    public void registerTick(SlimefunItem item){
+        //no ticker
     }
 
 }

@@ -34,21 +34,6 @@ public class BiSorter extends AbstractSorter{
             new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6输入槽1","&7货运输入~"),
             new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6白名单槽1","&7设置白名单"),
     };
-    public int[] getInputSlots() {
-        return INPUT_SLOT;
-    }
-    public int[] getInputWLSlot() {
-        return INPUTW_SLOT;
-    }
-    public int[] getOutputSlots() {
-        return OUTPUT_SLOT;
-    }
-    public int getChipSlot(){
-        return 4;
-    }
-    public int getInfoSlot(){
-        return 13;
-    }
     public BiSorter(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(itemGroup, item, recipeType, recipe,2);
     }
@@ -63,6 +48,21 @@ public class BiSorter extends AbstractSorter{
         for (int i=0;i<len;i++){
             preset.addItem(border[i], INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
         }
+    }
+    public int getChipSlot(){
+        return 4;
+    }
+    public int getInfoSlot(){
+        return 13;
+    }
+    public int[] getInputSlots() {
+        return INPUT_SLOT;
+    }
+    public int[] getInputWLSlot() {
+        return INPUTW_SLOT;
+    }
+    public int[] getOutputSlots() {
+        return OUTPUT_SLOT;
     }
 
 }

@@ -39,14 +39,10 @@ import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 
 public abstract class AbstractWorkBench extends AbstractMachine {
-    protected final int CRAFT_LIMIT;
-
-    protected int getRecipeMenuSlot(){
-        return -1;
-    }
     protected static final ItemStack LAZY_ONECLICK=new CustomItemStack(Material.KNOWLEDGE_BOOK,"&b使用物品栏中的物品摆放配方","&7左键放入一份配方","&7右键放入64份配方","&a欢呼吧 懒狗们");
-    protected static final ItemStack RECIPEBOOK_SHOW_ITEM=new CustomItemStack(Material.BOOK,"&6点击查看配方","","&a而且有一键放置配方的功能","&b欢呼吧 懒狗们");
 
+    protected static final ItemStack RECIPEBOOK_SHOW_ITEM=new CustomItemStack(Material.BOOK,"&6点击查看配方","","&a而且有一键放置配方的功能","&b欢呼吧 懒狗们");
+    protected final int CRAFT_LIMIT;
     public AbstractWorkBench(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                             int energybuffer, int energyConsumption,int limit, LinkedHashMap<Object,Integer> shapedRecipes){
         super(category,item,recipeType,recipe,energybuffer,energyConsumption);
@@ -64,62 +60,22 @@ public abstract class AbstractWorkBench extends AbstractMachine {
         }
 
     }
+
     public void addInfo(ItemStack item){
         item.setItemMeta(AddUtils.advancedMachineShow(item,CRAFT_LIMIT).getItemMeta());
         if(this.energyConsumption > 0){
             item.setItemMeta(AddUtils.workBenchInfoAdd(item,this.energybuffer,this.energyConsumption).getItemMeta());
         }
     }
-    public List<MachineRecipe> provideDisplayRecipe(){
-        List<MachineRecipe> machineRecipes =  getMachineRecipes();
-        List<MachineRecipe> targetRecipe = new ArrayList<>();
-        int size=machineRecipes.size();
-        for (int i=0;i<size;++i) {
-            targetRecipe.add(MachineRecipeUtils.stackFrom(machineRecipes.get(i).getTicks(),
-                    Utils.array(AddUtils.getInfoShow("&f有序配方合成","&7请在配方显示界面或者机器界面查看")),machineRecipes.get(i).getOutput()));
-        }
-        return targetRecipe;
+    public boolean conditionHandle(Block b,BlockMenu menu){
+        //do nothing
+        return true;
     }
     /**
      * construct your menu here.called in constructor
      * @param preset
      */
     public abstract void constructMenu(BlockMenuPreset preset);
-    public MenuFactory getRecipeMenu(Block b,BlockMenu inv){
-
-         return MenuUtils.createMRecipeListDisplay(getItem(),getMachineRecipes(),null,(MenuUtils.RecipeMenuConstructor)(itemstack, recipes, backhandler,history)->{
-            return MenuUtils.createMRecipeDisplay(itemstack,recipes,backhandler).addOverrides(8,LAZY_ONECLICK).addHandler(8,((player, i, itemStack, clickAction) -> {
-                moveRecipe(player,inv,recipes, clickAction.isRightClicked());
-                return false;
-            }));
-        });
-    }
-    public int getCraftLimit(Block b,BlockMenu inv){
-        return CRAFT_LIMIT;
-    }
-    /**
-     * cargo and IO
-     * @return
-     */
-    public abstract int[] getInputSlots();
-
-    /**
-     * cargo and IO
-     * @return
-     */
-    public abstract int[] getOutputSlots();
-
-    public abstract int[] getRecipeSlots();
-    public void registerTick(SlimefunItem item){
-        //no ticker
-    }
-    public boolean conditionHandle(Block b,BlockMenu menu){
-        //do nothing
-        return true;
-    }
-    protected void progressorCost(Block b, BlockMenu menu) {
-        //do nothing
-    }
     public void craft(Block b,BlockMenu inv,Player player){
         Location loc=inv.getLocation();
         int charge=getCharge(inv.getLocation());
@@ -149,10 +105,34 @@ public abstract class AbstractWorkBench extends AbstractMachine {
             CraftUtils.multiUpdateOutputMenu(outputResult.getSecondValue(),inv);
         }
     }
-
-    public void process(Block b, BlockMenu preset, SlimefunBlockData data){
-
+    public int getCraftLimit(Block b,BlockMenu inv){
+        return CRAFT_LIMIT;
     }
+    /**
+     * cargo and IO
+     * @return
+     */
+    public abstract int[] getInputSlots();
+    /**
+     * cargo and IO
+     * @return
+     */
+    public abstract int[] getOutputSlots();
+
+    public MenuFactory getRecipeMenu(Block b,BlockMenu inv){
+
+         return MenuUtils.createMRecipeListDisplay(getItem(),getMachineRecipes(),null,(MenuUtils.RecipeMenuConstructor)(itemstack, recipes, backhandler,history)->{
+            return MenuUtils.createMRecipeDisplay(itemstack,recipes,backhandler).addOverrides(8,LAZY_ONECLICK).addHandler(8,((player, i, itemStack, clickAction) -> {
+                moveRecipe(player,inv,recipes, clickAction.isRightClicked());
+                return false;
+            }));
+        });
+    }
+
+    protected int getRecipeMenuSlot(){
+        return -1;
+    }
+    public abstract int[] getRecipeSlots();
     public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow){
         return flow==ItemTransportFlow.WITHDRAW?getOutputSlots():getInputSlots();
     }
@@ -255,6 +235,26 @@ public abstract class AbstractWorkBench extends AbstractMachine {
             }
         }
         menu.open(player);
+    }
+
+    public void process(Block b, BlockMenu preset, SlimefunBlockData data){
+
+    }
+    protected void progressorCost(Block b, BlockMenu menu) {
+        //do nothing
+    }
+    public List<MachineRecipe> provideDisplayRecipe(){
+        List<MachineRecipe> machineRecipes =  getMachineRecipes();
+        List<MachineRecipe> targetRecipe = new ArrayList<>();
+        int size=machineRecipes.size();
+        for (int i=0;i<size;++i) {
+            targetRecipe.add(MachineRecipeUtils.stackFrom(machineRecipes.get(i).getTicks(),
+                    Utils.array(AddUtils.getInfoShow("&f有序配方合成","&7请在配方显示界面或者机器界面查看")),machineRecipes.get(i).getOutput()));
+        }
+        return targetRecipe;
+    }
+    public void registerTick(SlimefunItem item){
+        //no ticker
     }
 
 }

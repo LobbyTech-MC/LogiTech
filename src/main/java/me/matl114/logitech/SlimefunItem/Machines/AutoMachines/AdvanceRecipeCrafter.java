@@ -59,15 +59,6 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
     protected final int CTIME_SLOT=5;
     protected final ItemStack CTIME_ITEM=new CustomItemStack(Material.CLOCK,"&6自定义进度时间","&7点击输入自定义进度时常");
     public AdvanceRecipeCrafter(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
-                                Material processbar, int energyConsumption, int energyBuffer,
-                                LinkedHashMap<Object, Integer> customRecipes)  {
-        super(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,customRecipes);
-        this.craftType=null;
-        this.publicTime=0;
-        this.progressItem = new ItemStack(processbar);
-    }
-
-    public AdvanceRecipeCrafter(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                                 Material processbar, int energyConsumption, int energyBuffer,int ticks,
                                 RecipeType... craftType)  {
         super(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,null);
@@ -77,6 +68,39 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         SchedulePostRegister.addPostRegisterTask(()->
             getDisplayRecipes()
         );
+    }
+
+    public AdvanceRecipeCrafter(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
+                                Material processbar, int energyConsumption, int energyBuffer,
+                                LinkedHashMap<Object, Integer> customRecipes)  {
+        super(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,customRecipes);
+        this.craftType=null;
+        this.publicTime=0;
+        this.progressItem = new ItemStack(processbar);
+    }
+    public void constructMenu(BlockMenuPreset preset) {
+	        //空白背景 禁止点击
+	        int[] border = BORDER;
+	        int len=border.length;
+	        for(int var4 = 0; var4 < len; ++var4) {
+	            preset.addItem(border[var4], ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler());
+	        }
+	        //输入槽边框
+	        border = BORDER_SLOT;
+	        len = border.length;
+	        for(int var4 = 0; var4 <len; ++var4) {
+	            preset.addItem(border[var4], ChestMenuUtils.getInputSlotTexture(), ChestMenuUtils.getEmptyClickHandler());
+	        }
+	        preset.addItem(22,MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
+	        border = RECIPE_DISPLAY;
+	        len = border.length;
+	        //emptyhandler
+	        for(int var4 = 0; var4 < len; ++var4) {
+	            preset.addMenuClickHandler(border[var4], ChestMenuUtils.getEmptyClickHandler());
+	        }
+	    }
+    public int getCraftLimit(Block b,BlockMenu inv){
+        return 1;
     }
     public List<MachineRecipe> getMachineRecipes() {
         if(this.machineRecipes == null||this.machineRecipes.isEmpty()) {
@@ -113,9 +137,9 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         }
         return this.machineRecipes;
     }
-    public ItemStack getProgressBar(){
-        return this.progressItem;
-    }
+   public ItemStack getProgressBar(){
+    return this.progressItem;
+}
     public MachineRecipe getRecordRecipe(SlimefunBlockData data){
         int index=getNowRecordRecipe(data);
         List<MachineRecipe> recipes=getMachineRecipes();
@@ -127,180 +151,10 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
        else return recipes.get(index);
 
     }
-   public void constructMenu(BlockMenuPreset preset) {
-        //空白背景 禁止点击
-        int[] border = BORDER;
-        int len=border.length;
-        for(int var4 = 0; var4 < len; ++var4) {
-            preset.addItem(border[var4], ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler());
-        }
-        //输入槽边框
-        border = BORDER_SLOT;
-        len = border.length;
-        for(int var4 = 0; var4 <len; ++var4) {
-            preset.addItem(border[var4], ChestMenuUtils.getInputSlotTexture(), ChestMenuUtils.getEmptyClickHandler());
-        }
-        preset.addItem(22,MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
-        border = RECIPE_DISPLAY;
-        len = border.length;
-        //emptyhandler
-        for(int var4 = 0; var4 < len; ++var4) {
-            preset.addMenuClickHandler(border[var4], ChestMenuUtils.getEmptyClickHandler());
-        }
-    }
-    public void newMenuInstance(BlockMenu menu,Block block){
-        if(publicTime>0){
-            if(menu.getItemInSlot(CTIME_SLOT)==null||menu.getItemInSlot(CTIME_SLOT).getType()!=Material.CLOCK){
-                menu.replaceExistingItem(CTIME_SLOT,CTIME_ITEM);
-
-            }
-            menu.addMenuClickHandler(CTIME_SLOT,((player, i, itemStack, clickAction) -> {
-                AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&a 请输入自定义的进度时长(单位:sf tick)&e(必须>%s)".formatted(String.valueOf(publicTime)));
-                player.closeInventory();
-                AddUtils.asyncWaitPlayerInput(player,(str)->{
-                    try{
-                        int a=Integer.parseInt(str);
-                        assert a>=this.publicTime;
-                        DataCache.setCustomData(menu.getLocation(),KEY_CTIME,a);
-                        menu.replaceExistingItem(CTIME_SLOT,AddUtils.addLore(CTIME_ITEM,"&c当前的自定义进度时长为: &f%s".formatted(String.valueOf(a))));
-                        AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&a 成功设置!");
-                    }catch (Throwable e){
-                        AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&c 这不是有效的进度时常&e(必须>%s)");
-                    }
-                });
-                return false;
-            }));
-        }
-        menu.replaceExistingItem(PARSE_SLOT,PARSE_ITEM);
-        menu.addMenuClickHandler(PARSE_SLOT,(player, i, itemStack, clickAction)->{
-            parseRecipe(menu);
-            updateMenu(menu,block,Settings.RUN);
-            return false;
-        });
-        menu.addMenuOpeningHandler((player -> {
-            parseRecipe(menu);
-            updateMenu(menu,block,Settings.RUN);
-        }));
-        menu.addMenuCloseHandler((player -> {
-            parseRecipe(menu);
-            updateMenu(menu,block,Settings.RUN);
-        }));
-        updateMenu(menu,block,Settings.INIT);
-    }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu){
-        super.onBreak(e, menu);
-        Location loc=menu.getLocation();
-        menu.dropItems(loc,RECIPEITEM_SLOT);
-    }
-    public void parseRecipe(BlockMenu menu){
-        ItemStack target=menu.getItemInSlot(RECIPEITEM_SLOT);
-        if(target==null||target.getType()==Material.AIR){
-            setNowRecordRecipe(menu.getLocation(),-1);
-        }else{
-            List<MachineRecipe> machineRecipes1=getMachineRecipes();
-            for(int i=0;i<machineRecipes1.size();++i){
-                MachineRecipe machineRecipe=machineRecipes1.get(i);
-                if(CraftUtils.matchItemStack(target,machineRecipe.getOutput()[0], false)){
-                    setNowRecordRecipe(menu.getLocation(),i);
-                    return ;
-                }
-            }
-            setNowRecordRecipe(menu.getLocation(),-1);
-            return;
-        }
-    }
-    public void updateMenu(BlockMenu menu,Block block,Settings mod){
-        SlimefunBlockData data=DataCache.safeLoadBlock(menu.getLocation());
-        if(data==null){
-            Schedules.launchSchedules(()->{
-                updateMenu(menu,block,mod);
-            },20,false,0);
-            return;
-        }
-        MachineRecipe recipe=getRecordRecipe(data);
-
-        if(recipe==null){
-            for(int var4 = 0; var4 < RECIPE_DISPLAY.length; ++var4) {
-                menu.replaceExistingItem(RECIPE_DISPLAY[var4],DISPLAY_DEFAULT_BKGROUND);
-            }
-        }else{
-            ItemStack[] input ;
-            input =recipe.getInput();
-
-        int len=Math.min(RECIPE_DISPLAY.length,input.length);
-        for(int var4 = 0; var4 < len; ++var4) {
-            menu.replaceExistingItem(RECIPE_DISPLAY[var4], RecipeDisplay.addRecipeInfo(input[var4],Settings.INPUT,var4,1.0,0));
-        }
-        for(int var4 = len; var4 < RECIPE_DISPLAY.length; ++var4) {
-            menu.replaceExistingItem(RECIPE_DISPLAY[var4],DISPLAY_BKGROUND);
-        } }
-    }
-    public int getCraftLimit(Block b,BlockMenu inv){
-        return 1;
-    }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
-
-        MultiCraftingOperation currentOperation = this.processor.getOperation(b);
-        ItemGreedyConsumer[] fastCraft=null;
-        if(currentOperation==null){
-            MachineRecipe next=getRecordRecipe(data);
-            if(next==null){
-                parseRecipe(inv);
-                if(inv.hasViewer()){
-                    updateMenu(inv,b,Settings.RUN);
-                    inv.replaceExistingItem(22, MenuUtils.PROCESSOR_NULL);
-                }
-                return ;
-            }
-            Pair<ItemGreedyConsumer[],ItemGreedyConsumer[]> nextP=CraftUtils.countMultiRecipe(inv,getInputSlots(),
-                    getOutputSlots(),next,getCraftLimit(b,inv),CRAFT_PROVIDER);
-            if (nextP != null) {
-
-                    CraftUtils.multiUpdateInputMenu(nextP.getFirstValue(),inv);
-                    int ticks=next.getTicks();
-                    if(next.getTicks()<0){
-                        ticks=DataCache.getCustomData(data,KEY_CTIME, this.publicTime) ;
-                    }
-                if(ticks>0){
-
-                    currentOperation = new MultiCraftingOperation(nextP.getSecondValue(),ticks);
-                    this.processor.startOperation(b, currentOperation);
-                }
-                else{
-                    fastCraft = nextP.getSecondValue();
-                }
-            }else{//if currentOperation ==null return  , cant find nextRecipe
-
-                    if(inv.hasViewer()){inv.replaceExistingItem(22, MenuUtils.PROCESSOR_NULL);
-                    }
-                return ;
-            }
-        }
-        progressorCost(b,inv);
-        if (fastCraft!=null) {
-            CraftUtils.multiUpdateOutputMenu(fastCraft,inv);
-        }else if(currentOperation.isFinished()){
-            ItemGreedyConsumer[] var4=currentOperation.getResults();
-            CraftUtils.multiForcePush(var4,inv,getOutputSlots(),CRAFT_PROVIDER);
-            if(inv.hasViewer()){inv.replaceExistingItem(22, MenuUtils.PROCESSOR_NULL);
-            }
-            this.processor.endOperation(b);
-        }
-        else{
-            if(inv.hasViewer()){
-                this.processor.updateProgressBar(inv, 22, currentOperation);
-
-            }
-            currentOperation.progress(1);
-        }
-
-
-    }
     @Override
     public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
         return new int[0];
     }
-
     @Override
 //    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
 //        if (flow == ItemTransportFlow.WITHDRAW) return getOutputSlots();
@@ -400,5 +254,151 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
             }
         }
         return inputSlots;
+    }
+    public void newMenuInstance(BlockMenu menu,Block block){
+        if(publicTime>0){
+            if(menu.getItemInSlot(CTIME_SLOT)==null||menu.getItemInSlot(CTIME_SLOT).getType()!=Material.CLOCK){
+                menu.replaceExistingItem(CTIME_SLOT,CTIME_ITEM);
+
+            }
+            menu.addMenuClickHandler(CTIME_SLOT,((player, i, itemStack, clickAction) -> {
+                AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&a 请输入自定义的进度时长(单位:sf tick)&e(必须>%s)".formatted(String.valueOf(publicTime)));
+                player.closeInventory();
+                AddUtils.asyncWaitPlayerInput(player,(str)->{
+                    try{
+                        int a=Integer.parseInt(str);
+                        assert a>=this.publicTime;
+                        DataCache.setCustomData(menu.getLocation(),KEY_CTIME,a);
+                        menu.replaceExistingItem(CTIME_SLOT,AddUtils.addLore(CTIME_ITEM,"&c当前的自定义进度时长为: &f%s".formatted(String.valueOf(a))));
+                        AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&a 成功设置!");
+                    }catch (Throwable e){
+                        AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&c 这不是有效的进度时常&e(必须>%s)");
+                    }
+                });
+                return false;
+            }));
+        }
+        menu.replaceExistingItem(PARSE_SLOT,PARSE_ITEM);
+        menu.addMenuClickHandler(PARSE_SLOT,(player, i, itemStack, clickAction)->{
+            parseRecipe(menu);
+            updateMenu(menu,block,Settings.RUN);
+            return false;
+        });
+        menu.addMenuOpeningHandler((player -> {
+            parseRecipe(menu);
+            updateMenu(menu,block,Settings.RUN);
+        }));
+        menu.addMenuCloseHandler((player -> {
+            parseRecipe(menu);
+            updateMenu(menu,block,Settings.RUN);
+        }));
+        updateMenu(menu,block,Settings.INIT);
+    }
+    public void onBreak(BlockBreakEvent e, BlockMenu menu){
+        super.onBreak(e, menu);
+        Location loc=menu.getLocation();
+        menu.dropItems(loc,RECIPEITEM_SLOT);
+    }
+    public void parseRecipe(BlockMenu menu){
+        ItemStack target=menu.getItemInSlot(RECIPEITEM_SLOT);
+        if(target==null||target.getType()==Material.AIR){
+            setNowRecordRecipe(menu.getLocation(),-1);
+        }else{
+            List<MachineRecipe> machineRecipes1=getMachineRecipes();
+            for(int i=0;i<machineRecipes1.size();++i){
+                MachineRecipe machineRecipe=machineRecipes1.get(i);
+                if(CraftUtils.matchItemStack(target,machineRecipe.getOutput()[0], false)){
+                    setNowRecordRecipe(menu.getLocation(),i);
+                    return ;
+                }
+            }
+            setNowRecordRecipe(menu.getLocation(),-1);
+            return;
+        }
+    }
+    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+
+        MultiCraftingOperation currentOperation = this.processor.getOperation(b);
+        ItemGreedyConsumer[] fastCraft=null;
+        if(currentOperation==null){
+            MachineRecipe next=getRecordRecipe(data);
+            if(next==null){
+                parseRecipe(inv);
+                if(inv.hasViewer()){
+                    updateMenu(inv,b,Settings.RUN);
+                    inv.replaceExistingItem(22, MenuUtils.PROCESSOR_NULL);
+                }
+                return ;
+            }
+            Pair<ItemGreedyConsumer[],ItemGreedyConsumer[]> nextP=CraftUtils.countMultiRecipe(inv,getInputSlots(),
+                    getOutputSlots(),next,getCraftLimit(b,inv),CRAFT_PROVIDER);
+            if (nextP != null) {
+
+                    CraftUtils.multiUpdateInputMenu(nextP.getFirstValue(),inv);
+                    int ticks=next.getTicks();
+                    if(next.getTicks()<0){
+                        ticks=DataCache.getCustomData(data,KEY_CTIME, this.publicTime) ;
+                    }
+                if(ticks>0){
+
+                    currentOperation = new MultiCraftingOperation(nextP.getSecondValue(),ticks);
+                    this.processor.startOperation(b, currentOperation);
+                }
+                else{
+                    fastCraft = nextP.getSecondValue();
+                }
+            }else{//if currentOperation ==null return  , cant find nextRecipe
+
+                    if(inv.hasViewer()){inv.replaceExistingItem(22, MenuUtils.PROCESSOR_NULL);
+                    }
+                return ;
+            }
+        }
+        progressorCost(b,inv);
+        if (fastCraft!=null) {
+            CraftUtils.multiUpdateOutputMenu(fastCraft,inv);
+        }else if(currentOperation.isFinished()){
+            ItemGreedyConsumer[] var4=currentOperation.getResults();
+            CraftUtils.multiForcePush(var4,inv,getOutputSlots(),CRAFT_PROVIDER);
+            if(inv.hasViewer()){inv.replaceExistingItem(22, MenuUtils.PROCESSOR_NULL);
+            }
+            this.processor.endOperation(b);
+        }
+        else{
+            if(inv.hasViewer()){
+                this.processor.updateProgressBar(inv, 22, currentOperation);
+
+            }
+            currentOperation.progress(1);
+        }
+
+
+    }
+
+    public void updateMenu(BlockMenu menu,Block block,Settings mod){
+        SlimefunBlockData data=DataCache.safeLoadBlock(menu.getLocation());
+        if(data==null){
+            Schedules.launchSchedules(()->{
+                updateMenu(menu,block,mod);
+            },20,false,0);
+            return;
+        }
+        MachineRecipe recipe=getRecordRecipe(data);
+
+        if(recipe==null){
+            for(int var4 = 0; var4 < RECIPE_DISPLAY.length; ++var4) {
+                menu.replaceExistingItem(RECIPE_DISPLAY[var4],DISPLAY_DEFAULT_BKGROUND);
+            }
+        }else{
+            ItemStack[] input ;
+            input =recipe.getInput();
+
+        int len=Math.min(RECIPE_DISPLAY.length,input.length);
+        for(int var4 = 0; var4 < len; ++var4) {
+            menu.replaceExistingItem(RECIPE_DISPLAY[var4], RecipeDisplay.addRecipeInfo(input[var4],Settings.INPUT,var4,1.0,0));
+        }
+        for(int var4 = len; var4 < RECIPE_DISPLAY.length; ++var4) {
+            menu.replaceExistingItem(RECIPE_DISPLAY[var4],DISPLAY_BKGROUND);
+        } }
     }
 }

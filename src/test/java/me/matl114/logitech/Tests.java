@@ -45,6 +45,8 @@ public class Tests {
         a.subList(size-8,size).clear();
         log(a.size()+"");
     }
+    public void test_Import(){
+    }
     //@Test
     public void test_MathUtils(){
         int code=-1;
@@ -57,8 +59,6 @@ public class Tests {
         log("FINISH");
         log(String.valueOf(MathUtils.bitCount(code,32)));
         log(String.valueOf(MathUtils.bitCountStupid(code,32)));
-    }
-    public void test_Import(){
     }
 
 

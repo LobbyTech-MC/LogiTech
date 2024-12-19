@@ -34,6 +34,20 @@ public class SpreadBlock extends AbstractBlock implements Ticking {
     protected final  SlimefunItem RESULT;
     protected final  Material SPREAD_MATERIAL;
     protected final  Material RESULT_MATERIAL;
+    protected Random rand = new Random();
+    protected final int LIFE_DEFAULT=13;
+    protected final int ONE_TICK_SPREAD_MAXCNT=1600;
+    protected final int CHANCE_KEEP_MATERIAL=2;
+    protected final ConcurrentHashMap<Location, Player> SPREAD_PLAYER=new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<Location,Integer> SPREAD_TICKER=new ConcurrentHashMap<>();
+    protected final Vector[] SPREAD_DELTA=new Vector[]{
+            new Vector(1,0,0),
+            new Vector(0,0,1),
+            new Vector(-1,0,0),
+            new Vector(0,0,-1),
+            new Vector(0,1,0),
+            new Vector(0,-1,0),
+    };
     public SpreadBlock(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,SlimefunItem result,
                        Material spreadMaterial,Material finalMaterial) {
         super(itemGroup, item, recipeType, recipe);
@@ -62,26 +76,33 @@ public class SpreadBlock extends AbstractBlock implements Ticking {
                 )
         );
     }
-    protected Random rand = new Random();
-    protected final int LIFE_DEFAULT=13;
-    protected final int ONE_TICK_SPREAD_MAXCNT=1600;
-    protected final int CHANCE_KEEP_MATERIAL=2;
-    protected final ConcurrentHashMap<Location, Player> SPREAD_PLAYER=new ConcurrentHashMap<>();
     public Map<Location,Player> getSpreadOwner(){
         return SPREAD_PLAYER;
     }
-    protected final ConcurrentHashMap<Location,Integer> SPREAD_TICKER=new ConcurrentHashMap<>();
     public Map<Location,Integer> getSpreadTicker(){
         return SPREAD_TICKER;
     }
-    protected final Vector[] SPREAD_DELTA=new Vector[]{
-            new Vector(1,0,0),
-            new Vector(0,0,1),
-            new Vector(-1,0,0),
-            new Vector(0,0,-1),
-            new Vector(0,1,0),
-            new Vector(0,-1,0),
-    };
+    public boolean isSync(){
+        return false;
+    }
+    public void onPlace(BlockPlaceEvent e, Block b) {
+        SPREAD_PLAYER.put(b.getLocation(), e.getPlayer());
+        SPREAD_TICKER.put(b.getLocation(),LIFE_DEFAULT);
+        b.setType(SPREAD_MATERIAL);
+    }
+    public void preRegister(){
+        super.preRegister();
+        registerTick(this);
+        handleBlock(this);
+        SlimefunBlockPlaceLimitListener.registerBlockLimit(this,(event)->{
+            if(!this.SPREAD_TICKER.isEmpty()){
+                event.setCancelled(true);
+                if(event.getPlayer()!=null){
+                    AddUtils.sendMessage(event.getPlayer(),"&c不能同时存在超过1个[%s]&c的扩散进程".formatted(this.getItem().getItemMeta().getDisplayName()));
+                }
+            }
+        });
+    }
     public void registerTick(SlimefunItem item){
         item.addItemHandler(
                 new BlockTicker() {
@@ -137,27 +158,6 @@ public class SpreadBlock extends AbstractBlock implements Ticking {
     public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
 
 
-    }
-    public void onPlace(BlockPlaceEvent e, Block b) {
-        SPREAD_PLAYER.put(b.getLocation(), e.getPlayer());
-        SPREAD_TICKER.put(b.getLocation(),LIFE_DEFAULT);
-        b.setType(SPREAD_MATERIAL);
-    }
-    public boolean isSync(){
-        return false;
-    }
-    public void preRegister(){
-        super.preRegister();
-        registerTick(this);
-        handleBlock(this);
-        SlimefunBlockPlaceLimitListener.registerBlockLimit(this,(event)->{
-            if(!this.SPREAD_TICKER.isEmpty()){
-                event.setCancelled(true);
-                if(event.getPlayer()!=null){
-                    AddUtils.sendMessage(event.getPlayer(),"&c不能同时存在超过1个[%s]&c的扩散进程".formatted(this.getItem().getItemMeta().getDisplayName()));
-                }
-            }
-        });
     }
 
 }

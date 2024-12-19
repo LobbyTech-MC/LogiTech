@@ -15,13 +15,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 public  class EmptyMachineSample extends AbstractMachine{
     protected final int[] INPUT_SLOTS=new int[0];
     protected final int[] OUTPUT_SLOTS=new int[0];
-    public int[] getInputSlots(){
-        return INPUT_SLOTS;
-    }
-    public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
-
     public EmptyMachineSample(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                            int energybuffer, int energyConsumption){
         super(category, item, recipeType, recipe, energybuffer, energyConsumption);
@@ -29,8 +22,15 @@ public  class EmptyMachineSample extends AbstractMachine{
     public void constructMenu(BlockMenuPreset preset){
 
     }
+
+    public int[] getInputSlots(){
+        return INPUT_SLOTS;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOTS;
+    }
     public void newMenuInstance(BlockMenu menu, Block block){
     }
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
     public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
+    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 }

@@ -5,12 +5,20 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemCounter implements Cloneable{
+    private static ItemCounter INSTANCE=new ItemCounter(new ItemStack(Material.STONE)) ;
+    public static ItemCounter get(ItemStack item) {
+        ItemCounter consumer=INSTANCE.clone();
+        consumer.init(item);
+        return consumer;
+    }
     protected int cnt;
     protected boolean dirty;
     protected ItemStack item;
     protected ItemMeta meta=null;
     protected int maxStackCnt;
-    private static ItemCounter INSTANCE=new ItemCounter(new ItemStack(Material.STONE)) ;
+    public ItemCounter() {
+        dirty=false;
+    }
     protected ItemCounter(ItemStack item) {
         dirty=false;
         this.cnt = item.getAmount();
@@ -18,34 +26,51 @@ public class ItemCounter implements Cloneable{
         this.maxStackCnt=item.getMaxStackSize();
         this.maxStackCnt=maxStackCnt<=0?2147483646:maxStackCnt;
     }
-    public ItemCounter() {
-        dirty=false;
+    /**
+     * modify recorded amount
+     * @param amount
+     */
+    public void addAmount(int amount) {
+        cnt += amount;
+        dirty=dirty||(amount!=0);
     }
-    public static ItemCounter get(ItemStack item) {
-        ItemCounter consumer=INSTANCE.clone();
-        consumer.init(item);
-        return consumer;
+    protected ItemCounter clone(){
+        ItemCounter clone=null;
+        try {
+            clone=(ItemCounter) super.clone();
+        }catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return clone;
     }
-    protected void init(ItemStack item) {
-        this.dirty=false;
-        this.item=item;
-        this.cnt=item.getAmount();
-        this.maxStackCnt=item.getMaxStackSize();
-        this.maxStackCnt=maxStackCnt<=0?2147483646:maxStackCnt;
+    /**
+     * consume other counter ,till one of them got zero
+     * @param other
+     */
+    public void consume(ItemCounter other){
+        int diff = (other.getAmount()>cnt)?cnt:other.getAmount();
+        cnt-=diff;
+        dirty=true;
+        other.addAmount(-diff);
     }
-    protected void init() {
-        this.dirty=false;
-        this.cnt=0;
-        this.item=null;
-        this.maxStackCnt=0;
+    /**
+     * get recorded amount
+     */
+    public int getAmount() {
+        return cnt;
+    }
+    /**
+     * get item,should be read-only! and will not represent real amount
+     * @return
+     */
+    public ItemStack getItem() {
+        return item;
+    }
 
-    }
     public int getMaxStackCnt() {
         return maxStackCnt;
     }
-    public boolean isNull() {
-        return item==null;
-    }
+
     /**
      * get meta info ,if havn't get ,getItemMeta() clone one
      * @return
@@ -59,6 +84,66 @@ public class ItemCounter implements Cloneable{
         }
         return null;
     }
+    /**
+     * grab other counter till maxSize or sth
+     * @param other
+     */
+    public void grab(ItemCounter other){
+        cnt+=other.getAmount();
+        dirty=true;
+        other.setAmount(0);
+    }
+
+
+    protected void init() {
+        this.dirty=false;
+        this.cnt=0;
+        this.item=null;
+        this.maxStackCnt=0;
+
+    }
+    protected void init(ItemStack item) {
+        this.dirty=false;
+        this.item=item;
+        this.cnt=item.getAmount();
+        this.maxStackCnt=item.getMaxStackSize();
+        this.maxStackCnt=maxStackCnt<=0?2147483646:maxStackCnt;
+    }
+    /**
+     * get dirty bits
+     * @return
+     */
+    public boolean isDirty(){
+        return dirty;
+    }
+
+    public boolean isNull() {
+        return item==null;
+    }
+
+    /**
+     * push to other counter till maxsize or sth
+     * @param other
+     */
+    public void push(ItemCounter other){
+        other.grab(this);
+    }
+
+    /**
+     * modify recorded amount
+     * @param amount
+     */
+    public void setAmount(int amount) {
+        dirty=dirty||amount!=cnt;
+        cnt=amount;
+    }
+
+    public void setDirty(boolean t){
+        this.dirty=t;
+    }
+    /**
+     * void constructor
+     */
 
     /**
      * make sure you know what you are doing!
@@ -69,55 +154,9 @@ public class ItemCounter implements Cloneable{
     }
 
     /**
-     * get dirty bits
-     * @return
+     * will only sync amount,keep the rest of data unchanged
      */
-    public boolean isDirty(){
-        return dirty;
-    }
-    public void setDirty(boolean t){
-        this.dirty=t;
-    }
-    /**
-     * void constructor
-     */
-
-
-    /**
-     * get item,should be read-only! and will not represent real amount
-     * @return
-     */
-    public ItemStack getItem() {
-        return item;
-    }
-    /**
-     * modify recorded amount
-     * @param amount
-     */
-    public void setAmount(int amount) {
-        dirty=dirty||amount!=cnt;
-        cnt=amount;
-    }
-    /**
-     * get recorded amount
-     */
-    public int getAmount() {
-        return cnt;
-    }
-
-    /**
-     * modify recorded amount
-     * @param amount
-     */
-    public void addAmount(int amount) {
-        cnt += amount;
-        dirty=dirty||(amount!=0);
-    }
-
-    /**
-     * will sync amount and other data ,override by subclasses
-     */
-    public void syncData(){
+    public void syncAmount(){
         if(dirty){
             cnt=item.getAmount();
             dirty=false;
@@ -125,9 +164,9 @@ public class ItemCounter implements Cloneable{
     }
 
     /**
-     * will only sync amount,keep the rest of data unchanged
+     * will sync amount and other data ,override by subclasses
      */
-    public void syncAmount(){
+    public void syncData(){
         if(dirty){
             cnt=item.getAmount();
             dirty=false;
@@ -143,45 +182,6 @@ public class ItemCounter implements Cloneable{
             item.setAmount(cnt);
             dirty=false;
         }
-    }
-
-    /**
-     * consume other counter ,till one of them got zero
-     * @param other
-     */
-    public void consume(ItemCounter other){
-        int diff = (other.getAmount()>cnt)?cnt:other.getAmount();
-        cnt-=diff;
-        dirty=true;
-        other.addAmount(-diff);
-    }
-
-    /**
-     * grab other counter till maxSize or sth
-     * @param other
-     */
-    public void grab(ItemCounter other){
-        cnt+=other.getAmount();
-        dirty=true;
-        other.setAmount(0);
-    }
-
-    /**
-     * push to other counter till maxsize or sth
-     * @param other
-     */
-    public void push(ItemCounter other){
-        other.grab(this);
-    }
-
-    protected ItemCounter clone(){
-        ItemCounter clone=null;
-        try {
-            clone=(ItemCounter) super.clone();
-        }catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return clone;
     }
 
 }

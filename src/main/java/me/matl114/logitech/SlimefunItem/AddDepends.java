@@ -39,9 +39,25 @@ import me.matl114.logitech.Utils.UtilClass.ItemClass.ConstSlimefunItemStack;
  * only enable when certain addon are enable
  */
 public class AddDepends {
-    public static void setup(SlimefunAddon plugin){
-        AddDepends.registerSlimefunItems(plugin);
-    }
+    public static boolean hasInfiniteExpansion=false;
+    public static boolean hasNetwork=false;
+    public static boolean hasNetworkExpansion=false;
+    public static RecipeType MOBDATA_TYPE;
+    public static RecipeType INFINITYWORKBENCH_TYPE;
+    public static RecipeType NTWQTWORKBENCH_TYPE;
+    public static SlimefunItem NTWEP_WORKBENCH;
+    public static RecipeType NTWEP_WORKBENCH_TYPE;
+    public static RecipeType VOIDHARVEST   ;
+    public static RecipeType SINGULARITY_CONSTRUCTOR;
+    public static SlimefunItem MOBDATA_MANUAL;
+    public static SlimefunItem INFINITY_MANUAL;
+    public static SlimefunItem NTWWORKBENCH_MANUAL;
+    public static SlimefunItem INFINITY_AUTOCRAFT;
+    public static SlimefunItem INFINITY_MOBSIMNULATOR;
+    public static SlimefunItem INFINITY_GEOQURRY;
+    public static MyVanillaItem NTW_STORAGE_DISPLAY;
+    public static  Class NETWORKSQUANTUMSTORAGE;
+    public static NamespacedKey NTWQUANTUMKEY;
     public static void registerSlimefunItems(SlimefunAddon plugin){
         try{
             if(hasInfiniteExpansion)
@@ -224,23 +240,7 @@ public class AddDepends {
 
         }
     }
-    public static boolean hasInfiniteExpansion=false;
-    public static boolean hasNetwork=false;
-    public static boolean hasNetworkExpansion=false;
-    public static RecipeType MOBDATA_TYPE;
-    public static RecipeType INFINITYWORKBENCH_TYPE;
-    public static RecipeType NTWQTWORKBENCH_TYPE;
-    public static SlimefunItem NTWEP_WORKBENCH;
-    public static RecipeType NTWEP_WORKBENCH_TYPE;
-    public static RecipeType VOIDHARVEST   ;
-    public static RecipeType SINGULARITY_CONSTRUCTOR;
-    public static SlimefunItem MOBDATA_MANUAL;
-    public static SlimefunItem INFINITY_MANUAL;
-    public static SlimefunItem NTWWORKBENCH_MANUAL;
-    public static SlimefunItem INFINITY_AUTOCRAFT;
-    public static SlimefunItem INFINITY_MOBSIMNULATOR;
-    public static SlimefunItem INFINITY_GEOQURRY;
-    public static MyVanillaItem NTW_STORAGE_DISPLAY;
-    public static  Class NETWORKSQUANTUMSTORAGE;
-    public static NamespacedKey NTWQUANTUMKEY;
+    public static void setup(SlimefunAddon plugin){
+        AddDepends.registerSlimefunItems(plugin);
+    }
 }
