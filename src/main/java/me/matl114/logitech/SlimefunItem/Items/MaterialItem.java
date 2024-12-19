@@ -20,7 +20,8 @@ public class MaterialItem extends CustomSlimefunItem {
         super(itemGroup, item, recipeType, recipe,recipeDisplay);
         this.checkCanStack=false;
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
 
     }
     @Override

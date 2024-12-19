@@ -21,10 +21,12 @@ public class AbstractStorageType implements PersistentDataType<PersistentDataCon
         final ItemStack item = primitive.get(ITEM, DataType.ITEM_STACK);
         return item;
     }
-    public Class<ItemStack> getComplexType(){
+    @Override
+	public Class<ItemStack> getComplexType(){
         return ItemStack.class;
     }
-    public Class<PersistentDataContainer> getPrimitiveType(){
+    @Override
+	public Class<PersistentDataContainer> getPrimitiveType(){
         return PersistentDataContainer.class;
     }
 

@@ -28,7 +28,9 @@ public class StorageLink {
     public final static String LOC_DISPLAY=AddUtils.resolveColor("&3[%s,x=%d,y=%d,z=%d]");
     public static boolean canLink(ItemMeta meta) {
         String it= CraftUtils.parseSfId(meta);
-        if(it==null) return false;
+        if(it==null) {
+			return false;
+		}
         return SlimefunItem.getById(it) instanceof QuantumLink;
     }
     public static void clearLink(ItemMeta meta) {

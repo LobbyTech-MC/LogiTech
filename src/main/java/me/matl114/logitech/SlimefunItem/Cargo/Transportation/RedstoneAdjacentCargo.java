@@ -40,7 +40,8 @@ public class RedstoneAdjacentCargo extends AdjacentCargo {
                 )
         );
     }
-    public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
+    @Override
+	public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
 
         if(DataCache.getCustomData(data,POWERED_KEY,0)!=0){
             super.cargoTask(b,menu,data,configCode);

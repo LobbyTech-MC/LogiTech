@@ -116,7 +116,8 @@ public enum Directions {
     public int toInt(){
         return seqCode;
     }
-    public String toString(){
+    @Override
+	public String toString(){
         return nickname;
     }
 

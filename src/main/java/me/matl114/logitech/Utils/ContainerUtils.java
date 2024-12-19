@@ -28,7 +28,9 @@ public class ContainerUtils {
     private static int[][] preCalculatedSlots= IntStream.range(0,73).mapToObj(i->{
         if(i<9||i%9==0){
             return IntStream.range(0,i).toArray();
-        }else return null;
+        } else {
+			return null;
+		}
     }).toArray(int[][]::new);
     @Getter
     protected static BlockMenuPreset containerWrapperMenuPreset =new BlockMenuPreset("LOGITECH_FUNCTIONAL_BLOCKMENU","&c容器") {
@@ -36,10 +38,13 @@ public class ContainerUtils {
         public boolean canOpen(@Nonnull Block block, @Nonnull Player player) {
             return false;
         }
-        public int[] getSlotsAccessedByItemTransport(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
+        @Override
+		public int[] getSlotsAccessedByItemTransport(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
             if(menu instanceof ContainerBlockMenuWrapper impl){
                 return getSlotAccess(impl.getSlotSize());
-            }else return getSlotsAccessedByItemTransport(flow);
+            } else {
+				return getSlotsAccessedByItemTransport(flow);
+			}
         }
 
         @Override
@@ -53,7 +58,8 @@ public class ContainerUtils {
             }
             this.setSize(54);
         };
-        public void newInstance(@Nonnull BlockMenu menu, @Nonnull Location l) {
+        @Override
+		public void newInstance(@Nonnull BlockMenu menu, @Nonnull Location l) {
             //do nothing
         }
     };
@@ -98,7 +104,9 @@ public class ContainerUtils {
     private static int[] getSlotAccess(int size){
         if(preCalculatedSlots[size]==null){
             return IntStream.range(0,size).toArray();
-        }else return preCalculatedSlots[size];
+        } else {
+			return preCalculatedSlots[size];
+		}
     }
     public static void setup(){
         ContainerBlockMenuWrapper.setup();
@@ -119,8 +127,9 @@ public class ContainerUtils {
             if(fromInv!=null&&toInv==null){
                 if(WorldUtils.isEntityBlock(toMaterial)){
                     ContainerUtils.getBlockContainerMenuWrapperWithCallback((blockMenus -> {
-                        if(blockMenus[0]!=null)
-                            TransportUtils.transportItem(fromInv,blockMenus[0],configCode,smart,bwlist,CraftUtils.getpusher);
+                        if(blockMenus[0]!=null) {
+							TransportUtils.transportItem(fromInv,blockMenus[0],configCode,smart,bwlist,CraftUtils.getpusher);
+						}
                     }),true, to);
                 }
             }else if(fromInv==null){
@@ -128,8 +137,9 @@ public class ContainerUtils {
                 if(WorldUtils.isEntityBlock(fromMaterial)){
                     if(toInv!=null){
                         ContainerUtils.getBlockContainerMenuWrapperWithCallback((blockMenus -> {
-                            if(blockMenus[0]!=null)
-                                TransportUtils.transportItem(blockMenus[0],toInv,configCode,smart,bwlist,CraftUtils.getpusher);
+                            if(blockMenus[0]!=null) {
+								TransportUtils.transportItem(blockMenus[0],toInv,configCode,smart,bwlist,CraftUtils.getpusher);
+							}
                         }),true, from);
                     }else {
                         if(WorldUtils.isEntityBlock(toMaterial)){

@@ -19,18 +19,24 @@ public  class EmptyMachineSample extends AbstractMachine{
                            int energybuffer, int energyConsumption){
         super(category, item, recipeType, recipe, energybuffer, energyConsumption);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
 
     }
 
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
     }
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
+    @Override
+	public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
+    @Override
+	public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 }

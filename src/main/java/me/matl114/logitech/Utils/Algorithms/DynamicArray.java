@@ -23,7 +23,8 @@ public class DynamicArray<T> extends AbstractList<T> implements List<T> {
             }
         }
     }
-    public T get(int index){
+    @Override
+	public T get(int index){
         if(index<0 || index>=size){
             throw new IndexOutOfBoundsException(index+" is out of bounds "+size);
         }
@@ -49,10 +50,12 @@ public class DynamicArray<T> extends AbstractList<T> implements List<T> {
         return array;
     }
 
-    public boolean isEmpty(){
+    @Override
+	public boolean isEmpty(){
         return size==0;
     }
-    public int size(){
+    @Override
+	public int size(){
         return size;
     }
 }

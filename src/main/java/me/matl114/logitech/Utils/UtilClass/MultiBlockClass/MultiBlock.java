@@ -9,14 +9,17 @@ public class MultiBlock implements AbstractMultiBlock{
         this.TYPE = type;
         this.DIRECTION = direction;
     }
-    public MultiBlockService.Direction getDirection() {
+    @Override
+	public MultiBlockService.Direction getDirection() {
         return DIRECTION;
     }
 
-    public Vector getStructurePart(int index){
+    @Override
+	public Vector getStructurePart(int index){
         return DIRECTION.rotate( getType().getSchemaPart(index));
     }
-    public AbstractMultiBlockType getType() {
+    @Override
+	public AbstractMultiBlockType getType() {
         return TYPE;
     }
 }

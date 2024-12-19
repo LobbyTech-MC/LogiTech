@@ -20,26 +20,33 @@ public class TrashCan extends AbstractMachine {
     public TrashCan(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(category,item,recipeType,recipe,0,0);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         preset.setSize(54);
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
 
-    public void process(Block b, BlockMenu preset, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu preset, SlimefunBlockData data){
 
     }
-    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
+    @Override
+	public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
         //Schedules.launchSchedules(()->{
             int[] slots=getInputSlots();
             ItemStack it;
-            for(int i=0; i<slots.length; i++){
-                if(menu.getItemInSlot(slots[i])==null)break;
-                menu.replaceExistingItem(slots[i],null,false);
+            for (int slot : slots) {
+                if(menu.getItemInSlot(slot)==null) {
+					break;
+				}
+                menu.replaceExistingItem(slot,null,false);
             }
         //},0,false,0);
     }

@@ -15,7 +15,8 @@ public class WitherProofBlock extends AbstractBlock implements WitherProof {
     public WitherProofBlock(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
-    public void onAttack(@Nonnull Block var1, @Nonnull Wither var2){
+    @Override
+	public void onAttack(@Nonnull Block var1, @Nonnull Wither var2){
 
     }
 }

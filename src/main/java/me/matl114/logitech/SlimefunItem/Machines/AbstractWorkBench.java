@@ -61,13 +61,15 @@ public abstract class AbstractWorkBench extends AbstractMachine {
 
     }
 
-    public void addInfo(ItemStack item){
+    @Override
+	public void addInfo(ItemStack item){
         item.setItemMeta(AddUtils.advancedMachineShow(item,CRAFT_LIMIT).getItemMeta());
         if(this.energyConsumption > 0){
             item.setItemMeta(AddUtils.workBenchInfoAdd(item,this.energybuffer,this.energyConsumption).getItemMeta());
         }
     }
-    public boolean conditionHandle(Block b,BlockMenu menu){
+    @Override
+	public boolean conditionHandle(Block b,BlockMenu menu){
         //do nothing
         return true;
     }
@@ -75,7 +77,8 @@ public abstract class AbstractWorkBench extends AbstractMachine {
      * construct your menu here.called in constructor
      * @param preset
      */
-    public abstract void constructMenu(BlockMenuPreset preset);
+    @Override
+	public abstract void constructMenu(BlockMenuPreset preset);
     public void craft(Block b,BlockMenu inv,Player player){
         Location loc=inv.getLocation();
         int charge=getCharge(inv.getLocation());
@@ -112,12 +115,14 @@ public abstract class AbstractWorkBench extends AbstractMachine {
      * cargo and IO
      * @return
      */
-    public abstract int[] getInputSlots();
+    @Override
+	public abstract int[] getInputSlots();
     /**
      * cargo and IO
      * @return
      */
-    public abstract int[] getOutputSlots();
+    @Override
+	public abstract int[] getOutputSlots();
 
     public MenuFactory getRecipeMenu(Block b,BlockMenu inv){
 
@@ -133,21 +138,23 @@ public abstract class AbstractWorkBench extends AbstractMachine {
         return -1;
     }
     public abstract int[] getRecipeSlots();
-    public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow){
+    @Override
+	public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow){
         return flow==ItemTransportFlow.WITHDRAW?getOutputSlots():getInputSlots();
     }
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+    @Override
+	public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
         if(flow==ItemTransportFlow.WITHDRAW){
             return getOutputSlots();
         }else if(item==null||item.getMaxStackSize()<=1){
             return getInputSlots();
         }
         else{
-            List<Integer> input_slots=new ArrayList<Integer>();
+            List<Integer> input_slots=new ArrayList<>();
             int[] input=getInputSlots();
-            for (int i=0;i<input.length;i++){
-                if(menu.getItemInSlot(input[i])!=null){
-                    input_slots.add(input[i]);
+            for (int element : input) {
+                if(menu.getItemInSlot(element)!=null){
+                    input_slots.add(element);
                 }
             }
             int[] array = new int[input_slots.size()];
@@ -237,13 +244,16 @@ public abstract class AbstractWorkBench extends AbstractMachine {
         menu.open(player);
     }
 
-    public void process(Block b, BlockMenu preset, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu preset, SlimefunBlockData data){
 
     }
-    protected void progressorCost(Block b, BlockMenu menu) {
+    @Override
+	protected void progressorCost(Block b, BlockMenu menu) {
         //do nothing
     }
-    public List<MachineRecipe> provideDisplayRecipe(){
+    @Override
+	public List<MachineRecipe> provideDisplayRecipe(){
         List<MachineRecipe> machineRecipes =  getMachineRecipes();
         List<MachineRecipe> targetRecipe = new ArrayList<>();
         int size=machineRecipes.size();
@@ -253,7 +263,8 @@ public abstract class AbstractWorkBench extends AbstractMachine {
         }
         return targetRecipe;
     }
-    public void registerTick(SlimefunItem item){
+    @Override
+	public void registerTick(SlimefunItem item){
         //no ticker
     }
 

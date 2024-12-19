@@ -71,7 +71,8 @@ public abstract  class AbstractTransformer extends AbstractMachine {
         }
 
     }
-    public List<ItemStack> _getDisplayRecipes(List<ItemStack> list2) {
+    @Override
+	public List<ItemStack> _getDisplayRecipes(List<ItemStack> list2) {
         List<ItemStack> list= super._getDisplayRecipes(list2);
         if(!list.isEmpty()&&list.get(0)==null){
             list.set(0,new DisplayItemStack(
@@ -87,14 +88,16 @@ public abstract  class AbstractTransformer extends AbstractMachine {
         return new DataMenuClickHandler() {
             //0 为 数量 1 为 电力
             int[] tick=new int[2];
-            public int getInt(int i){
+            @Override
+			public int getInt(int i){
                 return tick[i];
             }
             @Override
             public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
                 return false;
             }
-            public void setInt(int i, int val){
+            @Override
+			public void setInt(int i, int val){
                 tick[i]=val;
             }
         };
@@ -112,27 +115,32 @@ public abstract  class AbstractTransformer extends AbstractMachine {
             return dh;
         }
     }
-    public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
+    @Override
+	public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
         return flow == ItemTransportFlow.INSERT ? this.INPUT : this.getOutputSlots();
     }
     public ItemStack getWorkingItem(int tickLeft){
         return AddUtils.addLore(INFO_WORKING,AddUtils.concat("&7将在 ",String.valueOf(tickLeft)," tick后产出"));
     }
-    public boolean isSync(){
+    @Override
+	public boolean isSync(){
         return false;
     }
-    public void newMenuInstance(BlockMenu inv,Block b){
+    @Override
+	public void newMenuInstance(BlockMenu inv,Block b){
         inv.addMenuOpeningHandler((player -> {
             updateMenu(inv,b,Settings.RUN);
         }));
         inv.addMenuCloseHandler(player -> updateMenu(inv,b,Settings.RUN));
         updateMenu(inv,b,Settings.INIT);
     }
-    public final void process(Block block, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public final void process(Block block, BlockMenu inv, SlimefunBlockData data){
 
 
     }
-    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
+    @Override
+	public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
         DataMenuClickHandler dh=getDataHolder(b,menu);
         int tick=dh.getInt(0);
         boolean hasViewer=menu.hasViewer();
@@ -187,11 +195,13 @@ public abstract  class AbstractTransformer extends AbstractMachine {
 
         }else if (tick!=-1){
            dh.setInt(0,-1);
-           if(hasViewer)
-                menu.replaceExistingItem(this.PROCESSOR_SLOT,this.INFO_NULL);
+           if(hasViewer) {
+			menu.replaceExistingItem(this.PROCESSOR_SLOT,this.INFO_NULL);
+		}
         }
     }
-    public void updateMenu(BlockMenu inv,Block b,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv,Block b,Settings mod){
         SlimefunBlockData data=DataCache.safeLoadBlock(inv.getLocation());
         if(data==null){
             Schedules.launchSchedules(()->updateMenu(inv,b,mod),20,false,0);

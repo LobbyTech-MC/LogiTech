@@ -45,7 +45,8 @@ public class TrackingArrowLauncher extends ChargableProps {
     public TrackingArrowLauncher(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(itemGroup, item, recipeType, recipe);
     }
-    public float getMaxItemCharge(ItemStack var1){
+    @Override
+	public float getMaxItemCharge(ItemStack var1){
         return MAX_CHARGE;
     }
 
@@ -54,7 +55,8 @@ public class TrackingArrowLauncher extends ChargableProps {
         BukkitRunnable task = new BukkitRunnable() {
             protected int runTime;
             protected boolean isRunning=false;
-            public void cancel(){
+            @Override
+			public void cancel(){
                 super.cancel();
                 //runningArrows.forEach((a)->{onArrowCancelTrace(a);});
                 BukkitUtils.executeSync(()->{
@@ -65,7 +67,8 @@ public class TrackingArrowLauncher extends ChargableProps {
 
 
             }
-            public void run(){
+            @Override
+			public void run(){
                 if(isRunning){
                     return;
                 }
@@ -121,8 +124,9 @@ public class TrackingArrowLauncher extends ChargableProps {
                         }
                         for(Arrow arrow:arrows){
                             arrow.getWorld().spawnParticle(Particle.CHERRY_LEAVES,arrow.getLocation(),3,0.0,0.0,0.0,1,null,true);
-                            if(runTime%2==0&&runTime>5)
-                                arrow.getWorld().spawnParticle(Particle.FLAME,arrow.getLocation(),0,0.0,0.0,0.0,1,null,true);
+                            if(runTime%2==0&&runTime>5) {
+								arrow.getWorld().spawnParticle(Particle.FLAME,arrow.getLocation(),0,0.0,0.0,0.0,1,null,true);
+							}
 
                         }
                     }finally {
@@ -140,7 +144,7 @@ public class TrackingArrowLauncher extends ChargableProps {
         ItemMeta meta=item.getItemMeta();
         int powerLevel=meta.getEnchantLevel(Enchantment.POWER);
         int sharpnessLevel=meta.getEnchantLevel(Enchantment.SHARPNESS);
-        int damage=(int)BASIC_DAMAGE+2*powerLevel+sharpnessLevel;
+        int damage=BASIC_DAMAGE+2*powerLevel+sharpnessLevel;
         //随机生成若干箭矢，需要针对location 朝向 motion做改动
         Location loc = WorldUtils.getHandLocation(p);
         HashSet<Arrow> arrows=new HashSet<>();

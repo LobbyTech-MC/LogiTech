@@ -29,7 +29,8 @@ public class NetworksQuantumProxy extends NetworksAdaptQuantumStorage implements
         }
         cacheMap=NetWorkQuantumMethod.getCacheMap(INSTANCE);
     }
-    public  void disableNetworkQuantum(Throwable e){
+    @Override
+	public  void disableNetworkQuantum(Throwable e){
         Debug.logger("AN ERROR OCCURED IN NETWORK_QUANTUM_PROXY,STORAGE TYPE MAY BE DISABLED %d/%d".formatted(ExceptionTimes, 100));
         Debug.logger(e);
         ExceptionTimes++;
@@ -38,27 +39,37 @@ public class NetworksQuantumProxy extends NetworksAdaptQuantumStorage implements
             disableStorageType(this);
         }
     }
-    public int getAmount(Location loc) {
+    @Override
+	public int getAmount(Location loc) {
         return getStorageAmount((QuantumCache)cacheMap.get(loc) );
     }
-    public ItemStack getItemStack(Location loc) {
+    @Override
+	public ItemStack getItemStack(Location loc) {
         return getStorageContent ((QuantumCache)cacheMap.get(loc) );
     }
-    public Location getLocation(ItemMeta meta){
+    @Override
+	public Location getLocation(ItemMeta meta){
         String locstr= meta.getPersistentDataContainer().get(KEY_LOC, PersistentDataType.STRING);
-        if(locstr==null) return null;
+        if(locstr==null) {
+			return null;
+		}
         return DataCache.locationFromString(locstr);
     }
-    public int getMaxAmount(Location loc){
+    @Override
+	public int getMaxAmount(Location loc){
         return getStorageMaxSize((QuantumCache)cacheMap.get(loc) );
     }
-    public QuantumCache getQuantumCache(ItemMeta meta) {
+    @Override
+	public QuantumCache getQuantumCache(ItemMeta meta) {
         try{
             Location loc=getLocation(meta);
-            if(loc==null) return null;
-            else {
+            if(loc==null) {
+				return null;
+			} else {
                 Object obj=cacheMap.get(loc);
-                if(obj==null)return null;
+                if(obj==null) {
+					return null;
+				}
                 return (QuantumCache)cacheMap.get(loc);
             }
         }catch (Throwable e){
@@ -66,14 +77,17 @@ public class NetworksQuantumProxy extends NetworksAdaptQuantumStorage implements
             return null;
         }
     }
-    public boolean isStorage(ItemMeta meta) {
+    @Override
+	public boolean isStorage(ItemMeta meta) {
         //check lock
         return getQuantumCache(meta)!=null;
     }
-    public boolean isStorageProxy(){
+    @Override
+	public boolean isStorageProxy(){
         return  true;
     }
-    public void onStorageAmountWrite(ItemMeta meta, int amount) {
+    @Override
+	public void onStorageAmountWrite(ItemMeta meta, int amount) {
         QuantumCache cache=getQuantumCache(meta);
         if(cache==null){return;}
         Method set=NetWorkQuantumMethod.getSetAmountMethod(cache);
@@ -84,16 +98,21 @@ public class NetworksQuantumProxy extends NetworksAdaptQuantumStorage implements
         }
         //DataTypeMethods.setCustom(meta, Keys.QUANTUM_STORAGE_INSTANCE, PersistentQuantumStorageType.TYPE,cache);
     }
-    public void onStorageDisplayWrite(ItemMeta meta, int amount) {
+    @Override
+	public void onStorageDisplayWrite(ItemMeta meta, int amount) {
         Location loc=getLocation(meta);
-        if(loc==null) return ;
+        if(loc==null) {
+			return ;
+		}
         updateLocation(loc);
     }
 
-    public void setAmount(Location loc,int amount){
+    @Override
+	public void setAmount(Location loc,int amount){
         setAmount((QuantumCache)cacheMap.get(loc),amount);
     }
-    public void updateLocation(Location loc){
+    @Override
+	public void updateLocation(Location loc){
         Method method=NetWorkQuantumMethod.getSyncBlock(INSTANCE);
         try{
             QuantumCache cache=(QuantumCache)cacheMap.get(loc);

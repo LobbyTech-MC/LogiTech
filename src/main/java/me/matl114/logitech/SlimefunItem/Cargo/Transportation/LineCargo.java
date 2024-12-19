@@ -87,9 +87,12 @@ public class LineCargo extends AbstractCargo {
         );
     }
     //todo async
-    public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
+    @Override
+	public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
         Directions dir=getDirection(0,data);
-        if(dir==Directions.NONE||dir==null)return;
+        if(dir==Directions.NONE||dir==null) {
+			return;
+		}
         //非null 非空
         boolean loop =getConfigValue(0,data)==1;
         Location loc=dir.relate(menu.getLocation());
@@ -98,8 +101,8 @@ public class LineCargo extends AbstractCargo {
             HashSet<ItemStack> bwset=new HashSet<>();
             ItemStack it;
             int[] bwslots=getBWListSlot();
-            for (int i=0;i<bwslots.length;++i){
-                it=menu.getItemInSlot(bwslots[i]);
+            for (int bwslot2 : bwslots) {
+                it=menu.getItemInSlot(bwslot2);
                 if(it!=null){
                     bwset.add(it);
                 }
@@ -125,7 +128,8 @@ public class LineCargo extends AbstractCargo {
 
     }
 
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for (int i=0;i<len;++i){
@@ -137,7 +141,8 @@ public class LineCargo extends AbstractCargo {
             preset.addItem(INFO_SLOT[i],INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
         }
     }
-    public int[] getBWListSlot(){
+    @Override
+	public int[] getBWListSlot(){
         return BWSLOT;
     }
     public ChestMenu.MenuClickHandler getConfigHandlers(int configIdx,BlockMenu inv){
@@ -158,25 +163,31 @@ public class LineCargo extends AbstractCargo {
             return false;
         });
     }
-    public int getConfigSlot(){
+    @Override
+	public int getConfigSlot(){
         return 4;
     }
     public int getConfigValue(int configIdx,SlimefunBlockData data){
         return DataCache.getCustomData(data,CONFIG_KEYS[configIdx],CONFIG_VALUE[configIdx]);
     }
-    public int[] getDirectionSlots(){
+    @Override
+	public int[] getDirectionSlots(){
         return DIRECTION_SLOTS;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[0];
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return new int[0];
     }
-    public String[] getSaveKeys(){
+    @Override
+	public String[] getSaveKeys(){
         return savedKeys;
     }
-    public void newMenuInstance(BlockMenu inv, Block b){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block b){
         inv.addMenuOpeningHandler((player -> {
             updateMenu(inv,b,Settings.RUN);
         }));
@@ -205,7 +216,8 @@ public class LineCargo extends AbstractCargo {
             inv.replaceExistingItem(CONFIG_SLOT[i],CONFIG_ITEM[code]);
         }
     }
-    public void updateMenu(BlockMenu inv ,Block b,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv ,Block b,Settings mod){
         loadConfig(inv,b);
         updateDirectionSlots(0,inv);
         updateConfigSlots(inv);

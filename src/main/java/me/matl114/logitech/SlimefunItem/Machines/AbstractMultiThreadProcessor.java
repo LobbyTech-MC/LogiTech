@@ -106,7 +106,8 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
      *
      * @param preset
      */
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         //输入槽边框
         int[] border = BORDER_IN;
@@ -129,18 +130,21 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
             preset.addItem(PROCESSOR_SLOT[var4], MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
         }
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT;
     }
     /**
      * method from MachineProcessorHolder
      * @return
      */
-    public MachineProcessor<SimpleCraftingOperation> getMachineProcessor() {
+    @Override
+	public MachineProcessor<SimpleCraftingOperation> getMachineProcessor() {
         return this.processor[0];
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT;
     }
 
@@ -163,21 +167,24 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
      * @param e
      * @param menu
      */
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu) {
         super.onBreak(e,menu);
         for (int i=0;i<THREAD_NUM;i++){
             processor[i].endOperation(menu.getLocation());
         }
     }
 
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         int run=0;
         boolean hasViewer=inv.hasViewer();
         for (int i=0;i<THREAD_NUM;i++){
-            SimpleCraftingOperation currentOperation = (SimpleCraftingOperation)this.processor[i].getOperation(b);
+            SimpleCraftingOperation currentOperation = this.processor[i].getOperation(b);
             ItemConsumer[] fastCraft=null;
             if(currentOperation==null){
                 Pair<MachineRecipe, ItemConsumer[]> nextP = CraftUtils.findNextRecipe(inv,

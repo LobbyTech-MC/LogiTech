@@ -344,7 +344,7 @@ public class AddGroups {
         }
     };
     public static ItemGroup BUGCRAFTER=new CustomItemGroup(bugcrafterId,AddUtils.colorful(AddUtils.ADDON_NAME),AddItem.ALLBIGRECIPES,54,36,new LinkedHashMap<>()) {
-        public PlayerHistoryRecord<CustomMenu> historyHandler=new PlayerHistoryRecord<CustomMenu>() {
+        public PlayerHistoryRecord<CustomMenu> historyHandler=new PlayerHistoryRecord<>() {
             HashMap<UUID,List<CustomMenu>> records=new HashMap<>();
             {
                 PlayerQuiteListener.addHandler((player)->{
@@ -354,7 +354,8 @@ public class AddGroups {
                     }
                 });
             }
-            public void addRecord(Player player, CustomMenu record){
+            @Override
+			public void addRecord(Player player, CustomMenu record){
                 UUID uuid=player.getUniqueId();
                 synchronized(records){
                     List<CustomMenu> list=records.get(uuid);
@@ -366,7 +367,8 @@ public class AddGroups {
 
                 }
             }
-            public CustomMenu deleteRecord(Player player,CustomMenu record){
+            @Override
+			public CustomMenu deleteRecord(Player player,CustomMenu record){
                 UUID uuid=player.getUniqueId();
                 synchronized(records){
                     List<CustomMenu> list=records.get(uuid);
@@ -376,12 +378,13 @@ public class AddGroups {
                     return list.remove(list.size()-1);
                 }
             }
-            public  CustomMenu getRecord(Player player){
+            @Override
+			public  CustomMenu getRecord(Player player){
                 UUID uuid=player.getUniqueId();
                 synchronized(records){
                     List<CustomMenu> list=records.get(uuid);
                     if(list==null){
-                        list=new ArrayList<CustomMenu>();
+                        list=new ArrayList<>();
                     }
                     if(list.isEmpty()){
                         return null;
@@ -401,7 +404,8 @@ public class AddGroups {
             }
             return subRecipes;
         }
-        protected void init(MenuFactory factory) {
+        @Override
+		protected void init(MenuFactory factory) {
             ItemStack menuBackGround=new CustomItemStack(Material.PURPLE_STAINED_GLASS_PANE,"");
             factory.addOverrides(4,AddItem.URL,(Player player1, int i1, ItemStack itemstack1, ClickAction clickAction) -> {
                 final TextComponent link = new TextComponent("单击此处访问Github");
@@ -417,7 +421,8 @@ public class AddGroups {
             subRecipes=MenuUtils.createMRecipeListDisplay(AddItem.BUG_CRAFTER,RecipeSupporter.PROVIDED_SHAPED_RECIPES.get(BugCrafter.TYPE),
                     null,historyHandler,MenuUtils::createMRecipeDisplay,true);
         }
-        public void openPage(Player var1, PlayerProfile var2, SlimefunGuideMode var3,int page){
+        @Override
+		public void openPage(Player var1, PlayerProfile var2, SlimefunGuideMode var3,int page){
 
             var2.getGuideHistory().add(this,1);
             CustomMenu menu= historyHandler.getRecord(var1);
@@ -517,7 +522,8 @@ final ItemMeta s4=new CustomItemStack(CustomHead.SUPPORTER2.getItem(),AddUtils.c
         ItemMeta[] smetas;
         final HashMap<UUID,String> LASTLY_CALCUATED_DATE=new HashMap<>();
         //used to set GUIDE based handlers,an interface to adapt CustomMenu menus
-        public void addGuideRelated(ChestMenu menu, Player p, PlayerProfile profile, SlimefunGuideMode mode, int page){
+        @Override
+		public void addGuideRelated(ChestMenu menu, Player p, PlayerProfile profile, SlimefunGuideMode mode, int page){
             //加入实例化之后的handler和item,同打开玩家等数据有关的handler
             if(page==1){
                 menu.addMenuClickHandler(27 ,((Player player1, int i1, ItemStack itemstack1, ClickAction clickAction) -> {
@@ -557,7 +563,8 @@ final ItemMeta s4=new CustomItemStack(CustomHead.SUPPORTER2.getItem(),AddUtils.c
 //            return BUGCRAFTER;
 //        }
         //used to set common handlers and common params
-        public void init(MenuFactory factory){
+        @Override
+		public void init(MenuFactory factory){
             this.setVisble(true);
             //对模板进行最高级别的覆写
             ItemStack menuBackGround=new CustomItemStack(Material.PURPLE_STAINED_GLASS_PANE,"");
@@ -662,7 +669,8 @@ final ItemMeta s4=new CustomItemStack(CustomHead.SUPPORTER2.getItem(),AddUtils.c
             });
             factory.addInventory(66,h7,(cm)-> new ChestMenu.MenuClickHandler() {
                 boolean has=false;
-                public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
+                @Override
+				public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
                     if(!has&&itemStack!=null){has=true;
                         itemStack.setItemMeta(s7);
                     }
@@ -700,8 +708,9 @@ final ItemMeta s4=new CustomItemStack(CustomHead.SUPPORTER2.getItem(),AddUtils.c
                 int index=0;
                 @Override
                 public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
-                    if(itemStack!=null)
-                        itemStack.setItemMeta(smetas[index]);
+                    if(itemStack!=null) {
+						itemStack.setItemMeta(smetas[index]);
+					}
                     index=(index+1)%5;
                     return false;
                 }
@@ -726,7 +735,9 @@ final ItemMeta s4=new CustomItemStack(CustomHead.SUPPORTER2.getItem(),AddUtils.c
                 if(itemStack!=null){
                     ItemMeta meta=itemStack.getItemMeta();
                     List<String> lores=meta.getLore();
-                    if(lores==null)lores=new ArrayList<>();
+                    if(lores==null) {
+						lores=new ArrayList<>();
+					}
                     lores.subList(1,lores.size()).clear();
                     lores.add(PREFIX1);
                     String dateString=AddUtils.getDateString();

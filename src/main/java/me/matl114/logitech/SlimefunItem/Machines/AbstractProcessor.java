@@ -78,7 +78,8 @@ public abstract class AbstractProcessor extends AbstractMachine implements Machi
      *
      * @param preset
      */
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         int[] border = AbstractProcessor.BORDER;
         int len=border.length;
@@ -107,10 +108,12 @@ public abstract class AbstractProcessor extends AbstractMachine implements Machi
 
         for(int var4 = 0; var4 < len; ++var4) {
             preset.addMenuClickHandler(border[var4], new ChestMenu.AdvancedMenuClickHandler() {
-                public boolean onClick(InventoryClickEvent e, Player p, int slot, ItemStack cursor, ClickAction action) {
+                @Override
+				public boolean onClick(InventoryClickEvent e, Player p, int slot, ItemStack cursor, ClickAction action) {
                     return cursor == null || cursor.getType() == null || cursor.getType() == Material.AIR;
                 }
-                public boolean onClick(Player p, int slot, ItemStack cursor, ClickAction action) {
+                @Override
+				public boolean onClick(Player p, int slot, ItemStack cursor, ClickAction action) {
                     return false;
                 }
             });
@@ -118,7 +121,8 @@ public abstract class AbstractProcessor extends AbstractMachine implements Machi
     }
 
 
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[]{19,20};
     }
 
@@ -126,10 +130,12 @@ public abstract class AbstractProcessor extends AbstractMachine implements Machi
      * method from MachineProcessorHolder
      * @return
      */
-    public MachineProcessor<SimpleCraftingOperation> getMachineProcessor() {
+    @Override
+	public MachineProcessor<SimpleCraftingOperation> getMachineProcessor() {
         return this.processor;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return new int[]{24,25};
     }
 
@@ -147,15 +153,18 @@ public abstract class AbstractProcessor extends AbstractMachine implements Machi
      * @param e
      * @param menu
      */
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu) {
         super.onBreak(e,menu);
         AbstractProcessor.this.processor.endOperation(menu.getLocation());
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
-        SimpleCraftingOperation currentOperation = (SimpleCraftingOperation)this.processor.getOperation(b);
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+        SimpleCraftingOperation currentOperation = this.processor.getOperation(b);
         ItemConsumer[] fastCraft=null;
         if(currentOperation==null){
             Pair<MachineRecipe, ItemConsumer[]> nextP = CraftUtils.findNextRecipe(inv,getInputSlots(),getOutputSlots(),getMachineRecipes(),USE_HISTORY

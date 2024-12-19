@@ -54,7 +54,8 @@ public class BugCrafter extends AbstractWorkBench implements ImportRecipes {
 //        };
       //  SchedulePostRegister.addPostRegisterTask(this::getMachineRecipes);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border = BORDER_IN;
         int len = border.length;
         for(int var4 = 0; var4 <len; ++var4) {
@@ -71,23 +72,29 @@ public class BugCrafter extends AbstractWorkBench implements ImportRecipes {
         preset.addItem(CRAFT_SLOT,CRAFT_ITEM);
         preset.addItem(getRecipeMenuSlot(),AbstractWorkBench.RECIPEBOOK_SHOW_ITEM);
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public int getRecipeMenuSlot(){
+    @Override
+	public int getRecipeMenuSlot(){
         return MENU_SLOT;
     }
-    public int[] getRecipeSlots(){
+    @Override
+	public int[] getRecipeSlots(){
         return INPUT_SLOT;
     }
-    public boolean isConflict(){
+    @Override
+	public boolean isConflict(){
         return false;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         menu.addMenuClickHandler(CRAFT_SLOT,
                 (player, i, itemStack, clickAction)->{
 

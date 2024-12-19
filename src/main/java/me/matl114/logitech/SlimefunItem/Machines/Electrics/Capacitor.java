@@ -17,21 +17,26 @@ public class Capacitor extends AbstractMachine {
                      int energybuffer){
         super(category,item,recipeType,recipe,energybuffer,0);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
 
     }
 
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[0];
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return new int[0];
     }
 
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         registerTick(this);
         addInfo(this.getItem());
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
     }
 }

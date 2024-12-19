@@ -22,11 +22,13 @@ public interface Ticking {
     default void registerTick(SlimefunItem item){
         item.addItemHandler(
                 new BlockTicker() {
-                    public boolean isSynchronized() {
+                    @Override
+					public boolean isSynchronized() {
                         return Ticking.this.isSync();
                     }
 
-                    @ParametersAreNonnullByDefault
+                    @Override
+					@ParametersAreNonnullByDefault
                     public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
                         BlockMenu menu = data.getBlockMenu();
                         //BlockMenu menu = BlockStorage.getInventory(b);

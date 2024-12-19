@@ -26,7 +26,8 @@ public class AbstractSpawner extends AbstractBlock{
         super(itemGroup, item, recipeType, recipe);
         this.addItemSetting(allowSpawnEggs);
     }
-    public boolean canStack(ItemMeta meta1, ItemMeta meta2){
+    @Override
+	public boolean canStack(ItemMeta meta1, ItemMeta meta2){
         if(!super.canStack(meta1,meta2)){
             return false;
         }
@@ -35,17 +36,20 @@ public class AbstractSpawner extends AbstractBlock{
         }
         return false;
     }
-    public Collection<ItemStack> getDrops() {
+    @Override
+	public Collection<ItemStack> getDrops() {
         /**
          * There should be no drops by default since drops are handled by listener
          */
         return new ArrayList<>();
     }
-    public void onBreak(BlockBreakEvent event, BlockMenu e) {
+    @Override
+	public void onBreak(BlockBreakEvent event, BlockMenu e) {
         super.onBreak(event, e);
         onSpawnerBreak(event);
     }
-    public void onPlace(BlockPlaceEvent event, Block e) {
+    @Override
+	public void onPlace(BlockPlaceEvent event, Block e) {
         super.onPlace(event, e);
         BlockState data =e.getState();
         if(data instanceof CreatureSpawner cs){
@@ -77,7 +81,8 @@ public class AbstractSpawner extends AbstractBlock{
         event.setExpToDrop(0);
     }
 }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
 	        super.preRegister();
 	        this.handleBlock(this);
 	   }

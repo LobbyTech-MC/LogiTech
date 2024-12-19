@@ -9,10 +9,12 @@ public class ConstItemStack extends ItemStack {
         super(itemStack);
         this.data = itemStack;
     }
-    public ItemStack clone(){
+    @Override
+	public ItemStack clone(){
         return data.clone();
     }
-    public boolean setItemMeta(ItemMeta meta){
+    @Override
+	public boolean setItemMeta(ItemMeta meta){
         return true;
     }
 

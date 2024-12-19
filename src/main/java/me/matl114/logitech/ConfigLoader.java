@@ -3,7 +3,6 @@ package me.matl114.logitech;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.file.Files;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -87,7 +86,7 @@ public class ConfigLoader {
     public static Config loadInternalConfig(String name){
         FileConfiguration config = new YamlConfiguration();
         try{
-            config.load((Reader)( new InputStreamReader(plugin.getClass().getResourceAsStream("/"+ name + ".yml"), Charsets.UTF_8)));
+            config.load(( new InputStreamReader(plugin.getClass().getResourceAsStream("/"+ name + ".yml"), Charsets.UTF_8)));
 
         }catch (Throwable e){
             Debug.logger("failed to load internal config " + name + ".yml, Error: " + e.getMessage());

@@ -9,29 +9,36 @@ import me.matl114.logitech.Utils.AddUtils;
 
 public class CustomEffects {
     public static AbstractEffect ANTI_GRAVITY= new AbstractEffect("ANTIGRAVITY") {
-        public void aquireEffect(Player p,int level) {
+        @Override
+		public void aquireEffect(Player p,int level) {
             p.setAllowFlight(true);
 
             p.setGravity(false);
         }
-        public void removeEffect(Player p,int level) {
+        @Override
+		public void removeEffect(Player p,int level) {
            // p.setGravity(true);
             p.setAllowFlight(false);
             p.setGravity(true);
         }
-        public void tickEffect(Player p,int level) {
+        @Override
+		public void tickEffect(Player p,int level) {
         }
 
     };
     public static AbstractEffect SOLAR_BURN= new AbstractEffect("SOLAR_BURN") {
-        public void aquireEffect(Player p,int level) {
+        @Override
+		public void aquireEffect(Player p,int level) {
         }
-        public void onDeathEvent(PlayerDeathEvent e,int level) {
+        @Override
+		public void onDeathEvent(PlayerDeathEvent e,int level) {
             e.setDeathMessage(AddUtils.resolveColor( "%s &6在超新星的烈焰中化为灰烬".formatted(e.getEntity().getName())));
         }
-        public void removeEffect(Player p,int level) {
+        @Override
+		public void removeEffect(Player p,int level) {
         }
-        public void tickEffect(Player p,int level) {
+        @Override
+		public void tickEffect(Player p,int level) {
             p.addPotionEffect(new PotionEffect( PotionEffectType.DARKNESS,140,3*level,false ),true);
             p.addPotionEffect(new PotionEffect( PotionEffectType.WITHER,140,3*level,false ),true);
             if(level==1){
@@ -43,16 +50,20 @@ public class CustomEffects {
         }
     };
     public static AbstractEffect RADIATION= new AbstractEffect("RADIATION") {
-        public void aquireEffect(Player p,int level) {
+        @Override
+		public void aquireEffect(Player p,int level) {
 
         }
-        public void onDeathEvent(PlayerDeathEvent e,int level) {
+        @Override
+		public void onDeathEvent(PlayerDeathEvent e,int level) {
             e.setDeathMessage(AddUtils.resolveColor( "%s &6的身体被核辐射穿成了筛子".formatted(e.getEntity().getName())));
         }
-        public void removeEffect(Player p,int level) {
+        @Override
+		public void removeEffect(Player p,int level) {
 
         }
-        public void tickEffect(Player p,int level) {
+        @Override
+		public void tickEffect(Player p,int level) {
             p.addPotionEffect(new PotionEffect( PotionEffectType.DARKNESS,140,10*level,false ),true);
             p.addPotionEffect(new PotionEffect( PotionEffectType.WITHER,140,10*level,false ),true);
             p.addPotionEffect(new PotionEffect( PotionEffectType.SLOWNESS,140,10*level,false ),true);
@@ -73,7 +84,8 @@ public class CustomEffects {
 
         }
 
-        public void onDeathEvent(PlayerDeathEvent e,int level) {
+        @Override
+		public void onDeathEvent(PlayerDeathEvent e,int level) {
             if(level==1){
                 e.setDeathMessage(AddUtils.resolveColor( "%s &6因选错了方向而被系统制裁".formatted(e.getEntity().getName())));
             }else if(level==2){
@@ -95,7 +107,8 @@ public class CustomEffects {
 
         }
 
-        public void onDeathEvent(PlayerDeathEvent e,int level) {
+        @Override
+		public void onDeathEvent(PlayerDeathEvent e,int level) {
             e.setDeathMessage(AddUtils.resolveColor( "%s &6被%d级的强力激光融化了".formatted(e.getEntity().getName(),level)));
         }
 

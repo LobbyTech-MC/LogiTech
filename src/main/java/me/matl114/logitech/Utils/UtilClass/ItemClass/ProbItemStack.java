@@ -17,7 +17,7 @@ public class ProbItemStack extends ItemStack implements MultiItemStack,RandOutIt
     public ProbItemStack(ItemStack stack,double prob) {
         super(stack);
         this.stack = stack;
-        this.stacklist = new ArrayList<ItemStack>();
+        this.stacklist = new ArrayList<>();
         this.problist=new ArrayList<>();
         if(stack instanceof MultiItemStack ms) {
             this.stacklist.addAll(ms.getItemStacks());
@@ -28,13 +28,15 @@ public class ProbItemStack extends ItemStack implements MultiItemStack,RandOutIt
         }
         this.prob = prob;
     }
-    public ItemStack clone(){
+    @Override
+	public ItemStack clone(){
         if(rand.nextDouble()<this.prob){
             return stack.clone();
         }
         return new ItemStack(Material.AIR);
     }
-    public ProbItemStack copy(){
+    @Override
+	public ProbItemStack copy(){
         ProbItemStack copystack = new ProbItemStack(stack, prob);
         copystack.stack=this.stack;
         copystack.air=this.air;
@@ -44,19 +46,23 @@ public class ProbItemStack extends ItemStack implements MultiItemStack,RandOutIt
         return copystack;
 
     }
-    public ItemStack getInstance(){
+    @Override
+	public ItemStack getInstance(){
         if(rand.nextDouble()<this.prob){
             return  (stack instanceof RandOutItem w)?w.getInstance():stack;
         }
         return this.air;
     }
-    public List<ItemStack> getItemStacks() {
+    @Override
+	public List<ItemStack> getItemStacks() {
         return stacklist;
     }
-    public int getTypeNum(){
+    @Override
+	public int getTypeNum(){
         return 1;
     }
-    public List<Double> getWeight(Double percent){
+    @Override
+	public List<Double> getWeight(Double percent){
         List<Double> doubles=new ArrayList<>();
         int len=this.problist.size();
         for (int i=0;i<len;i++){
@@ -64,7 +70,8 @@ public class ProbItemStack extends ItemStack implements MultiItemStack,RandOutIt
         }
         return doubles;
     }
-    public boolean matchItem(ItemStack item,boolean strictCheck){
+    @Override
+	public boolean matchItem(ItemStack item,boolean strictCheck){
         return false;
     }
 }

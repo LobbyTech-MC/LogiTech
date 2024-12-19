@@ -92,7 +92,8 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
             getCraftTypes();
         });
     }
-    public List<ItemStack> _getDisplayRecipes(List<ItemStack> displayRecipe2){
+    @Override
+	public List<ItemStack> _getDisplayRecipes(List<ItemStack> displayRecipe2){
         List<ItemStack> displayRecipe=new ArrayList<>(displayRecipe2);
         HashMap<SlimefunItem,RecipeType> providedRecipeTypeMap=getRecipeTypeMap();
         if(providedRecipeTypeMap!=null&&!providedRecipeTypeMap.isEmpty()){
@@ -107,7 +108,8 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
         return displayRecipe;
     }
     public abstract boolean advanced();
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
 
         //输入槽边框
@@ -134,24 +136,29 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
         return new DataMenuClickHandler() {
             //0 为 数量 1 为 电力
             int[] intdata=new int[3];
-            public int getInt(int i){
+            @Override
+			public int getInt(int i){
                 return intdata[i];
             }
             @Override
             public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
                 return false;
             }
-            public void setInt(int i, int val){
+            @Override
+			public void setInt(int i, int val){
                 intdata[i]=val;
             }
         };
     }
-    public int getCraftLimit(Block b,BlockMenu menu){
+    @Override
+	public int getCraftLimit(Block b,BlockMenu menu){
         if(advanced()){
             DataMenuClickHandler handler=getDataHolder(b,menu);
             int t= handler.getInt(2);
             return t<=0?1:t;
-        }else return 1;
+        } else {
+			return 1;
+		}
     }
 
     public RecipeType[] getCraftTypes(){
@@ -185,14 +192,17 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
             return dh;
         }
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public ItemStack getProgressBar(){
+    @Override
+	public ItemStack getProgressBar(){
         return this.progressbar;
     }
     public MachineRecipe getRecipe(BlockMenu inv){
@@ -215,9 +225,13 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
     }
     @Override
     public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
-        if (flow == ItemTransportFlow.WITHDRAW) return getOutputSlots();
+        if (flow == ItemTransportFlow.WITHDRAW) {
+			return getOutputSlots();
+		}
         int [] inputSlots=getInputSlots();
-        if(item==null||item.getType().isAir()||(!(menu instanceof BlockMenu)))return inputSlots;
+        if(item==null||item.getType().isAir()||(!(menu instanceof BlockMenu))) {
+			return inputSlots;
+		}
         MachineRecipe now=getRecipe((BlockMenu)menu);
         if(now==null){
             return new int[0];
@@ -228,10 +242,10 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
         ItemStack[] recipeInput=now.getInput();
         ItemCounter pusher=null;
         boolean hasOne=false;
-        for (int i=0;i<recipeInput.length;++i){
-            if(recipeInput[i].getType()==item.getType()&&recipeInput[i].hasItemMeta()==item.hasItemMeta()){
+        for (ItemStack element : recipeInput) {
+            if(element.getType()==item.getType()&&element.hasItemMeta()==item.hasItemMeta()){
                 if(!hasOne){
-                    amountLimit=Math.max(recipeInput[i].getAmount()*craftlimit,maxStack);
+                    amountLimit=Math.max(element.getAmount()*craftlimit,maxStack);
                     hasOne=true;
                 }else{
                     if(pusher==null){
@@ -240,8 +254,8 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
                     }
 
                     //由于StackMachineRecipe 材料已经被折叠过了 只需要找到一个匹配就行
-                    if(CraftUtils.matchItemStack(recipeInput[i],pusher,false)){
-                        amountLimit=Math.max(recipeInput[i].getAmount()*craftlimit,maxStack);
+                    if(CraftUtils.matchItemStack(element,pusher,false)){
+                        amountLimit=Math.max(element.getAmount()*craftlimit,maxStack);
                         break;
                     }
                 }
@@ -255,7 +269,9 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
         boolean hasItemMeta=item.hasItemMeta();
         for (int slot : inputSlots) {
             ItemStack itemInSlot = menu.getItemInSlot(slot);
-            if(itemInSlot==null)continue;
+            if(itemInSlot==null) {
+				continue;
+			}
             //出现类型匹配
             if (itemInSlot.getType()==item.getType()&&itemInSlot.hasItemMeta()==hasItemMeta) {
                 //如果pusher!=null,说明上面出现了两个相同type 需要比较
@@ -273,7 +289,8 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
         return inputSlots;
     }
 
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         menu.replaceExistingItem(PARSE_SLOT,PARSE_ITEM);
         menu.addMenuClickHandler(PARSE_SLOT,(player, i, itemStack, clickAction)->{
             updateMenu(menu,block, Settings.RUN);
@@ -287,7 +304,8 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
         }));
         updateMenu(menu,block,Settings.INIT);
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu){
         super.onBreak(e, menu);
         Location loc=menu.getLocation();
         menu.dropItems(loc,RECIPEITEM_SLOT);
@@ -298,13 +316,7 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
         SlimefunItem machineType=SlimefunItem.getByItem(machine.getItem());
         HashMap<SlimefunItem,RecipeType> providedRecipesMap=getRecipeTypeMap();
         DataMenuClickHandler handler=getDataHolder(null,menu);
-        if(providedRecipesMap==null) {
-            handler.setInt(0,-1);
-            handler.setInt(1,-1);
-            handler.setInt(2,0);
-            return false;
-        }
-        if(machineType==null||!providedRecipesMap.containsKey(machineType)){
+        if((providedRecipesMap==null) || machineType==null||!providedRecipesMap.containsKey(machineType)){
             handler.setInt(0,-1);
             handler.setInt(1,-1);
             handler.setInt(2,0);
@@ -340,7 +352,8 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
             return false;
         }
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         if(inv.hasViewer()){
             updateMenu(inv,b,Settings.RUN);
         }
@@ -408,13 +421,14 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
             currentOperation.progress(1);
         }
     }
-    public void updateMenu(BlockMenu menu,Block block,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu menu,Block block,Settings mod){
         DataMenuClickHandler hd=getDataHolder(block,menu);
         parseRecipe(menu);
         MachineRecipe recipe=getRecipe(menu);
         if(recipe==null){
-            for(int var4 = 0; var4 < RECIPE_DISPLAY.length; ++var4) {
-                menu.replaceExistingItem(RECIPE_DISPLAY[var4],DISPLAY_DEFAULT_BKGROUND);
+            for (int element : RECIPE_DISPLAY) {
+                menu.replaceExistingItem(element,DISPLAY_DEFAULT_BKGROUND);
             }
         }else{
             ItemStack[] input ;

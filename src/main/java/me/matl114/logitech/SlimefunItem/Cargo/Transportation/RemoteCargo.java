@@ -68,7 +68,8 @@ public class RemoteCargo extends AbstractCargo {
         );
 
     }
-    public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
+    @Override
+	public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
         //Location loc=menu.getLocation();
         Location from_dir=getLocation("from_dir",data);
         if(from_dir==null){
@@ -81,15 +82,16 @@ public class RemoteCargo extends AbstractCargo {
         int[] bwslots=getBWListSlot();
         HashSet<ItemStack> bwset=new HashSet<>();
         ItemStack it;
-        for (int i=0;i<bwslots.length;++i){
-            it=menu.getItemInSlot(bwslots[i]);
+        for (int bwslot2 : bwslots) {
+            it=menu.getItemInSlot(bwslot2);
             if(it!=null){
                 bwset.add(it);
             }
         }
         ContainerUtils.transferWithContainer(from_dir,to_dir,configCode,bwset,transportSmarter);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for (int i=0;i<len;++i){
@@ -101,28 +103,35 @@ public class RemoteCargo extends AbstractCargo {
             preset.addItem(INFO_SLOT[i],INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
         }
     }
-    public int[] getBWListSlot(){
+    @Override
+	public int[] getBWListSlot(){
         return BWSLOT;
     }
-    public int getConfigSlot(){
+    @Override
+	public int getConfigSlot(){
         return 4;
     }
-    public int[] getDirectionSlots(){
+    @Override
+	public int[] getDirectionSlots(){
         return new int[0];
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[0];
     }
     public Location getLocation(String saveKey,SlimefunBlockData data){
         return DataCache.getLocation(saveKey,data);
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return new int[0];
     }
-    public String[] getSaveKeys(){
+    @Override
+	public String[] getSaveKeys(){
         return savedKeys;
     }
-    public void newMenuInstance(BlockMenu inv, Block b){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block b){
         inv.addMenuOpeningHandler((player -> {
             updateMenu(inv,b,Settings.RUN);
         }));
@@ -132,7 +141,8 @@ public class RemoteCargo extends AbstractCargo {
 
         updateMenu(inv,b, Settings.INIT);
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu){
         super.onBreak(e, menu);
         if(menu!=null){
             Location loc=menu.getLocation();
@@ -151,7 +161,8 @@ public class RemoteCargo extends AbstractCargo {
         }
         DataCache.setLocation(saveKey,blockMenu.getLocation(),null);
     }
-    public void updateMenu(BlockMenu inv ,Block b,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv ,Block b,Settings mod){
         loadConfig(inv,b);
         updateLocationSlot("from_dir",inv,LOCATION_SLOT[0]);
         updateLocationSlot("to_dir",inv,LOCATION_SLOT[1]);

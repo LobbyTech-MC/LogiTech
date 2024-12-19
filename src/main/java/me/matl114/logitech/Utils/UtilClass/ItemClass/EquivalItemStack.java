@@ -49,15 +49,17 @@ public class EquivalItemStack extends ItemStack implements MultiItemStack ,Equal
         for(Map.Entry<ItemStack, Integer> entry : itemSettings.entrySet()) {
             itemList[cnt] = entry.getKey();
             counterList[cnt]=ItemCounter.get(itemList[cnt]);
-            itemWeight[cnt]= 1.0/(double)weight;
+            itemWeight[cnt]= 1.0/weight;
             weightSum[cnt+1]=weightSum[cnt]+itemWeight[cnt];
             ++cnt;
         }
     }
-    public ItemStack clone(){
+    @Override
+	public ItemStack clone(){
         return itemList[0].clone();
     }
-    public EquivalItemStack copy(){
+    @Override
+	public EquivalItemStack copy(){
         EquivalItemStack stack = new EquivalItemStack(itemSettings);
         stack.itemList=Arrays.copyOf(this.itemList,this.itemList.length);
         stack.counterList=Arrays.copyOf(this.counterList,this.counterList.length);
@@ -67,11 +69,13 @@ public class EquivalItemStack extends ItemStack implements MultiItemStack ,Equal
         return stack;
 
     }
-    public int getAmount(){
+    @Override
+	public int getAmount(){
         return this.eamount;
     }
     //递归地解析全体物品列
-    public List<ItemStack> getItemStacks() {
+    @Override
+	public List<ItemStack> getItemStacks() {
         List<ItemStack> items = new ArrayList<>();
         for(int i=0;i<sum;i++) {
             if(itemList[i] instanceof MultiItemStack) {
@@ -80,16 +84,18 @@ public class EquivalItemStack extends ItemStack implements MultiItemStack ,Equal
                 items.add(itemList[i].clone());
             }
         }
-        for(int i=0;i<items.size();i++) {
-            items.get(i).setAmount(this.eamount);
+        for (ItemStack item : items) {
+            item.setAmount(this.eamount);
         }
 
         return items;
     }
-    public int getTypeNum(){
+    @Override
+	public int getTypeNum(){
         return this.sum;
     }
-    public List<Double> getWeight(Double percentage) {
+    @Override
+	public List<Double> getWeight(Double percentage) {
         List<Double> weights = new ArrayList<>();
         for(int i=0;i<sum;i++) {
             if(itemList[i] instanceof MultiItemStack) {
@@ -100,18 +106,21 @@ public class EquivalItemStack extends ItemStack implements MultiItemStack ,Equal
         }
         return weights;
     }
-    public boolean matchItem(ItemStack item,boolean strickCheck){
-        for (int i = 0; i < counterList.length; i++) {
-            if(CraftUtils.matchItemStack(item,counterList[i],strickCheck)){
+    @Override
+	public boolean matchItem(ItemStack item,boolean strickCheck){
+        for (ItemCounter element : counterList) {
+            if(CraftUtils.matchItemStack(item,element,strickCheck)){
                 return true;
             }
         }
         return false;
     }
-    public void setAmount(int t){
+    @Override
+	public void setAmount(int t){
         throw new NotImplementedException("this method shoudln't be called");
     }
-    public void setEqualAmount(int t){
+    @Override
+	public void setEqualAmount(int t){
         this.eamount=t;
     }
 }

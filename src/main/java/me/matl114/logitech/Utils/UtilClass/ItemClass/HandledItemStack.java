@@ -18,30 +18,36 @@ public class HandledItemStack extends ItemStack {
         super();
         this.handle = itemStack;
     }
-    public void addEnchantment(Enchantment ench, int level) {
+    @Override
+	public void addEnchantment(Enchantment ench, int level) {
         this.handle.addEnchantment(ench, level);
     }
-    public void addEnchantments( Map<Enchantment, Integer> enchantments) {
+    @Override
+	public void addEnchantments( Map<Enchantment, Integer> enchantments) {
         this.handle.addEnchantments(enchantments);
 
     }
 
-    public void addUnsafeEnchantment( Enchantment ench, int level) {
+    @Override
+	public void addUnsafeEnchantment( Enchantment ench, int level) {
         this.handle.addUnsafeEnchantment(ench, level);
     }
 
-    public void addUnsafeEnchantments( Map<Enchantment, Integer> enchantments) {
+    @Override
+	public void addUnsafeEnchantments( Map<Enchantment, Integer> enchantments) {
         this.handle.addUnsafeEnchantments(enchantments);
 
     }
 
 
 
-    public ItemStack clone() {
+    @Override
+	public ItemStack clone() {
         return this.handle.clone();
     }
 
-    public boolean containsEnchantment( Enchantment ench) {
+    @Override
+	public boolean containsEnchantment( Enchantment ench) {
         return this.handle.containsEnchantment(ench);
     }
 
@@ -50,99 +56,120 @@ public class HandledItemStack extends ItemStack {
         return handleMeta;
     }
 
-    public boolean equals(Object obj) {
+    @Override
+	public boolean equals(Object obj) {
         return this.handle.equals(obj);
     }
 
-    public int getAmount() {
+    @Override
+	public int getAmount() {
         return this.handle.getAmount();
     }
 
-    @Nullable
+    @Override
+	@Nullable
     public MaterialData getData() {
         return this.handle.getData();
     }
 
     /** @deprecated */
-    @Deprecated
+    @Override
+	@Deprecated
     public short getDurability() {
         return   this.handle.getDurability();
     }
 
-    public int getEnchantmentLevel( Enchantment ench) {
+    @Override
+	public int getEnchantmentLevel( Enchantment ench) {
         return this.handle.getEnchantmentLevel(ench);
     }
 
-    public Map<Enchantment, Integer> getEnchantments() {
+    @Override
+	public Map<Enchantment, Integer> getEnchantments() {
         return this.handle.getEnchantments();
     }
 
 
 
-    @Nullable
+    @Override
+	@Nullable
     public ItemMeta getItemMeta() {
         return this.handleMeta==null?createItemMeta():this.handleMeta;
     }
 
-    public int getMaxStackSize() {
+    @Override
+	public int getMaxStackSize() {
         return this.handle.getMaxStackSize();
     }
 
-    public String getTranslationKey() {
+    @Override
+	public String getTranslationKey() {
         return Bukkit.getUnsafe().getTranslationKey(this);
     }
 
-    public Material getType() {
+    @Override
+	public Material getType() {
         return this.handle.getType();
     }
 
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return this.handle.hashCode();
     }
 
-    public boolean hasItemMeta() {
+    @Override
+	public boolean hasItemMeta() {
         return handle.hasItemMeta();
     }
 
-    public boolean isSimilar(@Nullable ItemStack stack) {
+    @Override
+	public boolean isSimilar(@Nullable ItemStack stack) {
         return this.handle.isSimilar(stack);
     }
 
 
-    public int removeEnchantment( Enchantment ench) {
+    @Override
+	public int removeEnchantment( Enchantment ench) {
         return this.handle.removeEnchantment(ench);
     }
 
-    public void removeEnchantments() {
+    @Override
+	public void removeEnchantments() {
         this.handle.removeEnchantments();
     }
 
-    public Map<String, Object> serialize() {
+    @Override
+	public Map<String, Object> serialize() {
         return this.handle.serialize();
     }
 
-    public void setAmount(int amount) {
+    @Override
+	public void setAmount(int amount) {
         this.handle.setAmount(amount);
     }
 
-    public void setData(@Nullable MaterialData data) {
+    @Override
+	public void setData(@Nullable MaterialData data) {
         this.handle.setData(data);
     }
 
     /** @deprecated */
-    @Deprecated
+    @Override
+	@Deprecated
     public void setDurability(short durability) {
        this.handle.setDurability(durability);
 
     }
 
-    public boolean setItemMeta(@Nullable ItemMeta itemMeta) {
+    @Override
+	public boolean setItemMeta(@Nullable ItemMeta itemMeta) {
 
         this.handleMeta = itemMeta;
         return true;
     }
 
-    public void setType( Material type) {
+    @Override
+	public void setType( Material type) {
         this.handle.setType(type);
     }
 
@@ -150,7 +177,8 @@ public class HandledItemStack extends ItemStack {
 
 
 
-    public String toString() {
+    @Override
+	public String toString() {
         return this.handle.toString();
     }
 }

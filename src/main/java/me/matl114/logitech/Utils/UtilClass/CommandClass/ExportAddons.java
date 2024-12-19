@@ -60,10 +60,12 @@ public class ExportAddons {
                             if(2*i+1<len){
                                 a2=stacks.get(2*i+1);
                             }
-                            if(a1!=null)
-                                outputConfig.setValue(recipeRoot+".%d.input.1".formatted(index),AddUtils.getItemId(a1));
-                            if(a2!=null)
-                                outputConfig.setValue(recipeRoot+".%d.output.1".formatted(index),AddUtils.getItemId(a2));
+                            if(a1!=null) {
+								outputConfig.setValue(recipeRoot+".%d.input.1".formatted(index),AddUtils.getItemId(a1));
+							}
+                            if(a2!=null) {
+								outputConfig.setValue(recipeRoot+".%d.output.1".formatted(index),AddUtils.getItemId(a2));
+							}
                             if(a1!=null||a2!=null){
                                 isEmpty=false;
                                 outputConfig.setValue(recipeRoot+".%d.tick".formatted(index),0);
@@ -98,8 +100,9 @@ public class ExportAddons {
                     outputConfig.setValue(root+".mode","w");
                     outputConfig.setValue(root+".type","machine");
                     int energy=RecipeSupporter.tryGetMachineEnergy(sfitem);
-                    if(energy>=0)
-                        outputConfig.setValue(root+".energy",energy);
+                    if(energy>=0) {
+						outputConfig.setValue(root+".energy",energy);
+					}
                 }
             }
             outputConfig.save();

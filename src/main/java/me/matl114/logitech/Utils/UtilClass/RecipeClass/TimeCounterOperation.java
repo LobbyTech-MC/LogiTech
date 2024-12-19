@@ -17,7 +17,8 @@ public class TimeCounterOperation implements CustomMachineOperation {
         return totalTime;
     }
 
-    public void progress(int k){
+    @Override
+	public void progress(int k){
         currentTime += k;
     }
 }

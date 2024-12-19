@@ -265,8 +265,9 @@ public class TransportUtils {
                     tarCounter2.setFrom(cache);
                     tarCounter2.grab(cache);
                 }
-                else if(tarCounter2.getAmount()>=tarCounter2.getMaxStackCnt())continue;
-                else if(CraftUtils.matchItemCounter(tarCounter2,cache,true)){
+                else if(tarCounter2.getAmount()>=tarCounter2.getMaxStackCnt()) {
+					continue;
+				} else if(CraftUtils.matchItemCounter(tarCounter2,cache,true)){
                     tarCounter2.grab(cache);
                 }
                 if(cache.getAmount()==0){
@@ -319,7 +320,9 @@ public class TransportUtils {
             }
         }
         //我那么大一个输出槽呢？
-        if(indexLen<=0)return;
+        if(indexLen<=0) {
+			return;
+		}
         DynamicArray<ItemPusher> toCache=new DynamicArray<>(ItemPusher[]::new,indexLen,provider.getMenuInstance(Settings.OUTPUT,to,toCacheIndex));
         boolean[] toRecord=new boolean[indexLen];
         ItemPusher fromPusher ;
@@ -566,7 +569,9 @@ public class TransportUtils {
             }
         }
         //我那么大一个输出槽呢？
-        if(indexLen<=0)return;
+        if(indexLen<=0) {
+			return;
+		}
         DynamicArray<ItemPusher> toCache=new DynamicArray<>(ItemPusher[]::new,indexLen,provider.getMenuInstance(Settings.OUTPUT,to,toCacheIndex));
         boolean[] toRecord=new boolean[indexLen];
         ItemPusher fromPusher ;
@@ -668,7 +673,9 @@ public class TransportUtils {
             }
         }
         //我那么大一个输出槽呢？
-        if(indexLen<=0)return;
+        if(indexLen<=0) {
+			return;
+		}
         DynamicArray<ItemPusher> toCache=new DynamicArray<>(ItemPusher[]::new,indexLen,provider.getMenuInstance(Settings.OUTPUT,to,toCacheIndex));
         boolean[] toRecord=new boolean[indexLen];
         ItemPusher fromPusher ;
@@ -689,7 +696,9 @@ public class TransportUtils {
             for(int j=0;j<restrictedLen;++j){
                 index=slotMappers[restrictedInsertSlot[j]]-1;
                 //not in available slots
-                if(index<0)continue ;
+                if(index<0) {
+					continue ;
+				}
                 if(!toRecord[index]){
                     toPusher=toCache.get(index);
                     if(toPusher.getItem()==null){

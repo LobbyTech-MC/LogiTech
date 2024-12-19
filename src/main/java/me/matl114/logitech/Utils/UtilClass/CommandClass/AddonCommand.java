@@ -17,7 +17,8 @@ public class AddonCommand implements TabExecutor {
     public AddonCommand(MyAddon plugin) {
         this.plugin=plugin;
     }
-    public boolean onCommand( CommandSender var1,  Command var2, String var3,  String[] var4){
+    @Override
+	public boolean onCommand( CommandSender var1,  Command var2, String var3,  String[] var4){
         if(var1 instanceof Player player){
             if(var1.hasPermission("logitech.command.op")){
                 if(var4.length>0){

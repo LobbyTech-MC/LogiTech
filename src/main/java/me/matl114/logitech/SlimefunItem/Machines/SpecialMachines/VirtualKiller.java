@@ -61,7 +61,8 @@ public class VirtualKiller extends AbstractMachine {
                         "&a注明:普通掉落物部分由ChatGPT生成,并由@haiman补充完整,若有欠缺欢迎补充"),null
         ));
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for(int i=0;i<len;i++){
@@ -82,20 +83,24 @@ public class VirtualKiller extends AbstractMachine {
             //0 为 数量 1 为 电力
             int amount;
             Object spawnerType;
-            public int getInt(int i){
+            @Override
+			public int getInt(int i){
                 return amount;
             }
-            public Object getObject(int i){
+            @Override
+			public Object getObject(int i){
                 return spawnerType;
             }
             @Override
             public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
                 return false;
             }
-            public void setInt(int i, int val){
+            @Override
+			public void setInt(int i, int val){
                 amount=val;
             }
-            public void setObject(int i, Object val){
+            @Override
+			public void setObject(int i, Object val){
                 spawnerType=val;
             }
         };
@@ -121,18 +126,22 @@ public class VirtualKiller extends AbstractMachine {
                AddUtils.concat( "&7当前生物: &a",type==null?"&c无生物": ChatUtils.humanize(type.name())),
                 AddUtils.concat("&7当前数量: &a",String.valueOf(amount)));
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         menu.addMenuOpeningHandler(player -> updateMenu(menu,block,Settings.RUN));
         menu.addMenuCloseHandler(player -> updateMenu(menu,block,Settings.RUN));
         updateMenu(menu,block,Settings.INIT);
     }
-    public void onBreak(BlockBreakEvent event,BlockMenu inv){
+    @Override
+	public void onBreak(BlockBreakEvent event,BlockMenu inv){
         super.onBreak(event,inv);
         if(inv!=null){
             inv.dropItems(inv.getLocation(),SPAWNER_SLOT);
@@ -155,7 +164,8 @@ public class VirtualKiller extends AbstractMachine {
         handler.setObject(0,null);
         menu.replaceExistingItem(INFO_SLOT,getInfoItem(null,0));
     }
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu menu, SlimefunBlockData data){
         if(menu.hasViewer()){
             updateMenu(menu,b,Settings.RUN);
         }
@@ -169,16 +179,19 @@ public class VirtualKiller extends AbstractMachine {
             }
         }
     }
-    public List<MachineRecipe> provideDisplayRecipe(){
+    @Override
+	public List<MachineRecipe> provideDisplayRecipe(){
         HashMap<EntityType,ItemStack[]> map=getEntityMap();
         List<MachineRecipe> providedRecipes=new ArrayList<>();
         for(Map.Entry<EntityType,ItemStack[]> entry:map.entrySet()){
-            if(entry.getValue().length!=0)
-                providedRecipes.add(MachineRecipeUtils.stackFrom(0,new ItemStack[]{ EntityFeat.getItemFromEntityType(entry.getKey())},entry.getValue()));
+            if(entry.getValue().length!=0) {
+				providedRecipes.add(MachineRecipeUtils.stackFrom(0,new ItemStack[]{ EntityFeat.getItemFromEntityType(entry.getKey())},entry.getValue()));
+			}
         }
         return providedRecipes;
     }
-    public void updateMenu(BlockMenu menu,Block block,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu menu,Block block,Settings mod){
         parseItem(menu,block);
     }
 }

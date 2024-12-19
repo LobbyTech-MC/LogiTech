@@ -15,10 +15,11 @@ public class RandOutManulCrafter extends ManualCrafter{
                          RecipeType... craftType) {
         super(category,item,recipeType,recipe,energybuffer,energyConsumption,craftType);
     }
-    public boolean preCraft(BlockMenu inv, Player p,boolean sendMessage){
+    @Override
+	public boolean preCraft(BlockMenu inv, Player p,boolean sendMessage){
         int[] outputs=getOutputSlots();
-        for (int i=0;i<outputs.length;i++){
-            if(inv.getItemInSlot(outputs[i])==null){
+        for (int output : outputs) {
+            if(inv.getItemInSlot(output)==null){
                 return true;
             }
         }

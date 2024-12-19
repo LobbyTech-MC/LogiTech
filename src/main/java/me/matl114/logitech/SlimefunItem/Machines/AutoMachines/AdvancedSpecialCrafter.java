@@ -101,7 +101,8 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
             }
         }};
     }
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
 
         //输入槽边框
@@ -149,19 +150,23 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
         }
         return craftType;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public ItemStack getProgressBar(){
+    @Override
+	public ItemStack getProgressBar(){
         return this.progressbar;
     }
     public abstract HashMap<SlimefunItem,RecipeType> getRecipeTypeMap();
 
-    public MachineRecipe getRecordRecipe(SlimefunBlockData data){
+    @Override
+	public MachineRecipe getRecordRecipe(SlimefunBlockData data){
         int index= MultiCraftType.getRecipeTypeIndex(data);
         if(index>=0){
             RecipeType[] types=getCraftTypes();
@@ -186,9 +191,13 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
     }
     @Override
     public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
-        if (flow == ItemTransportFlow.WITHDRAW) return getOutputSlots();
+        if (flow == ItemTransportFlow.WITHDRAW) {
+			return getOutputSlots();
+		}
         int [] inputSlots=getInputSlots();
-        if(item==null||item.getType().isAir()||(!(menu instanceof BlockMenu)))return inputSlots;
+        if(item==null||item.getType().isAir()||(!(menu instanceof BlockMenu))) {
+			return inputSlots;
+		}
         SlimefunBlockData data = DataCache.safeLoadBlock(((BlockMenu)menu).getLocation());
         if(data==null){
             return inputSlots;
@@ -201,16 +210,18 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
         int amountLimit=0;
         int maxStack=item.getMaxStackSize();
         ItemStack[] recipeInput=now.getInput();
-        for (int i=0;i<recipeInput.length;++i){
-            if(recipeInput[i].getType()==item.getType()&&recipeInput[i].hasItemMeta()==item.hasItemMeta()){
-                amountLimit+=Math.max(recipeInput[i].getAmount()*craftlimit,maxStack);
+        for (ItemStack element : recipeInput) {
+            if(element.getType()==item.getType()&&element.hasItemMeta()==item.hasItemMeta()){
+                amountLimit+=Math.max(element.getAmount()*craftlimit,maxStack);
             }
         }
         // Check the current amount
         int itemAmount = 0;
         for (int slot : getInputSlots()) {
             ItemStack itemInSlot = menu.getItemInSlot(slot);
-            if(itemInSlot==null)continue;
+            if(itemInSlot==null) {
+				continue;
+			}
             if (itemInSlot.getType()==item.getType()&&itemInSlot.hasItemMeta()==item.hasItemMeta()) {
                 itemAmount+=itemInSlot.getAmount();
                 // Amount has reached the limited, just return.
@@ -221,7 +232,8 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
         }
         return inputSlots;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         menu.replaceExistingItem(PARSE_SLOT,PARSE_ITEM);
         menu.addMenuClickHandler(PARSE_SLOT,(player, i, itemStack, clickAction)->{
             parseRecipe(menu);
@@ -238,7 +250,8 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
         }));
         updateMenu(menu,block,Settings.INIT);
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu){
         super.onBreak(e, menu);
         Location loc=menu.getLocation();
         menu.dropItems(loc,RECIPEITEM_SLOT);
@@ -249,7 +262,9 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
         SlimefunItem machineType=SlimefunItem.getByItem(machine);
         Location loc=menu.getLocation();
         HashMap<SlimefunItem,RecipeType> providedRecipesMap=getRecipeTypeMap();
-        if(providedRecipesMap==null)return false;
+        if(providedRecipesMap==null) {
+			return false;
+		}
         if(machineType==null||!providedRecipesMap.containsKey(machineType)){
             setNowRecordRecipe(loc,-1);
             MultiCraftType.setRecipeTypeIndex(loc,-1);
@@ -280,7 +295,8 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
         }
     }
 
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
 
         SimpleCraftingOperation currentOperation = this.processor.getOperation(b);
         ItemConsumer[] fastCraft=null;
@@ -346,7 +362,8 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
             currentOperation.progress(1);
         }
     }
-    public void updateMenu(BlockMenu menu,Block block,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu menu,Block block,Settings mod){
         SlimefunBlockData data=DataCache.safeLoadBlock(menu.getLocation());
         if(data==null){
             Schedules.launchSchedules(()->{
@@ -356,8 +373,8 @@ public abstract class AdvancedSpecialCrafter extends AbstractProcessor implement
         }
         MachineRecipe recipe=getRecordRecipe(data);
         if(recipe==null){
-            for(int var4 = 0; var4 < RECIPE_DISPLAY.length; ++var4) {
-                menu.replaceExistingItem(RECIPE_DISPLAY[var4],DISPLAY_DEFAULT_BKGROUND);
+            for (int element : RECIPE_DISPLAY) {
+                menu.replaceExistingItem(element,DISPLAY_DEFAULT_BKGROUND);
             }
         }else{
             ItemStack[] input ;

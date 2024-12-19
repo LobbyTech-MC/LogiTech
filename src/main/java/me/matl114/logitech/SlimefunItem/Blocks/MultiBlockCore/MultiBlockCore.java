@@ -36,7 +36,9 @@ public interface MultiBlockCore extends MultiBlockPart, Ticking , MenuBlock {
      */
     static ConcurrentHashMap<Location, AtomicBoolean> locks=new ConcurrentHashMap<>();
     default void autoBuild(Location loc, SlimefunBlockData data, int autoCode){
-        if(autoCode<=0)return;
+        if(autoCode<=0) {
+			return;
+		}
         if(autoCode==3){//3tick重连一次
             Location tarloc=loc.clone();
             AtomicBoolean lock=locks.computeIfAbsent(tarloc,(i)->new AtomicBoolean(false));
@@ -62,16 +64,19 @@ public interface MultiBlockCore extends MultiBlockPart, Ticking , MenuBlock {
         return MultiBlockHandler::createHandler;
     }
     public AbstractMultiBlockType getMultiBlockType();
-    default void handleBlock(SlimefunItem machine){
+    @Override
+	default void handleBlock(SlimefunItem machine){
         machine.addItemHandler(
             new BlockBreakHandler(false, false) {
-                @ParametersAreNonnullByDefault
+                @Override
+				@ParametersAreNonnullByDefault
                 public void onPlayerBreak(BlockBreakEvent e, ItemStack itemStack, List<ItemStack> list) {
                     //BlockMenu menu = DataCache.getMenu(e.getBlock().getLocation());// BlockStorage.getInventory(e.getBlock());
                     MultiBlockCore.this.onMultiBlockBreak(e);
                 }
             }, new BlockPlaceHandler(false) {
-                @ParametersAreNonnullByDefault
+                @Override
+				@ParametersAreNonnullByDefault
                 public void onPlayerPlace(BlockPlaceEvent e) {
                     MultiBlockCore.this.onPlace(e, e.getBlockPlaced());
                 }
@@ -81,7 +86,8 @@ public interface MultiBlockCore extends MultiBlockPart, Ticking , MenuBlock {
      * should override if Menu if present ,should add MenuBlock.onBreak
      * @param e
      */
-    default void onMultiBlockBreak(BlockBreakEvent e) {
+    @Override
+	default void onMultiBlockBreak(BlockBreakEvent e) {
         this.onBreak(e,DataCache.getMenu(e.getBlock().getLocation()));
         MultiBlockPart.super.onMultiBlockBreak(e);
         Location loc = e.getBlock().getLocation();
@@ -95,7 +101,8 @@ public interface MultiBlockCore extends MultiBlockPart, Ticking , MenuBlock {
         MultiBlockService.removeHologram(loc);
     }
 
-    default boolean redirectMenu(){
+    @Override
+	default boolean redirectMenu(){
         return false;
     }
 

@@ -30,7 +30,8 @@ public abstract class AbstractFilter extends AbstractBlock implements Ticking {
     public AbstractFilter(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=getInputBorders();
         int len=border.length;
         for (int i=0;i<len;i++){
@@ -49,15 +50,18 @@ public abstract class AbstractFilter extends AbstractBlock implements Ticking {
     }
     public abstract int[] getBorders();
     public abstract int[] getInputBorders();
-    public abstract int[] getInputSlots();
+    @Override
+	public abstract int[] getInputSlots();
     public abstract int[] getOutputBorders();
     public abstract ItemStack[] getOutputBordersItem();
-    public abstract int[] getOutputSlots();
+    @Override
+	public abstract int[] getOutputSlots();
     public abstract int[] getOutputWLSlot();
 
    // public abstract void updateMenu(BlockMenu blockMenu, Block block, Settings mod);
     public abstract int getTrashSlot();
-    public void newMenuInstance(BlockMenu menu, Block b){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block b){
         SlimefunBlockData data=DataCache.safeLoadBlock(menu.getLocation());
         String clean=DataCache.getCustomString(data,KEY_CLEAN,"no");
         if(clean.length()==1){
@@ -78,12 +82,14 @@ public abstract class AbstractFilter extends AbstractBlock implements Ticking {
             return false;
         }));
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         registerBlockMenu(this);
         registerTick(this);
     }
-    public void tick(Block b,BlockMenu inv,SlimefunBlockData data ,int tickCount){
+    @Override
+	public void tick(Block b,BlockMenu inv,SlimefunBlockData data ,int tickCount){
         int[] inputSlots = getInputSlots();
         int[] outputSlots = getOutputSlots();
         int[] outputWLSlot = getOutputWLSlot();

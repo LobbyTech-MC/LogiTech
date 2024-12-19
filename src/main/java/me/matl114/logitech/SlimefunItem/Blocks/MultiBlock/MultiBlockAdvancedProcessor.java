@@ -48,34 +48,44 @@ public abstract class MultiBlockAdvancedProcessor extends AbstractAdvancedProces
         }
         return handler;
     }
-    public MultiBlockService.MultiBlockBuilder getBuilder(){
+    @Override
+	public MultiBlockService.MultiBlockBuilder getBuilder(){
         return (MultiBlockService.MultiBlockBuilder) this::createAdvanceProcessor;
     }
-    public int getCraftLimit(Block b,BlockMenu inv){
+    @Override
+	public int getCraftLimit(Block b,BlockMenu inv){
         return 1<<DataCache.getCustomData(inv.getLocation(),HEIGHT_KEY,0);
     }
-    public abstract int[] getInputSlots();
-    public MachineProcessor<MultiCraftingOperation> getMachineProcessor() {
+    @Override
+	public abstract int[] getInputSlots();
+    @Override
+	public MachineProcessor<MultiCraftingOperation> getMachineProcessor() {
         return this.processor;
     }
-    public AbstractMultiBlockType getMultiBlockType(){
+    @Override
+	public AbstractMultiBlockType getMultiBlockType(){
         return MBTYPE;
     }
-    public abstract int[] getOutputSlots();
-    public String getPartId(){
+    @Override
+	public abstract int[] getOutputSlots();
+    @Override
+	public String getPartId(){
         return this.PARTID;
     }
-    public boolean isSync(){
+    @Override
+	public boolean isSync(){
         return false;
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu){
         super.onBreak(e,menu);
         if(endOperationWhenBreak&& menu!=null){
             this.processor.endOperation(menu.getLocation());
         }
         //合理性:processor可能需要在MultiBlockBreak中处理processor
     }
-    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int tickCount){
+    @Override
+	public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int tickCount){
         //in this case .blockMenu is null
         if(MultiBlockService.acceptCoreRequest(b.getLocation(),getBuilder(),getMultiBlockType())){
             process(b,menu,data);

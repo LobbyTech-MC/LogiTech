@@ -2,9 +2,9 @@ package me.matl114.logitech;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
@@ -36,13 +36,13 @@ public class Language {
             PLACEHOLDERS.put("%%%s%%".formatted(placeHolder),cfg.getString("placeholder."+placeHolder));
         }
         Set<String> keys=cfg.getKeys(LANGUAGE_NAMESPACE);
-        if(keys.isEmpty()) return false;
+        if(keys.isEmpty()) {
+			return false;
+		}
         for (String ns : keys) {
             loadRecursively(cfg,ns);
         }
-        Iterator<Map.Entry<String, Object>> it=LANGUAGE.entrySet().iterator();
-        while(it.hasNext()){
-            Map.Entry<String, Object> entry=it.next();
+        for (Entry<String, Object> entry : LANGUAGE.entrySet()) {
             entry.setValue(replacePlaceHolder(entry.getValue()));
         }
         Debug.logger("语言配置加载完毕");
@@ -72,6 +72,8 @@ public class Language {
             return s;
         }else if(val instanceof List<?> lst){
             return lst.stream().map(Language::replacePlaceHolder).toList();
-        }else return val;
+        } else {
+			return val;
+		}
     }
 }

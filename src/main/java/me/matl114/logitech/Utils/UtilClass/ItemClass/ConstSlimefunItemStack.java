@@ -26,7 +26,8 @@ public class ConstSlimefunItemStack extends SlimefunItemStack {
 
         }
     }
-    public ItemStack clone() {
+    @Override
+	public ItemStack clone() {
         SlimefunItemStack stack=(SlimefunItemStack) super.clone();
         try{
             Object locked=this.lockedField.get(stack);

@@ -44,7 +44,8 @@ public class StorageCleaner extends AbstractMachine {
                         "&7并转移至对应的输出槽位中")
         ));
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] slot=BORDER;
         int len=slot.length;
         for (int i=0;i<len;i++){
@@ -52,15 +53,19 @@ public class StorageCleaner extends AbstractMachine {
         }
         preset.addItem(BOTTON_SLOT,BOTTON_ITEM,ChestMenuUtils.getEmptyClickHandler());
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         //doing nothings
         int[] input=getInputSlots();
         int[] output=getOutputSlots();

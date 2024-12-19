@@ -18,15 +18,18 @@ public class SyncBlockTick extends BlockTicker {
     public SyncBlockTick(){
 
     }
-    public boolean isSynchronized() {
+    @Override
+	public boolean isSynchronized() {
         return false;
     }
-    public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
+    @Override
+	public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
        if(item instanceof SyncTickers){
            ((SyncTickers)item).syncTick(b,data.getBlockMenu(),data,tickCount);
        }
     }
-    public void uniqueTick() {
+    @Override
+	public void uniqueTick() {
         tickCount++;
     }
 }

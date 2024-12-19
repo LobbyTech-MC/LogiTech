@@ -27,25 +27,31 @@ public class Storage extends AbstractMachine implements Ticking {
         this.INPUT_SLOT = inputs;
         this.OUTPUT_SLOT = outputs;
     }
-    public void addInfo(ItemStack item){
+    @Override
+	public void addInfo(ItemStack item){
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         preset.setSize(54);
     }
 
 
-    public  int[] getInputSlots(){
+    @Override
+	public  int[] getInputSlots(){
         return INPUT_SLOT;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
 
     }
-    public void  process(Block b,BlockMenu inv,SlimefunBlockData data){
+    @Override
+	public void  process(Block b,BlockMenu inv,SlimefunBlockData data){
 
     }
 }

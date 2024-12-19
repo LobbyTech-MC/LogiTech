@@ -74,7 +74,8 @@ public class ChipBiConsumer extends AbstractMachine {
                         "&7运算规则:","&7依次对两个芯片的对应01位进行'&'运算","&8⇨ &70^1=1^0=1","&8⇨ &70^0=1^1=0"),AddItem.LOGIC
         ));
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for(int i=0;i<len;i++){
@@ -86,15 +87,19 @@ public class ChipBiConsumer extends AbstractMachine {
             preset.addItem(INFO_SLOT[i],INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
         }
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
     @Override
     public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
-        if(flow==ItemTransportFlow.WITHDRAW)return getOutputSlots();
+        if(flow==ItemTransportFlow.WITHDRAW) {
+			return getOutputSlots();
+		}
         if(item==null||item.getType().isAir()){
             return getInputSlots();
         }
@@ -103,7 +108,8 @@ public class ChipBiConsumer extends AbstractMachine {
         }
         return NOCHIP_SLOT;
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         ItemStack it=inv.getItemInSlot(INPUT_SLOT[0]);
         ItemStack it2=inv.getItemInSlot(INPUT_SLOT[1]);
         ItemStack it3=inv.getItemInSlot(INPUT_SLOT[2]);

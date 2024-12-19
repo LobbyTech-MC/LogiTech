@@ -40,7 +40,8 @@ public abstract class AbstractEnergyCharger extends AbstractEnergyMachine implem
                                int energybuffer){
         super(category, item, recipeType, recipe, energybuffer, 0,EnergyNetComponentType.CONSUMER);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for (int i=0;i<len;++i){
@@ -53,7 +54,9 @@ public abstract class AbstractEnergyCharger extends AbstractEnergyMachine implem
     protected EnergyNetComponent getChargeableComponent(SlimefunItem item){
         if(item!=null&&isChargeable(item)&&item instanceof EnergyNetComponent ec){
             return ec;
-        }else return null;
+        } else {
+			return null;
+		}
     }
     public abstract Collection<SlimefunBlockData> getChargeRange(BlockMenu menu,Block block,SlimefunBlockData data);
 
@@ -66,7 +69,8 @@ public abstract class AbstractEnergyCharger extends AbstractEnergyMachine implem
     protected int getInfoSlot(){
         return INFO_SLOT;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
     protected int getLazySlot(){
@@ -74,7 +78,8 @@ public abstract class AbstractEnergyCharger extends AbstractEnergyMachine implem
     }
     public abstract int getMaxChargeAmount();
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
     @Override
@@ -93,7 +98,8 @@ public abstract class AbstractEnergyCharger extends AbstractEnergyMachine implem
     protected boolean isChargeable(SlimefunItem that){
         return true;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         ItemStack icon=menu.getItemInSlot(getLazySlot());
         if(icon==null||icon.getType()!=Material.RED_STAINED_GLASS_PANE){
             menu.replaceExistingItem(getLazySlot(),LAZY_ITEM_ON);

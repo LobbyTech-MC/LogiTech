@@ -278,7 +278,7 @@ public class AddUtils {
     public static final String VERSION=Language.getPlaceHolder("VERSION");
     public static final SlimefunAddon ADDON_INSTANCE=MyAddon.getInstance();
     public static boolean USE_IDDECORATOR=true;
-    private static final double SF_TPS = 20.0 / (double) Slimefun.getTickerTask().getTickRate();
+    private static final double SF_TPS = 20.0 / Slimefun.getTickerTask().getTickRate();
     private static final DecimalFormat FORMAT = new DecimalFormat("###,###,###,###,###,###.#");
 
     private static Random random=new Random();
@@ -333,7 +333,9 @@ public class AddUtils {
         return new MachineRecipe(time,b.getFirstValue(),b.getSecondValue());
     }
     public static <T extends Object> LinkedHashMap<Pair<ItemStack[],ItemStack[]>,Integer> buildRecipeMap(LinkedHashMap<T,Integer> rawDataMap){
-        if(rawDataMap==null)return new LinkedHashMap<>();
+        if(rawDataMap==null) {
+			return new LinkedHashMap<>();
+		}
         LinkedHashMap<Pair<ItemStack[],ItemStack[]>,Integer> map = new LinkedHashMap<>();
         rawDataMap.forEach((k,v)->{
             if(k instanceof Object[]){
@@ -423,8 +425,8 @@ public class AddUtils {
     }
     public static String concat(String... strs){
         StringBuilder sb=new StringBuilder();
-        for(int i=0;i<strs.length;++i){
-            sb.append(strs[i]);
+        for (String str : strs) {
+            sb.append(str);
         }
         return sb.toString();
     }
@@ -462,7 +464,9 @@ public class AddUtils {
         return equalItemStackFactory(list,1);
     }
     public static <T extends Object> ItemStack equalItemStackFactory(List<T> list,int t){
-        if(list.isEmpty())return null;
+        if(list.isEmpty()) {
+			return null;
+		}
         if(list.size()==1){
            ItemStack it= AddUtils.resolveItem(list.get(0));
            it.setAmount(t);
@@ -474,9 +478,12 @@ public class AddUtils {
                 ItemStack o_=AddUtils.resolveItem(o);
                 if(o_!=null){
                     c.put(o_,1);
-                }
-                else return null;
-            }else return null;
+                } else {
+					return null;
+				}
+            } else {
+				return null;
+			}
         }
 
         EquivalItemStack it= new EquivalItemStack(c);
@@ -506,7 +513,7 @@ public class AddUtils {
         return FORMAT.format(s);
     }
     public static String formatEnergy(int energy) {
-        return FORMAT.format((double)energy * SF_TPS);
+        return FORMAT.format(energy * SF_TPS);
     }
     public static MachineRecipe formatInfoMachineRecipe(ItemStack[] stack,int tick,String... description){
         return MachineRecipeUtils.From(tick,new ItemStack[]{
@@ -552,7 +559,9 @@ public class AddUtils {
         return new DisplayItemStack(new CustomItemStack(Material.BOOK,title,name));
     }
     public static String getItemId(ItemStack its){
-        if(its==null)return null;
+        if(its==null) {
+			return null;
+		}
         SlimefunItem sfitem=SlimefunItem.getByItem(its);
         if(sfitem==null){
             return (its.getAmount()==1?"":String.valueOf(its.getAmount()))+its.getType().toString().toUpperCase(Locale.ROOT);
@@ -607,8 +616,9 @@ public class AddUtils {
     public static String idDecorator(String b){
         if(USE_IDDECORATOR){
             return ADDON_ID+"_"+b;
-        }
-        else return b;
+        } else {
+			return b;
+		}
     }
     public static  ItemStack machineInfoAdd(ItemStack item,int energyBuffer,int energyConsumption){
         return machineInfoAdd(item,energyBuffer,energyConsumption,Settings.USE_SEC_EXP);
@@ -619,11 +629,14 @@ public class AddUtils {
         }
         else if(type==Settings.USE_TICK_EXP) {
             return  AddUtils.addLore( item, LoreBuilder.powerBuffer(energyBuffer), AddUtils.energyPerTick(energyConsumption));
-        }
-        else return null;
+        } else {
+			return null;
+		}
     }
     public static ItemStack probItemStackFactory(ItemStack it,int prob){
-        if(prob>=100)return new CustomItemStack(it);
+        if(prob>=100) {
+			return new CustomItemStack(it);
+		}
         prob=prob<0?0:prob;
         return new ProbItemStack(new CustomItemStack(it),((double)prob)/100 );
     }
@@ -648,9 +661,12 @@ public class AddUtils {
                     ItemStack o_=AddUtils.resolveItem(o);
                     if(o_!=null){
                         c.put(o_,s.getValue());
-                    }
-                    else return null;
-                }else return null;
+                    } else {
+						return null;
+					}
+                } else {
+					return null;
+				}
                 if(last_value>0){
 
                     isEqPro=(last_value==s.getValue());
@@ -704,7 +720,9 @@ public class AddUtils {
         return translateAlternateColorCodes('&', s);
     }
     public static ItemStack resolveItem(Object a){
-        if(a==null)return null;
+        if(a==null) {
+			return null;
+		}
         if(a instanceof ItemStack item){
             return  getCopy(item);
         }else if(a instanceof SlimefunItemStack){
@@ -815,8 +833,9 @@ public class AddUtils {
             }
             else if(c>='A'&&c<='F'){
                 value=value*16+(c-'A'+10);
-            }
-            else throw new IllegalArgumentException("Invalid RGB String");
+            } else {
+				throw new IllegalArgumentException("Invalid RGB String");
+			}
         }
         return value;
     }

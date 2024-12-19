@@ -34,7 +34,8 @@ public class ItemCounter implements Cloneable{
         cnt += amount;
         dirty=dirty||(amount!=0);
     }
-    protected ItemCounter clone(){
+    @Override
+	protected ItemCounter clone(){
         ItemCounter clone=null;
         try {
             clone=(ItemCounter) super.clone();

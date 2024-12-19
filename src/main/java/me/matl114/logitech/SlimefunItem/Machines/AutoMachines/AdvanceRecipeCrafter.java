@@ -78,7 +78,8 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         this.publicTime=0;
         this.progressItem = new ItemStack(processbar);
     }
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
 	        //空白背景 禁止点击
 	        int[] border = BORDER;
 	        int len=border.length;
@@ -99,10 +100,12 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
 	            preset.addMenuClickHandler(border[var4], ChestMenuUtils.getEmptyClickHandler());
 	        }
 	    }
-    public int getCraftLimit(Block b,BlockMenu inv){
+    @Override
+	public int getCraftLimit(Block b,BlockMenu inv){
         return 1;
     }
-    public List<MachineRecipe> getMachineRecipes() {
+    @Override
+	public List<MachineRecipe> getMachineRecipes() {
         if(this.machineRecipes == null||this.machineRecipes.isEmpty()) {
             this.machineRecipes = new ArrayList<>();
             if(this.craftType!=null){
@@ -116,7 +119,9 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
                         for(RecipeType rt : this.craftType){
                             if(rt!=null){
                                 List<MachineRecipe> rep=RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(rt);
-                                if(rep==null)rep=new ArrayList<>();
+                                if(rep==null) {
+									rep=new ArrayList<>();
+								}
                                 this.machineRecipes.addAll(rep);
                             }
                         }
@@ -124,11 +129,12 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
                     //reset ticks to ...
                 }else{
                     //@TODO new MachineRecipe to reset ticks
-                    for(int i=0;i<this.craftType.length;i++){
-                        RecipeType rt = this.craftType[i];
+                    for (RecipeType rt : this.craftType) {
                         if(rt!=null){
                             List<MachineRecipe> rep=RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(rt);
-                            if(rep==null)rep=new ArrayList<>();
+                            if(rep==null) {
+								rep=new ArrayList<>();
+							}
                             this.machineRecipes.addAll(rep);
                         }
                     }
@@ -137,18 +143,23 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         }
         return this.machineRecipes;
     }
-   public ItemStack getProgressBar(){
+   @Override
+public ItemStack getProgressBar(){
     return this.progressItem;
 }
-    public MachineRecipe getRecordRecipe(SlimefunBlockData data){
+    @Override
+	public MachineRecipe getRecordRecipe(SlimefunBlockData data){
         int index=getNowRecordRecipe(data);
         List<MachineRecipe> recipes=getMachineRecipes();
         if(index>=recipes.size()){//越界
             setNowRecordRecipe(data,-1);
             return null;
         }
-        if(index<0)return null;
-       else return recipes.get(index);
+        if(index<0) {
+			return null;
+		} else {
+			return recipes.get(index);
+		}
 
     }
     @Override
@@ -195,9 +206,13 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
 //        return inputSlots;
 //    }
     public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
-        if (flow == ItemTransportFlow.WITHDRAW) return getOutputSlots();
+        if (flow == ItemTransportFlow.WITHDRAW) {
+			return getOutputSlots();
+		}
         int [] inputSlots=getInputSlots();
-        if(item==null||item.getType().isAir()||(!(menu instanceof BlockMenu)))return inputSlots;
+        if(item==null||item.getType().isAir()||(!(menu instanceof BlockMenu))) {
+			return inputSlots;
+		}
         SlimefunBlockData data=DataCache.safeLoadBlock(((BlockMenu)menu).getLocation());
         if(data==null){
             return inputSlots;
@@ -212,10 +227,10 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         ItemStack[] recipeInput=now.getInput();
         ItemCounter pusher=null;
         boolean hasOne=false;
-        for (int i=0;i<recipeInput.length;++i){
-            if(recipeInput[i].getType()==item.getType()&&recipeInput[i].hasItemMeta()==item.hasItemMeta()){
+        for (ItemStack element : recipeInput) {
+            if(element.getType()==item.getType()&&element.hasItemMeta()==item.hasItemMeta()){
                 if(!hasOne){
-                    amountLimit=Math.max(recipeInput[i].getAmount()*craftlimit,maxStack);
+                    amountLimit=Math.max(element.getAmount()*craftlimit,maxStack);
                     hasOne=true;
                 }else{
                     if(pusher==null){
@@ -223,8 +238,8 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
                         pusher=CraftUtils.getCounter(item);
                     }
                     //由于StackMachineRecipe 材料已经被折叠过了 只需要找到一个匹配就行
-                    if(CraftUtils.matchItemStack(recipeInput[i],pusher,false)){
-                        amountLimit=Math.max(recipeInput[i].getAmount()*craftlimit,maxStack);
+                    if(CraftUtils.matchItemStack(element,pusher,false)){
+                        amountLimit=Math.max(element.getAmount()*craftlimit,maxStack);
                         break;
                     }
                 }
@@ -238,7 +253,9 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         boolean hasItemMeta=item.hasItemMeta();
         for (int slot : inputSlots) {
             ItemStack itemInSlot = menu.getItemInSlot(slot);
-            if(itemInSlot==null)continue;
+            if(itemInSlot==null) {
+				continue;
+			}
             //出现类型匹配
             if (itemInSlot.getType()==item.getType()&&itemInSlot.hasItemMeta()==hasItemMeta) {
                 //如果pusher!=null,说明上面出现了两个相同type 需要比较
@@ -255,7 +272,8 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         }
         return inputSlots;
     }
-    public void newMenuInstance(BlockMenu menu,Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu,Block block){
         if(publicTime>0){
             if(menu.getItemInSlot(CTIME_SLOT)==null||menu.getItemInSlot(CTIME_SLOT).getType()!=Material.CLOCK){
                 menu.replaceExistingItem(CTIME_SLOT,CTIME_ITEM);
@@ -294,7 +312,8 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         }));
         updateMenu(menu,block,Settings.INIT);
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu){
         super.onBreak(e, menu);
         Location loc=menu.getLocation();
         menu.dropItems(loc,RECIPEITEM_SLOT);
@@ -316,7 +335,8 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
             return;
         }
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
 
         MultiCraftingOperation currentOperation = this.processor.getOperation(b);
         ItemGreedyConsumer[] fastCraft=null;
@@ -375,7 +395,8 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
 
     }
 
-    public void updateMenu(BlockMenu menu,Block block,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu menu,Block block,Settings mod){
         SlimefunBlockData data=DataCache.safeLoadBlock(menu.getLocation());
         if(data==null){
             Schedules.launchSchedules(()->{
@@ -386,8 +407,8 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
         MachineRecipe recipe=getRecordRecipe(data);
 
         if(recipe==null){
-            for(int var4 = 0; var4 < RECIPE_DISPLAY.length; ++var4) {
-                menu.replaceExistingItem(RECIPE_DISPLAY[var4],DISPLAY_DEFAULT_BKGROUND);
+            for (int element : RECIPE_DISPLAY) {
+                menu.replaceExistingItem(element,DISPLAY_DEFAULT_BKGROUND);
             }
         }else{
             ItemStack[] input ;

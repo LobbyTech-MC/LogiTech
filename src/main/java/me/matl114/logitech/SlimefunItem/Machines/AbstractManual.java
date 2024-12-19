@@ -79,13 +79,15 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
         this.CRAFT_PROVIDER=FinalFeature.MANUAL_CARD_READER;
 
     }
-    public void addInfo(ItemStack item){
+    @Override
+	public void addInfo(ItemStack item){
         if(this.energyConsumption > 0){
             item.setItemMeta(AddUtils.workBenchInfoAdd(item,this.energybuffer,this.energyConsumption).getItemMeta());
         }
     }
 
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         preset.addItem(30,PREV);
         preset.addItem(32,NEXT);
         preset.addMenuClickHandler(31,ChestMenuUtils.getEmptyClickHandler());
@@ -122,17 +124,21 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
             CraftUtils.multiUpdateOutputMenu(results.getSecondValue(),inv);
         }
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
     public MachineRecipe getRecordRecipe(Location loc){
         return getMachineRecipes().get(getNowRecordRecipe(loc));
     }
-    public MachineRecipe getRecordRecipe(SlimefunBlockData data){return getMachineRecipes().get(getNowRecordRecipe(data));}
-    public void newMenuInstance(BlockMenu menu,Block block){
+    @Override
+	public MachineRecipe getRecordRecipe(SlimefunBlockData data){return getMachineRecipes().get(getNowRecordRecipe(data));}
+    @Override
+	public void newMenuInstance(BlockMenu menu,Block block){
         menu.addMenuOpeningHandler((player -> {
             AbstractManual.this.updateMenu(menu,block,Settings.RUN);
         }));
@@ -211,7 +217,9 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
                 return;
             }
             List<MachineRecipe> mRecipe=getMachineRecipes(null,inv);
-            if(mRecipe==null)return;
+            if(mRecipe==null) {
+				return;
+			}
             index=index+delta;
             if(index<0){
                 index=mRecipe.size()-1;
@@ -229,7 +237,8 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
         return true;
     }
 
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
     }
     /**
@@ -237,13 +246,15 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
      * @param b
      * @param inv
      */
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         //only works when has viewer.
         if(inv!=null&&inv.hasViewer()){
             updateMenu(inv ,b,Settings.RUN);
         }
     }
-    public void updateMenu(BlockMenu inv,Block block,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv,Block block,Settings mod){
         if(mod==Settings.INIT){
             orderSearchRecipe(inv,Settings.SEQUNTIAL);
         }else{

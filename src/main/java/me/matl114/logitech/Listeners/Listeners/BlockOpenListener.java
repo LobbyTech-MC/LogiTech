@@ -114,11 +114,7 @@ public class BlockOpenListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onRightClick(PlayerRightClickEvent event){
         boolean itemUsed = event.getHand() == EquipmentSlot.OFF_HAND;
-        if(event.getPlayer().isSneaking()){
-            return ;
-        }
-
-        if (!itemUsed && event.useBlock() != Event.Result.DENY && !rightClickBlock(event)) {
+        if (event.getPlayer().isSneaking() || (!itemUsed && event.useBlock() != Event.Result.DENY && !rightClickBlock(event))) {
             return;
         }
     }

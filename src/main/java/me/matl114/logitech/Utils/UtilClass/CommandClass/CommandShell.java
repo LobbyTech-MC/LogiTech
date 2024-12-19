@@ -49,7 +49,8 @@ public class CommandShell {
         public Object getVal(){
             return val;
         }
-        public String toString(){
+        @Override
+		public String toString(){
             return val.toString();
         }
     }
@@ -63,7 +64,7 @@ public class CommandShell {
     }
     protected static String ROOT_PASSWORD="...";
     public static String PREFIX=AddUtils.color( AddUtils.ADDON_ID+" >>  ");
-    public static HashMap<UUID,CommandShell> map = new HashMap<UUID,CommandShell>();
+    public static HashMap<UUID,CommandShell> map = new HashMap<>();
     static {
 
         PlayerQuiteListener.addHandler((playerQuitEvent -> {
@@ -78,7 +79,8 @@ public class CommandShell {
                 "help 获得全部指令的说明",
                 "help <arg1> 获得单个指令的说明"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             shell.send("指令说明:");
             if(argv.length==1){
                 String arg=argv[0];
@@ -102,7 +104,8 @@ public class CommandShell {
             }
             return 0;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("help");
@@ -110,7 +113,8 @@ public class CommandShell {
         public String[] help=new String[]{
                 "exit 退出shell并删除记录",
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             shell.status=false;
             boolean success=false;
 //            Iterator<Map.Entry<UUID,CommandShell>> shells=map.entrySet().iterator();
@@ -129,7 +133,8 @@ public class CommandShell {
 //            }
             return success?1:0;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("exit");
@@ -137,12 +142,14 @@ public class CommandShell {
         public String[] help=new String[]{
                 "quit 退出shell不删除记录",
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             shell.status=false;
             shell.send("成功退出");
             return 1;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("quit");
@@ -150,7 +157,8 @@ public class CommandShell {
         public String[] help=new String[]{
                 "setting <setting> <boolean> 设置基础设定",
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             boolean flag=Boolean.parseBoolean(argv[1]);
             switch (argv[0]){
                 case "Async": shell.async=flag;return 1;
@@ -159,7 +167,8 @@ public class CommandShell {
             return 0;
 
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("setting");
@@ -168,7 +177,8 @@ public class CommandShell {
         public String[] help=new String[]{
                 "say <argvs> 玩家输出<argvs>,用空格相连"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             if(Bukkit.isPrimaryThread()){
                 shell.user.chat(String.join(" ", argv));
                 return 1;
@@ -177,7 +187,8 @@ public class CommandShell {
                 return 0;
             }
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("say");
@@ -185,7 +196,8 @@ public class CommandShell {
         public String[] help=new String[]{
                 "setPath <Class> 将当前指令的默认类对象设置为<Class>"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             Class clazz;
             try{
                 clazz=Class.forName(argv[0]);
@@ -195,7 +207,8 @@ public class CommandShell {
             return setVariable(shell,getPathVarName(),clazz);
 
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("setPath");
@@ -204,7 +217,8 @@ public class CommandShell {
                 "getStatic <arg1> 获取当前默认类的名称为<arg1>的静态成员/枚举",
                 "getStatic <arg1> <varName> 获取当前默认类的名称为<arg1>的静态成员/枚举,并赋值给<varName>变量"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
 
             Object clazz=getVariable(shell,getPathVarName());
             if(clazz instanceof Class cls){
@@ -238,7 +252,8 @@ public class CommandShell {
                 return pathNotInit(shell);
             }
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("getStatic");
@@ -247,7 +262,8 @@ public class CommandShell {
                 "setStatic <arg1> 将当前默认类对象的<arg1>静态成员设置为当前默认类对象",
                 "setStatic <arg1> <var1> 将当前默认类对象的<arg1>静态成员设置为变量<var1>"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             Object obj=getVariable(shell,getPathVarName());
             if(obj instanceof Class clazz) {
                 Pair<Field,Class> result=ReflectUtils.getDeclaredFieldsRecursively(clazz,argv[0]);
@@ -271,7 +287,8 @@ public class CommandShell {
                 return pathNotInit(shell);
             }
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("setStatic");
@@ -280,7 +297,8 @@ public class CommandShell {
                 "get 打印当前选中的类path信息",
                 "get <varName> 打印变量<varName>"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             if(argv.length==0){
 
                 shell.printObject(getVariable(shell,getPathVarName()) );
@@ -289,7 +307,8 @@ public class CommandShell {
             }
             return 1;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("get");
@@ -299,12 +318,14 @@ public class CommandShell {
                 "set <var1> <var2> 将变量<var2>存储至<var1>"
         };
 
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
 
             Object obj=getVariable(shell, argv.length==1? getPathVarName():argv[1]);
            return setVariable(shell,argv[0],obj);
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("set");
@@ -313,7 +334,8 @@ public class CommandShell {
                 "getField <var1> <arg1> 获取变量<var1>名称为<arg1>的成员 ",
                 "getField <var1> <arg1> <var2> 获取变量<var1>名称为<arg1>的成员,并赋值给var2 ",
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             Object obj=getVariable(shell,argv[0]);
             if(obj==null){
                 return variableNotInit(shell,argv[0]);
@@ -339,7 +361,8 @@ public class CommandShell {
                 }
             }
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("getField");
@@ -348,7 +371,8 @@ public class CommandShell {
                 "getAllFields <var1> 获取变量<var1>的所有成员 ",
                 "getAllFields 获取当前设置的Class的所有成员",
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             Class clazz;
            if(argv.length==0){
                Object obj=getVariable(shell,getPathVarName());
@@ -374,7 +398,8 @@ public class CommandShell {
            }
            return 1;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("getAllFields");
@@ -382,7 +407,8 @@ public class CommandShell {
         public String[] help=new String[]{
                 "setField <var1> <arg1> <var2> 将变量<var2>赋值给变量<var1>名称为<arg1>的成员 ",
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             assert argv.length==3;
             Object obj=getVariable(shell,argv[0]);
             if(obj==null){
@@ -407,7 +433,8 @@ public class CommandShell {
                 }
             }
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("setField");
@@ -416,14 +443,16 @@ public class CommandShell {
                 "const <type> <val> <var2> 将字符串<val>转为支持的基类/字符串<type>并将变量<var2>设置为该值",
                 "const list <len> <var2> 将变量<var2>设置为创建的长度为<len>的数组"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             assert argv.length==3;
             String val=argv[1];
             Object obj=getBaseWarpper(argv[0],val);
             setVariable(shell,argv[2],obj);
             return 0;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("const");
@@ -432,7 +461,8 @@ public class CommandShell {
                 "getSfItem <ID> <var1> 获取id为<ID>的sf物品实例,并存储到",
                 "getSfitem <ID> 获取id为<ID>的sf物品实例"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             SlimefunItem item=SlimefunItem.getById(argv[0]);
             shell.printObject(item);
             if(argv.length==2){
@@ -440,7 +470,8 @@ public class CommandShell {
             }
             return 1;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("getSfItem");
@@ -449,11 +480,13 @@ public class CommandShell {
                 "getNearbyEntity <int> <var1> 获取当前范围<int>内的全部实体,并存储在<var1>中",
                 "getNearbyEntity <int> 获取当前范围<int>内的全部实体"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             Collection<Entity> result;
             int nearby=Integer.parseInt(argv[0]);
-            AsyncResultRunnable<Collection<Entity>> getNearby=new AsyncResultRunnable<Collection<Entity>>() {
-                public Collection<Entity> result(){
+            AsyncResultRunnable<Collection<Entity>> getNearby=new AsyncResultRunnable<>() {
+                @Override
+				public Collection<Entity> result(){
                     return shell.user.getWorld().getNearbyEntities(shell.user.getLocation(),nearby,nearby,nearby);
                 }
             };
@@ -469,7 +502,8 @@ public class CommandShell {
                 setVariable(shell,argv[1],entities);
             }return 1;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("getNearbyEntity");
@@ -478,7 +512,8 @@ public class CommandShell {
                 "getHeldItem <var1> 获得玩家当前手持物品的对象并存入<var1>",
                 "getHeldItem 获得玩家当前手持物品的对象"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             ItemStack stack=shell.user.getItemInHand();
             shell.printObject(stack);
             if(argv.length==1){
@@ -487,7 +522,8 @@ public class CommandShell {
 
             return 1;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("getHeldItem");
@@ -495,7 +531,8 @@ public class CommandShell {
         public String[] help=new String[]{
                 "exec <argvs> 执行代码,按空格划分行"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             String code=String.join(" ", argv);
             String className = "ExecRunTime";
             code = "public class " + className + " { " +
@@ -529,7 +566,8 @@ public class CommandShell {
             return 0;
 
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("exec");
@@ -538,7 +576,8 @@ public class CommandShell {
                 "invoke <var1> <method> <varlist>... 当<var1>为类时候,反射静态方法<method>,反之则反射对象<var1>的方法<method>",
                 "invoke set <result> <var1> <method> <varlist>... 当<var1>为类时候,反射静态方法<method>,反之则反射对象<var1>的方法<method>,并将结果存入<result>",
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             String result=null;
             if("set".equals(argv[0])){
                 result=argv[1];
@@ -592,7 +631,8 @@ public class CommandShell {
                 }
             }return 1;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("invoke");
@@ -601,7 +641,8 @@ public class CommandShell {
                 "newInstance <classVar> <varlist>... 用<varlist>创建classVar的新实例",
                 "newInstance set <result> <classVar> <varlist>... 用<varlist>创建classVar的新实例,并保存至<result>",
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             String result=null;
             ArrayList a=new ArrayList<String>();
 
@@ -657,7 +698,8 @@ public class CommandShell {
                 }
             }return 1;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("newInstance");
@@ -668,7 +710,8 @@ public class CommandShell {
                 "break <int> 启动<int>处的断点,当断点位于主线程时,将会跳过,再次输入将关闭断点",
                 "break <int> <var2> 启动<int>处的断点,当断点位于主线程时,将会跳过,再次输入将关闭断点,同时获得断点Object值存入<var2>"
         };
-        public int cmd(String[] argv,CommandShell shell){
+        @Override
+		public int cmd(String[] argv,CommandShell shell){
             if(!MyAddon.testmode()){
                 shell.warn("附属并未在测试模式,无法启用断点功能");
             }
@@ -686,13 +729,15 @@ public class CommandShell {
             Object obj=null;
             if(bo.get()){
                 obj=Debug.getBreakValue(index);
-                if(argv.length==2)
-                    Debug.setBreakPoint(index,false);
+                if(argv.length==2) {
+					Debug.setBreakPoint(index,false);
+				}
             }else {
                 Debug.setBreakPoint(index,true);
-                if(argv.length==2)
-                    obj=new AsyncResultRunnable<Object>(){
-                        public Object result(){
+                if(argv.length==2) {
+					obj=new AsyncResultRunnable<>(){
+                        @Override
+						public Object result(){
                             while(!Debug.getHasSetValue(index)){
                                 try {
                                     Thread.sleep(10);
@@ -702,13 +747,15 @@ public class CommandShell {
                             return Debug.getBreakValue(index);
                         }
                     };
+				}
             }
             if(argv.length==2){
                 setVariable(shell,argv[1],obj);
             }
             return 1;
         }
-        public String[] getHelp(){
+        @Override
+		public String[] getHelp(){
             return this.help;
         }
     }.register("break");
@@ -822,7 +869,7 @@ public class CommandShell {
             case "char": obj=val.charAt(0); break;
             case "class": try{
 
-                obj=cls.forName(val);
+                obj=Class.forName(val);
                 break;
             }catch(ClassNotFoundException e){
                 throw  new IllegalArgumentException("Class Not Found");
@@ -866,9 +913,9 @@ public class CommandShell {
             else {
                 return "&6<class: %s, %s>".formatted(obj.getClass().getName(),obj.toString());
             }
-        }
-        else
-            return "&6<NULL>";
+        } else {
+			return "&6<NULL>";
+		}
     }
     public static String getPathVarName(){
         return "____path@#";
@@ -1016,20 +1063,26 @@ public class CommandShell {
     }
     //TODO execute
     public void clear(){
-        if(!interact_mod)return;
+        if(!interact_mod) {
+			return;
+		}
         synchronized(lock){
             outputStream.clear();
         }
     }
 
     public void error(String message){
-        if(!interact_mod)return;
+        if(!interact_mod) {
+			return;
+		}
         synchronized(lock){
             outputStream.add(AddUtils.concat(PREFIX,"&c",message));
         }
     }
     public void print(){
-        if(!interact_mod)return;
+        if(!interact_mod) {
+			return;
+		}
         synchronized(lock){
             for(String s:outputStream){
                 AddUtils.sendMessage(user,s);
@@ -1038,7 +1091,9 @@ public class CommandShell {
         }
     }
     public void printObject(Object obj){
-        if(!interact_mod)return;
+        if(!interact_mod) {
+			return;
+		}
         String str=getObjectStringDisplay(obj);
         if(str==null){
             str="<ERROR:UNKNOWN>";
@@ -1081,13 +1136,17 @@ public class CommandShell {
                 ()->runCommand(command),0,!async,0);
     }
     public void send(String message){
-        if(!interact_mod)return;
+        if(!interact_mod) {
+			return;
+		}
         synchronized(lock){
             outputStream.add(AddUtils.concat(PREFIX,"&f",message));
         }
     }
     public void warn(String message){
-        if(!interact_mod)return;
+        if(!interact_mod) {
+			return;
+		}
         synchronized(lock){
             outputStream.add(AddUtils.concat(PREFIX,"&e",message));
         }

@@ -118,7 +118,8 @@ public class FinalAltarCore  extends MultiCore {
         ));
         this.setAutoBuildDefault(false);
     }
-    public void constructMenu(BlockMenuPreset inv) {
+    @Override
+	public void constructMenu(BlockMenuPreset inv) {
         int[] border = BORDER;
         int len = border.length;
         for (int i = 0; i < len; i++) {
@@ -126,20 +127,25 @@ public class FinalAltarCore  extends MultiCore {
         }
         inv.addItem(HOLOGRAM_SLOT, HOLOGRAM_ITEM_OFF);
     }
-    public MultiBlockService.MultiBlockBuilder getBuilder(){
+    @Override
+	public MultiBlockService.MultiBlockBuilder getBuilder(){
         return BUILDER;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[0];
     }
-    public MultiLevelBlockType getMultiBlockType(){
+    @Override
+	public MultiLevelBlockType getMultiBlockType(){
         return MBTYPE;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return new int[0];
     }
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
         Location loc2=block.getLocation();
         if (MultiBlockService.getStatus(loc2)!=0){
             int lvl=DataCache.getCustomData(inv.getLocation(),LVL_KEY,0);
@@ -195,10 +201,12 @@ public class FinalAltarCore  extends MultiCore {
         }));
         updateMenu(inv,block,Settings.RUN);
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu inv){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu inv){
         super.onBreak(e,inv);
     }
-    public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
+    @Override
+	public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
         super.onMultiBlockDisable(loc,handler,cause);
         //这里也要清除,lvl数据 防止上面重新读取回来
         DataCache.setCustomString(loc,LVL_KEY,"0");
@@ -210,7 +218,8 @@ public class FinalAltarCore  extends MultiCore {
             inv.replaceExistingItem(STATUS_SLOT,STATUS_ITEM_OFF);
         }
     }
-    public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
+    @Override
+	public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
         super.onMultiBlockEnable(loc,handler);
         BlockMenu inv= DataCache.getMenu(loc);
         if(inv!=null){
@@ -219,7 +228,8 @@ public class FinalAltarCore  extends MultiCore {
 
     }
 
-    public void processCore(Block b, BlockMenu menu){
+    @Override
+	public void processCore(Block b, BlockMenu menu){
         if(menu.hasViewer()){
             updateMenu(menu,b,Settings.RUN);
         }

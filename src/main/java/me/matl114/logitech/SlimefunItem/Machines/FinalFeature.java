@@ -76,9 +76,10 @@ public class FinalFeature {
         }
         @Override
         public IntFunction<ItemPusher> getMenu(Settings settings, BlockMenu inv, IntFunction<ItemStack> stackFunction, int[] slots){
-            return new IntFunction<ItemPusher>() {
+            return new IntFunction<>() {
                 HashSet<Location> proxyLocation;
-                public ItemPusher apply(int slot) {
+                @Override
+				public ItemPusher apply(int slot) {
 
                     ItemPusher tar= get(settings,stackFunction.apply(slot),slots[slot]);
                     if(tar instanceof LocationStorageProxy lsp){

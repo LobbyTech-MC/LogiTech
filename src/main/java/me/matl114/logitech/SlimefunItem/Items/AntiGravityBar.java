@@ -20,7 +20,8 @@ public class AntiGravityBar extends DistinctiveCustomItemStack {
         PlayerEffects.grantEffect(CustomEffects.ANTI_GRAVITY,e.getPlayer(),1,10);
         return false;
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         this.addHandler((ItemUseHandler)this::onItemClick);
     }
 }

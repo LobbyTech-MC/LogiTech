@@ -18,7 +18,8 @@ public abstract class ItemWithHandler<T extends ItemHandler> extends ItemNotPlac
         setDisplayRecipes(displayes);
     }
     public abstract T[] getItemHandler();
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         addItemHandler(getItemHandler());
     }

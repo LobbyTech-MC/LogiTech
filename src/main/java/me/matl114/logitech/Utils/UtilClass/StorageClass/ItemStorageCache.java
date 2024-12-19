@@ -100,7 +100,9 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
             StorageType  type=StorageType.getPossibleStorageType(it,filter);
             if(type==null){
                 return null;
-            }else return new ItemStorageCache(source,saveSlot,type);
+            } else {
+				return new ItemStorageCache(source,saveSlot,type);
+			}
         }
     }
     public static ItemStorageCache getOrCreate(ItemStack source, ItemMeta sourceMeta, int saveSlot,StorageType type) {
@@ -220,9 +222,12 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
      * @return
      */
     public boolean keepRelated(ItemStack item){
-        if(item==null)return false;
-        if(item.getAmount()!=1)return false;
-        else if(CraftUtils.sameCraftItem(item,source)){
+        if(item==null) {
+			return false;
+		}
+        if(item.getAmount()!=1) {
+			return false;
+		} else if(CraftUtils.sameCraftItem(item,source)){
             return true;
         }
         //only check pdc, else ignored
@@ -230,14 +235,17 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
             source=item;
             this.dirty=true;
             return true;
-        }else return false;
+        } else {
+			return false;
+		}
     }
     public void setDeprecated(boolean deprecated){
         this.deprecated=deprecated;
         this.dirty=true;
     }
     //修复了setFrom存储时覆写maxSize的问题
-    public void setFrom(ItemCounter source){
+    @Override
+	public void setFrom(ItemCounter source){
         if(wasNull||(source!=null&&source.getItem()!=null)){
             item=source.getItem();
             cnt=0;
@@ -262,7 +270,8 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
         this.slot=slot;
     }
 
-    public void syncData(){
+    @Override
+	public void syncData(){
         if(!wasNull){
             if(dirty){
                 cnt=storageAmount;
@@ -290,7 +299,8 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
             throw e;
         }
     }
-    public void updateItemStack(){
+    @Override
+	public void updateItemStack(){
         if(dirty) {
             if (wasNull) {
                 if (getItem() != null) {
@@ -304,7 +314,8 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
             storageAmount = getAmount();
         }
     }
-    public void updateMenu(@Nonnull BlockMenu menu){
+    @Override
+	public void updateMenu(@Nonnull BlockMenu menu){
         if (getItem()!=null&&!getItem().getType().isAir()){
             updateItemStack();
             if(persistent){
@@ -320,8 +331,9 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
         if((!persistent)&&slot>=0){
             //not work?
             //in case player take it away while working
-            if(keepRelated(menu.getItemInSlot(slot)))
-                source= MenuUtils.syncSlot(menu,slot,source);
+            if(keepRelated(menu.getItemInSlot(slot))) {
+				source= MenuUtils.syncSlot(menu,slot,source);
+			}
         }
         dirty=false;
 

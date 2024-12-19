@@ -60,66 +60,70 @@ public class AddDepends {
     public static NamespacedKey NTWQUANTUMKEY;
     public static void registerSlimefunItems(SlimefunAddon plugin){
         try{
-            if(hasInfiniteExpansion)
-            MOBDATA_MANUAL=new ManualCrafter(AddGroups.MANUAL,AddItem.MOBDATA_MANUAL, BugCrafter.TYPE,
-                    AddSlimefunItems.recipe(null,null,AddItem.BUG,AddItem.BUG,null,null,
-                            null,AddItem.BUG,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.BUG,null,
-                            null,AddItem.LFIELD,"DATA_INFUSER","DATA_INFUSER",AddItem.LFIELD,null,
-                            null,AddItem.LFIELD,"DATA_INFUSER","DATA_INFUSER",AddItem.LFIELD,null,
-                            null,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,null
-                            ),600_000,20_000,MOBDATA_TYPE)
-                    .register();
+            if(hasInfiniteExpansion) {
+				MOBDATA_MANUAL=new ManualCrafter(AddGroups.MANUAL,AddItem.MOBDATA_MANUAL, BugCrafter.TYPE,
+				        AddSlimefunItems.recipe(null,null,AddItem.BUG,AddItem.BUG,null,null,
+				                null,AddItem.BUG,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.BUG,null,
+				                null,AddItem.LFIELD,"DATA_INFUSER","DATA_INFUSER",AddItem.LFIELD,null,
+				                null,AddItem.LFIELD,"DATA_INFUSER","DATA_INFUSER",AddItem.LFIELD,null,
+				                null,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,null
+				                ),600_000,20_000,MOBDATA_TYPE)
+				        .register();
+			}
         }catch (Throwable e){
             Debug.logger("AN ERROR OCCURED WHILE REGISTERING ITEM: MOBDATA_MANUAL,ITEM DISABLED");
             e.printStackTrace();
         }
         try{
-            if(hasInfiniteExpansion)
-            INFINITY_MANUAL=new ManualCrafter(AddGroups.MANUAL,AddItem.INFINITY_MANUAL,BugCrafter.TYPE,
-                    AddSlimefunItems.recipe(null,null,null,null,null,null,
-                            AddItem.ABSTRACT_INGOT,"REINFORCED_PLATE","REINFORCED_PLATE","REINFORCED_PLATE","REINFORCED_PLATE",AddItem.ABSTRACT_INGOT,
-                            AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,
-                            AddItem.ABSTRACT_INGOT,"MACHINE_PLATE","INFINITY_FORGE","INFINITY_FORGE","MACHINE_PLATE",AddItem.ABSTRACT_INGOT,
-                            AddItem.ABSTRACT_INGOT,AddItem.LFIELD,AddItem.LFIELD,AddItem.LFIELD,AddItem.LFIELD,AddItem.ABSTRACT_INGOT),
-                    100_000_000,2_500_000,INFINITYWORKBENCH_TYPE)
-                    .register();
+            if(hasInfiniteExpansion) {
+				INFINITY_MANUAL=new ManualCrafter(AddGroups.MANUAL,AddItem.INFINITY_MANUAL,BugCrafter.TYPE,
+				        AddSlimefunItems.recipe(null,null,null,null,null,null,
+				                AddItem.ABSTRACT_INGOT,"REINFORCED_PLATE","REINFORCED_PLATE","REINFORCED_PLATE","REINFORCED_PLATE",AddItem.ABSTRACT_INGOT,
+				                AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,
+				                AddItem.ABSTRACT_INGOT,"MACHINE_PLATE","INFINITY_FORGE","INFINITY_FORGE","MACHINE_PLATE",AddItem.ABSTRACT_INGOT,
+				                AddItem.ABSTRACT_INGOT,AddItem.LFIELD,AddItem.LFIELD,AddItem.LFIELD,AddItem.LFIELD,AddItem.ABSTRACT_INGOT),
+				        100_000_000,2_500_000,INFINITYWORKBENCH_TYPE)
+				        .register();
+			}
         }catch (Throwable e){
             Debug.logger("AN ERROR OCCURED WHILE REGISTERING ITEM: INFINITY_MANUAL,ITEM DISABLED");
             e.printStackTrace();
         }
         try{
-            if(hasNetwork)
-            NTWWORKBENCH_MANUAL=new ManualCrafter(AddGroups.MANUAL,AddItem.NTWWORKBENCH_MANUAL,BugCrafter.TYPE,
-                    AddSlimefunItems.recipe(null,null,null,null,null,null,
-                            null,"NTW_BRIDGE","ADVANCED_CIRCUIT_BOARD","ADVANCED_CIRCUIT_BOARD","NTW_BRIDGE",null,
-                            null,"NTW_BRIDGE",AddItem.LFIELD,AddItem.LFIELD,"NTW_BRIDGE",null,
-                            null,AddItem.ABSTRACT_INGOT,"NTW_QUANTUM_WORKBENCH","NTW_QUANTUM_WORKBENCH",AddItem.ABSTRACT_INGOT,null,
-                            null,AddItem.ABSTRACT_INGOT,"NTW_QUANTUM_WORKBENCH","NTW_QUANTUM_WORKBENCH",AddItem.ABSTRACT_INGOT,null,
-                            null,AddItem.ABSTRACT_INGOT,AddItem.LFIELD,AddItem.LFIELD,AddItem.ABSTRACT_INGOT,null),
-                    0,0,NTWQTWORKBENCH_TYPE,NTWEP_WORKBENCH_TYPE)
-                    .register();
+            if(hasNetwork) {
+				NTWWORKBENCH_MANUAL=new ManualCrafter(AddGroups.MANUAL,AddItem.NTWWORKBENCH_MANUAL,BugCrafter.TYPE,
+				        AddSlimefunItems.recipe(null,null,null,null,null,null,
+				                null,"NTW_BRIDGE","ADVANCED_CIRCUIT_BOARD","ADVANCED_CIRCUIT_BOARD","NTW_BRIDGE",null,
+				                null,"NTW_BRIDGE",AddItem.LFIELD,AddItem.LFIELD,"NTW_BRIDGE",null,
+				                null,AddItem.ABSTRACT_INGOT,"NTW_QUANTUM_WORKBENCH","NTW_QUANTUM_WORKBENCH",AddItem.ABSTRACT_INGOT,null,
+				                null,AddItem.ABSTRACT_INGOT,"NTW_QUANTUM_WORKBENCH","NTW_QUANTUM_WORKBENCH",AddItem.ABSTRACT_INGOT,null,
+				                null,AddItem.ABSTRACT_INGOT,AddItem.LFIELD,AddItem.LFIELD,AddItem.ABSTRACT_INGOT,null),
+				        0,0,NTWQTWORKBENCH_TYPE,NTWEP_WORKBENCH_TYPE)
+				        .register();
+			}
         }catch (Throwable e){
             Debug.logger("AN ERROR OCCURED WHILE REGISTERING ITEM: NTWWORKBENCH_MANUAL,ITEM DISABLED");
             e.printStackTrace();
         }
         try{
-            if(hasInfiniteExpansion)
-            INFINITY_AUTOCRAFT =new AdvanceRecipeCrafter(AddGroups.BASIC, AddItem.INFINITY_AUTOCRAFT,BugCrafter.TYPE,
-                  AddSlimefunItems.recipe(AddItem.LFIELD,AddItem.LFIELD,"INFINITE_INGOT","INFINITE_INGOT",AddItem.LFIELD,AddItem.LFIELD,
-                          AddItem.LFIELD,AddItem.LCRAFT,"VOID_INGOT","VOID_INGOT",AddItem.LMOTOR,AddItem.LFIELD,
-                          "INFINITE_INGOT","VOID_INGOT","INFINITY_FORGE","INFINITY_FORGE","VOID_INGOT","INFINITE_INGOT",
-                          "INFINITE_INGOT","VOID_INGOT","INFINITY_FORGE","INFINITY_FORGE","VOID_INGOT","INFINITE_INGOT",
-                          AddItem.LFIELD,AddItem.LMOTOR,"VOID_INGOT","VOID_INGOT",AddItem.LCRAFT,AddItem.LFIELD,
-                            AddItem.LFIELD,AddItem.LFIELD,"INFINITE_INGOT","INFINITE_INGOT",AddItem.LFIELD,AddItem.LFIELD)
-                    , Material.STONE,100_000,1_500_000,8,INFINITYWORKBENCH_TYPE)
-                    .register();
+            if(hasInfiniteExpansion) {
+				INFINITY_AUTOCRAFT =new AdvanceRecipeCrafter(AddGroups.BASIC, AddItem.INFINITY_AUTOCRAFT,BugCrafter.TYPE,
+				      AddSlimefunItems.recipe(AddItem.LFIELD,AddItem.LFIELD,"INFINITE_INGOT","INFINITE_INGOT",AddItem.LFIELD,AddItem.LFIELD,
+				              AddItem.LFIELD,AddItem.LCRAFT,"VOID_INGOT","VOID_INGOT",AddItem.LMOTOR,AddItem.LFIELD,
+				              "INFINITE_INGOT","VOID_INGOT","INFINITY_FORGE","INFINITY_FORGE","VOID_INGOT","INFINITE_INGOT",
+				              "INFINITE_INGOT","VOID_INGOT","INFINITY_FORGE","INFINITY_FORGE","VOID_INGOT","INFINITE_INGOT",
+				              AddItem.LFIELD,AddItem.LMOTOR,"VOID_INGOT","VOID_INGOT",AddItem.LCRAFT,AddItem.LFIELD,
+				                AddItem.LFIELD,AddItem.LFIELD,"INFINITE_INGOT","INFINITE_INGOT",AddItem.LFIELD,AddItem.LFIELD)
+				        , Material.STONE,100_000,1_500_000,8,INFINITYWORKBENCH_TYPE)
+				        .register();
+			}
         }catch (Throwable e){
             Debug.logger("AN ERROR OCCURED WHILE REGISTERING ITEM: INFINITY_AUTOCRAFT,ITEM DISABLED");
             e.printStackTrace();
         }
         try {
-            if(hasNetwork)
-                NTW_STORAGE_DISPLAY=new MyVanillaItem(AddGroups.SINGULARITY,SlimefunItem.getById("NTW_QUANTUM_STORAGE_8").getItem().clone(),"NTW_QUANTUM_STORAGE_DISPLAY",RecipeType.ENHANCED_CRAFTING_TABLE,
+            if(hasNetwork) {
+				NTW_STORAGE_DISPLAY=new MyVanillaItem(AddGroups.SINGULARITY,SlimefunItem.getById("NTW_QUANTUM_STORAGE_8").getItem().clone(),"NTW_QUANTUM_STORAGE_DISPLAY",RecipeType.ENHANCED_CRAFTING_TABLE,
                      AddSlimefunItems.recipe(AddItem.ABSTRACT_INGOT,"NTW_QUANTUM_STORAGE_1",AddItem.ABSTRACT_INGOT,
                              AddItem.ABSTRACT_INGOT,AddItem.IOPORT,AddItem.ABSTRACT_INGOT,
                              AddItem.STORAGE_SINGULARITY,AddItem.ABSTRACT_INGOT,AddItem.STORAGE_SINGULARITY)   )
@@ -150,6 +154,7 @@ public class AddDepends {
                                                 "&7若累计报错达到一定数目,将会禁用该兼容"),null
                                 )
                         ).register();
+			}
 
         }catch (Throwable e){
                 Debug.logger("AN ERROR OCCURED WHILE REGISTERING ITEM: NTW_STORAGE_DISPLAY,ITEM DISABLED");

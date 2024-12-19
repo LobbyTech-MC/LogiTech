@@ -11,7 +11,8 @@ import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiLevelBlock.Multi
 
 public class MultiBlockTypes {
     public static final MultiBlockType PORTAL_TYPE=new MultiBlockType() {
-        public void  init(){
+        @Override
+		public void  init(){
             addBlock(0,0,0,"portal.core");
             addBlock(1,0,0,"portal.part");
             addBlock(1,1,0,"portal.part");
@@ -142,7 +143,8 @@ public class MultiBlockTypes {
         protected int[] dy=new int[]{
                 -1,1,-2,0,2,-1,1,-2,0,2,-1,1
         };
-        public void init(){
+        @Override
+		public void init(){
             this.maxHeight=10;
             String frameId="nuclear.frame";
             String glassId="nuclear.glass";

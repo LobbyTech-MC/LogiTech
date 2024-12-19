@@ -59,7 +59,8 @@ public class TestGenerator extends AbstractEnergyProvider {
         this.machineRecipes=new ArrayList<>();
         this.RANDOM_THREASHOLD= 2*this.ENERGY_ABSMAX+1;
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         stack.setItemMeta(AddUtils.addLore(stack,
                 new StringBuilder("&8⇨ &e⚡ &7").
                         append(AddUtils.formatDouble(-ENERGY_ABSMAX)).
@@ -67,29 +68,36 @@ public class TestGenerator extends AbstractEnergyProvider {
                         append(AddUtils.formatDouble(ENERGY_ABSMAX)).append(" J/t").toString()).getItemMeta());
 
     }
-    public void constructMenu(BlockMenuPreset inv){
+    @Override
+	public void constructMenu(BlockMenuPreset inv){
         inv.addItem(DISPLAY_SLOT, ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
     }
 
-    public EnergyNetComponentType getEnergyComponentType(){
+    @Override
+	public EnergyNetComponentType getEnergyComponentType(){
             return EnergyNetComponentType.GENERATOR;
     }
-    public int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
+    @Override
+	public int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
         return ThreadLocalRandom.current().nextInt(RANDOM_THREASHOLD)-ENERGY_ABSMAX;
     }
 
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[0];
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuOpeningHandler((player -> {
             inv.replaceExistingItem(DISPLAY_SLOT,ChestMenuUtils.getBackground());
         }));
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         Location loc=inv.getLocation();
         int charge=getCharge(loc);
 
@@ -102,14 +110,17 @@ public class TestGenerator extends AbstractEnergyProvider {
             inv.replaceExistingItem(DISPLAY_SLOT,AddUtils.getGeneratorDisplay(true,"虚空量子",charge,this.energybuffer));
         }
     }
-    public void registerTick(SlimefunItem item){
+    @Override
+	public void registerTick(SlimefunItem item){
         item.addItemHandler(
                 new BlockTicker() {
-                    public boolean isSynchronized() {
+                    @Override
+					public boolean isSynchronized() {
                         return  ((Ticking)TestGenerator.this).isSync();
                     }
 
-                    @ParametersAreNonnullByDefault
+                    @Override
+					@ParametersAreNonnullByDefault
                     public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
                         BlockMenu menu = data.getBlockMenu();
                         //BlockMenu menu = BlockStorage.getInventory(b);

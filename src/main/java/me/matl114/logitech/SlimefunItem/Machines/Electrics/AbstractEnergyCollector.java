@@ -47,7 +47,8 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
                                  int energybuffer){
         super(category, item, recipeType, recipe, energybuffer, 0, EnergyNetComponentType.GENERATOR);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for (int i=0;i<len;++i){
@@ -61,7 +62,9 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
     protected EnergyNetProvider getEnergyProvider(SlimefunItem item){
         if(item!=null&& isCollectable(item)&&item instanceof EnergyNetProvider ec){
             return ec;
-        }else return null;
+        } else {
+			return null;
+		}
     }
 
     protected ItemStack getInfoShow(int charge,int machine,int errors){
@@ -73,7 +76,8 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
     protected int getInfoSlot(){
         return INFO_SLOT;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
     protected int getLazySlot(){
@@ -81,7 +85,8 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
     }
     public abstract int getMaxCollectAmount();
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
     @Override
@@ -100,7 +105,8 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
     protected boolean isCollectable(SlimefunItem that){
         return true;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         ItemStack icon=menu.getItemInSlot(getLazySlot());
         if(icon==null||icon.getType()!=Material.RED_STAINED_GLASS_PANE){
             menu.replaceExistingItem(getLazySlot(),LAZY_ITEM_ON);

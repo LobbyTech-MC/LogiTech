@@ -30,7 +30,8 @@ public class AdjacentEnergyCharger extends AbstractEnergyCharger implements Dire
                              int energybuffer){
         super(category, item, recipeType, recipe, energybuffer);
     }
-    public Collection<SlimefunBlockData> getChargeRange(BlockMenu inv, Block block, SlimefunBlockData data){
+    @Override
+	public Collection<SlimefunBlockData> getChargeRange(BlockMenu inv, Block block, SlimefunBlockData data){
         Location loc=block.getLocation();
         Directions dir=getDirection(0,data);
         HashSet<SlimefunBlockData> ret=new HashSet<>();
@@ -38,30 +39,36 @@ public class AdjacentEnergyCharger extends AbstractEnergyCharger implements Dire
         if(dir!=Directions.NONE){
             loc=dir.relate(loc);
             if(getChargeableComponent(DataCache.getSfItem(loc))!=null){
-                if((testData=DataCache.safeLoadBlock(loc))!=null)
-                    ret.add(testData);
+                if((testData=DataCache.safeLoadBlock(loc))!=null) {
+					ret.add(testData);
+				}
             }
         }else {
             for (Directions d : Directions.nonnullValues()) {
                 Location testloc=d.relate(loc);
                 if(getChargeableComponent(DataCache.getSfItem(testloc))!=null){
-                    if((testData=DataCache.safeLoadBlock(testloc))!=null)
-                        ret.add(testData);
+                    if((testData=DataCache.safeLoadBlock(testloc))!=null) {
+						ret.add(testData);
+					}
                 }
             }
         }
         return ret;
     }
-    public int[] getDirectionSlots(){
+    @Override
+	public int[] getDirectionSlots(){
         return DIRECTION_SLOTS;
     }
-    public int getMaxChargeAmount(){
+    @Override
+	public int getMaxChargeAmount(){
         return MAX_LEN;
     }
-    public  String[] getSaveKeys(){
+    @Override
+	public  String[] getSaveKeys(){
         return savedKeys;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         super.newMenuInstance(menu, block);
         menu.addMenuClickHandler(DIRECTION_SLOTS[0],getDirectionHandler(0,menu));
         updateDirectionSlots(0,menu);

@@ -30,7 +30,8 @@ public void clearRelated(){
             targetConsumers.clear();
         }
     }
-    protected ItemConsumer clone(){
+    @Override
+	protected ItemConsumer clone(){
         return (ItemConsumer)super.clone();
     }
     /**
@@ -52,7 +53,8 @@ public void clearRelated(){
         super.grab(target);
       //  addRelate(target);
     }
-    protected void init(ItemStack item) {
+    @Override
+	protected void init(ItemStack item) {
         super.init(item);
         this.targetConsumers = null;
     }
@@ -64,7 +66,8 @@ public void clearRelated(){
     /**
      * clear all modifi
      */
-    public void syncData(){
+    @Override
+	public void syncData(){
         clearRelated();
         super.syncData();
     }
@@ -100,7 +103,8 @@ public void clearRelated(){
 //        }
 //        return null;
 //    }
-    public void updateItemStack(){
+    @Override
+	public void updateItemStack(){
         throw new NotImplementedException("this method should not be called");
     }
 

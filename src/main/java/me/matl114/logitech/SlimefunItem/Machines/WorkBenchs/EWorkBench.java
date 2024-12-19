@@ -40,7 +40,8 @@ public class EWorkBench extends AbstractWorkBench {
             getMachineRecipes();
         });
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         //preset.setSize(45);
         int[] border = BORDER;
         int len=border.length;
@@ -50,17 +51,22 @@ public class EWorkBench extends AbstractWorkBench {
         preset.addItem(CRAFT_SLOT,CRAFT_ITEM);
         preset.addItem(getRecipeMenuSlot(),AbstractWorkBench.RECIPEBOOK_SHOW_ITEM);
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public int getRecipeMenuSlot(){return MENU_SLOT; }
-    public int[] getRecipeSlots(){
+    @Override
+	public int getRecipeMenuSlot(){return MENU_SLOT; }
+    @Override
+	public int[] getRecipeSlots(){
         return INPUT_SLOT;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         menu.addMenuClickHandler(CRAFT_SLOT,
                 (player, i, itemStack, clickAction)->{
                     craft(block,menu,player);

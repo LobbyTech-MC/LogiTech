@@ -99,7 +99,8 @@ public class MyAddon extends JavaPlugin implements SlimefunAddon {
          */
         return this;
     }
-    public String getWikiURL(){
+    @Override
+	public String getWikiURL(){
         return "https://github.com/m1919810/LogiTech/wiki/{0}";
     }
 

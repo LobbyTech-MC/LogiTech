@@ -367,7 +367,9 @@ public class MultiBlockService {
             }
         }else if(blocks instanceof MultiBlockPart){
             return ((MultiBlockPart)blocks).getPartId();
-        }else return MBID_AIR;
+        } else {
+			return MBID_AIR;
+		}
     }
 
 
@@ -408,7 +410,9 @@ public class MultiBlockService {
             }
             data.setData(MB_STATUS_KEY,"0");
             return 0;
-        }else return MB_STATUS_MAP.computeIfAbsent(data.getLocation(),(l)->new AtomicInteger(0)).get();
+        } else {
+			return MB_STATUS_MAP.computeIfAbsent(data.getLocation(),(l)->new AtomicInteger(0)).get();
+		}
     }
     public static void handleVanillaBlockBreak(Location loc){
         if(getStatus(loc)!=0){
@@ -491,7 +495,9 @@ public class MultiBlockService {
             }else {
                 return -1;
             }
-        }else return MB_STATUS_MAP.computeIfAbsent(loc,(l)->new AtomicInteger(0)).get();
+        } else {
+			return MB_STATUS_MAP.computeIfAbsent(loc,(l)->new AtomicInteger(0)).get();
+		}
     }
     public static String safeGetUUID(Location loc){
         SlimefunItem item=DataCache.getSfItem(loc);
@@ -506,8 +512,9 @@ public class MultiBlockService {
             if(data!=null){
                 try{
                     uuid= data.getData(MB_UUID_KEY);
-                    if(uuid!=null)
-                        return uuid;
+                    if(uuid!=null) {
+						return uuid;
+					}
                 }catch (Throwable a){
 
                 }
@@ -566,7 +573,9 @@ public class MultiBlockService {
         }
     }
     public static void toggleOff(SlimefunBlockData data,DeleteCause cause){
-        if(data==null)return;
+        if(data==null) {
+			return;
+		}
         String uid=safeGetUUID(data.getLocation());
         AbstractMultiBlockHandler handler=MULTIBLOCK_CACHE.get(uid);
         if(handler!=null){

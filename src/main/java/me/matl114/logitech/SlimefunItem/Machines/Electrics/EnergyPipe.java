@@ -21,7 +21,8 @@ public class EnergyPipe extends AbstractPipe  {
         this.MAX_TRANSFER=maxTransfer;
         this.TRANSFER_COST=transferCost;
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         stack.setItemMeta( AddUtils.addLore(stack,"&7最大电力传输速率: %sJ/t".formatted(AddUtils.formatDouble(MAX_TRANSFER)),"&7能量传输损耗率: %s%%".formatted(AddUtils.formatDouble(100*this.TRANSFER_COST))).getItemMeta());
     }
 
@@ -44,10 +45,10 @@ public class EnergyPipe extends AbstractPipe  {
 
                 int fromCharge=ec2.getCharge(fromLocation);
                 int toCharge=ec1.getCharge(toLocation);
-                int transfer=Math.min( Math.min(fromCharge,MAX_TRANSFER), ((int)(((double)(ec1.getCapacity()-toCharge))/(1-TRANSFER_COST))));
+                int transfer=Math.min( Math.min(fromCharge,MAX_TRANSFER), ((int)((ec1.getCapacity()-toCharge)/(1-TRANSFER_COST))));
 
                 ec2.setCharge(fromLocation,fromCharge-transfer);
-                ec1.setCharge(toLocation,toCharge+(int)(((double)transfer)*(1-TRANSFER_COST)) );
+                ec1.setCharge(toLocation,toCharge+(int)((transfer)*(1-TRANSFER_COST)) );
             }
         }
     }

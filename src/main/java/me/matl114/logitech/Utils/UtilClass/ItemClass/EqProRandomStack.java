@@ -19,17 +19,20 @@ public class EqProRandomStack extends RandomItemStack  {
            });
         }});
     }
-    
-    public ItemStack clone(){
+
+    @Override
+	public ItemStack clone(){
         return this.itemList[rand.nextInt(this.sum)].clone();
     }
-    
-    public EqProRandomStack copy(){
+
+    @Override
+	public EqProRandomStack copy(){
         EqProRandomStack stack = new EqProRandomStack(itemSettings);
         return stack;
 
     }
-    public ItemStack getInstance(){
+    @Override
+	public ItemStack getInstance(){
         ItemStack it= this.itemList[rand.nextInt(this.sum)];
         return (it instanceof RandOutItem w)?w.getInstance():it;
     }

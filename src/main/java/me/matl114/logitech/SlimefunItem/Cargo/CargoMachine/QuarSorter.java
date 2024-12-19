@@ -46,7 +46,8 @@ public class QuarSorter extends AbstractSorter{
     public QuarSorter(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(itemGroup, item, recipeType, recipe,4);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for (int i=0;i<len;i++){
@@ -58,19 +59,24 @@ public class QuarSorter extends AbstractSorter{
             preset.addItem(border[i], INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
         }
     }
-    public int getChipSlot(){
+    @Override
+	public int getChipSlot(){
         return 13;
     }
-    public int getInfoSlot(){
+    @Override
+	public int getInfoSlot(){
         return 22;
     }
-    public int[] getInputSlots() {
+    @Override
+	public int[] getInputSlots() {
         return INPUT_SLOT;
     }
-    public int[] getInputWLSlot() {
+    @Override
+	public int[] getInputWLSlot() {
         return INPUTW_SLOT;
     }
-    public int[] getOutputSlots() {
+    @Override
+	public int[] getOutputSlots() {
         return OUTPUT_SLOT;
     }
 

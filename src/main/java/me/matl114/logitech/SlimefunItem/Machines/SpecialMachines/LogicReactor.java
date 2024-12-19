@@ -100,7 +100,9 @@ public class LogicReactor extends AbstractProcessor {
                     cnt=-64;
                 }
                 it.setAmount(0);
-            }else  cnt=-64;
+            } else {
+				cnt=-64;
+			}
         }
         for (int i=4;i<8;++i){
             it=inv.getItemInSlot(inputs[i]);
@@ -116,7 +118,9 @@ public class LogicReactor extends AbstractProcessor {
                     cnt=-64;
                 }
                 it.setAmount(0);
-            }else cnt=-64;
+            } else {
+				cnt=-64;
+			}
         }
         if(cnt<0){
             return -1;
@@ -130,16 +134,23 @@ public class LogicReactor extends AbstractProcessor {
                return 1;
            }else if (code==1||code==2||code==4||code==8){//仅一位
                return 2;
-           }else return 3;//else
+           }
+		else { //仅一位
+			return 3;//else
+		}
         }
     }
-    public boolean conditionHandle(Block b,BlockMenu menu){
+    @Override
+	public boolean conditionHandle(Block b,BlockMenu menu){
         ItemStack switchItem=menu.getItemInSlot(SWITCH_SLOT);
         if(switchItem!=null&&switchItem.getType()==Material.SOUL_TORCH){
             return false;
-        }else return super.conditionHandle(b,menu);
+        } else {
+			return super.conditionHandle(b,menu);
+		}
     }
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         int[] border = BORDER;
         int len=border.length;
@@ -188,16 +199,19 @@ public class LogicReactor extends AbstractProcessor {
         return null;
 
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
-        if(flow==ItemTransportFlow.WITHDRAW)
-            return getOutputSlots();
-        else if(item==null||item.getType()==Material.AIR){
+    @Override
+	public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+        if(flow==ItemTransportFlow.WITHDRAW) {
+			return getOutputSlots();
+		} else if(item==null||item.getType()==Material.AIR){
             return getInputSlots();
         }
         if(item.getType()==Material.MUSIC_DISC_5){
@@ -206,7 +220,8 @@ public class LogicReactor extends AbstractProcessor {
             return COMMON_SLOT;
         }
     }
-    public void newMenuInstance(@Nonnull BlockMenu inv, @Nonnull Block block){
+    @Override
+	public void newMenuInstance(@Nonnull BlockMenu inv, @Nonnull Block block){
         if(inv.getItemInSlot(SWITCH_SLOT)==null){
             inv.replaceExistingItem(SWITCH_SLOT,SWITCH_OFF);
         }
@@ -222,7 +237,7 @@ public class LogicReactor extends AbstractProcessor {
     }
     @Override
     public void process(Block b, BlockMenu inv, SlimefunBlockData data){
-        SimpleCraftingOperation currentOperation = (SimpleCraftingOperation)this.processor.getOperation(b);
+        SimpleCraftingOperation currentOperation = this.processor.getOperation(b);
         ItemConsumer[] fastCraft=null;
         if(currentOperation==null){
 
@@ -240,8 +255,8 @@ public class LogicReactor extends AbstractProcessor {
                 }
             }else{//if currentOperation ==null return  , cant find nextRecipe
                 if(inv.hasViewer()){
-                    for(int var4 = 0; var4 <PROCESSOR_SLOT.length; ++var4) {
-                        inv.replaceExistingItem(PROCESSOR_SLOT[var4],MenuUtils.PROCESSOR_NULL );
+                    for (int element : PROCESSOR_SLOT) {
+                        inv.replaceExistingItem(element,MenuUtils.PROCESSOR_NULL );
                     }
                 }
                 return ;
@@ -255,16 +270,16 @@ public class LogicReactor extends AbstractProcessor {
             ItemConsumer[] var4=currentOperation.getResults();
             CraftUtils.forcePush(var4,inv,getOutputSlots());
             if(inv.hasViewer()){
-                for(int var5 = 0; var5 <PROCESSOR_SLOT.length; ++var5) {
-                    inv.replaceExistingItem(PROCESSOR_SLOT[var5],MenuUtils.PROCESSOR_NULL );
+                for (int element : PROCESSOR_SLOT) {
+                    inv.replaceExistingItem(element,MenuUtils.PROCESSOR_NULL );
                 }
             }
             this.processor.endOperation(b);
         }
         else{
             if(inv.hasViewer()){
-                for(int var5 = 0; var5 <PROCESSOR_SLOT.length; ++var5) {
-                    this.processor.updateProgressBar(inv, PROCESSOR_SLOT[var5], currentOperation);
+                for (int element : PROCESSOR_SLOT) {
+                    this.processor.updateProgressBar(inv, element, currentOperation);
                 }
             }
             currentOperation.progress(1);

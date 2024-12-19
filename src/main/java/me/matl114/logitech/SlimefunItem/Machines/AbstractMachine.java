@@ -73,7 +73,9 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
                 this.handleProcess = (inv) -> {
                     if(this.getCapacity()>this.getCharge(inv)+this.energyConsumption){
                         return true;
-                    }else return false;
+                    } else {
+						return false;
+					}
                 };
                 this.handlerProcessCost = (inv) -> {
                     return ;
@@ -83,7 +85,9 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
                 this.handleProcess =  (inv) -> {
                     if(this.energyConsumption<this.getCharge(inv)){
                         return true;
-                    }else return false;
+                    } else {
+						return false;
+					}
                 };
                 this.handlerProcessCost = (inv) -> {
                     this.removeCharge(inv, this.energyConsumption);
@@ -106,7 +110,8 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
 
     }
 
-    public void addCharge(@Nonnull Location l, int charge){
+    @Override
+	public void addCharge(@Nonnull Location l, int charge){
         EnergyNetComponent.super.addCharge(l,charge);
     }
 
@@ -115,7 +120,8 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
      * @param stack
      * @return
      */
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         if(this.energyConsumption!=0){
             stack.setItemMeta(AddUtils.machineInfoAdd(stack,this.energybuffer,this.energyConsumption).getItemMeta());
         }
@@ -132,23 +138,27 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
      * @return
      */
     public boolean conditionHandle(Block b,BlockMenu menu){
-        if(menu!=null)
-            return this.handleProcess.apply(menu.getLocation());
-        else
-            return this.handleProcess.apply(b.getLocation());
+        if(menu!=null) {
+			return this.handleProcess.apply(menu.getLocation());
+		} else {
+			return this.handleProcess.apply(b.getLocation());
+		}
     }
 
     /**
      * construct your menu here.called in constructor
      * @param preset
      */
-    public abstract void constructMenu(BlockMenuPreset preset);
+    @Override
+	public abstract void constructMenu(BlockMenuPreset preset);
 
-    public void disable() {
+    @Override
+	public void disable() {
         super.disable();
         //this.getMachineRecipes().clear();
     }
-    public void enable() {
+    @Override
+	public void enable() {
         super.enable();
         this.registerDefaultRecipes();
     }
@@ -156,7 +166,8 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
      * get capacity
      * @return
      */
-    public final int getCapacity(){
+    @Override
+	public final int getCapacity(){
         return this.energybuffer;
     }
     /**
@@ -171,7 +182,8 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
      * cargo and IO
      * @return
      */
-    public abstract int[] getInputSlots();
+    @Override
+	public abstract int[] getInputSlots();
     /**
      * container name,default item name
      * @return
@@ -210,18 +222,21 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
      * cargo and IO
      * @return
      */
-    public abstract int[] getOutputSlots();
+    @Override
+	public abstract int[] getOutputSlots();
 
     /**
      * create new Menu INSTANCE at blockMenu,default None
      * @param blockMenu
      * @param block
      */
-    public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
+    @Override
+	public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
         updateMenu(blockMenu,block,Settings.INIT);
     }
 
-    public void postRegister() {
+    @Override
+	public void postRegister() {
         super.postRegister();
         if (this.getState() == ItemState.ENABLED) {
             this.registerDefaultRecipes();
@@ -229,7 +244,8 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
 
     }
 
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         //
         registerTick(this);
@@ -249,33 +265,39 @@ public abstract  class AbstractMachine extends DistinctiveCustomItemStack implem
      * @param menu
      */
     protected void progressorCost(Block b, BlockMenu menu) {
-        if(menu!=null)
-            this.handlerProcessCost.accept(menu.getLocation());
-        else
-            this.handlerProcessCost.accept(b.getLocation());
+        if(menu!=null) {
+			this.handlerProcessCost.accept(menu.getLocation());
+		} else {
+			this.handlerProcessCost.accept(b.getLocation());
+		}
     }
     /**
      * fetch List of recipes tobee show
      * @return
      */
-    public List<MachineRecipe> provideDisplayRecipe(){
+    @Override
+	public List<MachineRecipe> provideDisplayRecipe(){
         return getMachineRecipes();
     }
     protected void registerDefaultRecipes() {
     }
-    public void removeCharge(@Nonnull Location l, int charge){
+    @Override
+	public void removeCharge(@Nonnull Location l, int charge){
         if(charge>0){
             EnergyNetComponent.super.removeCharge(l,charge);
         }
     }
 
-    public void setCharge(@Nonnull Location l, int charge){
+    @Override
+	public void setCharge(@Nonnull Location l, int charge){
         EnergyNetComponent.super.setCharge(l,Math.max(0,charge));
     }
-    public final void tick(Block b, BlockMenu menu, int ticker) {
+    @Override
+	public final void tick(Block b, BlockMenu menu, int ticker) {
 
     }
-    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
+    @Override
+	public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
         if(conditionHandle(b,menu)){
             process(b,menu,data);
         }}

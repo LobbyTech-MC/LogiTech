@@ -39,7 +39,8 @@ public class ChunkEnergyCharger extends AbstractEnergyCharger implements ChunkLi
                               int energybuffer){
         super(category, item, recipeType, recipe, energybuffer);
     }
-    public Collection<SlimefunBlockData> getChargeRange(BlockMenu inv,Block block,SlimefunBlockData data){
+    @Override
+	public Collection<SlimefunBlockData> getChargeRange(BlockMenu inv,Block block,SlimefunBlockData data){
         Location loc=block.getLocation();
         Schedules.launchSchedules(()->{
             int t;
@@ -55,10 +56,12 @@ public class ChunkEnergyCharger extends AbstractEnergyCharger implements ChunkLi
         },0,false,0);
         return DataCache.getAllSfItemInChunk(loc.getWorld(),loc.getBlockX()>>4,loc.getBlockZ()>>4);
     }
-    public int getMaxChargeAmount(){
+    @Override
+	public int getMaxChargeAmount(){
         return 114514;
     }
-    public HashMap<Chunk,Location> getRecords(){
+    @Override
+	public HashMap<Chunk,Location> getRecords(){
         return MACHINE_POSITION;
     }
 
@@ -75,10 +78,12 @@ public class ChunkEnergyCharger extends AbstractEnergyCharger implements ChunkLi
     public boolean isBorder(int i) {
         return super.isBorder(i)&&i!=PARTICLE_SLOT;
     }
-    protected boolean isChargeable(SlimefunItem that){
+    @Override
+	protected boolean isChargeable(SlimefunItem that){
         return !(that instanceof AbstractEnergyMachine);
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         if(!onChunkPlace(menu.getLocation(),ChunkEnergyCharger.class)){
             onChunkReachLimit(menu.getLocation(),this,(str)->{menu.getLocation().getWorld().getNearbyEntities(menu.getLocation(),10,10,10,(e)->{
                 if(e instanceof Player player){
@@ -104,7 +109,8 @@ public class ChunkEnergyCharger extends AbstractEnergyCharger implements ChunkLi
         super.onBreak(e, menu);
         onChunkBreak(menu.getLocation());
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         SlimefunBlockPlaceLimitListener.registerBlockLimit(this,(event)->{
             Location loc=event.getBlockPlaced().getLocation();

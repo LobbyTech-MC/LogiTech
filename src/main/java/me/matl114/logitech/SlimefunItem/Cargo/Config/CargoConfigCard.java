@@ -42,7 +42,9 @@ public class CargoConfigCard {
     }
     public static boolean canConfig(ItemMeta meta) {
         String it= CraftUtils.parseSfId(meta);
-        if(it==null) return false;
+        if(it==null) {
+			return false;
+		}
         return SlimefunItem.getById(it) instanceof ConfigCard;
     }
     public static void clearConfig(ItemMeta meta) {

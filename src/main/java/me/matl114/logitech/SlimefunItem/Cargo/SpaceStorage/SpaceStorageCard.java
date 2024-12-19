@@ -24,7 +24,8 @@ public class SpaceStorageCard extends DistinctiveCustomItemStack {
     public SpaceStorageCard(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         super.addInfo(stack);
         ItemMeta meta=stack.getItemMeta();
         List<String> lore=meta.getLore();

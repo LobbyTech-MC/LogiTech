@@ -19,10 +19,12 @@ public class ItemReplacerPusher extends ItemPusher{
 
     }
     //修复了setFrom存储时覆写maxSize的问题
-    public void setFrom(ItemCounter source){
+    @Override
+	public void setFrom(ItemCounter source){
         super.setFrom(source);
     }
-    public void updateItemStack(){
+    @Override
+	public void updateItemStack(){
         if(isDirty()){
             source.setAmount(cnt);
         }

@@ -49,10 +49,11 @@ public interface RecipeDisplay extends RecipeDisplayItem {
                 else if(stack.getAmount()>64||stack.getAmount()<=0){
                     lore.add("&c输出数量: "+stack.getAmount());
                 }
-                if(time>=0)
-                    lore.add("&e进程耗时: "+(int)(time/2)+"s ("+time+"tick)");
-                else
-                    lore.add("&e直接合成~");
+                if(time>=0) {
+					lore.add("&e进程耗时: "+time/2+"s ("+time+"tick)");
+				} else {
+					lore.add("&e直接合成~");
+				}
                 stack=AddUtils.addLore(stack, lore.toArray(new String[0]));
 
                 break;
@@ -72,8 +73,9 @@ public interface RecipeDisplay extends RecipeDisplayItem {
         if(recipes==null||recipes.isEmpty()){
             return  displayRecipes;
         }
-        if(displayRecipes.size()%2==1)
-            displayRecipes.add(null);
+        if(displayRecipes.size()%2==1) {
+			displayRecipes.add(null);
+		}
 
         for (int i = 0; i < recipes.size(); i++) {
 
@@ -125,18 +127,23 @@ public interface RecipeDisplay extends RecipeDisplayItem {
                 if (j < endp1) {
                     displayRecipes.add(getInputList.get(t));
                     ++t;
-                } else displayRecipes.add(null);
+                } else {
+					displayRecipes.add(null);
+				}
 
                 if (j >= endp2) {
                     displayRecipes.add(getOutputList.get(s));
                     ++s;
-                } else displayRecipes.add(null);
+                } else {
+					displayRecipes.add(null);
+				}
             }
         }
 
         return displayRecipes;
     }
-    default List<ItemStack> getDisplayRecipes() {
+    @Override
+	default List<ItemStack> getDisplayRecipes() {
         return this._getDisplayRecipes(new ArrayList<>());
     }
     List<MachineRecipe> provideDisplayRecipe();

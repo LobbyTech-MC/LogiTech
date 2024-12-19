@@ -195,7 +195,7 @@ public class AddSlimefunItems {
     public static final SlimefunAddon INSTANCE = MyAddon.getInstance();
     protected static boolean TYPE=false;
     protected static int[] CHOOSEN_SLOT=new int[]{
-       
+
     };
     protected static RecipeType COMMON_TYPE=TYPE?RecipeType.ENHANCED_CRAFTING_TABLE: BugCrafter.TYPE;
     //items
@@ -500,7 +500,8 @@ public class AddSlimefunItems {
             .register();
     public static final SlimefunItem FINAL_FRAME=new MultiPart(AddGroups.MATERIAL,AddItem.FINAL_FRAME,RecipeType.NULL,
             AddUtils.formatInfoRecipe(AddItem.FINAL_SEQUENTIAL,Language.get("Machines.FINAL_SEQUENTIAL.Name")),"final.frame"){
-            public boolean redirectMenu(){
+            @Override
+			public boolean redirectMenu(){
                 return false;
             }
     }
@@ -588,8 +589,9 @@ public class AddSlimefunItems {
                 List<MachineRecipe> recipes=new ArrayList<>();
                 List<MachineRecipe> elecpress=RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(RecipeType.COMPRESSOR);
                 for (MachineRecipe recipe:elecpress){
-                    if(recipe.getOutput()[0].getType()!=Material.COBBLESTONE)
-                    recipes.add(MachineRecipeUtils.stackFrom(3,recipe.getInput(),recipe.getOutput()));
+                    if(recipe.getOutput()[0].getType()!=Material.COBBLESTONE) {
+						recipes.add(MachineRecipeUtils.stackFrom(3,recipe.getInput(),recipe.getOutput()));
+					}
                 }
                 elecpress=RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(RecipeType.PRESSURE_CHAMBER);
                 for (MachineRecipe recipe:elecpress){
@@ -759,7 +761,8 @@ public class AddSlimefunItems {
     public static final  SlimefunItem CRAFTER=new SpecialCrafter(AddGroups.BASIC, AddItem.CRAFTER, RecipeType.ENHANCED_CRAFTING_TABLE,
             recipe(AddItem.ABSTRACT_INGOT, AddItem.NOLOGIC, AddItem.ABSTRACT_INGOT, AddItem.LBOOLIZER, AddItem.LCRAFT, AddItem.LBOOLIZER,
                     AddItem.ABSTRACT_INGOT, AddItem.NOLOGIC, AddItem.ABSTRACT_INGOT), Material.BOOK, 0, 180, 7200) {
-        public boolean advanced(){
+        @Override
+		public boolean advanced(){
             return true;
         }
         @Override
@@ -980,10 +983,12 @@ public class AddSlimefunItems {
                     AddItem.LFIELD,AddItem.LMOTOR,AddItem.LPLATE,AddItem.LPLATE,AddItem.LDIGITIZER,AddItem.LFIELD,
                     AddItem.ABSTRACT_INGOT,AddItem.LFIELD,AddItem.LOGIC,AddItem.LOGIC,AddItem.LFIELD,AddItem.ABSTRACT_INGOT)
             , Material.NETHER_STAR,0,300,20_000,new HashSet<>(){{
-                if(AddDepends.INFINITYWORKBENCH_TYPE!=null)
-                    add(AddDepends.INFINITYWORKBENCH_TYPE);
-                if(AddDepends.VOIDHARVEST!=null)
-                    add(AddDepends.VOIDHARVEST);
+                if(AddDepends.INFINITYWORKBENCH_TYPE!=null) {
+					add(AddDepends.INFINITYWORKBENCH_TYPE);
+				}
+                if(AddDepends.VOIDHARVEST!=null) {
+					add(AddDepends.VOIDHARVEST);
+				}
             }})
             .register();
 
@@ -995,7 +1000,8 @@ public class AddSlimefunItems {
                     AddItem.STAR_GOLD_INGOT,setC(AddItem.LPLATE,1),"ELECTRIC_SMELTERY_2","ELECTRIC_SMELTERY_2",setC(AddItem.LPLATE,1),AddItem.STAR_GOLD_INGOT,
                     AddItem.LFIELD,AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.LFIELD), Material.STONE,18_000,180_000,
            120,AddSlimefunItems.STARSMELTERY){
-        public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+        @Override
+		public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
             if(flow==ItemTransportFlow.WITHDRAW){
                 return this.getOutputSlots();
             }else {
@@ -1005,13 +1011,13 @@ public class AddSlimefunItems {
                 int[] inputSlot=getInputSlots();
                 ItemCounter push=CraftUtils.getCounter(item);
                 ItemStack itemInSlot;
-                for(int i =0;i<inputSlot.length;++i){
-                    itemInSlot=menu.getItemInSlot(inputSlot[i]);
+                for (int element : inputSlot) {
+                    itemInSlot=menu.getItemInSlot(element);
                     if(itemInSlot==null||itemInSlot.getType()!=item.getType()){
                         continue;
                     }
                     if(CraftUtils.matchItemStack(itemInSlot,push,false)){
-                        return new int[]{inputSlot[i]};
+                        return new int[]{element};
                     }
                 }
                 return inputSlot;
@@ -1138,7 +1144,8 @@ public class AddSlimefunItems {
                     "WET_SPONGE","PISTON","WET_SPONGE")){
         protected final int SEARCH_RANGE=10;
         protected final Set<Player> COOL_DOWN=ConcurrentHashMap.newKeySet();
-        public void onClickAction(PlayerRightClickEvent event){
+        @Override
+		public void onClickAction(PlayerRightClickEvent event){
             Player p=event.getPlayer();
             if(p!=null){
                 if(COOL_DOWN.contains(p)){
@@ -2487,7 +2494,8 @@ public class AddSlimefunItems {
         public Random rand=new Random();
         int EFFECT_RANGE=3;
         int EFFECT_PERIOD=4;
-        public ItemDropHandler[] getItemHandler(){
+        @Override
+		public ItemDropHandler[] getItemHandler(){
             return new ItemDropHandler[]{this::onDrop};
         }
         public boolean onDrop(PlayerDropItemEvent var1, Player var2, Item var3){
@@ -2495,7 +2503,9 @@ public class AddSlimefunItems {
                 if(canUse(var2,true)){
                     Schedules.launchSchedules(
                             ()-> {
-                                if(!var3.isValid())return;
+                                if(!var3.isValid()) {
+									return;
+								}
                                 ItemStack stack=var3.getItemStack();
                                 int amount=stack.getAmount();
                                 stack.setAmount(0);
@@ -2596,7 +2606,7 @@ public class AddSlimefunItems {
 
         }
         public void onRtp(Player player,Location center,int range,int leftTime){
-            AsyncResultRunnable<Boolean> effectResult=new AsyncResultRunnable<Boolean>() {
+            AsyncResultRunnable<Boolean> effectResult=new AsyncResultRunnable<>() {
                 @Override
                 public Boolean result() {
                     return onEffect(player);
@@ -2682,7 +2692,8 @@ public class AddSlimefunItems {
             .register();
     public static final SlimefunItem RADIATION_CLEAR=new CustomProps(AddGroups.SPECIAL, AddItem.RADIATION_CLEAR, RecipeType.NULL,
             AddUtils.NULL_RECIPE.clone(), null) {
-                public void onClickAction(PlayerRightClickEvent event) {
+                @Override
+				public void onClickAction(PlayerRightClickEvent event) {
                     Optional<Block> b= event.getClickedBlock();
                     if(b.isPresent()){
                         if(RadiationRegion.removeNearRadiation(b.get().getLocation(),40)){
@@ -2703,7 +2714,8 @@ public class AddSlimefunItems {
 
     public static final SlimefunItem ANTIMASS_CLEAR=new CustomProps(AddGroups.SPECIAL, AddItem.ANTIMASS_CLEAR, RecipeType.NULL,
             AddUtils.NULL_RECIPE.clone(), null) {
-        public void onClickAction(PlayerRightClickEvent event) {
+        @Override
+		public void onClickAction(PlayerRightClickEvent event) {
             if(ANTIMASS instanceof SpreadBlock sb){
                 sb.getSpreadOwner().clear();
                 sb.getSpreadTicker().clear();
@@ -2841,10 +2853,12 @@ public class AddSlimefunItems {
             CRAFT_PROVIDER=FinalFeature.STORAGE_AND_LOCPROXY_READER;
             MACHINE_PROVIDER=FinalFeature.STORAGE_READER;
         }
-        public boolean advanced(){
+        @Override
+		public boolean advanced(){
             return true;
         }
-        public int getCraftLimit(Block b,BlockMenu menu){
+        @Override
+		public int getCraftLimit(Block b,BlockMenu menu){
             return super.getCraftLimit(b,menu)*4;
         }
         @Override
@@ -2963,16 +2977,17 @@ public class AddSlimefunItems {
     }
 
     protected static ItemStack[] recipe(Object ... v){
-        if(!TYPE||v.length<=9)
-            return Arrays.stream(v).map(AddUtils::resolveItem).toArray(ItemStack[]::new);
-        else{
+        if(!TYPE||v.length<=9) {
+			return Arrays.stream(v).map(AddUtils::resolveItem).toArray(ItemStack[]::new);
+		} else{
             int len=v.length;
             ItemStack[] res = new ItemStack[9];
             int index=0;
             int delta=len/9;
             for(int i=0;i<9;++i){
-                if(index>=len)res[i]=null;
-                else{
+                if(index>=len) {
+					res[i]=null;
+				} else{
                     res[i]=AddUtils.resolveItem(v[index]);
                 }
                 index+=delta-1+i%2;

@@ -49,10 +49,12 @@ public class HeadAnalyzer extends AbstractMachine{
     public HeadAnalyzer(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(category, item, recipeType, recipe, 0,0);
     }
-    public void addInfo(ItemStack item){
+    @Override
+	public void addInfo(ItemStack item){
 
     }
-    public  void constructMenu(BlockMenuPreset preset){
+    @Override
+	public  void constructMenu(BlockMenuPreset preset){
         int[] border = BORDER;
         int len=border.length;
         for(int var4 = 0; var4 < len; ++var4) {
@@ -66,15 +68,18 @@ public class HeadAnalyzer extends AbstractMachine{
     }
     private String getHash(ItemStack item){
         String st= CustomHead.getHash(item);
-        if(st!=null)
-            return "&3hash: &f"+st;
-        else
-            return "&3hash: &f空";
+        if(st!=null) {
+			return "&3hash: &f"+st;
+		} else {
+			return "&3hash: &f空";
+		}
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[0];
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return new int[0];
     }
     private ItemStack getSkull(String string){
@@ -85,7 +90,8 @@ public class HeadAnalyzer extends AbstractMachine{
         }
     }
 
-    public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
+    @Override
+	public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
         blockMenu.addMenuClickHandler(ENCODE_SLOT,((player, i, itemStack, clickAction) -> {
             player.closeInventory();
 
@@ -150,10 +156,12 @@ public class HeadAnalyzer extends AbstractMachine{
             return false;
         }));
     }
-    public void process(Block b, BlockMenu preset, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu preset, SlimefunBlockData data){
 
     }
-    public void registerTick(SlimefunItem item){
+    @Override
+	public void registerTick(SlimefunItem item){
         //no ticker
     }
 

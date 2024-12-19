@@ -26,7 +26,7 @@ public abstract class MultiBlockType implements AbstractMultiBlockType {
 
 
     public MultiBlockType() {
-        this.STRUCTURE_MAP = new LinkedHashMap<BlockVector,String>();
+        this.STRUCTURE_MAP = new LinkedHashMap<>();
         this.REQUIREMENT_MAP=new LinkedHashMap<>();
     }
     public MultiBlockType addBlock(int x, int y, int z,String id) {
@@ -52,7 +52,8 @@ public abstract class MultiBlockType implements AbstractMultiBlockType {
         REQUIREMENT_MAP.put(new BlockVector(x,y,z),id);
         return this;
     }
-    public MultiBlockType build(){
+    @Override
+	public MultiBlockType build(){
         init();
         isFinal=true;
         this.size=STRUCTURE_MAP.size();
@@ -79,7 +80,8 @@ public abstract class MultiBlockType implements AbstractMultiBlockType {
         this.STRUCTURE_MAP=null;
         return this;
     }
-    public AbstractMultiBlock genMultiBlockFrom(Location loc, MultiBlockService.Direction dir, boolean hasPrevRecord, OutputStream errorOut){
+    @Override
+	public AbstractMultiBlock genMultiBlockFrom(Location loc, MultiBlockService.Direction dir, boolean hasPrevRecord, OutputStream errorOut){
         int len=this.getSchemaSize();
         for(int i=0;i<len;i++){
             Vector delta= dir.rotate(this.getSchemaPart(i));
@@ -128,13 +130,16 @@ public abstract class MultiBlockType implements AbstractMultiBlockType {
     public String getRequirementPartId(int index) {return REQUIREMENT_IDS[index];}
     public int getRequirementSize() {return sizeR;}
 
-    public BlockVector getSchemaPart(int index){
+    @Override
+	public BlockVector getSchemaPart(int index){
         return STRUCTURE_LOC[index].clone();
     }
-    public String getSchemaPartId(int index) {
+    @Override
+	public String getSchemaPartId(int index) {
         return STRUCTURE_IDS[index];
     }
-    public int getSchemaSize() {
+    @Override
+	public int getSchemaSize() {
         return size;
     }
     public String[] getStructureIds() {
@@ -145,7 +150,8 @@ public abstract class MultiBlockType implements AbstractMultiBlockType {
     }
 
     public abstract void init();
-    public boolean isSymmetric(){
+    @Override
+	public boolean isSymmetric(){
         return isSymmetric;
     }
 }

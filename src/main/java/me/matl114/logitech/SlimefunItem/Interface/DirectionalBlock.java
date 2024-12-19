@@ -33,7 +33,9 @@ public interface DirectionalBlock {
                 dir[i]=getDirection(saveKeys[i],data);
             }
             return dir;
-        }else return null;
+        } else {
+			return null;
+		}
     }
     default Directions getDirection(int index,SlimefunBlockData data){
         return getDirection(getSaveKeys()[index],data);
@@ -79,11 +81,14 @@ public interface DirectionalBlock {
             BlockMenu menu=data.getBlockMenu();
             for (int i=0;i<len;i++){
                 setDirection(saveKeys[i],data,dir[i]);
-                if(i<slotlens)
-                    updateSlot(menu,slots[i],dir[i]);
+                if(i<slotlens) {
+					updateSlot(menu,slots[i],dir[i]);
+				}
             }
             return len;
-        }else return -1;
+        } else {
+			return -1;
+		}
     }
     default void setDirection(String saveKey,SlimefunBlockData data,Directions dir){
         DataCache.setCustomData(data,saveKey,dir.toInt());

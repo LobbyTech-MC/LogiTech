@@ -65,7 +65,9 @@ public abstract class MenuFactory {
         init();
     }
     public MenuFactory addHandler(int pos,ChestMenu.MenuClickHandler handler){
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         while(pos>=handlers.size()){
             handlers.add(null);
             inventory.add(null);
@@ -74,7 +76,9 @@ public abstract class MenuFactory {
         return this;
     }
     public MenuFactory addHandler(int pos,CustomMenuHandler handler){
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         while(pos>=handlers.size()){
             handlers.add(null);
             inventory.add(null);
@@ -83,7 +87,9 @@ public abstract class MenuFactory {
         return this;
     }
     public MenuFactory addInventory(int pos,ItemStack item){
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         while(pos>=inventory.size()) {
             inventory.add(null);
             handlers.add(null);
@@ -92,7 +98,9 @@ public abstract class MenuFactory {
         return this;
     }
     public MenuFactory addInventory(int pos,ItemStack item,ChestMenu.MenuClickHandler handler){
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         while(pos>=handlers.size()){
             handlers.add(null);
             inventory.add(null);
@@ -101,7 +109,9 @@ public abstract class MenuFactory {
         return addInventory(pos,item);
     }
     public MenuFactory addInventory(int pos,ItemStack item,CustomMenuHandler handler){
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         while(pos>=handlers.size()){
             handlers.add(null);
             inventory.add(null);
@@ -110,27 +120,37 @@ public abstract class MenuFactory {
         return addInventory(pos,item);
     }
     public MenuFactory addOverrides(int slot,ChestMenu.MenuClickHandler handler) {
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         overrideHandler.put(slot, CustomMenuHandler.from(handler));
         return this;
     }
     public MenuFactory addOverrides(int slot,CustomMenuHandler handler) {
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         overrideHandler.put(slot, handler);
         return this;
     }
     public MenuFactory addOverrides( int slot,ItemStack item) {
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         overrideItem.put(slot, item);
         return this;
     }
     public MenuFactory addOverrides(int slot,ItemStack item, ChestMenu.MenuClickHandler handler) {
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         overrideHandler.put(slot, CustomMenuHandler.from(handler));
         return addOverrides(slot,item);
     }
     public MenuFactory addOverrides(int slot,ItemStack item,CustomMenuHandler handler) {
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         overrideHandler.put(slot,handler);
         return addOverrides(slot,item);
     }
@@ -142,8 +162,9 @@ public abstract class MenuFactory {
         }
     }
     public CustomMenu build(CustomMenuHandler fatherHandler){
-        if(!isFinal)
-            makeFinal();
+        if(!isFinal) {
+			makeFinal();
+		}
         CustomMenu a=new CustomMenu(title,size,finalInventory.length,this);
         if(next>=0&&next<size){
             a.setNextPageButtom(next);
@@ -163,8 +184,9 @@ public abstract class MenuFactory {
         return a;
     }
     public GuideCustomMenu buildGuide(CustomMenuHandler fatherHandler,PlayerHistoryRecord<CustomMenu> history){
-        if(!isFinal)
-            makeFinal();
+        if(!isFinal) {
+			makeFinal();
+		}
         GuideCustomMenu a=new GuideCustomMenu(title,size,finalInventory.length,this);
         if(next>=0&&next<size){
             a.setNextPageButtom(next);
@@ -193,22 +215,29 @@ public abstract class MenuFactory {
         if (isFinal){
             if(pos>=finalHandlers.length) {
                 return null;
-            }else return finalHandlers[pos];
+            } else {
+				return finalHandlers[pos];
+			}
         }
         if(pos>=handlers.size()) {
             return null;
-        }else return handlers.get(pos);
+        } else {
+			return handlers.get(pos);
+		}
     }
     public ItemStack getInventory(int pos){
         if(isFinal) {
             if(pos>=finalInventory.length) {
                 return null;
-            }
-            else return finalInventory[pos];
+            } else {
+				return finalInventory[pos];
+			}
         }
         if(pos>=inventory.size()){
             return  null;
-        }else return inventory.get(pos);
+        } else {
+			return inventory.get(pos);
+		}
     }
     public int getInventorySize(){
         return finalInventory.length;
@@ -255,7 +284,9 @@ public abstract class MenuFactory {
         return  this;
     }
     public MenuFactory setBack(int slot) {
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         back = slot;
         return this;
     }
@@ -268,22 +299,29 @@ public abstract class MenuFactory {
         return this;
     }
     public MenuFactory setDefaultNPSlots(){
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         this.setNext(size-2).setPrev(size-8);
         return this;
     }
     public MenuFactory setGuideModHistory(PlayerHistoryRecord<CustomMenu> guideBuilder){
-        if(guideBuilder!=null)
-            this.guideBuilder=guideBuilder;
+        if(guideBuilder!=null) {
+			this.guideBuilder=guideBuilder;
+		}
         return this;
     }
     public MenuFactory setNext(int slot) {
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         next = slot;
         return this;
     }
     public MenuFactory setPrev(int slot) {
-        if(isFinal)return this;
+        if(isFinal) {
+			return this;
+		}
         prev = slot;
         return this;
     }

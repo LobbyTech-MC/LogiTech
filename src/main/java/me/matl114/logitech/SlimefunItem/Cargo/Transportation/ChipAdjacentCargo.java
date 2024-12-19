@@ -47,7 +47,8 @@ public class ChipAdjacentCargo extends AdjacentCargo implements ChipControllable
                 )
         );
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for (int i=0;i<len;++i){
@@ -55,10 +56,12 @@ public class ChipAdjacentCargo extends AdjacentCargo implements ChipControllable
         }
         preset.addItem(getInfoSlot(),getInfoOffItem(0), ChestMenuUtils.getEmptyClickHandler());
     }
-    public int getChipSlot(){
+    @Override
+	public int getChipSlot(){
         return 5;
     }
-    public int getConfigSlot(){
+    @Override
+	public int getConfigSlot(){
 
         return 3;
     }
@@ -76,7 +79,8 @@ public class ChipAdjacentCargo extends AdjacentCargo implements ChipControllable
     public  int getInfoSlot(){
         return 4;
     }
-    public void newMenuInstance(BlockMenu inv, Block b){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block b){
         inv.addMenuOpeningHandler((player -> {
             updateMenu(inv,b,Settings.RUN);
         }));
@@ -87,47 +91,56 @@ public class ChipAdjacentCargo extends AdjacentCargo implements ChipControllable
         inv.addMenuClickHandler(DIRECTION_SLOT[1],getDirectionHandler("to_dir",inv));
         updateMenu(inv,b, Settings.INIT);
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu inv){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu inv){
         super.onBreak(e, inv);
         if(inv!=null){
             inv.dropItems(inv.getLocation(),getChipSlot());
         }
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         //shared ticker
         this.addItemHandler((BlockTicker) AbstractSyncTickCargo. CHIP_SYNC);
     }
 
-    public void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount){
-        if(inv.hasViewer())
-            updateMenu(inv,b,Settings.RUN);
+    @Override
+	public void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount){
+        if(inv.hasViewer()) {
+			updateMenu(inv,b,Settings.RUN);
+		}
         String cmd=data.getData(CCODEKEY);
         int code;
         if(cmd==null||cmd.startsWith("nu")){
-            if(cmd==null)
-                data.setData(CCODEKEY,"nu");
-            if(inv.hasViewer())
-                inv.replaceExistingItem(getInfoSlot(),getInfoOffItem(synTickCount));
+            if(cmd==null) {
+				data.setData(CCODEKEY,"nu");
+			}
+            if(inv.hasViewer()) {
+				inv.replaceExistingItem(getInfoSlot(),getInfoOffItem(synTickCount));
+			}
             return;
         }
         try{
             code=Integer.parseInt(cmd);
         }catch (Throwable e){
             data.setData(CCODEKEY,"nu");
-            if(inv.hasViewer())
-                inv.replaceExistingItem(getInfoSlot(),getInfoOffItem(synTickCount));
+            if(inv.hasViewer()) {
+				inv.replaceExistingItem(getInfoSlot(),getInfoOffItem(synTickCount));
+			}
             return;
         }
         synTickCount=synTickCount%32;
         int bit=  MathUtils.getBit(code,synTickCount);
-        if(inv.hasViewer())
-            inv.replaceExistingItem(getInfoSlot(),getInfoItem(code,synTickCount,bit));
+        if(inv.hasViewer()) {
+			inv.replaceExistingItem(getInfoSlot(),getInfoItem(code,synTickCount,bit));
+		}
         if(bit==1){
             super.tick(b,inv,data,synTickCount);
         }
     }
-    public void updateMenu(BlockMenu inv ,Block b,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv ,Block b,Settings mod){
         loadConfig(inv,b);
         updateDirectionSlots("from_dir",inv,DIRECTION_SLOT[0]);
         updateDirectionSlots("to_dir",inv,DIRECTION_SLOT[1]);

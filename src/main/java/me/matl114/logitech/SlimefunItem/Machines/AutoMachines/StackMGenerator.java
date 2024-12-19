@@ -71,21 +71,22 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         return BWSIZE;
     }
     public static List<SlimefunItem> getMachineList(){
-        if(!hasInit)
-        synchronized (BW_LIST){
-            if(BW_LIST.isEmpty()){
-                RecipeSupporter.init();
-                BWSIZE=RecipeSupporter.STACKMGENERATOR_LIST.size();
-                BW_LIST_ENERGYCOMSUME=new int[BWSIZE+1];
-                int i=0;
-                for(Map.Entry<SlimefunItem,Integer> e:RecipeSupporter.STACKMGENERATOR_LIST.entrySet()){
-                    BW_LIST.add(e.getKey());
-                    BW_LIST_ENERGYCOMSUME[i]=e.getValue();
-                    ++i;
-                }
-                hasInit=true;
-            }
-        }
+        if(!hasInit) {
+			synchronized (BW_LIST){
+			    if(BW_LIST.isEmpty()){
+			        RecipeSupporter.init();
+			        BWSIZE=RecipeSupporter.STACKMGENERATOR_LIST.size();
+			        BW_LIST_ENERGYCOMSUME=new int[BWSIZE+1];
+			        int i=0;
+			        for(Map.Entry<SlimefunItem,Integer> e:RecipeSupporter.STACKMGENERATOR_LIST.entrySet()){
+			            BW_LIST.add(e.getKey());
+			            BW_LIST_ENERGYCOMSUME[i]=e.getValue();
+			            ++i;
+			        }
+			        hasInit=true;
+			    }
+			}
+		}
         return BW_LIST;
     }
     protected final int[] BORDER=new int[]{
@@ -132,10 +133,12 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         );
         this.PROCESSOR_SLOT=12;
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         stack.setItemMeta( AddUtils.capacitorInfoAdd(stack,energybuffer).getItemMeta());
     }
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         preset.setSize(54);
         int[] border = BORDER;
@@ -149,27 +152,32 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         preset.addItem(MINFO_SLOT,MINFO_ITEM_OFF,ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(PROCESSOR_SLOT, this.INFO_NULL, ChestMenuUtils.getEmptyClickHandler());
     }
-    public DataMenuClickHandler createDataHolder(){
+    @Override
+	public DataMenuClickHandler createDataHolder(){
         return new DataMenuClickHandler() {
             //0 为 数量 1 为 电力
             int[] intdata=new int[4];
-            public int getInt(int i){
+            @Override
+			public int getInt(int i){
                 return intdata[i];
             }
             @Override
             public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
                 return false;
             }
-            public void setInt(int i, int val){
+            @Override
+			public void setInt(int i, int val){
                 intdata[i]=val;
             }
         };
     }
-    public final int getCraftLimit(Block b,BlockMenu inv){
+    @Override
+	public final int getCraftLimit(Block b,BlockMenu inv){
         return (this.efficiency*getDataHolder(b,inv).getInt(0));
     }
 
-    public final DataMenuClickHandler getDataHolder(Block b, BlockMenu inv){
+    @Override
+	public final DataMenuClickHandler getDataHolder(Block b, BlockMenu inv){
         ChestMenu.MenuClickHandler handler=inv.getMenuClickHandler(DATA_SLOT);
         if(handler instanceof DataMenuClickHandler dh){return dh;}
         else{
@@ -190,13 +198,16 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c生成器信息","&c缺少电力!",AddUtils.concat("&7当前模拟的生成器名称: ",(name)),
                 "&7当前并行处理数: %-3d".formatted(craftlimit),"&7当前每刻耗电量: %sJ/t".formatted(AddUtils.formatDouble(energyCost)),"&7当前电量: %sJ".formatted(AddUtils.formatDouble(charge)));
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public List<MachineRecipe> getMachineRecipes(Block b, BlockMenu inv){
+    @Override
+	public List<MachineRecipe> getMachineRecipes(Block b, BlockMenu inv){
         return getMachineRecipes(DataCache.safeLoadBlock(inv.getLocation()));
     }
-    public List<MachineRecipe> getMachineRecipes(SlimefunBlockData data){
+    @Override
+	public List<MachineRecipe> getMachineRecipes(SlimefunBlockData data){
         int index= MultiCraftType.getRecipeTypeIndex(data);
         if(index>=0&&index<getListSize()){
             List<MachineRecipe> lst= RecipeSupporter.MACHINE_RECIPELIST.get(getMachineList().get(index ));
@@ -204,10 +215,12 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         }
         return new ArrayList<>();
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
-    public MachineRecipe getRecordRecipe(SlimefunBlockData data){
+    @Override
+	public MachineRecipe getRecordRecipe(SlimefunBlockData data){
         List<MachineRecipe> lst=getMachineRecipes(data);
         int size=lst.size();
         if(size>0){
@@ -218,7 +231,8 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         }
         return null;
     }
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuOpeningHandler((player -> {
             updateMenu(inv,block, Settings.RUN);
         }));
@@ -252,7 +266,8 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         }));
         updateMenu(inv,block,Settings.INIT);
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu inv){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu inv){
         if(inv!=null){
             Location loc=inv.getLocation();
             inv.dropItems(loc,MACHINE_SLOT);
@@ -260,14 +275,16 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         super.onBreak(e,inv);
 
     }
-    public void progressorCost(Block b, BlockMenu inv){
+    @Override
+	public void progressorCost(Block b, BlockMenu inv){
         DataMenuClickHandler dh=getDataHolder(b,inv);
         int charge=dh.getInt(1);
         int machineCnt=dh.getInt(0);
         int consumption=Math.min(charge*machineCnt ,this.energybuffer);
         this.removeCharge(inv.getLocation(),consumption);
     }
-    public final void tick(Block b, @Nullable BlockMenu inv, SlimefunBlockData data, int tickCount){
+    @Override
+	public final void tick(Block b, @Nullable BlockMenu inv, SlimefunBlockData data, int tickCount){
         //首先 加载
         boolean hasViewer=inv.hasViewer();
         if(hasViewer){
@@ -337,13 +354,15 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
                 }
             }
             else  {
-                if (hasViewer)
-                    inv.replaceExistingItem(MINFO_SLOT,getInfoOffItem(getCraftLimit(b,inv),consumption,energy,
+                if (hasViewer) {
+					inv.replaceExistingItem(MINFO_SLOT,getInfoOffItem(getCraftLimit(b,inv),consumption,energy,
                         ItemStackHelper.getDisplayName(inv.getItemInSlot(MACHINE_SLOT))));
+				}
                 if(tick!=-1){
                     db.setInt(2,-1);
-                    if (hasViewer)
-                        inv.replaceExistingItem(this.PROCESSOR_SLOT,this.INFO_NULL);
+                    if (hasViewer) {
+						inv.replaceExistingItem(this.PROCESSOR_SLOT,this.INFO_NULL);
+					}
                 }
             }
 
@@ -356,7 +375,8 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
         }
     }
 
-    public final void updateMenu(BlockMenu inv, Block block, Settings mod){
+    @Override
+	public final void updateMenu(BlockMenu inv, Block block, Settings mod){
         SlimefunBlockData data=DataCache.safeGetBlockCacheWithLoad(inv.getLocation());
         if(data==null){
             Debug.logger("SF DATA LOST AT %s! PLEASE REPORT THIS LOG TO THE AUTHOR".formatted(DataCache.locationToString(inv.getLocation())));
@@ -433,8 +453,9 @@ public class StackMGenerator extends MMGenerator implements MultiCraftType, Impo
                 }//找不到,给你机会你不重用啊
             }
         }
-        if(index!=-1)//即将变成-1,不一样才变,不用重复查询
-            MultiCraftType.forceSetRecipeTypeIndex(data,-1);
+        if(index!=-1) { //即将变成-1,不一样才变,不用重复查询
+			MultiCraftType.forceSetRecipeTypeIndex(data,-1);
+		}
         db.setInt(0,0);
         db.setInt(1,0);
         db.setInt(2,-1);

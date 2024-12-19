@@ -25,15 +25,20 @@ public class SingularityStorage extends StorageType {
     public SingularityStorage() {
         super();
     }
-    public boolean canStorage(ItemMeta meta) {
+    @Override
+	public boolean canStorage(ItemMeta meta) {
         String it=CraftUtils.parseSfId(meta);
-        if(it==null) return false;
+        if(it==null) {
+			return false;
+		}
         return SlimefunItem.getById(it) instanceof Singularity;
     }
-    public boolean canStorage(SlimefunItem sfitem){
+    @Override
+	public boolean canStorage(SlimefunItem sfitem){
         return sfitem instanceof Singularity;
     }
-    public void clearStorage(ItemMeta meta) {
+    @Override
+	public void clearStorage(ItemMeta meta) {
         meta.getPersistentDataContainer().remove(KEY_ITEM);
         meta.getPersistentDataContainer().remove(KEY_AMOUNT);
         if(meta.hasLore()){
@@ -50,28 +55,36 @@ public class SingularityStorage extends StorageType {
             meta.setLore(lore);
         }
     }
-    public int getStorageAmount(ItemMeta meta) {
+    @Override
+	public int getStorageAmount(ItemMeta meta) {
         try{
             Integer e= meta.getPersistentDataContainer().get(KEY_AMOUNT,PersistentDataType.INTEGER);
-            if(e==null) return 0;
+            if(e==null) {
+				return 0;
+			}
             return e;
         }catch(Throwable e){
             return 0;
         }
     }
-    public ItemStack getStorageContent(ItemMeta meta) {
+    @Override
+	public ItemStack getStorageContent(ItemMeta meta) {
         return  meta.getPersistentDataContainer().get(KEY_ITEM,AbstractStorageType.TYPE);
     }
-    public int getStorageMaxSize(ItemMeta meta) {
+    @Override
+	public int getStorageMaxSize(ItemMeta meta) {
         return MAX_AMOUNT;
     }
-    public boolean isStorage(ItemMeta meta) {
+    @Override
+	public boolean isStorage(ItemMeta meta) {
         return meta.getPersistentDataContainer().has(KEY_AMOUNT)&&meta.getPersistentDataContainer().has(KEY_ITEM);
     }
-    public void onStorageAmountWrite(ItemMeta meta, int amount) {
+    @Override
+	public void onStorageAmountWrite(ItemMeta meta, int amount) {
         meta.getPersistentDataContainer().set(KEY_AMOUNT, PersistentDataType.INTEGER,amount);
     }
-    public void onStorageDisplayWrite(ItemMeta meta, int amount) {
+    @Override
+	public void onStorageDisplayWrite(ItemMeta meta, int amount) {
 
         List<String> lore =meta.hasLore()? meta.getLore():new ArrayList<>();
         if(lore.size()>0){
@@ -83,7 +96,8 @@ public class SingularityStorage extends StorageType {
         meta.setLore(lore);
 
     }
-    public void setStorage(ItemMeta meta, ItemStack item ) {
+    @Override
+	public void setStorage(ItemMeta meta, ItemStack item ) {
         if(item!=null) {
             clearStorage(meta);
             meta.getPersistentDataContainer().set(KEY_AMOUNT, PersistentDataType.INTEGER,0);

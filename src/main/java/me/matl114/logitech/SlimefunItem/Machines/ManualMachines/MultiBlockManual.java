@@ -73,7 +73,8 @@ public class MultiBlockManual extends AbstractManual implements MultiCraftType, 
             initMenuFactory();
         });
     }
-    public List<ItemStack> _getDisplayRecipes(List<ItemStack> re){
+    @Override
+	public List<ItemStack> _getDisplayRecipes(List<ItemStack> re){
         List<ItemStack> its= new ArrayList<>(){{
             for(SlimefunItem item : RecipeSupporter.MULTIBLOCK_RECIPES.keySet()){
                 add(AddUtils.getInfoShow("&f支持的多方块机器","&7将机器配方置于指定槽位以进行合成"));
@@ -83,7 +84,8 @@ public class MultiBlockManual extends AbstractManual implements MultiCraftType, 
         re.addAll(its);
         return re;
     }
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         int[] border = BORDER;
         int len=border.length;
@@ -114,10 +116,12 @@ public class MultiBlockManual extends AbstractManual implements MultiCraftType, 
             }
         }return craftType;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public List<MachineRecipe> getMachineRecipes(Block b,BlockMenu inv){
+    @Override
+	public List<MachineRecipe> getMachineRecipes(Block b,BlockMenu inv){
         Location loc=inv.getLocation();
         int index=MultiCraftType.getRecipeTypeIndex(loc);
         if(index>=0&&index<getCraftTypes().length){
@@ -134,10 +138,12 @@ public class MultiBlockManual extends AbstractManual implements MultiCraftType, 
         }
         return RECIPEMENU.get(r);
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public MachineRecipe getRecordRecipe(Location loc){
+    @Override
+	public MachineRecipe getRecordRecipe(Location loc){
         int index=MultiCraftType.getRecipeTypeIndex(loc);
 
         if(index>=0&&index<getCraftTypes().length){
@@ -162,7 +168,8 @@ public class MultiBlockManual extends AbstractManual implements MultiCraftType, 
             }
         }
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         menu.addMenuOpeningHandler((player -> {
             MultiBlockManual.this.updateMenu(menu,block,Settings.RUN);
         }));
@@ -288,14 +295,16 @@ public class MultiBlockManual extends AbstractManual implements MultiCraftType, 
         //清空当前搜索缓存
         return false;
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         //only works when has viewer.
         if(inv!=null&&inv.hasViewer()){
 
             updateMenu(inv ,b,Settings.RUN);
         }
     }
-    public void updateMenu(BlockMenu inv,Block block,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv,Block block,Settings mod){
         if(mod==Settings.INIT){
             parseRecipe(inv);
             orderSearchRecipe(inv,Settings.SEQUNTIAL);

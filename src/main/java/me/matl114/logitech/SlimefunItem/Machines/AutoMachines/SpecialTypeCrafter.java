@@ -17,7 +17,8 @@ public class SpecialTypeCrafter extends SpecialCrafter {
                           Material progressItem, int ticks, int energyConsumption, int energyBuffer, HashSet<RecipeType> blackList){
         super(category, item, recipeType, recipe, progressItem, ticks, energyConsumption, energyBuffer,blackList);
     }
-    public boolean advanced(){
+    @Override
+	public boolean advanced(){
         return false;
     }
     @Override

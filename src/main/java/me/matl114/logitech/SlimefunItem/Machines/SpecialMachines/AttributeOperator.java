@@ -125,12 +125,14 @@ public class AttributeOperator extends SmithingInterface {
                 )
         );
     }
-    public void addInfo(ItemStack item){
+    @Override
+	public void addInfo(ItemStack item){
         if(this.energyConsumption > 0){
             item.setItemMeta(AddUtils.workBenchInfoAdd(item,this.energybuffer,this.energyConsumption).getItemMeta());
         }
     }
-    public  void constructMenu(BlockMenuPreset preset){
+    @Override
+	public  void constructMenu(BlockMenuPreset preset){
         preset.setSize(45);
         int[] border=BORDER;
         int len=border.length;
@@ -151,26 +153,32 @@ public class AttributeOperator extends SmithingInterface {
             int[] intdata=new int[2];
             Object[] object=new Object[2];
             ItemStack itemStacks=null;
-            public int getInt(int i){
+            @Override
+			public int getInt(int i){
                 return intdata[i];
             }
-            public ItemStack getItemStack(int val){
+            @Override
+			public ItemStack getItemStack(int val){
                 return itemStacks;
             }
-            public Object getObject(int i){
+            @Override
+			public Object getObject(int i){
                 return object[i];
             }
             @Override
             public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
                 return false;
             }
-            public void setInt(int i, int val){
+            @Override
+			public void setInt(int i, int val){
                 intdata[i]=val;
             }
-            public void setItemStack(int val , ItemStack stack){
+            @Override
+			public void setItemStack(int val , ItemStack stack){
                 itemStacks=stack;
             }
-            public void setObject(int i, Object obj){
+            @Override
+			public void setObject(int i, Object obj){
                 object[i]=obj;
             }
         };
@@ -219,8 +227,9 @@ public class AttributeOperator extends SmithingInterface {
             stack=new ItemStack(Material.DIAMOND_CHESTPLATE);
             stack.setItemMeta(meta);
             inv.replaceExistingItem(CHOOSE_ATTRIBUTE_SLOT,stack);
-        }else
-            stack.setItemMeta(meta);
+        } else {
+			stack.setItemMeta(meta);
+		}
     }
     public int getAutoTransferCode(BlockMenu inv){
         ItemStack enchantAutoFlag=inv.getItemInSlot(TRANSFER_ALLENCHANT_SLOT);
@@ -271,16 +280,20 @@ public class AttributeOperator extends SmithingInterface {
             stack=new ItemStack(Material.ENCHANTED_BOOK);
             stack.setItemMeta(meta);
             inv.replaceExistingItem(CHOOSE_ATTRIBUTE_SLOT,stack);
-        }else
-            stack.setItemMeta(meta);
+        } else {
+			stack.setItemMeta(meta);
+		}
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public void newMenuInstance(@Nonnull BlockMenu inv, @Nonnull Block block){
+    @Override
+	public void newMenuInstance(@Nonnull BlockMenu inv, @Nonnull Block block){
         SlimefunBlockData data= DataCache.safeLoadBlock(inv.getLocation());
         DataMenuClickHandler handler=getDataHolder(block,inv);
         inv.addMenuOpeningHandler(player -> updateMenu(inv,block,Settings.RUN));
@@ -435,7 +448,8 @@ public class AttributeOperator extends SmithingInterface {
     public boolean online(BlockMenu inv){
         return MultiBlockService.getStatus(inv.getLocation())!=0;
     }
-    public void processFailed(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void processFailed(Block b, BlockMenu inv, SlimefunBlockData data){
         if(inv.hasViewer()){
             inv.replaceExistingItem(STATUS_SLOT,NO_MULTIBLOCK_ITEM);
         }
@@ -593,13 +607,18 @@ public class AttributeOperator extends SmithingInterface {
         int transfer=Math.min(it1.getAmount(),it2.getAmount());
         transfer=Math.min(transfer,transferAmount);
         inv.replaceExistingItem(OUTPUT_SLOT[0],transferResult.getFirstValue());
-        var a=inv.getItemInSlot(OUTPUT_SLOT[0]);if(a!=null)a.setAmount(transfer);
+        var a=inv.getItemInSlot(OUTPUT_SLOT[0]);if(a!=null) {
+			a.setAmount(transfer);
+		}
         inv.replaceExistingItem(OUTPUT_SLOT[1],transferResult.getSecondValue());
-        a=inv.getItemInSlot(OUTPUT_SLOT[1]);if(a!=null)a.setAmount(transfer);
+        a=inv.getItemInSlot(OUTPUT_SLOT[1]);if(a!=null) {
+			a.setAmount(transfer);
+		}
         it1.setAmount(it1.getAmount()-transfer);
         it2.setAmount(it2.getAmount()-transfer);
-        if(it1.getAmount()==0)
-            refreshInputItemData(inv,handler,true);
+        if(it1.getAmount()==0) {
+			refreshInputItemData(inv,handler,true);
+		}
         progressorCost(null,inv);
         if(outputStream!=null){
             outputStream.accept("&a转移成功!");
@@ -619,10 +638,11 @@ public class AttributeOperator extends SmithingInterface {
                     continue ;
                 }
                 Collection<AttributeModifier> mods2;
-                if(meta2.hasAttributeModifiers())
-                    mods2=meta2.getAttributeModifiers(a);
-                else
-                    mods2=null;
+                if(meta2.hasAttributeModifiers()) {
+					mods2=meta2.getAttributeModifiers(a);
+				} else {
+					mods2=null;
+				}
                 if(mods2!=null){
                     mods2.addAll(mods1);
 
@@ -723,7 +743,8 @@ public class AttributeOperator extends SmithingInterface {
         res2.setItemMeta(meta2);
         return new Pair(res1,res2);
     }
-    public void updateMenu(BlockMenu inv,Block b,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv,Block b,Settings mod){
         DataMenuClickHandler handler=getDataHolder(b,inv);
         refreshInputItemData(inv,handler,mod==Settings.INIT);
         int indexE=handler.getInt(0);

@@ -82,15 +82,18 @@ public class SpreadBlock extends AbstractBlock implements Ticking {
     public Map<Location,Integer> getSpreadTicker(){
         return SPREAD_TICKER;
     }
-    public boolean isSync(){
+    @Override
+	public boolean isSync(){
         return false;
     }
-    public void onPlace(BlockPlaceEvent e, Block b) {
+    @Override
+	public void onPlace(BlockPlaceEvent e, Block b) {
         SPREAD_PLAYER.put(b.getLocation(), e.getPlayer());
         SPREAD_TICKER.put(b.getLocation(),LIFE_DEFAULT);
         b.setType(SPREAD_MATERIAL);
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         registerTick(this);
         handleBlock(this);
@@ -103,17 +106,22 @@ public class SpreadBlock extends AbstractBlock implements Ticking {
             }
         });
     }
-    public void registerTick(SlimefunItem item){
+    @Override
+	public void registerTick(SlimefunItem item){
         item.addItemHandler(
                 new BlockTicker() {
                     int runPerTick=0;
-                    public boolean isSynchronized() {
+                    @Override
+					public boolean isSynchronized() {
                         return isSync();
                     }
 
-                    @ParametersAreNonnullByDefault
+                    @Override
+					@ParametersAreNonnullByDefault
                     public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
-                        if(runPerTick>ONE_TICK_SPREAD_MAXCNT)return;
+                        if(runPerTick>ONE_TICK_SPREAD_MAXCNT) {
+							return;
+						}
                         BlockMenu menu = data.getBlockMenu();
                         //BlockMenu menu = BlockStorage.getInventory(b);
                         Location loc = data.getLocation();
@@ -129,8 +137,8 @@ public class SpreadBlock extends AbstractBlock implements Ticking {
                         else {
                             int lifeToSet=life-(rand.nextInt(100)<60?1:0);
                             Player player=SPREAD_PLAYER.get(loc);
-                            for (int i=0;i<SPREAD_DELTA.length;i++){
-                                Location loc2=loc.clone().add(SPREAD_DELTA[i]);
+                            for (Vector element : SPREAD_DELTA) {
+                                Location loc2=loc.clone().add(element);
                                 if(SPREAD_TICKER.containsKey(loc2)){
                                     continue;
                                 }
@@ -155,7 +163,8 @@ public class SpreadBlock extends AbstractBlock implements Ticking {
 
         );
     }
-    public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
+    @Override
+	public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
 
 
     }

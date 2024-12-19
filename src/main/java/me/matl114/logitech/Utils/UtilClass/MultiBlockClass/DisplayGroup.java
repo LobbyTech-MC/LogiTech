@@ -90,13 +90,13 @@ public class DisplayGroup {
 
     @Nullable
     private List<String> getChildList() {
-        return (List<String>) this.parentDisplay.getPersistentDataContainer().get(KEY_LIST,AbstractStringList.TYPE);
+        return this.parentDisplay.getPersistentDataContainer().get(KEY_LIST,AbstractStringList.TYPE);
         // return (List) PersistentDataAPI.get(this.parentDisplay, KEY_LIST, AbstractStringList.TYPE);
     }
 
     @Nullable
     private List<String> getChildNames() {
-        return (List<String>) this.parentDisplay.getPersistentDataContainer().get(KEY_NAMES,AbstractStringList.TYPE);
+        return this.parentDisplay.getPersistentDataContainer().get(KEY_NAMES,AbstractStringList.TYPE);
         //return (List)PersistentDataAPI.get(this.parentDisplay, KEY_NAMES, AbstractStringList.TYPE);
     }
 
@@ -158,7 +158,7 @@ public class DisplayGroup {
 
     @Nullable
     public Display removeDisplay(@Nonnull String name) {
-        Display display = (Display)this.displays.remove(name);
+        Display display = this.displays.remove(name);
         if (display == null) {
             return display;
         } else {

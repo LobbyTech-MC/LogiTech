@@ -56,11 +56,13 @@ public class MultiBlockHandler  implements AbstractMultiBlockHandler {
      * should tell if this is active and complete,then the service will called handler.destroy if not
      * @return
      */
-    public boolean acceptCoreRequest(){
+    @Override
+	public boolean acceptCoreRequest(){
         return checkIfOnline();
 
     }
-    public void acceptPartRequest(Location loc){
+    @Override
+	public void acceptPartRequest(Location loc){
         if(this.active){
 //            int index=getPartIndex(loc);
 //            if(index>=0){
@@ -77,7 +79,8 @@ public class MultiBlockHandler  implements AbstractMultiBlockHandler {
      * used when autoreconnnected after server restart
      * @return
      */
-    public int checkIfComplete(){
+    @Override
+	public int checkIfComplete(){
         int len=this.size;
         for(int i=0;i<len;i++){
             Vector delta= STRUCTURE_TYPE.getStructurePart(i);
@@ -90,7 +93,8 @@ public class MultiBlockHandler  implements AbstractMultiBlockHandler {
         }
         return -1;
     }
-    public int checkIfCompleteRandom(){
+    @Override
+	public int checkIfCompleteRandom(){
         int len=this.size;
         int checkChance=10;//随机选取1/10的方块检测
         for(int s=0;s<len;s++){
@@ -114,7 +118,8 @@ public class MultiBlockHandler  implements AbstractMultiBlockHandler {
     /**
      * this method should called onMultiBlockDisable for CORE and reset blockdata!
      */
-    public void destroy(MultiBlockService.DeleteCause cause){
+    @Override
+	public void destroy(MultiBlockService.DeleteCause cause){
         this.active=false;
         //if(DataCache.hasData(CORE)){
         MultiBlockService.setUUID(CORE,"null");
@@ -132,30 +137,38 @@ public class MultiBlockHandler  implements AbstractMultiBlockHandler {
             }
         }
     }
-    public Location getBlockLoc(int index){
+    @Override
+	public Location getBlockLoc(int index){
         Vector delta=STRUCTURE_TYPE.getStructurePart(index);
         return this.CORE.clone().add(delta);
     }
-    public Location getCore() {
+    @Override
+	public Location getCore() {
         return CORE.clone();
     }
-    public MultiBlockService.Direction getDirection(){
+    @Override
+	public MultiBlockService.Direction getDirection(){
         return this.STRUCTURE_TYPE.getDirection();
     }
-    public MultiBlockService.DeleteCause getLastDeleteCause(){
+    @Override
+	public MultiBlockService.DeleteCause getLastDeleteCause(){
         return lastDeleteCause;
     }
-    public AbstractMultiBlock getMultiBlock(){
+    @Override
+	public AbstractMultiBlock getMultiBlock(){
         return STRUCTURE_TYPE;
     }
-    public int getSize(){
+    @Override
+	public int getSize(){
         return size;
     }
 
-    public String getUid() {
+    @Override
+	public String getUid() {
         return uid;
     }
-    public boolean isActive(){
+    @Override
+	public boolean isActive(){
         return active;
     }
 
@@ -164,7 +177,8 @@ public class MultiBlockHandler  implements AbstractMultiBlockHandler {
         return this;
     }
 
-    public void toggleOff(MultiBlockService.DeleteCause cause){
+    @Override
+	public void toggleOff(MultiBlockService.DeleteCause cause){
 
         this.lastDeleteCause=cause;
         this.active=false;

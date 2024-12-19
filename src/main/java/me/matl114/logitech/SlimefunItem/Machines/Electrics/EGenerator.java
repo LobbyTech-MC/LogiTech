@@ -21,10 +21,12 @@ public class EGenerator extends AbstractEnergyProcessor {
                       int energyBuffer, int energyProvider, LinkedHashMap<Object,Integer> customRecipe) {
         super(category,item,recipeType,recipe,progressItem,energyBuffer,energyProvider,customRecipe);
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
 }

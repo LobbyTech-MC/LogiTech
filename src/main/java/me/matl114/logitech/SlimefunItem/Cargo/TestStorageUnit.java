@@ -45,10 +45,12 @@ public class TestStorageUnit extends AbstractMachine {
                             int energybuffer, int energyConsumption){
         super(category,item , recipeType, recipe,energybuffer,energyConsumption);
     }
-    public void addInfo(ItemStack item){
+    @Override
+	public void addInfo(ItemStack item){
 
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         preset.setSize(54);
         preset.addMenuOpeningHandler((player -> {
             Debug.stackTrace();
@@ -56,7 +58,8 @@ public class TestStorageUnit extends AbstractMachine {
         preset.addMenuClickHandler(18,(player, i, itemStack, clickAction)->{
 
             new MenuFactory(MenuUtils.SIMPLE_MENU,"测试BYD",4){
-                public void init(){
+                @Override
+				public void init(){
                     setDefaultNPSlots();
                     addInventory(0,new ItemStack(Material.COMMAND_BLOCK));
                 }
@@ -74,17 +77,21 @@ public class TestStorageUnit extends AbstractMachine {
             return false;
         });
     }
-    public  int[] getInputSlots(){
+    @Override
+	public  int[] getInputSlots(){
         return INPUT_SLOT;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public boolean isSync(){
+    @Override
+	public boolean isSync(){
         return true;
     }
-    public void newMenuInstance(BlockMenu inv,Block bLock){
+    @Override
+	public void newMenuInstance(BlockMenu inv,Block bLock){
 //        DataCache.setLastRecipe(inv.getLocation(),-1);
 //        DataCache.setLastLocation(inv.getLocation(),inv.getLocation());\\
 
@@ -126,7 +133,8 @@ public class TestStorageUnit extends AbstractMachine {
             return false;
         }));
     }
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu menu, SlimefunBlockData data){
         Block c=b.getRelative(BlockFace.UP);
         if (c!=null){
             Debug.logger(c.getType());

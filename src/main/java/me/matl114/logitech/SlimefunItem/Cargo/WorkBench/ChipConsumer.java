@@ -73,7 +73,8 @@ public class ChipConsumer extends AbstractMachine {
         ));
     }
 
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for(int i=0;i<len;i++){
@@ -85,15 +86,19 @@ public class ChipConsumer extends AbstractMachine {
             preset.addItem(INFO_SLOT[i],INFO_ITEM[i],ChestMenuUtils.getEmptyClickHandler());
         }
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
     @Override
     public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
-        if(flow==ItemTransportFlow.WITHDRAW)return getOutputSlots();
+        if(flow==ItemTransportFlow.WITHDRAW) {
+			return getOutputSlots();
+		}
         if(item==null||item.getType().isAir()){
             return getInputSlots();
         }
@@ -102,7 +107,8 @@ public class ChipConsumer extends AbstractMachine {
         }
         return NOCHIP_SLOT;
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         ItemStack it2=inv.getItemInSlot(INPUT_SLOT[1]);
         ItemStack it=inv.getItemInSlot(INPUT_SLOT[0]);
         ItemStack it3=inv.getItemInSlot(OUTPUT_SLOT[0]);

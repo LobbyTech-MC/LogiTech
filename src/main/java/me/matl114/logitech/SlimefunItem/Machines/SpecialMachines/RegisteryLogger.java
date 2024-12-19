@@ -93,10 +93,12 @@ public class RegisteryLogger extends AbstractMachine {
     public RegisteryLogger(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, recipeType, recipe, 0,0);
     }
-    public void addInfo(ItemStack item){
+    @Override
+	public void addInfo(ItemStack item){
 
     }
-    public  void constructMenu(BlockMenuPreset preset){
+    @Override
+	public  void constructMenu(BlockMenuPreset preset){
         int[] border = BORDER;
         int len=border.length;
         for(int var4 = 0; var4 < len; ++var4) {
@@ -109,10 +111,12 @@ public class RegisteryLogger extends AbstractMachine {
         preset.addItem(ADDSFITEM_SLOT,ADDSFITEM_ITEM);
         preset.addItem(ID_SLOT,ID_ITEM);
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[0];
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return new int[0];
     }
 
@@ -151,9 +155,9 @@ public class RegisteryLogger extends AbstractMachine {
             }else {
                 idList[var4]="null";
             }
-            if(var4==0)
-                result+=idList[var4];
-            else if(var4%6==0){
+            if(var4==0) {
+				result+=idList[var4];
+			} else if(var4%6==0){
                 result+=",\n"+idList[var4];
             }else {
                 result+=","+idList[var4];
@@ -171,7 +175,8 @@ public class RegisteryLogger extends AbstractMachine {
             return "null";
         }
     }
-    public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
+    @Override
+	public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
         if(DataCache.getLastRecipe(blockMenu.getLocation())<0||DataCache.getLastRecipe(blockMenu.getLocation())>CHOOSE_ITEM.length){
             DataCache.setLastRecipe(blockMenu.getLocation(),0);
         }
@@ -255,10 +260,12 @@ public class RegisteryLogger extends AbstractMachine {
             return false;
         }));
     }
-    public void process(Block b, BlockMenu preset, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu preset, SlimefunBlockData data){
 
     }
-    public void registerTick(SlimefunItem item){
+    @Override
+	public void registerTick(SlimefunItem item){
         //no ticker
     }
     public void setRecordId(Location loc,String id){

@@ -37,7 +37,9 @@ public class EMachine extends AbstractProcessor implements ImportRecipes {
                 for(RecipeType rt : recipeTypes){
                     if(rt!=null){
                         List<MachineRecipe> rep= RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(rt);
-                        if(rep==null)rep=new ArrayList<>();
+                        if(rep==null) {
+							rep=new ArrayList<>();
+						}
                        mr.addAll(rep);
                     }
                 }
@@ -55,13 +57,16 @@ public class EMachine extends AbstractProcessor implements ImportRecipes {
         });
     }
 
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         super.addInfo(stack);
     }
-    public ItemStack getProgressBar() {
+    @Override
+	public ItemStack getProgressBar() {
         return progressbar;
     }
-    public boolean isConflict(){
+    @Override
+	public boolean isConflict(){
         return false;
     }
 }

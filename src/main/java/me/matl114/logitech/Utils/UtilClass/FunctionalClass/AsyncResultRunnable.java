@@ -13,7 +13,8 @@ public abstract class AsyncResultRunnable<T extends Object> extends BukkitRunnab
         return result;
     }
     public abstract T result();
-    public void run(){
+    @Override
+	public void run(){
         result = result();
     }
     public CountDownLatch runThreadBackground(){

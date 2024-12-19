@@ -41,26 +41,30 @@ public class SequenceCraftingOperation implements CustomMachineOperation {
             for(int i=0;i<now;++i){
                 lines.add(seqRecipe.displayedNames[i].formatted("&a",inputItems[i].getItem().getAmount(),"&a"));
             }
-            if(now!=total)
-                lines.add(seqRecipe.displayedNames[now].formatted("&e",inputItems[now].getItem().getAmount()-inputItems[now].getAmount(),"&e"));
+            if(now!=total) {
+				lines.add(seqRecipe.displayedNames[now].formatted("&e",inputItems[now].getItem().getAmount()-inputItems[now].getAmount(),"&e"));
+			}
             for(int i=now+1;i<total;++i){
                 lines.add(seqRecipe.displayedNames[i].formatted("&c",0,"&c"));
             }
             lines.add(AddUtils.concat("&7当前物品处理时间: ",String.valueOf(this.currentSeqTicks),"t/",String.valueOf(this.tickPerSeq),"t"));
             ItemStack it=new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a阶段输入进程",lines);
             return it;
-        }else
-            return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a阶段输入进程","&7当前进程信息","&c错误!使用的不是有序输入配方");
+        } else {
+			return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a阶段输入进程","&7当前进程信息","&c错误!使用的不是有序输入配方");
+		}
     }
 
     public int getNowSeq(){
         return this.currentTicks;
     }
-    public int getProgress(){
+    @Override
+	public int getProgress(){
         return this.currentSeqTicks;
     }
 
-    public int getRemainingTicks() {
+    @Override
+	public int getRemainingTicks() {
         return this.tickPerSeq-this.currentSeqTicks;
     }
 
@@ -73,13 +77,16 @@ public class SequenceCraftingOperation implements CustomMachineOperation {
     public int getSeqCount(){
         return this.totalTicks;
     }
-    public int getTotalTicks(){
+    @Override
+	public int getTotalTicks(){
         return this.tickPerSeq;
     }
-    public boolean isFinished() {
+    @Override
+	public boolean isFinished() {
         return this.totalTicks<=this.currentTicks;
     }
-    public void progress(int var1){
+    @Override
+	public void progress(int var1){
         if(this.currentSeqTicks<this.tickPerSeq){
             this.currentSeqTicks+=var1;
         }

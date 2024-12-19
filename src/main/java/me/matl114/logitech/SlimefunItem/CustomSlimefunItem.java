@@ -45,22 +45,26 @@ public abstract class CustomSlimefunItem extends SlimefunItem implements RecipeD
     public void addInfo(ItemStack stack){
 
     }
-    public final List<ItemStack> getDisplayRecipes() {
+    @Override
+	public final List<ItemStack> getDisplayRecipes() {
         if(displayedMemory==null||displayedMemory.isEmpty()) {
             displayedMemory=_getDisplayRecipes(originalMemory);
         }
         return displayedMemory;
     }
-    public void postRegister(){
+    @Override
+	public void postRegister(){
         super.postRegister();
         this.addWikiPage("");
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         addInfo(this.getItem());
 
     }
-    public List<MachineRecipe> provideDisplayRecipe(){
+    @Override
+	public List<MachineRecipe> provideDisplayRecipe(){
         return new ArrayList<>();
     }
     public CustomSlimefunItem register(){

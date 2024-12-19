@@ -46,8 +46,9 @@ public abstract class AbstractIOPort extends AbstractMachine {
             setAmount(data,t);
 
         }else {
-            if(withException)
-                throw new IllegalArgumentException("该位置的粘液数据不是AbstractIOPort!");
+            if(withException) {
+				throw new IllegalArgumentException("该位置的粘液数据不是AbstractIOPort!");
+			}
         }
     }
     public AbstractIOPort(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
@@ -77,11 +78,15 @@ public abstract class AbstractIOPort extends AbstractMachine {
              )
         );
     }
-    public abstract void addInfo(ItemStack item);
-    public abstract void constructMenu(BlockMenuPreset preset);
+    @Override
+	public abstract void addInfo(ItemStack item);
+    @Override
+	public abstract void constructMenu(BlockMenuPreset preset);
     public abstract int getDisplaySlot();
-    public abstract int[] getInputSlots();
-    public abstract int[] getOutputSlots();
+    @Override
+	public abstract int[] getInputSlots();
+    @Override
+	public abstract int[] getOutputSlots();
     public abstract int getStorageSlot();
 
     @Override
@@ -105,7 +110,8 @@ public abstract class AbstractIOPort extends AbstractMachine {
         }
     }
 
-    public void newMenuInstance(BlockMenu inv,Block b){
+    @Override
+	public void newMenuInstance(BlockMenu inv,Block b){
         inv.addMenuOpeningHandler(player -> {
             updateMenu(inv,b,Settings.RUN);
         });
@@ -118,7 +124,9 @@ public abstract class AbstractIOPort extends AbstractMachine {
                 if(cache!=null){
                     AddUtils.sendMessage(player,"&c存储物品与缓存并不同步,请稍后再试");
                     return false;
-                }else return true;
+                } else {
+					return true;
+				}
             }else{
                 //当有人企图从中间取出物品时
                 if(cache!=null){
@@ -169,7 +177,8 @@ public abstract class AbstractIOPort extends AbstractMachine {
         }
 
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu) {
         Location loc = menu.getLocation();
         ItemStorageCache cache= ItemStorageCache.removeCache(loc);
         if(cache!=null){
@@ -180,7 +189,8 @@ public abstract class AbstractIOPort extends AbstractMachine {
         //
         super.onBreak(e, menu);
     }
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu menu, SlimefunBlockData data){
         //先确认存储cache
         ItemStack stack=menu.getItemInSlot(getStorageSlot());
         Location loc = menu.getLocation();
@@ -247,7 +257,8 @@ public abstract class AbstractIOPort extends AbstractMachine {
         }
     }
 
-    public void updateMenu(BlockMenu inv, Block b, Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv, Block b, Settings mod){
         Location loc = inv.getLocation();
         ItemStorageCache cache= ItemStorageCache.getCache(loc);
         if(cache!=null){
@@ -263,7 +274,8 @@ public abstract class AbstractIOPort extends AbstractMachine {
 
     }
 
-    public boolean useAdvancedMenu(){
+    @Override
+	public boolean useAdvancedMenu(){
         return true;
     }
 }

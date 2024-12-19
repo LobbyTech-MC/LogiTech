@@ -31,7 +31,8 @@ public class AdjacentEnergyCollector extends AbstractEnergyCollector implements 
                                int energybuffer){
         super(category, item, recipeType, recipe, energybuffer);
     }
-    public Collection<SlimefunBlockData> getCollectRange(BlockMenu inv, Block block, SlimefunBlockData data){
+    @Override
+	public Collection<SlimefunBlockData> getCollectRange(BlockMenu inv, Block block, SlimefunBlockData data){
         Location loc=block.getLocation();
         Directions dir=getDirection(0,data);
         HashSet<SlimefunBlockData> ret=new HashSet<>();
@@ -41,32 +42,38 @@ public class AdjacentEnergyCollector extends AbstractEnergyCollector implements 
             SlimefunItem item= DataCache.getSfItem(loc);
 
             if(getEnergyProvider(item)!=null){
-                if((testData=DataCache.safeLoadBlock(loc))!=null)
-                    ret.add(testData);
+                if((testData=DataCache.safeLoadBlock(loc))!=null) {
+					ret.add(testData);
+				}
             }
         }else {
             for (Directions d : Directions.nonnullValues()) {
                 Location testloc=d.relate(loc);
                 SlimefunItem item= DataCache.getSfItem(testloc);
                 if(getEnergyProvider(item)!=null){
-                    if((testData=DataCache.safeLoadBlock(testloc))!=null)
-                        ret.add(testData);
+                    if((testData=DataCache.safeLoadBlock(testloc))!=null) {
+						ret.add(testData);
+					}
                 }
 
             }
         }
         return ret;
     }
-    public int[] getDirectionSlots(){
+    @Override
+	public int[] getDirectionSlots(){
         return DIRECTION_SLOTS;
     }
-    public int getMaxCollectAmount(){
+    @Override
+	public int getMaxCollectAmount(){
         return MAX_LEN;
     }
-    public  String[] getSaveKeys(){
+    @Override
+	public  String[] getSaveKeys(){
         return savedKeys;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         super.newMenuInstance(menu, block);
         menu.addMenuClickHandler(DIRECTION_SLOTS[0],getDirectionHandler(0,menu));
         updateDirectionSlots(0,menu);

@@ -51,7 +51,8 @@ public class BoolGenerator extends AbstractProcessor {
         this.machineRecipes.add(MachineRecipeUtils.stackFrom(tick,new ItemStack[0],new ItemStack[]{AddSlimefunItems.setC( AddItem.FALSE_,3)}));
         AddUtils.addGlow(this.getProgressBar());
     }
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         int[] border = BORDER;
         int len=border.length;
@@ -128,16 +129,18 @@ public class BoolGenerator extends AbstractProcessor {
             return null;
         }
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
 
     @Override
     public void process(Block b, BlockMenu inv, SlimefunBlockData data){
-        SimpleCraftingOperation currentOperation = (SimpleCraftingOperation)this.processor.getOperation(b);
+        SimpleCraftingOperation currentOperation = this.processor.getOperation(b);
         ItemConsumer[] fastCraft=null;
         if(currentOperation==null){
             Pair<MachineRecipe, ItemConsumer[]> nextP = findNextRecipe(inv,getInputSlots(),getOutputSlots());
@@ -154,8 +157,8 @@ public class BoolGenerator extends AbstractProcessor {
                 }
             }else{//if currentOperation ==null return  , cant find nextRecipe
                 if(inv.hasViewer()){
-                    for(int var4 = 0; var4 <PROCESSOR_SLOT.length; ++var4) {
-                        inv.addItem(PROCESSOR_SLOT[var4],MenuUtils.PROCESSOR_NULL );
+                    for (int element : PROCESSOR_SLOT) {
+                        inv.addItem(element,MenuUtils.PROCESSOR_NULL );
                     }
                 }
                 return ;
@@ -169,16 +172,16 @@ public class BoolGenerator extends AbstractProcessor {
             ItemConsumer[] var4=currentOperation.getResults();
             CraftUtils.forcePush(var4,inv,getOutputSlots());
             if(inv.hasViewer()){
-                for(int var5 = 0; var5 <PROCESSOR_SLOT.length; ++var5) {
-                    inv.addItem(PROCESSOR_SLOT[var5],MenuUtils.PROCESSOR_NULL );
+                for (int element : PROCESSOR_SLOT) {
+                    inv.addItem(element,MenuUtils.PROCESSOR_NULL );
                 }
             }
             this.processor.endOperation(b);
         }
         else{
             if(inv.hasViewer()){
-                for(int var5 = 0; var5 <PROCESSOR_SLOT.length; ++var5) {
-                    this.processor.updateProgressBar(inv, PROCESSOR_SLOT[var5], currentOperation);
+                for (int element : PROCESSOR_SLOT) {
+                    this.processor.updateProgressBar(inv, element, currentOperation);
                 }
             }
             currentOperation.progress(1);

@@ -27,7 +27,8 @@ import me.matl114.logitech.Utils.WorldUtils;
 
 public class StorageSpace {
     public static class StorageWorldGen extends ChunkGenerator {
-        public ChunkData generateChunkData(World world, Random random, int chunkx, int chunkz, BiomeGrid biomeGrid){
+        @Override
+		public ChunkData generateChunkData(World world, Random random, int chunkx, int chunkz, BiomeGrid biomeGrid){
             ChunkData chunkData=createChunkData(world);
             chunkData.setRegion(0, WORLD_MIN_Y,0,16, WORLD_MAX_Y,16, Material.BARRIER);
             return chunkData;
@@ -202,11 +203,7 @@ public class StorageSpace {
                                                 }
                                                 b1.setType(Material.AIR,false);
                                             }else {
-                                                if(!WorldUtils.copyBlockState(b1.getState(),b2)){
-                                                    AddUtils.sendMessage(player,"&e转移方块数据时出现未知错误,请联系管理员查询日志历史");
-                                                    continue;
-                                                }
-                                                if(!WorldUtils.copyBlockState(b3.getState(),b1)){
+                                                if(!WorldUtils.copyBlockState(b1.getState(),b2) || !WorldUtils.copyBlockState(b3.getState(),b1)){
                                                     AddUtils.sendMessage(player,"&e转移方块数据时出现未知错误,请联系管理员查询日志历史");
                                                     continue;
                                                 }

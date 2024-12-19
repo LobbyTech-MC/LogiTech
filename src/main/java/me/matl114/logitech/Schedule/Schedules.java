@@ -53,7 +53,8 @@ public class Schedules {
     }
     public static BukkitRunnable getRunnable(Runnable runnable){
         return new BukkitRunnable() {
-            public void  run(){
+            @Override
+			public void  run(){
                 runnable.run();
             }
         };
@@ -83,15 +84,17 @@ public class Schedules {
     public static void launchSchedules(BukkitRunnable thread ,int delay,boolean isSync,int period){
         if(period<=0){
             if(isSync){
-                if(delay!=0)
-                    thread.runTaskLater(plugin, delay);
-                else
-                    thread.runTask(plugin);
+                if(delay!=0) {
+					thread.runTaskLater(plugin, delay);
+				} else {
+					thread.runTask(plugin);
+				}
             }else{
-                if(delay!=0)
-                    thread.runTaskLaterAsynchronously(plugin,delay);
-                else
-                    thread.runTaskAsynchronously(plugin);
+                if(delay!=0) {
+					thread.runTaskLaterAsynchronously(plugin,delay);
+				} else {
+					thread.runTaskAsynchronously(plugin);
+				}
             }
         }else{
             if(isSync){
@@ -121,7 +124,8 @@ public class Schedules {
         autoSaveThread.runTaskTimerAsynchronously(plugin, periodAutoSave, periodAutoSave);
 
         effectThread = new BukkitRunnable() {
-            public void run() {
+            @Override
+			public void run() {
                 ScheduleEffects.scheduleEffects();
             }
         };
@@ -129,7 +133,8 @@ public class Schedules {
         effectThread.runTaskTimer(plugin, 200, periodEffect);
 
         BukkitRunnable postRegisterTask = new BukkitRunnable() {
-            public void run() {
+            @Override
+			public void run() {
                 SchedulePostRegister.schedulePostRegister();
             }
         };

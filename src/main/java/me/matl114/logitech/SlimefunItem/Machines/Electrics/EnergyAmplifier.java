@@ -71,7 +71,8 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
                 item,null,AddUtils.getInfoShow("&f说明","&7你将会看见下方的机器发电")
         ));
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for (int i=0;i<len;++i){
@@ -84,20 +85,24 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
             //0 为 数量 1 为 电力
             Object it=null;
             int t;
-            public int getInt(int val1){
+            @Override
+			public int getInt(int val1){
                 return t;
             }
-            public Object getObject(int val2){
+            @Override
+			public Object getObject(int val2){
                 return it;
             }
             @Override
             public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
                 return false;
             }
-            public void setInt(int val1,int val2){
+            @Override
+			public void setInt(int val1,int val2){
                 t=val2;
             }
-            public void setObject(int val1,Object val2){
+            @Override
+			public void setObject(int val1,Object val2){
                 it=val2;
             }
         };
@@ -112,9 +117,12 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
             return dh;
         }
     }
-    public  int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
+    @Override
+	public  int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
         BlockMenu inv=data.getBlockMenu();
-        if(inv==null)return 0;
+        if(inv==null) {
+			return 0;
+		}
         DataMenuClickHandler dh=getDataHolder(null,inv);
         Object sf=dh.getObject(0);
         if(sf instanceof EnergyNetProvider ep){
@@ -148,10 +156,12 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
         }
         return 0;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return NULL_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return NULL_SLOT;
     }
     @Override
@@ -184,7 +194,8 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
             }
         }
     }
-    public void newMenuInstance(BlockMenu inv, Block b){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block b){
         inv.addMenuOpeningHandler(player -> {
             updateMenu(inv,b,Settings.RUN);
         });
@@ -205,20 +216,24 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
         }
         updateMenu(inv,b,Settings.INIT);
     }
-    public void onBreak(BlockBreakEvent e,BlockMenu inv){
+    @Override
+	public void onBreak(BlockBreakEvent e,BlockMenu inv){
         super.onBreak(e,inv);
         if(inv!=null){
             inv.dropItems(inv.getLocation(),MACHINE_SLOT);
         }
     }
-    public void registerTick(SlimefunItem item){
+    @Override
+	public void registerTick(SlimefunItem item){
         item.addItemHandler(
                 new BlockTicker() {
-                    public boolean isSynchronized() {
+                    @Override
+					public boolean isSynchronized() {
                         return false;
                     }
 
-                    @ParametersAreNonnullByDefault
+                    @Override
+					@ParametersAreNonnullByDefault
                     public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
                         BlockMenu menu = data.getBlockMenu();
                        if(menu!=null&&menu.hasViewer()){
@@ -237,7 +252,8 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
             inv.replaceExistingItem(RUNWHENFULL_SLOT,RUNWHENFULL_OFF);
         }
     }
-    public void updateMenu(BlockMenu inv, Block b, Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv, Block b, Settings mod){
         ItemPusher pusher=MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,MACHINE_SLOT);
         DataMenuClickHandler dh=getDataHolder(b,inv);
         if(pusher!=null){

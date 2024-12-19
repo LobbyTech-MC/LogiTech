@@ -74,7 +74,8 @@ public abstract class AbstractSorter extends AbstractSyncTickCargo implements  C
     }
     public abstract int getInfoSlot();
     public abstract int[] getInputWLSlot();
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+    @Override
+	public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
         if(flow==ItemTransportFlow.WITHDRAW){
             return getOutputSlots();
         }
@@ -96,7 +97,8 @@ public abstract class AbstractSorter extends AbstractSyncTickCargo implements  C
             return blankSlot;
         }
     }
-    public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
+    @Override
+	public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
         blockMenu.addMenuOpeningHandler(player -> {
             updateMenu(blockMenu,block,Settings.INIT);
         });
@@ -107,45 +109,54 @@ public abstract class AbstractSorter extends AbstractSyncTickCargo implements  C
         blockMenu.replaceExistingItem(getInfoSlot(),getInfoOffItem(0));
         blockMenu.addMenuClickHandler(getInfoSlot(), ChestMenuUtils.getEmptyClickHandler());
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu inv){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu inv){
         super.onBreak(e, inv);
         if(inv!=null){
             inv.dropItems(inv.getLocation(),getInputWLSlot());
             inv.dropItems(inv.getLocation(),getChipSlot());
         }
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         //shared ticker
         this.addItemHandler((BlockTicker) CHIP_SYNC);
     }
-    public void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount){
-        if(inv.hasViewer())
-            updateMenu(inv,b,Settings.RUN);
+    @Override
+	public void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount){
+        if(inv.hasViewer()) {
+			updateMenu(inv,b,Settings.RUN);
+		}
         String cmd=data.getData(CCODEKEY);
         int code;
         if(cmd==null||cmd.startsWith("nu")){
-            if(cmd==null)
-                data.setData(CCODEKEY,"nu");
-            if(inv.hasViewer())
-                inv.replaceExistingItem(getInfoSlot(),getInfoOffItem(synTickCount));
+            if(cmd==null) {
+				data.setData(CCODEKEY,"nu");
+			}
+            if(inv.hasViewer()) {
+				inv.replaceExistingItem(getInfoSlot(),getInfoOffItem(synTickCount));
+			}
             return;
         }
         try{
             code=Integer.parseInt(cmd);
         }catch (Throwable e){
             data.setData(CCODEKEY,"nu");
-            if(inv.hasViewer())
-                inv.replaceExistingItem(getInfoSlot(),getInfoOffItem(synTickCount));
+            if(inv.hasViewer()) {
+				inv.replaceExistingItem(getInfoSlot(),getInfoOffItem(synTickCount));
+			}
             return;
         }
-        if(inv.hasViewer())
-            inv.replaceExistingItem(getInfoSlot(),getInfoItem(code,synTickCount));
+        if(inv.hasViewer()) {
+			inv.replaceExistingItem(getInfoSlot(),getInfoItem(code,synTickCount));
+		}
         int[] inputs=getInputSlots();
         int slot=inputs[ MathUtils.bitCount(code,(synTickCount%32)+1)%inputs.length];
         TransportUtils.transportItem(inv,new int[]{slot},inv,getOutputSlots(), CargoConfigs.getDefaultConfig(),false,null,CraftUtils.getpusher);
     }
-    public void updateMenu(BlockMenu blockMenu, Block block, Settings mod){
+    @Override
+	public void updateMenu(BlockMenu blockMenu, Block block, Settings mod){
         loadChipCommand(blockMenu);
     }
 }

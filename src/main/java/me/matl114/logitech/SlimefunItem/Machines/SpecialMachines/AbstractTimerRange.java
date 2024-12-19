@@ -83,7 +83,8 @@ public abstract class AbstractTimerRange  extends AbstractMachine implements Men
         this.TIMER=timer;
         if(TickTask==null){
             TickTask=new BukkitRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     tickInRange();
                 }
             };
@@ -105,8 +106,11 @@ public abstract class AbstractTimerRange  extends AbstractMachine implements Men
     }
 
     public abstract boolean blockPredicate(Block block);
-    public void constructMenu(BlockMenuPreset preset) {
-        IntStream.range(0,9).forEach(i->{if(i!=PARTICLE_SLOT)preset.addItem(i, ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());});
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
+        IntStream.range(0,9).forEach(i->{if(i!=PARTICLE_SLOT) {
+			preset.addItem(i, ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
+		}});
     }
     private void doParticle(Location loc){
         CompletableFuture.runAsync(()->{
@@ -201,15 +205,18 @@ public abstract class AbstractTimerRange  extends AbstractMachine implements Men
     public void process(Block b, BlockMenu preset, SlimefunBlockData data) {
 
     }
-    public final void registerTick(SlimefunItem that){
+    @Override
+	public final void registerTick(SlimefunItem that){
         that.addItemHandler(
                 new BlockTicker() {
                     int tickCount=0;
-                    public boolean isSynchronized() {
+                    @Override
+					public boolean isSynchronized() {
                         return false;
                     }
 
-                    @ParametersAreNonnullByDefault
+                    @Override
+					@ParametersAreNonnullByDefault
                     public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
                         Location loc=b.getLocation();
                         if(MACHINES_RUNNED.contains(loc)){

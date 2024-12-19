@@ -16,16 +16,19 @@ public class RandomMachineOperation implements CustomMachineOperation {
     public int getProgress() {
         return this.currentTick;
     }
-    public int getRemainingTicks() {
+    @Override
+	public int getRemainingTicks() {
         return Math.max(0, this.totalTicks-this.currentTick);
     }
 
 
-    public int getTotalTicks(){
+    @Override
+	public int getTotalTicks(){
         return this.totalTicks;
     }
 
-    public void progress(int var1){
+    @Override
+	public void progress(int var1){
     }
 
     public void randProgress(int amount,long value){

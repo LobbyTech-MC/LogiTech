@@ -68,7 +68,8 @@ public class StorageOperator extends AbstractMachine {
                         "&7转移结果将输入至输出槽")
         ));
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] slot=BORDER;
         int len=slot.length;
         for (int i=0;i<len;i++){
@@ -86,13 +87,16 @@ public class StorageOperator extends AbstractMachine {
         }
         preset.addItem(BOTTON_SLOT,BOTTON_ITEM);
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
 
         inv.addMenuClickHandler(BOTTON_SLOT,((player, i, itemStack, clickAction) -> {
             ItemStack it1,it2;
@@ -146,10 +150,12 @@ public class StorageOperator extends AbstractMachine {
             return false;
         }));
     }
-    public void process(Block b, BlockMenu preset, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu preset, SlimefunBlockData data){
         //doing nothings
     }
-    public void registerTick(SlimefunItem it ){
+    @Override
+	public void registerTick(SlimefunItem it ){
         //doing nothing
     }
 }

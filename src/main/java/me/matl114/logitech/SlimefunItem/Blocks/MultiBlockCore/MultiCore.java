@@ -24,25 +24,31 @@ public abstract class MultiCore extends MultiPart implements MultiBlockCore {
         super(itemGroup, item, recipeType, recipe, blockId);
 
     }
-    public abstract MultiBlockService.MultiBlockBuilder getBuilder();
-    public abstract AbstractMultiBlockType getMultiBlockType();
-    public boolean isSync(){
+    @Override
+	public abstract MultiBlockService.MultiBlockBuilder getBuilder();
+    @Override
+	public abstract AbstractMultiBlockType getMultiBlockType();
+    @Override
+	public boolean isSync(){
         return false;
     }
     public boolean preCondition(Block b,BlockMenu inv,SlimefunBlockData data){
         return true;
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         this.registerBlockMenu(this);
         this.registerTick(this);
     }
     public void processCore(Block b, BlockMenu menu){
         //doing nothing
     }
-    public boolean redirectMenu(){
+    @Override
+	public boolean redirectMenu(){
         return false;
     }
-    public final void tick(Block b, BlockMenu menu,SlimefunBlockData data, int tickCount){
+    @Override
+	public final void tick(Block b, BlockMenu menu,SlimefunBlockData data, int tickCount){
         //in this case .blockMenu is null?
         Location loc=b.getLocation();
         if(preCondition(b,menu,data)){

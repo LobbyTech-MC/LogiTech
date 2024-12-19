@@ -21,19 +21,21 @@ public class CubeMultiBlock implements AbstractMultiBlock {
         this.size2=size1+ TYPE.sizeP*height;
         this.size3=size2+TYPE.sizeT;
     }
-    public MultiBlockService.Direction getDirection() {
+    @Override
+	public MultiBlockService.Direction getDirection() {
         return DIRECTION;
     }
     public int getHeight() {
         return height;
     }
-    public Vector getStructurePart(int index){
+    @Override
+	public Vector getStructurePart(int index){
         if(index<size1){
             return DIRECTION.rotate(TYPE.BOTTOM_LOC[index].clone());
         }else if(index<size2){
             int t=index-size1;
             Vector s= DIRECTION.rotate(TYPE.PLATE_LOC[t%TYPE.sizeP].clone());
-            s.setY(s.getBlockY()+(int)(t/TYPE.sizeP));
+            s.setY(s.getBlockY()+t/TYPE.sizeP);
             return s;
         }else{
             Vector s= DIRECTION.rotate(TYPE.TOP_LOC[index-size2].clone());
@@ -41,13 +43,16 @@ public class CubeMultiBlock implements AbstractMultiBlock {
             return s;
         }
     }
-    public String getStructurePartId(int index){
+    @Override
+	public String getStructurePartId(int index){
         return (index<size1)?TYPE.BOTTOM_IDS[index]:((index<size2)?TYPE.PLATE_IDS[(index-size1)%TYPE.sizeP]:TYPE.TOP_IDS[index-size2]);
     }
-    public int getStructureSize(){
+    @Override
+	public int getStructureSize(){
         return size3;
     }
-    public AbstractMultiBlockType getType() {
+    @Override
+	public AbstractMultiBlockType getType() {
         return TYPE;
     }
 }

@@ -39,14 +39,17 @@ public class TimerSequentialSlimefun extends TimerSlimefun{
     public TimerSequentialSlimefun(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, int energybuffer, int energyConsumption) {
         super(category, item, recipeType, recipe, energybuffer, energyConsumption);
     }
-    public void registerTick(SlimefunItem item){
+    @Override
+	public void registerTick(SlimefunItem item){
         item.addItemHandler(
                 new BlockTicker() {
                     int tickCount=0;
-                    public boolean isSynchronized() {
+                    @Override
+					public boolean isSynchronized() {
                         return false;
                     }
-                    @ParametersAreNonnullByDefault
+                    @Override
+					@ParametersAreNonnullByDefault
                     public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
                         Location loc=b.getLocation();
                         if(RUNNING_MACHINES.contains(loc)){

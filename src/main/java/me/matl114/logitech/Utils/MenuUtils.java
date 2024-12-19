@@ -144,7 +144,8 @@ public class MenuUtils {
         int pageNum=(1+(RecipeSize-1)/pageContent);
 
         MenuFactory a=new MenuFactory(SIMPLE_MENU,AddUtils.colorful("识别机器类型大赏"),pageNum){
-            public void init(){
+            @Override
+			public void init(){
                 setDefaultNPSlots();
             }
         }.addOverrides(7, SlimefunGuide.getItem(SlimefunGuide.getDefaultMode())).setGuideModHistory(history);
@@ -188,7 +189,8 @@ public class MenuUtils {
         int inputlen=input.length;
         if(inputlen<=9){
             MenuFactory a=new MenuFactory(RECIPE_MENU_3X3,AddUtils.colorful("配方展示"),1){
-                public void init(){
+                @Override
+				public void init(){
 
                 }
             };
@@ -200,10 +202,11 @@ public class MenuUtils {
                 a.setBackHandler(CustomMenuHandler.from(CLOSE_HANDLER));
             }
             if(machine!=null&&!machine.getType().isAir()){
-                if(recipe.getTicks()>=0)
-                    a.addInventory(RECIPETYPESLOT_3X3,AddUtils.addLore(machine,"","&a在该机器中耗时"+recipe.getTicks()+"&at制作"));
-                else
-                    a.addInventory(RECIPETYPESLOT_3X3,AddUtils.addLore(machine,"","&a在该机器中制作"));
+                if(recipe.getTicks()>=0) {
+					a.addInventory(RECIPETYPESLOT_3X3,AddUtils.addLore(machine,"","&a在该机器中耗时"+recipe.getTicks()+"&at制作"));
+				} else {
+					a.addInventory(RECIPETYPESLOT_3X3,AddUtils.addLore(machine,"","&a在该机器中制作"));
+				}
             }
             for(int i=0;i<input.length;++i){
                 a.addInventory(RECIPESLOT_3X3[i],getDisplayItem(input[i]) );
@@ -234,7 +237,8 @@ public class MenuUtils {
         }
         else{
             MenuFactory a=new MenuFactory(RECIPE_MENU_6X6,AddUtils.colorful("配方展示"),1){
-                public void init(){
+                @Override
+				public void init(){
                 }
             };
             a.setGuideModHistory(history);
@@ -244,10 +248,11 @@ public class MenuUtils {
             }else{
                 a.setBackHandler(CustomMenuHandler.from(CLOSE_HANDLER));
             }
-            if(recipe.getTicks()>=0)
-                a.addInventory(RECIPETYPESLOT_6X6,AddUtils.addLore(machine,"","&a在该机器中耗时"+recipe.getTicks()+"&at制作"));
-            else
-                a.addInventory(RECIPETYPESLOT_6X6,AddUtils.addLore(machine,"","&a在该机器中制作"));
+            if(recipe.getTicks()>=0) {
+				a.addInventory(RECIPETYPESLOT_6X6,AddUtils.addLore(machine,"","&a在该机器中耗时"+recipe.getTicks()+"&at制作"));
+			} else {
+				a.addInventory(RECIPETYPESLOT_6X6,AddUtils.addLore(machine,"","&a在该机器中制作"));
+			}
             int len=Math.min(inputlen,RECIPESLOT_6x6.length);
 
             for(int i=0;i<len;++i){
@@ -300,7 +305,8 @@ public class MenuUtils {
             displayMachine=NO_ITEM;
         }
         MenuFactory a=new MenuFactory(SIMPLE_MENU,ItemStackHelper.getDisplayName(machine),pageNum){
-            public void init(){
+            @Override
+			public void init(){
                 setDefaultNPSlots();
             }
         }.addOverrides(7,displayMachine);
@@ -352,7 +358,8 @@ public class MenuUtils {
         int pageNum=(1+(RecipeSize-1)/pageContent);
 
         MenuFactory a=new MenuFactory(SIMPLE_MENU,AddUtils.colorful("合法配方类型大赏"),pageNum){
-            public void init(){
+            @Override
+			public void init(){
                 setDefaultNPSlots();
             }
         }.addOverrides(7, SlimefunGuide.getItem(SlimefunGuide.getDefaultMode()));
@@ -411,7 +418,9 @@ public class MenuUtils {
 //    SHIFT_LEFT,
     //右键
     private static ItemStack getDisplayItem(ItemStack it){
-        if(it==null||it.getType().isAir())return null;
+        if(it==null||it.getType().isAir()) {
+			return null;
+		}
         ItemStack finalStack;
         if(it instanceof RandomItemStack||it instanceof ProbItemStack){
             List<ItemStack> list=((MultiItemStack)it).getItemStacks();
@@ -430,7 +439,9 @@ public class MenuUtils {
             }};
             //如果是proItemStack就获得其实例 因为不能整一个air出来
             ItemStack sample=list.get(0);
-            if(sample.getType().isAir())return null;
+            if(sample.getType().isAir()) {
+				return null;
+			}
             finalStack= AddUtils.addLore(sample,namelist.toArray(new String[namelist.size()]));
         }else if(it instanceof EquivalItemStack){
             List<ItemStack> list=((EquivalItemStack)it).getItemStacks();
@@ -445,7 +456,9 @@ public class MenuUtils {
                 }
             }};
             ItemStack sample=list.get(0);
-            if(sample.getType().isAir())return null;
+            if(sample.getType().isAir()) {
+				return null;
+			}
             finalStack= AddUtils.addLore(sample,namelist.toArray(new String[namelist.size()]));
         }
         else if(it instanceof RandAmountStack){

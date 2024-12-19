@@ -14,15 +14,18 @@ public class RandAmountStack extends ItemStack implements AbstractItemStack,Rand
         this.len = max-min+1;
 
     }
-    public ItemStack clone(){
+    @Override
+	public ItemStack clone(){
         ItemStack clone =super.clone();
         clone.setAmount(min+ rand.nextInt(len));
         return clone;
     }
-    public RandAmountStack copy(){
+    @Override
+	public RandAmountStack copy(){
         return new RandAmountStack(this,min,min+len-1);
     }
-    public ItemStack getInstance(){
+    @Override
+	public ItemStack getInstance(){
         return this.clone();
     }
     public int getMax(){

@@ -92,8 +92,8 @@ public class EntityFeat extends ItemWithHandler<ItemDropHandler> {
         ItemMeta meta = item.getItemMeta();
 
         // Fixes #2583 - Proper NBT handling of Spawners
-        if(entityType!=null&&entityType.isSpawnable())
-            if (meta instanceof BlockStateMeta stateMeta) {
+        if(entityType!=null&&entityType.isSpawnable()) {
+			if (meta instanceof BlockStateMeta stateMeta) {
                 BlockState state = stateMeta.getBlockState();
 
                 if (state instanceof CreatureSpawner spawner) {
@@ -102,6 +102,7 @@ public class EntityFeat extends ItemWithHandler<ItemDropHandler> {
 
                 stateMeta.setBlockState(state);
             }
+		}
 
         // Setting the lore to indicate the Type visually
         List<String> lore = meta.getLore();
@@ -140,7 +141,8 @@ public class EntityFeat extends ItemWithHandler<ItemDropHandler> {
                 )
         );
     }
-    public boolean canStack(ItemMeta meta1,ItemMeta meta2){
+    @Override
+	public boolean canStack(ItemMeta meta1,ItemMeta meta2){
         if(!super.canStack(meta1,meta2)){
             return false;
         }

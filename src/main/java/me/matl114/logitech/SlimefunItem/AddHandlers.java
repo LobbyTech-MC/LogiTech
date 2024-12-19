@@ -14,7 +14,8 @@ public final class AddHandlers {
     public static final BlockUseHandler stopItemUseHandler =AddHandlers::stopUseClick;
     public static final ItemUseHandler stopAttackHandler =AddHandlers::stopAttackClick;
     public static final BlockPlaceHandler stopPlaceerHandler =new BlockPlaceHandler(false) {
-        @ParametersAreNonnullByDefault
+        @Override
+		@ParametersAreNonnullByDefault
         public void onPlayerPlace(BlockPlaceEvent e) {
             e.setCancelled(true);
         }

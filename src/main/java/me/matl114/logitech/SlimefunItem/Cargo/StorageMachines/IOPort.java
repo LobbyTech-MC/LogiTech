@@ -32,11 +32,13 @@ public class IOPort extends AbstractIOPort{
     public IOPort(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(category, item, recipeType, recipe);
     }
-    public  void addInfo(ItemStack item){
+    @Override
+	public  void addInfo(ItemStack item){
 
     }
 
-    public  void constructMenu(BlockMenuPreset preset){
+    @Override
+	public  void constructMenu(BlockMenuPreset preset){
         //空白背景 禁止点击
         int[] border = BORDER;
         int len=border.length;
@@ -50,7 +52,8 @@ public class IOPort extends AbstractIOPort{
         preset.setSize(54);
     }
 
-    public int getDisplaySlot(){
+    @Override
+	public int getDisplaySlot(){
         return 22;
     }
     @Override
@@ -58,10 +61,12 @@ public class IOPort extends AbstractIOPort{
         return INPUT_SLOT;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public int getStorageSlot(){
+    @Override
+	public int getStorageSlot(){
         return 13;
     }
 }

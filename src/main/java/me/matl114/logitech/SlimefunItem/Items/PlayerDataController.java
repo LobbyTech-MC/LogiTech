@@ -12,7 +12,8 @@ public class PlayerDataController extends CustomProps {
         super(itemGroup, item, recipeType, recipe);
     }
     //TODO build control menu,reconstruct menu utils?
-    public void onClickAction(PlayerRightClickEvent event){
+    @Override
+	public void onClickAction(PlayerRightClickEvent event){
 
     }
 }

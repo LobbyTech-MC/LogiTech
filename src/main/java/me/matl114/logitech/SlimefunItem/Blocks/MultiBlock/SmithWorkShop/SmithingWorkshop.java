@@ -76,7 +76,8 @@ public class SmithingWorkshop extends MultiCore {
                         "&7")
         ));
     }
-    public void constructMenu(BlockMenuPreset inv) {
+    @Override
+	public void constructMenu(BlockMenuPreset inv) {
         int[] border = BORDER;
         int len = border.length;
         for (int i = 0; i < len; i++) {
@@ -98,17 +99,21 @@ public class SmithingWorkshop extends MultiCore {
             return a!=null&&a.getType()==type;
         }).count();
     }
-    public MultiBlockService.MultiBlockBuilder getBuilder(){
+    @Override
+	public MultiBlockService.MultiBlockBuilder getBuilder(){
         return BUILDER;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[0];
     }
-    public MultiBlockType getMultiBlockType(){
+    @Override
+	public MultiBlockType getMultiBlockType(){
         return MBTYPE;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return new int[0];
     }
     public boolean hasAmplifyCompentLevel(Location loc,SWAmplifyComponent component){
@@ -169,7 +174,8 @@ public class SmithingWorkshop extends MultiCore {
             }
         }
     }
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
         Location loc2=block.getLocation();
         if (MultiBlockService.getStatus(loc2)!=0){
             inv.replaceExistingItem(STATUS_SLOT,STATUS_ITEM_ON);
@@ -205,10 +211,11 @@ public class SmithingWorkshop extends MultiCore {
             MultiBlockService.removeHologramSync(loc);
             if(statusCode==0){
                 if(holoStatus!=4){
-                    if(holoStatus==0)
-                        AddUtils.sendMessage(player,"&a全息投影已开启!");
-                    else
-                        AddUtils.sendMessage(player,"&a全息投影已切换方向!");
+                    if(holoStatus==0) {
+						AddUtils.sendMessage(player,"&a全息投影已开启!");
+					} else {
+						AddUtils.sendMessage(player,"&a全息投影已切换方向!");
+					}
                     MultiBlockService.createHologram(loc,MBTYPE, MultiBlockService.Direction.fromInt(holoStatus), MBID_TO_ITEM);
                     DataCache.setCustomData(loc,MultiBlockService.getHologramKey(),holoStatus+1);
                 }
@@ -263,7 +270,8 @@ public class SmithingWorkshop extends MultiCore {
             menu.dropItems(menu.getLocation(),PLUG_SLOT);
         }
     }
-    public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
+    @Override
+	public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
         super.onMultiBlockDisable(loc,handler,cause);
         //这里也要清除,lvl数据 防止上面重新读取回来
         //要设置上面的机器,清除里面的force level数据
@@ -273,14 +281,16 @@ public class SmithingWorkshop extends MultiCore {
         }
     }
 
-    public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
+    @Override
+	public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
         super.onMultiBlockEnable(loc,handler);
         BlockMenu inv= DataCache.getMenu(loc);
         if(inv!=null){
             updateMenu(inv,loc.getBlock(),Settings.RUN);
         }
     }
-    public void processCore(Block b, BlockMenu menu){
+    @Override
+	public void processCore(Block b, BlockMenu menu){
         if(menu.hasViewer()){
             updateMenu(menu,b,Settings.RUN);
         }
@@ -302,7 +312,8 @@ public class SmithingWorkshop extends MultiCore {
         inv.replaceExistingItem(STATUS_SLOT,status==0?STATUS_ITEM_OFF:STATUS_ITEM_ON);
     }
 
-    public boolean useAdvancedMenu(){
+    @Override
+	public boolean useAdvancedMenu(){
         return true;
     }
 }

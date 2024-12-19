@@ -181,14 +181,17 @@ public class TimerSlimefun extends AbstractMachine implements ChunkLimit, MenuTo
     public void process(Block b, BlockMenu inv, SlimefunBlockData data) {
 
     }
-    public void registerTick(SlimefunItem item){
+    @Override
+	public void registerTick(SlimefunItem item){
         item.addItemHandler(
                 new BlockTicker() {
                     int tickCount=0;
-                    public boolean isSynchronized() {
+                    @Override
+					public boolean isSynchronized() {
                         return false;
                     }
-                    @ParametersAreNonnullByDefault
+                    @Override
+					@ParametersAreNonnullByDefault
                     public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
                         Location loc=b.getLocation();
                         if(RUNNING_MACHINES.contains(loc)){

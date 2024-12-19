@@ -18,10 +18,12 @@ public class MultiPart extends AbstractBlock implements MultiBlockPart {
         super(itemGroup, item, recipeType, recipe);
         this.BLOCKID = blockId;
     }
-    public String getPartId(){
+    @Override
+	public String getPartId(){
         return BLOCKID;
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
 //        if(redirectMenu()){
 //            this.addHandler((BlockUseHandler)this::onMenuRedirect);
 //        }
@@ -36,10 +38,12 @@ public class MultiPart extends AbstractBlock implements MultiBlockPart {
     public void processPart(Block b, BlockMenu menu,Location core){
         //doing nothing
     }
-    public boolean redirectMenu(){
+    @Override
+	public boolean redirectMenu(){
         return true;
     }
-    public void tick(Block b,BlockMenu menu,int tickCount) {
+    @Override
+	public void tick(Block b,BlockMenu menu,int tickCount) {
         //donig nothing
     }
 }

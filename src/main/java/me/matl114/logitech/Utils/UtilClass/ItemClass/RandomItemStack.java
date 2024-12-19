@@ -13,7 +13,7 @@ import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.NotImplementedE
 
 public class RandomItemStack extends ItemStack implements MultiItemStack,RandOutItem {
 	protected LinkedHashMap<ItemStack, Integer> itemSettings;
-	
+
     public Random rand=new Random();
     public ItemStack[] itemList;
     public double[] itemWeight;
@@ -35,7 +35,7 @@ public class RandomItemStack extends ItemStack implements MultiItemStack,RandOut
         for(Map.Entry<ItemStack, Integer> entry : itemSettings.entrySet()) {
             itemList[cnt] = entry.getKey();
             double r=entry.getValue();
-            itemWeight[cnt]= r/(double)weight;
+            itemWeight[cnt]= r/weight;
 //           int lastWeight = this.weightMap.isEmpty() ? 0 : this.weightMap.lastKey();//统一转为double
 //            this.weightMap.put(entry.getValue() + lastWeight, entry.getKey());
            weightSum[cnt+1]=weightSum[cnt]+entry.getValue();
@@ -49,11 +49,13 @@ public class RandomItemStack extends ItemStack implements MultiItemStack,RandOut
 //        SortedMap<Integer,ItemStack> tailMap = this.weightMap.tailMap(randomWeight, false);
 //        return this.weightMap.get(tailMap.firstKey());
 //    }
-    public ItemStack clone(){
+    @Override
+	public ItemStack clone(){
         int i=weightedRandom(this.weightSum);
         return this.itemList[i].clone();
     }
-    public RandomItemStack copy(){
+    @Override
+	public RandomItemStack copy(){
         RandomItemStack stack = new RandomItemStack(itemSettings);
         stack.itemList=Arrays.copyOf(this.itemList,this.itemList.length);
         stack.sum=this.sum;
@@ -62,13 +64,15 @@ public class RandomItemStack extends ItemStack implements MultiItemStack,RandOut
         return stack;
 
     }
-    public ItemStack getInstance(){
+    @Override
+	public ItemStack getInstance(){
         long a,s;
         ItemStack it=this.itemList[weightedRandom(this.weightSum)];
         return (it instanceof RandOutItem w)?w.getInstance():it;
     }
 //递归地解析全体物品列
-    public List<ItemStack> getItemStacks() {
+    @Override
+	public List<ItemStack> getItemStacks() {
         List<ItemStack> items = new ArrayList<>();
         for(int i=0;i<sum;i++) {
             if(itemList[i] instanceof MultiItemStack) {
@@ -79,13 +83,16 @@ public class RandomItemStack extends ItemStack implements MultiItemStack,RandOut
         }
         return items;
     }
-    public int getMaxStackSize(){
+    @Override
+	public int getMaxStackSize(){
         return 64;
     }
-    public int getTypeNum(){
+    @Override
+	public int getTypeNum(){
         return this.sum;
     }
-    public List<Double> getWeight(Double percentage) {
+    @Override
+	public List<Double> getWeight(Double percentage) {
         List<Double> weights = new ArrayList<>();
         for(int i=0;i<sum;i++) {
             if(itemList[i] instanceof MultiItemStack) {
@@ -96,10 +103,12 @@ public class RandomItemStack extends ItemStack implements MultiItemStack,RandOut
         }
         return weights;
     }
-    public boolean matchItem(ItemStack item,boolean strictCheck){
+    @Override
+	public boolean matchItem(ItemStack item,boolean strictCheck){
         return false;
     }
-    public void setAmount(int amount){
+    @Override
+	public void setAmount(int amount){
         throw new NotImplementedException("AbstractItemStack can not set Amount");
     }
     public int weightedRandom(int[] weightSum ){
@@ -114,7 +123,9 @@ public class RandomItemStack extends ItemStack implements MultiItemStack,RandOut
                 start=mid;
             }else if (weightSum[mid]>randouble) {
                 end=mid;
-            }else return mid;
+            } else {
+				return mid;
+			}
         }
         return start;
         // }

@@ -15,7 +15,9 @@ public class ItemPusher extends ItemCounter {
 
     private static ItemPusher INSTANCE=new ItemPusher(new ItemStack(Material.STONE));
     public static ItemPusher get(ItemStack item) {
-        if(item==null) return null;
+        if(item==null) {
+			return null;
+		}
         ItemPusher itp=INSTANCE.clone();
         itp.init(item);
         return itp;
@@ -33,11 +35,13 @@ public class ItemPusher extends ItemCounter {
         super(item);
         this.maxStackCnt = maxcnt;
     }
-    protected ItemPusher clone(){
+    @Override
+	protected ItemPusher clone(){
         return (ItemPusher)super.clone();
     }
 
-    public void grab(ItemCounter counter) {
+    @Override
+	public void grab(ItemCounter counter) {
         int left=maxStackCnt-cnt;
         if(left>counter.getAmount()){
             addAmount(counter.getAmount());
@@ -47,14 +51,17 @@ public class ItemPusher extends ItemCounter {
             counter.addAmount(-left);
         }
     }
-    protected void init( ){
+    @Override
+	protected void init( ){
         super.init();
     }
-    protected void init(ItemStack item){
+    @Override
+	protected void init(ItemStack item){
         super.init( item);
     }
 
-    public void push(ItemCounter counter) {
+    @Override
+	public void push(ItemCounter counter) {
         counter.grab(this);
     }
     public boolean safeAddAmount(int amount){

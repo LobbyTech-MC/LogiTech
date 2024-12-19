@@ -117,10 +117,12 @@ public class SpaceTower extends AbstractMachine {
                       int energybuffer, int energyConsumption) {
         super(category, item, recipeType, recipe, energybuffer, energyConsumption);
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         stack.setItemMeta(AddUtils.addLore(stack, LoreBuilder.powerBuffer(energybuffer), "&8⇨ &e⚡ &7" + AddUtils.formatDouble(energyConsumption) + " J/方块").getItemMeta());
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for (int i=0;i<len;i++){
@@ -129,10 +131,12 @@ public class SpaceTower extends AbstractMachine {
         preset.addItem(OPERATE_SLOT,new CustomItemStack(Material.PURPLE_STAINED_GLASS_PANE,"&6点击进行空间IO操作","&7单位体积耗电: %dJ".formatted(energyConsumption),"&e请确保你已经阅读机器说明"));
         preset.addItem(INFO_SLOT, new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6状态","&c未检测出延申的空间塔框架"));
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
     public Pair<Location,Location> getSpaceTowerRange(Location loc){
@@ -147,7 +151,9 @@ public class SpaceTower extends AbstractMachine {
             }
         }else if(DataCache.getSfItem(testLocation2) instanceof SpaceTowerFrame){
             dx=-1;
-        }else return null;
+        } else {
+			return null;
+		}
         int length=1;
         Vector vec=new Vector(dx,0,0);
         for(;length<=MAX_SIZE;++length){
@@ -169,7 +175,9 @@ public class SpaceTower extends AbstractMachine {
             }
         }else if(DataCache.getSfItem(testLocation2) instanceof SpaceTowerFrame){
             dx=-1;
-        }else return null;
+        } else {
+			return null;
+		}
         length=1;
         vec=new Vector(0,dx,0);
         for(;length<=MAX_SIZE;length++){
@@ -191,7 +199,9 @@ public class SpaceTower extends AbstractMachine {
             }
         }else if(DataCache.getSfItem(testLocation2) instanceof SpaceTowerFrame){
             dx=-1;
-        }else return null;
+        } else {
+			return null;
+		}
         length=1;
         vec=new Vector(0,0,dx);
         for(;length<=MAX_SIZE;length++){
@@ -204,7 +214,8 @@ public class SpaceTower extends AbstractMachine {
         int maxZ= dx<0? loc.getBlockZ():loc.getBlockZ()+length;
         return new Pair<>(new Location(loc.getWorld(),minX,minY,minZ),new Location(loc.getWorld(),maxX,maxY,maxZ));
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         menu.addMenuClickHandler(OPERATE_SLOT, ((player, i, itemStack, clickAction) -> {
             onStorage(player,menu);
             return false;
@@ -252,15 +263,18 @@ public class SpaceTower extends AbstractMachine {
             }
         }
     }
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu menu, SlimefunBlockData data){
     }
 
-    public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
+    @Override
+	public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
         if(menu.hasViewer()){
             updateMenu(menu,b,Settings.RUN);
         }
     }
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){
+    @Override
+	public void updateMenu(BlockMenu menu, Block block, Settings mod){
         var locationInfo=getSpaceTowerRange(menu.getLocation());
         if(locationInfo==null){
             menu.replaceExistingItem(INFO_SLOT,new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&6点击刷新状态","&c未检测出延申的空间塔框架"));

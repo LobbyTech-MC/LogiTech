@@ -81,7 +81,8 @@ public abstract class AbstractSequenceProcessor extends AbstractMachine implemen
             this.machineRecipes=new ArrayList<>();
         }
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         //空白背景 禁止点击
         int[] border = BORDER;
         int len=border.length;
@@ -107,19 +108,23 @@ public abstract class AbstractSequenceProcessor extends AbstractMachine implemen
         preset.addItem(PROCESSOR_SLOT, MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(INFO_SLOT,INFO_ITEM,ChestMenuUtils.getEmptyClickHandler());
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public MachineProcessor<SequenceCraftingOperation> getMachineProcessor() {
+    @Override
+	public MachineProcessor<SequenceCraftingOperation> getMachineProcessor() {
         return this.processor;
     }
-    public  int[] getOutputSlots(){
+    @Override
+	public  int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
     public ItemStack getProgressBar(){
         return this.progressbar;
     }
-    public void newMenuInstance(BlockMenu inv,Block b){
+    @Override
+	public void newMenuInstance(BlockMenu inv,Block b){
         int clean=DataCache.getCustomData(inv.getLocation(),"clean",0);
         inv.replaceExistingItem(CLEAN_SLOT,CLEAN_ITEM[clean]);
         inv.addMenuClickHandler(CLEAN_SLOT,((player, i, itemStack, clickAction) -> {
@@ -129,12 +134,14 @@ public abstract class AbstractSequenceProcessor extends AbstractMachine implemen
             return false;
         }));
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu) {
         super.onBreak(e,menu);
         AbstractSequenceProcessor.this.processor.endOperation(menu.getLocation());
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
-        SequenceCraftingOperation currentOperation = (SequenceCraftingOperation)this.processor.getOperation(b);
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+        SequenceCraftingOperation currentOperation = this.processor.getOperation(b);
         int clear=DataCache.getCustomData(data,"clean",0);
         if(currentOperation==null){
             Pair<MachineRecipe,ItemConsumer> nextP=   CraftUtils.findNextSequenceRecipe(inv,getInputSlots(),getMachineRecipes(),
@@ -188,8 +195,9 @@ public abstract class AbstractSequenceProcessor extends AbstractMachine implemen
                 }
                 //进度加一
             }
-            if(fastNext.isDirty())
-                currentOperation.progress(1);
+            if(fastNext.isDirty()) {
+				currentOperation.progress(1);
+			}
                 if(inv.hasViewer()){
                     inv.replaceExistingItem(PROCESSOR_SLOT,currentOperation.getDisplays());
                 }//记得保证这玩意先于getDisplay 否则会数组越界

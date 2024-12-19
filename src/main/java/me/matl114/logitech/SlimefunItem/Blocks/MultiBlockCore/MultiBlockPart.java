@@ -24,7 +24,8 @@ public interface MultiBlockPart extends Ticking {
      */
     default void handleMultiBlockPart(SlimefunItem it){
         it.addItemHandler(new BlockBreakHandler(false, false) {
-            @ParametersAreNonnullByDefault
+            @Override
+			@ParametersAreNonnullByDefault
             public void onPlayerBreak(BlockBreakEvent e, ItemStack itemStack, List<ItemStack> list) {
                 MultiBlockPart.this.onMultiBlockBreak(e);
             }

@@ -37,28 +37,36 @@ public class BiFilter extends AbstractFilter{
     public BiFilter(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
-    public int[] getBorders(){
+    @Override
+	public int[] getBorders(){
         return BORDER;
     }
-    public int[] getInputBorders(){
+    @Override
+	public int[] getInputBorders(){
         return INPUT_BORDER;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
-    public int[] getOutputBorders(){
+    @Override
+	public int[] getOutputBorders(){
         return OUTPUT_BORDER;
     }
-    public ItemStack[] getOutputBordersItem(){
+    @Override
+	public ItemStack[] getOutputBordersItem(){
         return OUTPUT_BORDERS_ITEM;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
-    public int[] getOutputWLSlot(){
+    @Override
+	public int[] getOutputWLSlot(){
         return OUTPUT_WLSLOTS;
     }
-    public int getTrashSlot(){
+    @Override
+	public int getTrashSlot(){
         return TRASH_SLOT;
     }
 

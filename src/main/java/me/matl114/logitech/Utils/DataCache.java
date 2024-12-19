@@ -80,8 +80,9 @@ public class DataCache {
     public static int getCustomData(SlimefunBlockData data,String key,int defaultValue){
         try{
             String csd= data.getData(key);
-            if(csd!=null)
-                return Integer.parseInt(csd);
+            if(csd!=null) {
+				return Integer.parseInt(csd);
+			}
         }catch (Throwable a){
         }
         data.setData(key,String.valueOf(defaultValue));
@@ -94,8 +95,9 @@ public class DataCache {
     public static String getCustomString(SlimefunBlockData data,String key,String defaultVal){
         try{
             String csd= data.getData(key);
-            if(csd!=null)
-                return csd;
+            if(csd!=null) {
+				return csd;
+			}
         }catch (Throwable a){
         }
         data.setData(key,defaultVal);
@@ -141,15 +143,18 @@ public class DataCache {
 
         try{
             String uuid= data.getData("uuid");
-            if(uuid!=null)
-                return uuid;
+            if(uuid!=null) {
+				return uuid;
+			}
         }catch (Throwable a){
         }
         safeSetData(data,"uuid","null");
         return "null";
     }
     public static Location getLocation(String key,SlimefunBlockData data){
-        if(data==null)return null;
+        if(data==null) {
+			return null;
+		}
         String location=data.getData(key);
         if(location!=null){
             Location loc=locationFromString(location);
@@ -181,7 +186,9 @@ public class DataCache {
                 return null;
             }
             String[] list=loc.split(LOCATION_CODE_SPLITER);
-            if(list.length!=4)return null;
+            if(list.length!=4) {
+				return null;
+			}
             String world =list[0];
             int x = Integer.parseInt(list[1]);
             int y = Integer.parseInt(list[2]);
@@ -230,8 +237,9 @@ public class DataCache {
     public static void runAfterSafeLoad(Location loc,Consumer<SlimefunBlockData> consumer,boolean isSync){
         SlimefunBlockData data;
         data= safeGetBlockDataFromCache(loc);
-        if(data!=null)
-            StorageCacheUtils.executeAfterLoad(data,()-> consumer.accept(data),isSync);
+        if(data!=null) {
+			StorageCacheUtils.executeAfterLoad(data,()-> consumer.accept(data),isSync);
+		}
     }
     public static SlimefunBlockData safeGetBlockCacheWithLoad(Location loc){
         SlimefunBlockData data=safeGetBlockDataFromCache(loc);
@@ -276,7 +284,9 @@ public class DataCache {
         runAfterSafeLoad(loc,(data)-> data.setData(key,value),false);
     }
     private static void safeSetData(SlimefunBlockData data,String key,String value){
-        if(data==null)return;
+        if(data==null) {
+			return;
+		}
         StorageCacheUtils.executeAfterLoad(data,()-> data.setData(key,value),false);
     }
     public static void setCustomData(Location loc ,String key,int value){

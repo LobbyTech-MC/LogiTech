@@ -33,7 +33,9 @@ public class MTMachine extends AbstractMultiThreadProcessor {
                 for(RecipeType rt : recipeTypes){
                     if(rt!=null){
                         List<MachineRecipe> rep= RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(rt);
-                        if(rep==null)rep=new ArrayList<>();
+                        if(rep==null) {
+							rep=new ArrayList<>();
+						}
                         mr.addAll(rep);
                     }
                 }

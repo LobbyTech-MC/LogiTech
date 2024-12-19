@@ -51,7 +51,9 @@ public class AEMachine extends AbstractAdvancedProcessor {
                 for(RecipeType rt : recipeTypes){
                     if(rt!=null){
                         List<MachineRecipe> rep= RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(rt);
-                        if(rep==null)rep=new ArrayList<>();
+                        if(rep==null) {
+							rep=new ArrayList<>();
+						}
                         int len=rep.size();
                         MachineRecipe o1;
                         for (int i=0;i<len;++i){
@@ -80,18 +82,21 @@ public class AEMachine extends AbstractAdvancedProcessor {
             getMachineRecipes();
         });
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         super.addInfo(stack);
         stack.setItemMeta(AddUtils.addLore(stack,
                 "&7插入[%s]增加并行处理数".formatted(Language.get("Items.CHIP_CORE.Name"))).getItemMeta());
     }
-    public boolean conditionHandle( Block b,BlockMenu menu){
+    @Override
+	public boolean conditionHandle( Block b,BlockMenu menu){
         if(menu.hasViewer()){
             updateMenu(menu,b,Settings.RUN);
         }
         return super.conditionHandle(b,menu);
     }
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         int[] border = BORDER;
         int len=border.length;
@@ -108,13 +113,16 @@ public class AEMachine extends AbstractAdvancedProcessor {
         preset.addMenuClickHandler(INFO_SLOT,ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(PROCESSOR_SLOT, MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
     }
-    public int getCraftLimit(Block b, BlockMenu inv){
+    @Override
+	public int getCraftLimit(Block b, BlockMenu inv){
         return DataCache.getCustomData(inv.getLocation(),MAXCRAFT_KEY,1);
     }
-    public ItemStack getProgressBar() {
+    @Override
+	public ItemStack getProgressBar() {
         return progressbar;
     }
-    public void newMenuInstance(BlockMenu inv,Block b){
+    @Override
+	public void newMenuInstance(BlockMenu inv,Block b){
         inv.addMenuOpeningHandler(player -> {
             updateMenu(inv,b,Settings.RUN);
         });
@@ -123,13 +131,15 @@ public class AEMachine extends AbstractAdvancedProcessor {
         });
 
     }
-    public void onBreak(BlockBreakEvent e,BlockMenu inv){
+    @Override
+	public void onBreak(BlockBreakEvent e,BlockMenu inv){
         super.onBreak(e,inv);
         if(inv!=null){
             inv.dropItems(inv.getLocation(),CORE_SLOT);
         }
     }
-    public void updateMenu(BlockMenu menu, Block b , Settings mode){
+    @Override
+	public void updateMenu(BlockMenu menu, Block b , Settings mode){
         ItemStack it=menu.getItemInSlot(CORE_SLOT);
         int num=1;
         if(it!=null&&CraftUtils.matchItemStack(it,CORE_SAMPLE,false)){

@@ -84,7 +84,8 @@ public class PortalCore extends MultiCore {
         DataCache.setLastLocation(loc,null);
         return null;
     }
-    public void constructMenu(BlockMenuPreset inv){
+    @Override
+	public void constructMenu(BlockMenuPreset inv){
         int[] border=BORDER;
         int len=border.length;
         for(int i=0;i<len;i++){
@@ -104,18 +105,22 @@ public class PortalCore extends MultiCore {
         }
         },0,true,0);
     }
-    public MultiBlockService.MultiBlockBuilder getBuilder(){
+    @Override
+	public MultiBlockService.MultiBlockBuilder getBuilder(){
         return BUILDER;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[0];
     }
 
-    public MultiBlockType getMultiBlockType(){
+    @Override
+	public MultiBlockType getMultiBlockType(){
         return MBTYPE;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return new int[0];
     }
     public boolean loadLink(BlockMenu inv){
@@ -130,7 +135,8 @@ public class PortalCore extends MultiCore {
         DataCache.setLastLocation(inv.getLocation(),null);
         return false;
     }
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
         Location loc2=block.getLocation();
         if (MultiBlockService.getStatus(loc2)!=0){
             inv.replaceExistingItem(TOGGLE_SLOT,TOGGLE_ITEM_ON);
@@ -184,7 +190,8 @@ public class PortalCore extends MultiCore {
         }));
         updateMenu(inv,block,Settings.RUN);
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu inv){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu inv){
         if(inv!=null){
             Location loc=inv.getLocation();
             inv.dropItems(loc,LINK_SLOT);
@@ -192,7 +199,8 @@ public class PortalCore extends MultiCore {
         super.onBreak(e,inv);
 
     }
-    public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
+    @Override
+	public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
         super.onMultiBlockDisable(loc,handler,cause);
         deletePortal(loc.getBlock());
         BlockMenu inv= DataCache.getMenu(loc);
@@ -200,14 +208,17 @@ public class PortalCore extends MultiCore {
             inv.replaceExistingItem(TOGGLE_SLOT,TOGGLE_ITEM_OFF);
         }
     }
-    public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
+    @Override
+	public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
         super.onMultiBlockEnable(loc,handler);
         setupPortal(loc.getBlock());
     }
-    public boolean preCondition(Block b,BlockMenu inv,SlimefunBlockData data){
+    @Override
+	public boolean preCondition(Block b,BlockMenu inv,SlimefunBlockData data){
         return inv.getItemInSlot(LINK_SLOT)!=null;
     }
-    public void processCore(Block b, BlockMenu menu){
+    @Override
+	public void processCore(Block b, BlockMenu menu){
         if(menu.hasViewer()){
             updateMenu(menu,b,Settings.RUN);
         }

@@ -78,8 +78,9 @@ public class ScheduleEffects {
         Set<AbstractEffect> effectSet = effects.keySet();
         for(AbstractEffect effect : effectSet) {
             PlayerEffects eff= effects.get(effect);
-            if(eff!=null)
-                eff.finish();
+            if(eff!=null) {
+				eff.finish();
+			}
         }
     }
 
@@ -103,7 +104,9 @@ public class ScheduleEffects {
         Player p = e.getEntity();
         synchronized (lock){
             HashMap<AbstractEffect,PlayerEffects> effects = EFFECTS.get(p.getUniqueId());
-            if(effects==null)return;
+            if(effects==null) {
+				return;
+			}
             Set<AbstractEffect> effectSet = effects.keySet();
             for(AbstractEffect effect : effectSet) {
                 PlayerEffects eff= effects.get(effect);
@@ -144,7 +147,9 @@ public class ScheduleEffects {
             synchronized(lock){
                 if (EFFECTS.containsKey(player.getUniqueId())) {
                     effects = EFFECTS.get(player.getUniqueId());
-                    if(effects.isEmpty())continue;
+                    if(effects.isEmpty()) {
+						continue;
+					}
                     for(Map.Entry<AbstractEffect,PlayerEffects> entry : effects.entrySet()){
                         PlayerEffects effect = entry.getValue();
                         if(effect.isFinished()){

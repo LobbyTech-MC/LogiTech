@@ -18,7 +18,8 @@ public class  SimpleLinkList<T> extends AbstractList<T> implements List<T> {
         int tar=getNext(getNext(index)) ;
         next[index+1]=tar;
     }
-    public T get(int i){
+    @Override
+	public T get(int i){
         return data.get(i);
     }
     public int getNext(int index){
@@ -29,10 +30,12 @@ public class  SimpleLinkList<T> extends AbstractList<T> implements List<T> {
     public boolean hasNext(int index){
         return getNext(index)>=0;
     }
-    public boolean isEmpty(){
+    @Override
+	public boolean isEmpty(){
         return len == 0;
     }
-    public int size(){
+    @Override
+	public int size(){
         return len;
     }
 }

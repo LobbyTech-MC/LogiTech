@@ -1235,8 +1235,12 @@ protected static FieldAccess iBlockDataFieldAccess;
                 event.setDropItems(withDrop);
                 block.setType(Material.AIR);
                 return true;
-            }else return true;
-        }else return false;
+            } else {
+				return true;
+			}
+        } else {
+			return false;
+		}
     }
     public static boolean consumeItem(Player player, ItemConsumer... consumers) {
         for (ItemConsumer consumer : consumers) {
@@ -1294,8 +1298,12 @@ protected static FieldAccess iBlockDataFieldAccess;
                 }catch (Throwable e){
                     return false;
                 }
-            }else return false;
-        }else return false;
+            } else {
+				return false;
+			}
+        } else {
+			return false;
+		}
     }
     public static boolean createSlimefunBlock(Location loc,Player player,SlimefunItem item,Material material,boolean force){
         if(CREATING_QUEUE.containsKey(loc)){
@@ -1376,9 +1384,13 @@ protected static FieldAccess iBlockDataFieldAccess;
      * @param count
      */
     public static void doLineOperation(Location start,Location end,int count,Consumer<Location> task){
-        if(count<=0)return;
+        if(count<=0) {
+			return;
+		}
         World world= start.getWorld();
-        if(end.getWorld()!=world)return;
+        if(end.getWorld()!=world) {
+			return;
+		}
         if(count==1){
             task.accept(start);
         }else {
@@ -1397,7 +1409,9 @@ protected static FieldAccess iBlockDataFieldAccess;
 //    }
     //should be without movement
     public static int executeOnSameEntity(Entity entity, Consumer<Entity> execution){
-        if(entity==null)return 0;
+        if(entity==null) {
+			return 0;
+		}
         return entity.getLocation().getChunk().getWorld().getNearbyEntities(entity.getLocation(),0.5,0.5,0.5,(entity1 -> {
             if(entity1!=null&&entity.getUniqueId().equals( entity1.getUniqueId())){
                 execution.accept(entity1);
@@ -1425,7 +1439,7 @@ protected static FieldAccess iBlockDataFieldAccess;
 //        loc.getDirection();
 //    }
     public static HashSet<Entity> getEntityInDistance(Location location, double distance, Predicate<Entity> predicate){
-        return new HashSet<Entity>( location.getWorld().getNearbyEntities(location,2*distance,2*distance,2*distance,(e)->{return e.getLocation().distance(location)<=distance&&predicate.test(e);}));
+        return new HashSet<>( location.getWorld().getNearbyEntities(location,2*distance,2*distance,2*distance,(e)->{return e.getLocation().distance(location)<=distance&&predicate.test(e);}));
     }
     public static Location getHandLocation(LivingEntity p){
         Location loc=p.getEyeLocation();
@@ -1434,7 +1448,9 @@ protected static FieldAccess iBlockDataFieldAccess;
         return loc;
     }
     public static boolean hasPermission( Player player, @Nonnull Block location, @Nonnull Interaction... interactions) {
-        if(player==null)return true;
+        if(player==null) {
+			return true;
+		}
         for (Interaction interaction : interactions) {
             if (!Slimefun.getProtectionManager().hasPermission(player, location, interaction)) {
                 return false;
@@ -1443,7 +1459,9 @@ protected static FieldAccess iBlockDataFieldAccess;
         return true;
     }
     public static boolean hasPermission( Player player, @Nonnull Location location, @Nonnull Interaction... interactions) {
-        if(player==null)return true;
+        if(player==null) {
+			return true;
+		}
         for (Interaction interaction : interactions) {
             if (!Slimefun.getProtectionManager().hasPermission(player, location, interaction)) {
                 return false;
@@ -1464,13 +1482,17 @@ protected static FieldAccess iBlockDataFieldAccess;
         Material material=block.getType();
         if(material==Material.AIR||material.isTransparent()||WATER_VARIENT.contains(material)||material==Material.LAVA){
             return true;
-        }else return false;
+        } else {
+			return false;
+		}
     }
     public static boolean isLiquid(Block block){
         Material material=block.getType();
         if(WATER_VARIENT.contains(material)||material==Material.LAVA){
             return true;
-        }else return false;
+        } else {
+			return false;
+		}
     }
     public static boolean isMaterialWaterLoggable(Material material){
         return WATER_LOGGABLE_TYPES.contains(material);
@@ -1493,7 +1515,9 @@ public static boolean isWaterLogged(Block block){
             BlockData blockData=block.getBlockData();
             if(blockData instanceof Waterlogged wl){
                 return wl.isWaterlogged();
-            }else return false;
+            } else {
+				return false;
+			}
         }else{
             return false;
         }
@@ -1516,10 +1540,14 @@ public static void moveSlimefunBlock(Location loc, boolean force) {
             block2.setBlockData(block1.getBlockData(),applyPhysics);
             block1.setType(Material.AIR);
             return true;
-        }else return false;
+        } else {
+			return false;
+		}
     }
     public static Pair<Integer,Location> rayTraceLocation(LivingEntity entity, double period,double  maxLimitedDistance, Predicate<Location> execution){
-        if(entity==null)return null;
+        if(entity==null) {
+			return null;
+		}
         return rayTraceLocation(entity.getLocation().getDirection(),entity.getEyeLocation(),period,maxLimitedDistance,execution);
     }
     public static Pair<Integer,Location> rayTraceLocation(Vector rayVector,Location startLocation, double period,double maxLimitedDistance, Predicate<Location> execution){
@@ -1533,7 +1561,7 @@ public static void moveSlimefunBlock(Location loc, boolean force) {
                 break;
             }
         }
-        return new Pair<Integer,Location>(i,walkLocation) ;
+        return new Pair<>(i,walkLocation) ;
     }
     /**
      * this method no need to run sync
@@ -1588,7 +1616,9 @@ public static void moveSlimefunBlock(Location loc, boolean force) {
             Bukkit.getPluginManager().callEvent(event);
             if(event.isCancelled()){
                 return false;
-            }else return true;
+            } else {
+				return true;
+			}
         }catch (Throwable e){
             Debug.logger(e);
             return true;
@@ -1604,6 +1634,8 @@ public static void moveSlimefunBlock(Location loc, boolean force) {
             }
             event.setDropItems(false);
             return true;
-        }else return false;
+        } else {
+			return false;
+		}
     }
 }

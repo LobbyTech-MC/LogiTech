@@ -78,28 +78,35 @@ public abstract class AbstractPipe extends AbstractMachine implements Directiona
             }
         }
     }
-    public boolean canModify(){
+    @Override
+	public boolean canModify(){
         return false;
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
     }
 
-    public int[] getDirectionSlots(){
+    @Override
+	public int[] getDirectionSlots(){
         return DIRECTION_SLOTS;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
 
-    public String[] getSaveKeys(){
+    @Override
+	public String[] getSaveKeys(){
         return savedKeys;
     }
 
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
     }
 
     @Override
@@ -123,22 +130,27 @@ public abstract class AbstractPipe extends AbstractMachine implements Directiona
             DataCache.setCustomData(b.getLocation(),getSaveKeys()[0], Directions.fromBlockFace(dp.getFacing()).toInt());
         }
     }
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
-    public void registerBlockMenu(SlimefunItem item){
+    @Override
+	public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
+    @Override
+	public void registerBlockMenu(SlimefunItem item){
         //不用menu
         //this.createPreset(item,item.getItemName(),this::constructMenu);
         //handle blockPlaceEvent
         handleBlock(item);
     }
-    public void registerTick(SlimefunItem item){
+    @Override
+	public void registerTick(SlimefunItem item){
         item.addItemHandler(
                 new BlockTicker() {
                     int tickCounter=0;
-                    public boolean isSynchronized() {
+                    @Override
+					public boolean isSynchronized() {
                         return isSync();
                     }
 
-                    @ParametersAreNonnullByDefault
+                    @Override
+					@ParametersAreNonnullByDefault
                     public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
                         //BlockMenu menu = BlockStorage.getInventory(b);
                         AbstractPipe.this.tick(b, null,data,tickCounter);
@@ -172,5 +184,6 @@ public abstract class AbstractPipe extends AbstractMachine implements Directiona
         }
     }
     public abstract void transfer(Location from, Location to);
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
+    @Override
+	public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 }

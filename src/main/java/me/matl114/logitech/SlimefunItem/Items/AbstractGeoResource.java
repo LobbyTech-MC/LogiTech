@@ -38,7 +38,8 @@ public class AbstractGeoResource extends SlimefunItem implements GEOResource {
         this.BIOME_MAP=biomeMap!=null?biomeMap:new HashMap<>();
         this.CUSTOMWORLD_MAP=CustomWorld!=null?CustomWorld:new HashMap<>();
     }
-    public int getDefaultSupply(@Nonnull World.Environment var1, @Nonnull Biome var2){
+    @Override
+	public int getDefaultSupply(@Nonnull World.Environment var1, @Nonnull Biome var2){
         if(var1!=World.Environment.CUSTOM){
             if(BIOME_MAP.containsKey(var2)){
                 return BIOME_MAP.get(var2);
@@ -58,24 +59,30 @@ public class AbstractGeoResource extends SlimefunItem implements GEOResource {
         }
     }
 
-    @Nonnull
+    @Override
+	@Nonnull
     public ItemStack getItem(){
         return super.getItem().clone();
     }
-    public NamespacedKey getKey(){
+    @Override
+	public NamespacedKey getKey(){
         return NSKEY;
     }
-    public int getMaxDeviation(){
+    @Override
+	public int getMaxDeviation(){
         return MAXDEVIATION;
     }
-    @Nonnull
+    @Override
+	@Nonnull
     public String getName(){
         return NAME;
     }
-    public boolean isObtainableFromGEOMiner(){
+    @Override
+	public boolean isObtainableFromGEOMiner(){
         return true;
     }
-    public  void preRegister(){
+    @Override
+	public  void preRegister(){
         super.preRegister();
         addItemHandler(AddHandlers.stopAttackHandler);
         addItemHandler(AddHandlers.stopPlacementHandler);

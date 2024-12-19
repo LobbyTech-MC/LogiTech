@@ -39,7 +39,8 @@ public class LaserGun extends ChargableProps{
     public LaserGun(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(itemGroup, item, recipeType, recipe);
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         super.addInfo(stack);
         ItemMeta meta=stack.getItemMeta();
         setLevel(meta,0);
@@ -111,7 +112,9 @@ public class LaserGun extends ChargableProps{
                         testHistory.add(loc);
                         return true;
 
-                }else return false;
+                } else {
+					return false;
+				}
             }
         });
         WorldUtils.spawnLineParticle(loc,endLocaion.getSecondValue(), Particle.END_ROD,endLocaion.getFirstValue());

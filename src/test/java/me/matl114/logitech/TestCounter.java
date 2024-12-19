@@ -10,7 +10,8 @@ public abstract class TestCounter  implements Cloneable {
         this.amount = it.getAmount();
         this.dirty=false;
     }
-    public TestCounter clone() {
+    @Override
+	public TestCounter clone() {
         TestCounter it=null;
         try{
             it=(TestCounter)super.clone();
@@ -19,7 +20,8 @@ public abstract class TestCounter  implements Cloneable {
         }
         return it;
     }
-    public boolean equals(Object o){
+    @Override
+	public boolean equals(Object o){
         return false;
     }
     public void init(TestStack it){

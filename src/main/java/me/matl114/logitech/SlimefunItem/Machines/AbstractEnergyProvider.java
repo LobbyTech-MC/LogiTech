@@ -20,13 +20,17 @@ public abstract class AbstractEnergyProvider extends AbstractMachine implements 
                                   int energyBuffer, int energyProvider) {
         super(category, item, recipeType, recipe,   energyBuffer,-energyProvider);
     }
-    public abstract int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data);
-    public void preRegister(){
+    @Override
+	public abstract int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data);
+    @Override
+	public void preRegister(){
         super.preRegister();
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
     }
-    public void registerTick(SlimefunItem item){
+    @Override
+	public void registerTick(SlimefunItem item){
         //no ticker
     }
 }

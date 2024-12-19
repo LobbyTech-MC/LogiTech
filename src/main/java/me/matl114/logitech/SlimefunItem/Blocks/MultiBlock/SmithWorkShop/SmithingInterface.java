@@ -81,7 +81,8 @@ public class SmithingInterface extends AbstractMachine implements MultiBlockPart
     public final String getPartId() {
         return "smith.interface";
     }
-    public void onMultiBlockBreak(BlockBreakEvent e){
+    @Override
+	public void onMultiBlockBreak(BlockBreakEvent e){
         super.onBreak(e, DataCache.getMenu(e.getBlock().getLocation()));
         MultiBlockPart.super.onMultiBlockBreak(e);
         INTERFACE_MAP.remove(e.getBlock().getLocation());
@@ -101,7 +102,8 @@ public class SmithingInterface extends AbstractMachine implements MultiBlockPart
     public void processInterface(Block b,BlockMenu menu,SlimefunBlockData data,Location coreLocation,int speed) {
         //implement logic here
     }
-    public boolean redirectMenu(){
+    @Override
+	public boolean redirectMenu(){
         return redirectMenu;
     }
 

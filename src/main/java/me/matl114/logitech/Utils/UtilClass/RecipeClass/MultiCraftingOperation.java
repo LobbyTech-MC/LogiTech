@@ -10,17 +10,19 @@ public class MultiCraftingOperation implements CustomMachineOperation {
         this.outputItems = outputItems;
         this.totalTicks = time;
         this.currentTicks = 0;
-        for (int i = 0; i < outputItems.length; i++) {
-            outputItems[i].clearRelated();
+        for (ItemGreedyConsumer outputItem : outputItems) {
+            outputItem.clearRelated();
         }
     }
 
 
-    public int getProgress(){
+    @Override
+	public int getProgress(){
         return this.currentTicks;
     }
 
-    public int getRemainingTicks() {
+    @Override
+	public int getRemainingTicks() {
         return this.totalTicks-this.currentTicks;
     }
 
@@ -28,14 +30,17 @@ public class MultiCraftingOperation implements CustomMachineOperation {
         return this.outputItems;
     }
 
-    public int getTotalTicks(){
+    @Override
+	public int getTotalTicks(){
         return this.totalTicks;
     }
 
-    public boolean isFinished() {
+    @Override
+	public boolean isFinished() {
         return this.totalTicks<=this.currentTicks;
     }
-    public void progress(int var1){
+    @Override
+	public void progress(int var1){
         this.currentTicks += var1;
     }
 }

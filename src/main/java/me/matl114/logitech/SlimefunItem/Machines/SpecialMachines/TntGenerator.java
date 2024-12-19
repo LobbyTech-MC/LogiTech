@@ -52,7 +52,8 @@ public class TntGenerator extends AbstractMachine {
     protected final String DELAY_KEY="tntd";
     protected final BukkitRunnable gtThread = new BukkitRunnable() {
         boolean isWorking=false;
-        public void run() {
+        @Override
+		public void run() {
             if(isWorking){
                 return;
             }
@@ -124,7 +125,8 @@ public class TntGenerator extends AbstractMachine {
         );
 
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for(int i=0;i<len;i++){
@@ -136,20 +138,24 @@ public class TntGenerator extends AbstractMachine {
             //0 为 数量 1 为 电力
             int[] intdata=new int[4];
             Object runnable=null;
-            public int getInt(int i){
+            @Override
+			public int getInt(int i){
                 return intdata[i];
             }
-            public Object getObject(int i){
+            @Override
+			public Object getObject(int i){
                 return runnable;
             }
             @Override
             public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
                 return false;
             }
-            public void setInt(int i, int val){
+            @Override
+			public void setInt(int i, int val){
                 intdata[i]=val;
             }
-            public void setObject(int i,Object obj){
+            @Override
+			public void setObject(int i,Object obj){
                 this.runnable=obj;
             }
         };
@@ -181,13 +187,16 @@ public class TntGenerator extends AbstractMachine {
                 "&e左键 增加延时 1gt",
                 "&e右键 减少延时 1gt");
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         SlimefunBlockData data= DataCache.safeLoadBlock(menu.getLocation());
         DataMenuClickHandler dh=getDataHolder(block,menu);
         int offset=DataCache.getCustomData(data,OFFSET_KEY,-10);
@@ -269,13 +278,15 @@ public class TntGenerator extends AbstractMachine {
         INSTANCES.put(chunk,map);
 
     }
-    public void onBreak(BlockBreakEvent e,BlockMenu inv){
+    @Override
+	public void onBreak(BlockBreakEvent e,BlockMenu inv){
         super.onBreak(e,inv);
         Chunk chunk=e.getBlock().getChunk();
         var map= INSTANCES.getOrDefault(chunk,new ConcurrentHashMap<>());
         map.remove(e.getBlock().getLocation());
     }
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
+    @Override
+	public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
 
     public void saveData(Location loc,DataMenuClickHandler dh){
         SlimefunBlockData data=DataCache.safeLoadBlock(loc);
@@ -283,5 +294,6 @@ public class TntGenerator extends AbstractMachine {
         DataCache.setCustomData(data,FUSE_KEY,dh.getInt(1));
         DataCache.setCustomData(data,DELAY_KEY,dh.getInt(2));
     }
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
+    @Override
+	public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 }

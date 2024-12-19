@@ -108,7 +108,8 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
         this.rockectProcessor.setProgressBar(new ItemStack(Material.FIREWORK_ROCKET));
 
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         preset.setSize(54);
         for (int i:BORDER){
             preset.addItem(i, ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
@@ -120,7 +121,7 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
     }
     protected int consumeFly(BlockMenu inv,CustomMachineOperation foodOperation){
         ItemStack flyItem=inv.getItemInSlot(INPUT_SLOTS[0]);
-        CustomMachineOperation rocketOperation=(TimeCounterOperation)this.rockectProcessor.getOperation(inv.getLocation());
+        CustomMachineOperation rocketOperation=this.rockectProcessor.getOperation(inv.getLocation());
         boolean willChangeOffRocket=rocketOperation!=null;
         try{
             if(flyItem==null){
@@ -193,7 +194,8 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
             return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c未工作","&7食物不足!");
         }
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
     @Nonnull
@@ -201,7 +203,8 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
     public MachineProcessor<CustomMachineOperation> getMachineProcessor() {
         return this.mainProcessor;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
     protected int getRandFlyProgress(){
@@ -209,7 +212,9 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
     }
     @Override
     public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
-        if(flow==ItemTransportFlow.WITHDRAW)return OUTPUT_SLOTS;
+        if(flow==ItemTransportFlow.WITHDRAW) {
+			return OUTPUT_SLOTS;
+		}
         if(item==null||item.getType().isAir()){
             return INPUT_SLOTS;
         }
@@ -233,7 +238,8 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
             return 0;
         }
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         menu.addMenuClickHandler(SEED_SLOT,((player, i, itemStack, clickAction) -> {
             AddUtils.sendMessage(player,"&6[&7自动跑图机&6]&a 请输入种子:");
             player.closeInventory();
@@ -279,7 +285,8 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
         }
     }
 
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu menu, SlimefunBlockData data){
         //check food processor
         Location loc=menu.getLocation();
         if(loc.getWorld().getEnvironment()== World.Environment.CUSTOM){
@@ -371,7 +378,9 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
             default -> List.of();
         };
         int size=tables.size();
-        if(size==0)return;
+        if(size==0) {
+			return;
+		}
         HashSet<ItemConsumer> counters=new HashSet<>();
 
         int randIndex=rand.nextInt(0,size);
@@ -418,7 +427,8 @@ public class VirtualExplorer extends AbstractMachine implements MachineProcessHo
 
     }
 
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
+    @Override
+	public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 
     protected ItemStack useElytra(ItemStack item){
         if(item.getType()==Material.ELYTRA){

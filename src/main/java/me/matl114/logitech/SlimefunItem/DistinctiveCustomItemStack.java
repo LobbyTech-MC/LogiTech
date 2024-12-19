@@ -21,7 +21,8 @@ public abstract class DistinctiveCustomItemStack extends CustomSlimefunItem impl
     public DistinctiveCustomItemStack(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, List<ItemStack> displayInfo) {
         super(itemGroup, item, recipeType, recipe, displayInfo);
     }
-    public boolean canStack(@Nonnull ItemMeta var1, @Nonnull ItemMeta var2){
+    @Override
+	public boolean canStack(@Nonnull ItemMeta var1, @Nonnull ItemMeta var2){
 
         PersistentDataContainer container1 = var1.getPersistentDataContainer();
         PersistentDataContainer container2 = var2.getPersistentDataContainer();

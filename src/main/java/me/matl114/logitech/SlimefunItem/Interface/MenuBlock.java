@@ -51,10 +51,12 @@ public interface MenuBlock extends InventoryBlock {
 
     public void constructMenu(BlockMenuPreset preset);
 
-    default void createPreset(final SlimefunItem item, String title, final Consumer<BlockMenuPreset> setup) {
+    @Override
+	default void createPreset(final SlimefunItem item, String title, final Consumer<BlockMenuPreset> setup) {
         if(useAdvancedMenu()){
             BlockMenuPreset var10001 = new AdvancedBlockMenuPreset(item.getId(), title, useAdvancedMenu(),this)  {
-                public boolean canOpen(Block b, Player p) {
+                @Override
+				public boolean canOpen(Block b, Player p) {
                     if (p.hasPermission("slimefun.inventory.bypass")) {
                         return true;
                     } else {
@@ -62,23 +64,28 @@ public interface MenuBlock extends InventoryBlock {
                     }
                 }
 
-                public int[] getSlotsAccessedByItemTransport(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+                @Override
+				public int[] getSlotsAccessedByItemTransport(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
                     return  MenuBlock.this.getSlotsAccessedByItemTransportPlus(menu,flow,item);
                 }
-                public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
+                @Override
+				public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
                     return MenuBlock.this.getSlotsAccessedByItemTransport(flow);
                 }
 
-                public void init() {
+                @Override
+				public void init() {
                     setup.accept(this);
                 }
-                public void newInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
+                @Override
+				public void newInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
                     MenuBlock.this.newMenuInstance(blockMenu, block);
                 }
             };
         }else {
             BlockMenuPreset var10001 = new BlockMenuPreset(item.getId(), title)  {
-                public boolean canOpen(Block b, Player p) {
+                @Override
+				public boolean canOpen(Block b, Player p) {
                     if (p.hasPermission("slimefun.inventory.bypass")) {
                         return true;
                     } else {
@@ -86,17 +93,21 @@ public interface MenuBlock extends InventoryBlock {
                     }
                 }
 
-                public int[] getSlotsAccessedByItemTransport(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+                @Override
+				public int[] getSlotsAccessedByItemTransport(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
                     return  MenuBlock.this.getSlotsAccessedByItemTransportPlus(menu,flow,item);
                 }
-                public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
+                @Override
+				public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
                     return MenuBlock.this.getSlotsAccessedByItemTransport(flow);
                 }
 
-                public void init() {
+                @Override
+				public void init() {
                     setup.accept(this);
                 }
-                public void newInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
+                @Override
+				public void newInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
                     MenuBlock.this.newMenuInstance(blockMenu, block);
                 }
             };
@@ -115,13 +126,15 @@ public interface MenuBlock extends InventoryBlock {
     default void handleBlock(SlimefunItem machine){
         machine.addItemHandler(
                 new BlockBreakHandler(false, false) {
-                    @ParametersAreNonnullByDefault
+                    @Override
+					@ParametersAreNonnullByDefault
                     public void onPlayerBreak(BlockBreakEvent e, ItemStack itemStack, List<ItemStack> list) {
                         BlockMenu menu = DataCache.getMenu(e.getBlock().getLocation());// BlockStorage.getInventory(e.getBlock());
                         MenuBlock.this.onBreak(e, menu);
                     }
                 }, new BlockPlaceHandler(false) {
-                    @ParametersAreNonnullByDefault
+                    @Override
+					@ParametersAreNonnullByDefault
                     public void onPlayerPlace(BlockPlaceEvent e) {
                         MenuBlock.this.onPlace(e, e.getBlockPlaced());
                     }

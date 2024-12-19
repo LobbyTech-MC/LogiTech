@@ -28,7 +28,8 @@ public class TestWorkBench extends AbstractWorkBench {
                          int energybuffer, int energyConsumption, LinkedHashMap<Object,Integer> shapedRecipes) {
         super(category, item, recipeType, recipe, energybuffer, energyConsumption,9, shapedRecipes);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border = BORDER;
         int len=border.length;
         for(int var4 = 0; var4 < len; ++var4) {
@@ -37,17 +38,22 @@ public class TestWorkBench extends AbstractWorkBench {
         preset.addItem(CRAFT_SLOT,CRAFT_ITEM);
         preset.addItem(getRecipeMenuSlot(),AbstractWorkBench.RECIPEBOOK_SHOW_ITEM);
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public int getRecipeMenuSlot(){return MENU_SLOT; }
-    public int[] getRecipeSlots(){
+    @Override
+	public int getRecipeMenuSlot(){return MENU_SLOT; }
+    @Override
+	public int[] getRecipeSlots(){
         return INPUT_SLOT;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         menu.addMenuClickHandler(CRAFT_SLOT,
                 (player, i, itemStack, clickAction)->{
 

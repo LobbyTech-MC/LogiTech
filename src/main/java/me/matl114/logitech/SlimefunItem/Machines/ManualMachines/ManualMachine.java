@@ -25,6 +25,7 @@ public class ManualMachine extends AbstractManual implements ImportRecipes {
             getDisplayRecipes();
         });
     }
-    public void registerDefaultRecipes(){
+    @Override
+	public void registerDefaultRecipes(){
     }
 }

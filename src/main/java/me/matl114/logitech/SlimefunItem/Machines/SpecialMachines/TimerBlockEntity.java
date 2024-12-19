@@ -37,7 +37,8 @@ public class TimerBlockEntity extends AbstractTimerRange  {
     public boolean blockPredicate(Block block) {
         return DataCache.getMenu(block.getLocation())==null&&WorldUtils.isEntityBlock(block.getType());
     }
-    public Runnable getTickTask(Location loc,Location center){
+    @Override
+	public Runnable getTickTask(Location loc,Location center){
         AtomicReference<Runnable> result=new AtomicReference<>(null);
         Block bb=loc.getBlock();
         NMSUtils. getHandleMethodAccess.invokeCallback((levelAccess)->{

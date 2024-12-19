@@ -38,7 +38,8 @@ public class LineEnergyCharger extends AbstractEnergyCharger  implements Directi
                               int energybuffer){
         super(category, item, recipeType, recipe, energybuffer);
     }
-    public Collection<SlimefunBlockData> getChargeRange(BlockMenu inv, Block block, SlimefunBlockData data){
+    @Override
+	public Collection<SlimefunBlockData> getChargeRange(BlockMenu inv, Block block, SlimefunBlockData data){
         Location loc=block.getLocation();
         Directions dir=getDirection(0,data);
         HashSet<SlimefunBlockData> ret=new HashSet<>();
@@ -50,8 +51,9 @@ public class LineEnergyCharger extends AbstractEnergyCharger  implements Directi
         for (int i=0;i<MAX_LEN;i++){
             loc=dir.relate(loc);
             if(getChargeableComponent(DataCache.getSfItem(loc))!=null){
-                if((testdata=DataCache.safeLoadBlock(loc))!=null)
-                    ret.add(testdata);
+                if((testdata=DataCache.safeLoadBlock(loc))!=null) {
+					ret.add(testdata);
+				}
             }
         }
         if(getStatus(inv)[1]){
@@ -62,13 +64,16 @@ public class LineEnergyCharger extends AbstractEnergyCharger  implements Directi
         }
         return ret;
     }
-    public int[] getDirectionSlots(){
+    @Override
+	public int[] getDirectionSlots(){
         return DIRECTION_SLOTS;
     }
-    public int getMaxChargeAmount(){
+    @Override
+	public int getMaxChargeAmount(){
         return MAX_LEN;
     }
-    public  String[] getSaveKeys(){
+    @Override
+	public  String[] getSaveKeys(){
         return savedKeys;
     }
     @Override
@@ -86,7 +91,8 @@ public class LineEnergyCharger extends AbstractEnergyCharger  implements Directi
         return super.isBorder(i)&&i!=PARTICLE_SLOT;
     }
 
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         super.newMenuInstance(menu, block);
         menu.addMenuClickHandler(DIRECTION_SLOTS[0],getDirectionHandler(0,menu));
         ItemStack icon=menu.getItemInSlot(PARTICLE_SLOT);

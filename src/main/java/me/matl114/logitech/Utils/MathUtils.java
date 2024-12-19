@@ -16,12 +16,16 @@ public class MathUtils {
     })).get();
     static final int HI_BYTE_SHIFT=((Supplier<Integer>)(()->{
         Integer obj=   (Integer) ReflectUtils.invokeGetRecursively("草",Settings.FIELD,"HI_BYTE_SHIFT");
-        if(obj==null) return 0;
+        if(obj==null) {
+			return 0;
+		}
         return obj;
     })).get();
     static final int LO_BYTE_SHIFT=((Supplier<Integer>)(()->{
         Integer obj=   (Integer) ReflectUtils.invokeGetRecursively("草",Settings.FIELD,"LO_BYTE_SHIFT");
-        if(obj==null) return 8;
+        if(obj==null) {
+			return 8;
+		}
         return obj;
     })).get();
 
@@ -110,7 +114,9 @@ public class MathUtils {
     public static int fromLong(@Nonnull Long a){
         if(a>Integer.MAX_VALUE){
             return Integer.MAX_VALUE;
-        }else return a.intValue();
+        } else {
+			return a.intValue();
+		}
     }
 
     public static int getBit(int code,int pos){

@@ -17,11 +17,13 @@ public class EnergyProviderOperation implements CustomMachineOperation {
         return this.energyPertick;
     }
 
-    public int getProgress(){
+    @Override
+	public int getProgress(){
         return this.currentTicks;
     }
 
-    public int getRemainingTicks() {
+    @Override
+	public int getRemainingTicks() {
         return this.totalTicks-this.currentTicks;
     }
 
@@ -29,13 +31,16 @@ public class EnergyProviderOperation implements CustomMachineOperation {
         return this.outputItems;
     }
 
-    public int getTotalTicks(){
+    @Override
+	public int getTotalTicks(){
         return this.totalTicks;
     }
-    public boolean isFinished() {
+    @Override
+	public boolean isFinished() {
         return this.totalTicks<=this.currentTicks;
     }
-    public void progress(int var1){
+    @Override
+	public void progress(int var1){
         this.currentTicks += var1;
     }
 }

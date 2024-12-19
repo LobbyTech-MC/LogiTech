@@ -10,7 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 
 public abstract class StorageType {
-    private static HashSet<StorageType> storageTypes = new HashSet<StorageType>();
+    private static HashSet<StorageType> storageTypes = new HashSet<>();
     public static boolean disableStorageType(StorageType storageType){
         return storageTypes.remove(storageType);
     }
@@ -25,7 +25,9 @@ public abstract class StorageType {
         return getPossibleStorageType(meta,(storageType -> true));
     }
     public static StorageType getPossibleStorageType(ItemMeta meta, Predicate<StorageType> filter){
-        if(meta==null)return null;
+        if(meta==null) {
+			return null;
+		}
         for(StorageType type : storageTypes){
             if(filter.test(type)  &&type.canStorage(meta)){
                 return type;
@@ -42,7 +44,9 @@ public abstract class StorageType {
         return getPossibleStorageType(meta,(storageType -> true));
     }
     public static StorageType getPossibleStorageType(SlimefunItem meta, Predicate<StorageType> filter){
-        if(meta==null)return null;
+        if(meta==null) {
+			return null;
+		}
         for(StorageType type : storageTypes){
             if(filter.test(type)&&  type.canStorage(meta)){
                 return type;

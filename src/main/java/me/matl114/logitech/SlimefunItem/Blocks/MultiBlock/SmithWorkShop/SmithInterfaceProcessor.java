@@ -150,8 +150,7 @@ public class SmithInterfaceProcessor extends SmithingInterface implements Machin
         );
     }
     public boolean acceptable(BlockMenu inv){
-        if(inv==null)return false;
-        if(this.processor.getOperation(inv.getLocation())!=null){
+        if((inv==null) || (this.processor.getOperation(inv.getLocation())!=null)){
             return false;
         }
         return hasEmpty(inv);
@@ -202,7 +201,8 @@ public class SmithInterfaceProcessor extends SmithingInterface implements Machin
         }
     }
 
-    public void processInterface(Block b, BlockMenu menu, SlimefunBlockData data, Location coreLocation,int speed) {
+    @Override
+	public void processInterface(Block b, BlockMenu menu, SlimefunBlockData data, Location coreLocation,int speed) {
         //implement logic here
         Location loc=menu.getLocation();
         var a=this.processor.getOperation(loc);

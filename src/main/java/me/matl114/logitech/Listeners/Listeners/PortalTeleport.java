@@ -74,8 +74,9 @@ public class PortalTeleport implements Listener {
        // Debug.logger("event called ");
 
         Entity player=event.getEntity();
-        if(player==null) return;
-        else if (event.getEntity() instanceof Player) {
+        if(player==null) {
+			return;
+		} else if (event.getEntity() instanceof Player) {
             return;
         }
         else  if(event.getEntity().getPortalCooldown()>0) {

@@ -22,7 +22,8 @@ public class GuideCustomMenu extends CustomMenu {
             return ChestMenuUtils.getEmptyClickHandler().onClick(player,i,itemStack,clickAction);
         });
     }
-    public void openPages(Player p,int page){
+    @Override
+	public void openPages(Player p,int page){
         if(useHistory&&history!= null){
 //            CustomMenu menu= history.getRecord(p);
 //            if(menu!=null){
@@ -35,7 +36,8 @@ public class GuideCustomMenu extends CustomMenu {
         ChestMenu menu=constructPage(page);
         menu.open(p);
     }
-    public CustomMenu setBackHandler(ChestMenu.MenuClickHandler handler){
+    @Override
+	public CustomMenu setBackHandler(ChestMenu.MenuClickHandler handler){
         ChestMenu.MenuClickHandler han =handler==null? ChestMenuUtils.getEmptyClickHandler():handler;
         this.backHandlers=((player, i, itemStack, clickAction) -> {
             if(this.useHistory&&this.history!=null){

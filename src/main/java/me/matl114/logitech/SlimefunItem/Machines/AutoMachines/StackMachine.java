@@ -71,21 +71,22 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         return BWSIZE;
     }
     public static List<SlimefunItem> getMachineList(){
-        if(!hasInit)
-        synchronized (BW_LIST){
-            if(BW_LIST.isEmpty()){
-                RecipeSupporter.init();
-                BWSIZE=RecipeSupporter.STACKMACHINE_LIST.size();
-                BW_LIST_ENERGYCOMSUME=new int[BWSIZE];
-                int i=0;
-                for(Map.Entry<SlimefunItem,Integer> e:RecipeSupporter.STACKMACHINE_LIST.entrySet()){
-                    BW_LIST.add(e.getKey());
-                    BW_LIST_ENERGYCOMSUME[i]=e.getValue();
-                    ++i;
-                }
-                hasInit=true;
-            }
-        }
+        if(!hasInit) {
+			synchronized (BW_LIST){
+			    if(BW_LIST.isEmpty()){
+			        RecipeSupporter.init();
+			        BWSIZE=RecipeSupporter.STACKMACHINE_LIST.size();
+			        BW_LIST_ENERGYCOMSUME=new int[BWSIZE];
+			        int i=0;
+			        for(Map.Entry<SlimefunItem,Integer> e:RecipeSupporter.STACKMACHINE_LIST.entrySet()){
+			            BW_LIST.add(e.getKey());
+			            BW_LIST_ENERGYCOMSUME[i]=e.getValue();
+			            ++i;
+			        }
+			        hasInit=true;
+			    }
+			}
+		}
         return BW_LIST;
     }
     protected final int[] BORDER={
@@ -128,7 +129,8 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         );
 
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         stack.setItemMeta( AddUtils.capacitorInfoAdd(stack,energybuffer).getItemMeta());
     }
     //该方法一般只有updateMenu的时候调用
@@ -140,7 +142,8 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         //如果禁用
 
     }
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         int[] border = BORDER;
         int len=border.length;
@@ -157,19 +160,22 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         return new DataMenuClickHandler() {
             //0 为 数量 1 为 电力
             int[] intdata=new int[2];
-            public int getInt(int i){
+            @Override
+			public int getInt(int i){
                 return intdata[i];
             }
             @Override
             public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
                 return false;
             }
-            public void setInt(int i, int val){
+            @Override
+			public void setInt(int i, int val){
                 intdata[i]=val;
             }
         };
     }
-    public final int getCraftLimit(Block b,BlockMenu inv){
+    @Override
+	public final int getCraftLimit(Block b,BlockMenu inv){
        return (int)(this.efficiency*getDataHolder(b,inv).getInt(0));
     }
 
@@ -195,13 +201,16 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&c机器信息","&c缺少电力!",AddUtils.concat("&7当前模拟的机器名称: ",(name)),
                 "&7当前并行处理数: %-3d".formatted(craftlimit),"&7当前每刻耗电量: %sJ/t".formatted(AddUtils.formatDouble(energyCost)),"&7当前电量: %sJ".formatted(AddUtils.formatDouble(charge)));
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public List<MachineRecipe> getMachineRecipes(Block b, BlockMenu inv){
+    @Override
+	public List<MachineRecipe> getMachineRecipes(Block b, BlockMenu inv){
         return getMachineRecipes(DataCache.safeLoadBlock(inv.getLocation()));
     }
-    public List<MachineRecipe> getMachineRecipes(SlimefunBlockData data){
+    @Override
+	public List<MachineRecipe> getMachineRecipes(SlimefunBlockData data){
         int index= MultiCraftType.getRecipeTypeIndex(data);
         if(index>=0&&index<getListSize()){
             List<MachineRecipe> lst= RecipeSupporter.MACHINE_RECIPELIST.get(getMachineList().get(index ));
@@ -209,13 +218,16 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         }
         return new ArrayList<>();
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public ItemStack getProgressBar() {
+    @Override
+	public ItemStack getProgressBar() {
         return progressbar;
     }
-    public MachineRecipe getRecordRecipe(SlimefunBlockData data){
+    @Override
+	public MachineRecipe getRecordRecipe(SlimefunBlockData data){
         List<MachineRecipe> lst=getMachineRecipes(data);
         int size=lst.size();
         if(size>0){
@@ -227,7 +239,8 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         return null;
     }
 
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuOpeningHandler((player -> {
             updateMenu(inv,block,Settings.RUN);
         }));
@@ -260,7 +273,8 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
 
         updateMenu(inv,block,Settings.INIT);
     }
-    public void onBreak(BlockBreakEvent e,BlockMenu inv){
+    @Override
+	public void onBreak(BlockBreakEvent e,BlockMenu inv){
         if(inv!=null){
             Location loc=inv.getLocation();
             inv.dropItems(loc,MACHINE_SLOT);
@@ -268,7 +282,8 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         super.onBreak(e,inv);
 
     }
-    public void progressorCost(Block b, BlockMenu inv){
+    @Override
+	public void progressorCost(Block b, BlockMenu inv){
         DataMenuClickHandler dh=getDataHolder(b,inv);
         int charge=dh.getInt(1);
         int machineCnt=dh.getInt(0);
@@ -276,7 +291,8 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         this.removeCharge(inv.getLocation(),consumption);
     }
 
-    public void tick(Block b, @Nullable BlockMenu inv, SlimefunBlockData data, int tickCount){
+    @Override
+	public void tick(Block b, @Nullable BlockMenu inv, SlimefunBlockData data, int tickCount){
         //首先 加载
         if(inv.hasViewer()){
             updateMenu(inv,b,Settings.RUN);
@@ -308,7 +324,8 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
             }
         }
     }
-    public void updateMenu(BlockMenu inv, Block block, Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv, Block block, Settings mod){
         SlimefunBlockData data=DataCache.safeGetBlockCacheWithLoad(inv.getLocation());
         if(data==null){
             Debug.logger("SF DATA LOST AT %s! PLEASE REPORT THIS LOG TO THE AUTHOR".formatted(DataCache.locationToString(inv.getLocation())));
@@ -375,8 +392,9 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
                 }//找不到,给你机会你不重用啊
             }
         }
-        if(index!=-1)//即将变成-1,不一样才变,不用重复查询
-            MultiCraftType.forceSetRecipeTypeIndex(data,-1);
+        if(index!=-1) { //即将变成-1,不一样才变,不用重复查询
+			MultiCraftType.forceSetRecipeTypeIndex(data,-1);
+		}
         db.setInt(0,0);
         db.setInt(1,0);
         //拿走机器,想逃?

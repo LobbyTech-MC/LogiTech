@@ -21,8 +21,11 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 public abstract class AbstractSyncTickCargo extends AbstractBlock implements SyncBlockTick.SyncTickers {
     public static SyncBlockTick CARGO_SYNC_INSTANCE =new SyncBlockTick();
     public static SyncBlockTick CHIP_SYNC =new SyncBlockTick(){
-        public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
-            if(this.tickCount%2==0)return;
+        @Override
+		public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
+            if(this.tickCount%2==0) {
+				return;
+			}
             if(item instanceof SyncTickers){
                 ((SyncTickers)item).syncTick(b,data.getBlockMenu(),data,this.tickCount/2);
             }
@@ -32,15 +35,21 @@ public abstract class AbstractSyncTickCargo extends AbstractBlock implements Syn
     public AbstractSyncTickCargo(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
-    public abstract void constructMenu(BlockMenuPreset preset);
-    public abstract int[] getInputSlots();
-    public abstract int[] getOutputSlots();
-    public abstract void newMenuInstance(BlockMenu menu,Block b);
-    public void preRegister(){
+    @Override
+	public abstract void constructMenu(BlockMenuPreset preset);
+    @Override
+	public abstract int[] getInputSlots();
+    @Override
+	public abstract int[] getOutputSlots();
+    @Override
+	public abstract void newMenuInstance(BlockMenu menu,Block b);
+    @Override
+	public void preRegister(){
         super.preRegister();
         this.registerBlockMenu(this);
         this.handleBlock(this);
     }
-    public abstract void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount);
+    @Override
+	public abstract void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount);
     public abstract void updateMenu(BlockMenu blockMenu, Block block, Settings mod);
 }

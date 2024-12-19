@@ -58,7 +58,8 @@ private HashSet<Material> SPEED_UP_PLANTS=new HashSet<>(){{
     public Particle getParticle() {
         return Particle.WAX_ON  ;
     }
-    public Runnable getTickTask(Location location, Location center) {
+    @Override
+	public Runnable getTickTask(Location location, Location center) {
         Block bb=location.getBlock();
         AtomicReference<Runnable> task=new AtomicReference<>(null);
         Material material=bb.getType();

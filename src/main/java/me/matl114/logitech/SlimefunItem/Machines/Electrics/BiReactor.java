@@ -71,7 +71,8 @@ public class BiReactor extends AbstractEnergyProvider {
     }
 
 
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len= border.length;
         for (int i=0;i<len;i++){
@@ -96,7 +97,8 @@ public class BiReactor extends AbstractEnergyProvider {
 
 
     }
-    public int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
+    @Override
+	public int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
         BlockMenu inv=data.getBlockMenu();
         if(inv!=null){
 
@@ -117,17 +119,24 @@ public class BiReactor extends AbstractEnergyProvider {
                 inv.replaceExistingItem(STATUS_SLOT,STATUS_ITEM[1]);
             }
             return -this.energyConsumptionFalse;
-        }else return 0;
+        } else {
+			return 0;
+		}
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
-        if(flow==ItemTransportFlow.WITHDRAW)return getOutputSlots();
+    @Override
+	public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+        if(flow==ItemTransportFlow.WITHDRAW) {
+			return getOutputSlots();
+		}
         if(item!=null&&!item.getType().isAir()&& item.getType()==Material.MUSIC_DISC_5){
             return item.getEnchantments().isEmpty()?FALSE_SLOTS:TRUE_SLOTS;
         }

@@ -24,18 +24,21 @@ public class MenuPreset {
     }
 
     public MenuPreset addItem(ChestMenu.MenuClickHandler handler,int... slot) {
-        for(int slot_i :slot)
-            prehandlers.put(slot_i, handler);
+        for(int slot_i :slot) {
+			prehandlers.put(slot_i, handler);
+		}
         return this;
     }
     public MenuPreset addItem(ItemStack item, ChestMenu.MenuClickHandler handler,int... slot) {
-        for(int slot_i :slot)
-        prehandlers.put(slot_i, handler);
+        for(int slot_i :slot) {
+			prehandlers.put(slot_i, handler);
+		}
         return addItem(item,slot);
     }
     public MenuPreset addItem( ItemStack item,int... slot) {
-        for(int slot_i :slot)
-        preitems.put(slot_i, item);
+        for(int slot_i :slot) {
+			preitems.put(slot_i, item);
+		}
         return this;
     }
     public HashMap<Integer, ChestMenu.MenuClickHandler> getPrehandlers() {

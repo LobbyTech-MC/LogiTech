@@ -6,14 +6,16 @@ public class TestPusher extends TestConsumer{
         super(stack);
         this.maxCnt=stack.getMaxAmount();
     }
-    public TestPusher clone(){
+    @Override
+	public TestPusher clone(){
         return (TestPusher)super.clone();
     }
     public void init(){
        // super.init();
         Tests.log("TestPusher empty init");
     }
-    public void init(TestStack stack){
+    @Override
+	public void init(TestStack stack){
         super.init(stack);
         this.maxCnt=stack.getMaxAmount();
         Tests.log("TestPusher init");

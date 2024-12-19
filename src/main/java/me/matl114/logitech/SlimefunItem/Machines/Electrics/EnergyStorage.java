@@ -28,7 +28,8 @@ public class EnergyStorage extends AbstractEnergyMachine{
                                  int energybuffer,EnergyNetComponentType energyNetComponent){
         super(category, item, recipeType, recipe, energybuffer, 0, energyNetComponent);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for (int i=0;i<len;++i){
@@ -45,13 +46,16 @@ public class EnergyStorage extends AbstractEnergyMachine{
         return INFO_SLOT;
     }
 
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
     }
 
     @Override

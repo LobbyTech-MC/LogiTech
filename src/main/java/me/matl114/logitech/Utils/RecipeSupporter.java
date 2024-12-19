@@ -330,13 +330,21 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
     }
     public static ItemStack getRecipeTypeIcon(RecipeType type){
         ItemStack icon=type.toItem();
-        if(icon==null)return new ItemStack(Material.AIR);
+        if(icon==null) {
+			return new ItemStack(Material.AIR);
+		}
         return icon;
     }
     private static double getRscChance(Integer chance) {
-        if (chance == null) return 0d;
-        if (chance >= 100) return 1d;
-        if (chance < 1) return 0d;
+        if (chance == null) {
+			return 0d;
+		}
+        if (chance >= 100) {
+			return 1d;
+		}
+        if (chance < 1) {
+			return 0d;
+		}
 
 
         return  ((double)chance)/100;
@@ -365,8 +373,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
             }else{
                 machineRecipes=new ArrayList<>();
                 for(RecipeType rt : craftType){
-                    if(rt!=null)
-                        machineRecipes.addAll(RecipeSupporter.getStackedRecipes(rt));
+                    if(rt!=null) {
+						machineRecipes.addAll(RecipeSupporter.getStackedRecipes(rt));
+					}
                 }
             }
             if(machineRecipes==null) {
@@ -515,7 +524,7 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
             //解析指定类型特殊机器配方类型
             try{
                 Object _Type=ReflectUtils.invokeGetRecursively(item,Settings.FIELD,"TYPE");
-                if(_Type instanceof RecipeType&&!BLACKLIST_RECIPETYPES.contains((RecipeType) _Type)){
+                if(_Type instanceof RecipeType&&!BLACKLIST_RECIPETYPES.contains(_Type)){
                     CUSTOM_RECIPETYPES.put(item,(RecipeType) _Type);
                     //Debug.logger("detect certain field TYPE: "+item);
                 }
@@ -830,12 +839,15 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                                                         break;
                                                     } else if (item instanceof Crucible) {
                                                         break;
-                                                    } else break;
+                                                    } else {
+														break;
+													}
                                                 } else if (machineRecipe instanceof AltarRecipe ar) {
                                                     List<ItemStack> inp = (ar).getInput();
                                                     List<ItemStack> inpCopy=new ArrayList<>();
-                                                    if(!inp.isEmpty())
-                                                        inpCopy.addAll(inp);
+                                                    if(!inp.isEmpty()) {
+														inpCopy.addAll(inp);
+													}
                                                     inpCopy.add(4, (ar).getCatalyst());
                                                     MachineRecipe rp = new MachineRecipe(9, inpCopy.toArray(new ItemStack[inpCopy.size()]), new ItemStack[]{((AltarRecipe) machineRecipe).getOutput()});
                                                     recipes.add(rp);
@@ -869,8 +881,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                     for(MachineRecipe machineRecipe : recipes) {
                         //先检测是不是rsc的
                         machineRecipe=transferRSCRecipes(machineRecipe);
-                        if(machineRecipe ==null)
-                            continue;
+                        if(machineRecipe ==null) {
+							continue;
+						}
                         MGeneratorRecipe validGenerator=MachineRecipeUtils.tryGenerateMGFromMachine(machineRecipe);
                         if(validGenerator!=null){
                             res=validGenerator;
@@ -1026,8 +1039,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
         }
     }
     public static void loadMachineModification(Config config,String root,boolean withWarning){
-        if(MyAddon.testmode())
-            withWarning=true;
+        if(MyAddon.testmode()) {
+			withWarning=true;
+		}
         Set<String > keySets=config.getKeys(root);
         for (String machineId:keySets){
             String machinepath=root+"."+machineId;
@@ -1036,8 +1050,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                 machine= SlimefunItem.getById(machineId);
                 machine.getId();
             }catch(Throwable e){
-                if(withWarning)
-                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: not valid item  %s".formatted(machineId));
+                if(withWarning) {
+					Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: not valid item  %s".formatted(machineId));
+				}
                 continue;
             }
             boolean append=false;
@@ -1058,8 +1073,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                 }
                 isGenerator=config.getString(machinepath+".type").startsWith("gen");
             }catch(Throwable e){
-                if(withWarning)
-                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: Error config format in %s ".formatted(machineId));
+                if(withWarning) {
+					Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: Error config format in %s ".formatted(machineId));
+				}
                 Debug.debug(e);
             }
             List<MachineRecipe> recipes=new ArrayList<>(12);
@@ -1073,8 +1089,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                         }
                     }
                     if(type==null){
-                        if(withWarning)
-                            Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: RecipeType %s not found".formatted(recipeType));
+                        if(withWarning) {
+							Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: RecipeType %s not found".formatted(recipeType));
+						}
                         continue;
                     }
                     try {
@@ -1110,8 +1127,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                             for(String skey:inputKey){
                                 ItemStack it=loadItemStack(config,AddUtils.concat(ippath,".",skey));
                                 if(it==null){
-                                    if(withWarning)
-                                        Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: failed to load recipe output %s".formatted(recipe));
+                                    if(withWarning) {
+										Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: failed to load recipe output %s".formatted(recipe));
+									}
                                     it= AddItem.RESOLVE_FAILED.clone();
                                 }
                                 input[len]=it;
@@ -1125,8 +1143,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                             for(String skey:outputKey){
                                 ItemStack it=loadItemStack(config,AddUtils.concat(oppath,".",skey));
                                 if(it==null){
-                                    if(withWarning)
-                                        Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: failed to load recipe output %s".formatted(recipe));
+                                    if(withWarning) {
+										Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: failed to load recipe output %s".formatted(recipe));
+									}
                                     it= AddItem.RESOLVE_FAILED.clone();
                                 }
                                 output[len2]=it;
@@ -1173,8 +1192,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                 machine= SlimefunItem.getById(machineId);
                 machine.getId();
             }catch (Throwable e){
-                if(forceload)
-                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: not valid item  %s".formatted(machineId));
+                if(forceload) {
+					Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: not valid item  %s".formatted(machineId));
+				}
                 continue;
             }
             String type=null;
@@ -1184,8 +1204,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                 type=config.getString(machinepath+".type");
                 energy=config.getInt(machinepath+".energy");
             }catch(Throwable e){
-                if(forceload)
-                    Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: error config format in %s".formatted(machineId));
+                if(forceload) {
+					Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: error config format in %s".formatted(machineId));
+				}
             }
             if(type==null){
                 continue;
@@ -1392,7 +1413,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                     outputlist.add(new ProbItemStack(output[i],chance));
                 }
             }
-            if(outputlist.isEmpty())return null;
+            if(outputlist.isEmpty()) {
+				return null;
+			}
             MachineRecipe result;
             boolean isRandStack=(Boolean)ReflectUtils.invokeGetRecursively(rsc,Settings.FIELD,"chooseOneIfHas");
             if(isRandStack){
@@ -1404,8 +1427,9 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
             return result;
         }catch(Throwable e){
             Debug.debug("generate an exception while transfer rsc recipes %s".formatted(rsc.getClass().getName()));
-            if(MyAddon.testmode())
-                e.printStackTrace();
+            if(MyAddon.testmode()) {
+				e.printStackTrace();
+			}
             return null;
         }
     }

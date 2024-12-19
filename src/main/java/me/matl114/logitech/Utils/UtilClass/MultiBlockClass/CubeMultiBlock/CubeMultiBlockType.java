@@ -40,7 +40,7 @@ public abstract class CubeMultiBlockType implements AbstractMultiBlockType {
 
 
     public CubeMultiBlockType() {
-        this.BOTTOM_MAP = new LinkedHashMap<BlockVector,String>();
+        this.BOTTOM_MAP = new LinkedHashMap<>();
         this.PLATE_MAP=new LinkedHashMap<>();
         this.TOP_MAP=new LinkedHashMap<>();
     }
@@ -68,7 +68,8 @@ public abstract class CubeMultiBlockType implements AbstractMultiBlockType {
         TOP_MAP.put(new BlockVector(x,y,z),id);
         return this;
     }
-    public CubeMultiBlockType build(){
+    @Override
+	public CubeMultiBlockType build(){
         init();
         isFinal=true;
         this.sizeB=BOTTOM_MAP.size();
@@ -104,7 +105,8 @@ public abstract class CubeMultiBlockType implements AbstractMultiBlockType {
         this.defaultSize=this.sizeB+this.sizeP+this.sizeT;
         return this;
     }
-    public AbstractMultiBlock genMultiBlockFrom(Location loc, MultiBlockService.Direction dir, boolean hasPrevRecord, OutputStream errorOut){
+    @Override
+	public AbstractMultiBlock genMultiBlockFrom(Location loc, MultiBlockService.Direction dir, boolean hasPrevRecord, OutputStream errorOut){
         int len=this.sizeB;
         //底部匹配
         for(int i=0;i<len;i++){
@@ -208,20 +210,24 @@ public abstract class CubeMultiBlockType implements AbstractMultiBlockType {
         //  Debug.logger("check finished ,return value ",this.getSchemaSize(),"and req ",REQUIREMENT_MAP.size());
         return new CubeMultiBlock(this,dir,height);
     }
-    public BlockVector getSchemaPart(int index){
+    @Override
+	public BlockVector getSchemaPart(int index){
         return index<this.sizeB?BOTTOM_LOC[index].clone():((index<this.sizeB+this.sizeP)?PLATE_LOC[index-this.sizeB].clone():TOP_LOC[index-this.sizeP-this.sizeB].clone());
     }
-    public String getSchemaPartId(int index) {
+    @Override
+	public String getSchemaPartId(int index) {
         return index<this.sizeB?BOTTOM_IDS[index]:((index<this.sizeB+this.sizeP)?PLATE_IDS[index-this.sizeB]:TOP_IDS[index-this.sizeP-this.sizeB]);
     }
-    public int getSchemaSize(){
+    @Override
+	public int getSchemaSize(){
         return this.defaultSize;
     }
     public abstract void init();
 
 
 
-    public boolean isSymmetric(){
+    @Override
+	public boolean isSymmetric(){
         return isSymmetric;
     }
 }

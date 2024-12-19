@@ -129,7 +129,8 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
         );
 
     }
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         preset.addItem(DISPLAYEITEM_SLOT, DISPLAY_DEFAULT_BKGROUND, ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(INFO_SLOT, INFO_ITEM, ChestMenuUtils.getEmptyClickHandler());
@@ -148,10 +149,12 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
     public RecipeType[] getCraftTypes(){
         return craftType;
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public List<MachineRecipe> getMachineRecipes(Block b,BlockMenu inv){
+    @Override
+	public List<MachineRecipe> getMachineRecipes(Block b,BlockMenu inv){
         Location loc=inv.getLocation();
         int index=MultiCraftType.getRecipeTypeIndex(loc);
         if(index>=0&&index<getCraftTypes().length){
@@ -168,10 +171,12 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
         }
         return RECIPEMENU.get(r);
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public MachineRecipe getRecordRecipe(SlimefunBlockData data){
+    @Override
+	public MachineRecipe getRecordRecipe(SlimefunBlockData data){
         int index=MultiCraftType.getRecipeTypeIndex(data);
         if(index>=0&&index<getCraftTypes().length){
             int index2= getNowRecordRecipe(data);
@@ -196,7 +201,8 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
         }
     }
 
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
         int ind=MultiCraftType.getRecipeTypeIndex(menu.getLocation());
         //清除非法记录
         if(!(ind>=0&&ind<getCraftTypes().length)){
@@ -283,7 +289,8 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
         );
         updateMenu(menu,block,Settings.INIT);
     }
-    public void orderSearchRecipe(BlockMenu inv, Settings order){
+    @Override
+	public void orderSearchRecipe(BlockMenu inv, Settings order){
         if(inv!=null){
             int delta;
             switch (order){
@@ -298,7 +305,9 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
                 return;
             }
             List<MachineRecipe> mRecipe=getMachineRecipes(null,inv);
-            if(mRecipe==null)return;
+            if(mRecipe==null) {
+				return;
+			}
             index=index+delta;
             if(index<0){
                 index=mRecipe.size()-1;
@@ -313,7 +322,8 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
         }
     }
 //
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         //only works when has viewer.
         if(inv!=null&&(inv.hasViewer())){
 
@@ -325,7 +335,8 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
         craftType=BW_LIST.toArray(new RecipeType[BW_LIST.size()]);
     }
 
-    public void updateMenu(BlockMenu inv,Block block,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv,Block block,Settings mod){
         if(mod==Settings.INIT){
             orderSearchRecipe(inv,Settings.SEQUNTIAL);
         }else{
@@ -369,8 +380,8 @@ public class FinalManual extends AbstractManual implements MultiCraftType, Impor
                 if(indexRecord!=-1||mod==Settings.INIT){
                     inv.replaceExistingItem(DISPLAYEITEM_SLOT,DISPLAY_NOMATCH);
                     setNowRecordRecipe(loc,-1);
-                    for(int i=0;i<RECIPE_DISPLAY.length;i++){
-                        inv.replaceExistingItem(RECIPE_DISPLAY[i],DISPLAY_DEFAULT_BKGROUND);
+                    for (int element : RECIPE_DISPLAY) {
+                        inv.replaceExistingItem(element,DISPLAY_DEFAULT_BKGROUND);
                     }
                 }
             }

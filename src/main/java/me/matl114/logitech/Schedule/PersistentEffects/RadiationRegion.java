@@ -29,7 +29,8 @@ public class RadiationRegion {
         BukkitRunnable task=new BukkitRunnable(){
             public int radiation=period;
             Location center=loc.clone();
-            public void run(){
+            @Override
+			public void run(){
                 if(radiation>0){
                     --radiation;
                     runRadiation(center,range,level);

@@ -82,35 +82,44 @@ public class Laser extends AbstractMachine implements MultiBlockPart, FinalAltar
                         "&7一般用于机器激活的前置条件"),null
         ));
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
 
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[0];
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return new int[0];
     }
-    public String getPartId(){
+    @Override
+	public String getPartId(){
         return PARTID;
     }
-    public void onBreak(BlockBreakEvent event,BlockMenu menu ){
+    @Override
+	public void onBreak(BlockBreakEvent event,BlockMenu menu ){
         super.onBreak(event,menu);
     }
-    public void onPlace(BlockPlaceEvent e,Block b){
+    @Override
+	public void onPlace(BlockPlaceEvent e,Block b){
         super.onPlace(e,b);
         BlockData data1=b.getBlockData();
         if(data1 instanceof Directional dp){
             DataCache.setCustomData(b.getLocation(),DIRECTION,Directions.fromBlockFace(dp.getFacing()).toInt());
         }
     }
-    public void process(Block b, @Nullable BlockMenu menu, SlimefunBlockData data){
+    @Override
+	public void process(Block b, @Nullable BlockMenu menu, SlimefunBlockData data){
 
     }
-    public boolean redirectMenu(){
+    @Override
+	public boolean redirectMenu(){
         return false;
     }
-    public void registerBlockMenu(SlimefunItem that){
+    @Override
+	public void registerBlockMenu(SlimefunItem that){
         //handle blockPlaceEvent
         handleBlock(that);
         handleMultiBlockPart(this);
@@ -137,7 +146,9 @@ public class Laser extends AbstractMachine implements MultiBlockPart, FinalAltar
                                 break;
                             }
                         }
-                        if(i==0)return;
+                        if(i==0) {
+							return;
+						}
                         Location launcher=loc.clone().add(0.5,0.5,0.5);
                         if(force>0){
                             //给机器充能

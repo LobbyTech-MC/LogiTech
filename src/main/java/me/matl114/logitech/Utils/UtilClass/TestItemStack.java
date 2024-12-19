@@ -12,12 +12,14 @@ public class TestItemStack extends ItemStack {
     public TestItemStack( Material type, int amount, short damage,  Byte data) {
         super(type, amount, damage, data);
     }
-    public boolean equals(Object a){
+    @Override
+	public boolean equals(Object a){
         Debug.logger("equal called");
         Debug.logger("beyond");
         return super.equals(a);
     }
-    public int hashCode(){
+    @Override
+	public int hashCode(){
         Debug.logger("hash called");
         Debug.logger("beyond");
         return super.hashCode();

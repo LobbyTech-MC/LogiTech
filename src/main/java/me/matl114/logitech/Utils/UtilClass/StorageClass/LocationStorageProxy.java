@@ -21,17 +21,20 @@ public class LocationStorageProxy extends ItemStorageCache{
     public Location getProxyLocation(){
         return location;
     }
-    public boolean isDirty(){
+    @Override
+	public boolean isDirty(){
         return lock||dirty;
     }
-    public void updateMenu(@Nonnull BlockMenu menu){
+    @Override
+	public void updateMenu(@Nonnull BlockMenu menu){
         if (getItem()!=null&&!getItem().getType().isAir()){
             updateItemStack();
             updateStorage();
         }
         dirty=false;
     }
-    public void updateStorage(){
+    @Override
+	public void updateStorage(){
         //这里是代理存储 并不是唯一修改源
         //需要刷新一下并加上用当前记录-历史记录 的东西
         int delta=((LocationProxy)storageType).getAmount(location)-this.lastStorageAmount;

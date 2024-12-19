@@ -42,14 +42,17 @@ public void addRelate(ItemPusher target){
     /**
      */
     public void clearRelated(){
-        if(targetConsumers!=null)
-            targetConsumers.clear();
+        if(targetConsumers!=null) {
+			targetConsumers.clear();
+		}
     }
-    protected ItemGreedyConsumer clone(){
+    @Override
+	protected ItemGreedyConsumer clone(){
         return (ItemGreedyConsumer) super.clone();
     }
 
-    public  int compareTo(ItemGreedyConsumer o) {
+    @Override
+	public  int compareTo(ItemGreedyConsumer o) {
         return this.getStackNum()-o.getStackNum();
     }
     /**
@@ -108,7 +111,8 @@ public void addRelate(ItemPusher target){
 //        }
 //        return null;
 //    }
-    public void init(ItemStack itemStack) {
+    @Override
+	public void init(ItemStack itemStack) {
         super.init( itemStack);
         this.matchAmount = 0;
     }
@@ -141,7 +145,8 @@ public void addRelate(ItemPusher target){
         matchAmount = stackNum*cnt  ;
     }
 
-    public void syncData(){
+    @Override
+	public void syncData(){
         matchAmount = 0;
         super.syncData();
     }
@@ -192,7 +197,9 @@ public void addRelate(ItemPusher target){
                     target= targetConsumers.get(i);
                     target.consume(this);
                     target.updateMenu(inv);
-                    if(cnt<=0)break link;
+                    if(cnt<=0) {
+						break link;
+					}
                 }
                 break link;
             case PUSH:
@@ -200,7 +207,9 @@ public void addRelate(ItemPusher target){
                     target = targetConsumers.get(i);
                     target.grab(this);
                     target.updateMenu(inv);
-                    if(cnt<=0)break link ;
+                    if(cnt<=0) {
+						break link ;
+					}
                 }
                 break link;
 

@@ -46,7 +46,8 @@ public class MultiIOPort extends AbstractTransportor implements MultiBlockPart {
               AddUtils.concat(  "&7强对称: &6",CONFIG_SYMM?"是":"否"),
                 "&7可配置: &6否");
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         preset.setSize(18);
         int[] border = BORDER;
         int len=border.length;
@@ -58,20 +59,25 @@ public class MultiIOPort extends AbstractTransportor implements MultiBlockPart {
     }
 
 
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public String getPartId(){
+    @Override
+	public String getPartId(){
         return BLOCKID;
     }
     @Override
     public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item) {
         if(CONFIG_SYMM){
             if(flow==ItemTransportFlow.INSERT){
-                if(item==null||item.getType().isAir())return getInputSlots();
+                if(item==null||item.getType().isAir()) {
+					return getInputSlots();
+				}
                 int[] slots=getInputSlots();
                 for(int i=0;i<getInputSlots().length;++i){
                    ItemStack it=menu.getItemInSlot(slots[i]);
@@ -80,21 +86,26 @@ public class MultiIOPort extends AbstractTransportor implements MultiBlockPart {
                    }
                 }
                 return slots;
-            }else return getOutputSlots();
+            } else {
+				return getOutputSlots();
+			}
         }else {
             return super.getSlotsAccessedByItemTransportPlus(menu,flow,item);
         }
     }
 
-    public void onMultiBlockBreak(BlockBreakEvent e) {
+    @Override
+	public void onMultiBlockBreak(BlockBreakEvent e) {
         super.onBreak(e, DataCache.getMenu(e.getBlock().getLocation()));
         MultiBlockPart.super.onMultiBlockBreak(e);
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         handleMultiBlockPart(this);
     }
-    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker){
+    @Override
+	public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker){
         Location core= MultiBlockService.acceptPartRequest(b.getLocation());
         if(core!=null){
             BlockMenu inv= DataCache.getMenu(core);

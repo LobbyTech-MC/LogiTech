@@ -107,7 +107,7 @@ public class SmithInterfaceListener implements Listener {
     }
     @EventHandler(priority = EventPriority.MONITOR,ignoreCancelled = false)
     public void onAnvilLogicStop(PrepareAnvilEvent e) {
-        if(openingCraftInventory.containsKey(e.getInventory())) {;
+        if(openingCraftInventory.containsKey(e.getInventory())) {
             if(onAnvilPrepare(e.getInventory())){
                 e.setResult(INTERFACED_ANVIL);
             }else {

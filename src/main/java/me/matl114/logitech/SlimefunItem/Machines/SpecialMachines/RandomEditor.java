@@ -137,7 +137,8 @@ public class RandomEditor extends AbstractMachine implements FinalAltarCore.Fina
         );
 
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         preset.setSize(54);
         int[] border=BORDER;
         int len=border.length;
@@ -157,10 +158,12 @@ public class RandomEditor extends AbstractMachine implements FinalAltarCore.Fina
         preset.addItem(STATUS_SLOT,STATUS_OFF,ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(INFO_SLOT,INFO_ITEM,ChestMenuUtils.getEmptyClickHandler());
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return OUTPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
     public EquipmentSlot getRandAttributeModifierSlots(Material material,int randIndex){
@@ -189,7 +192,8 @@ public class RandomEditor extends AbstractMachine implements FinalAltarCore.Fina
         }
         return registeredEnchantments;
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data) {
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data) {
         int len=ITEM_SLOT.length;
         Schedules.launchSchedules(()->{
             for (int i=0;i<len;++i){
@@ -223,7 +227,7 @@ public class RandomEditor extends AbstractMachine implements FinalAltarCore.Fina
                         hasFind=true;
                         if(getAmountField){
                             try{
-                                amountField.set(mod,(double)(mod.getAmount()+upgrade));
+                                amountField.set(mod,mod.getAmount()+upgrade);
                                 break;
                             }catch (Throwable e){
                                 getAmountField=false;
@@ -236,12 +240,15 @@ public class RandomEditor extends AbstractMachine implements FinalAltarCore.Fina
                 }
             }
             if(!hasFind){
-                meta.addAttributeModifier(att,new AttributeModifier(UUID.randomUUID(),AddUtils.concat(PREFIX,att.getKey().getKey()),(double) upgrade, AttributeModifier.Operation.ADD_NUMBER,slot));
+                meta.addAttributeModifier(att,new AttributeModifier(UUID.randomUUID(),AddUtils.concat(PREFIX,att.getKey().getKey()),upgrade, AttributeModifier.Operation.ADD_NUMBER,slot));
             }
         }
     }
-    public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
-        if(menu==null)return;
+    @Override
+	public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
+        if(menu==null) {
+			return;
+		}
         if(conditionHandle(b,menu)&& FinalFeature.isFinalAltarCharged(this,data)){
             if(menu.hasViewer()){
                 menu.replaceExistingItem(STATUS_SLOT,STATUS_ON);

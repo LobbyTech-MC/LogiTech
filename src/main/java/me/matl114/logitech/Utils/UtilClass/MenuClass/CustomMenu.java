@@ -128,7 +128,10 @@ public class CustomMenu {
         this.pageContent=size-fixlen;
         this.inventorySize=Math.max(menulens,factory.getInventorySize());
         this.pages =(1+(inventorySize-1)/this.pageContent);
-        if(this.pages ==0)this.pages =1;//防止有傻逼不塞东西 写0
+        if(this.pages ==0)
+		 {
+			this.pages =1;//防止有傻逼不塞东西 写0
+		}
     }
 
     public ChestMenu constructPage(int page){
@@ -244,8 +247,9 @@ public class CustomMenu {
             };
         }else if(slot==backSlot){
             return backHandlers==null?ChestMenuUtils.getEmptyClickHandler():backHandlers;
-        }
-        else return null;
+        } else {
+			return null;
+		}
     }
     /**
      * 自动生成跳转槽物品

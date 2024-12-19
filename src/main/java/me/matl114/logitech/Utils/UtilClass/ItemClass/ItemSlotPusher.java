@@ -39,17 +39,22 @@ public class ItemSlotPusher extends ItemPusher {
         this.wasNull=false;
         this.slot=slot;
     }
-    protected ItemSlotPusher clone(){
+    @Override
+	protected ItemSlotPusher clone(){
         return (ItemSlotPusher) super.clone();
     }
-    public int getMaxStackCnt() {
+    @Override
+	public int getMaxStackCnt() {
         return maxStackCnt;
     }
-    public void grab(ItemCounter source){
+    @Override
+	public void grab(ItemCounter source){
         if(this.item==null){
-            if(source!=null&&source.getItem()!=null&&source.getAmount()>0)
-                setFrom(source);
-            else return;
+            if(source!=null&&source.getItem()!=null&&source.getAmount()>0) {
+				setFrom(source);
+			} else {
+				return;
+			}
         }
         super.grab(source);
     }
@@ -64,10 +69,12 @@ public class ItemSlotPusher extends ItemPusher {
         }
         this.slot=slot;
     }
-    public boolean isNull(){
+    @Override
+	public boolean isNull(){
         return wasNull;
     }
-    public void setFrom(ItemCounter source){
+    @Override
+	public void setFrom(ItemCounter source){
         //only when null AND source not null, can we setFrom
         //we don't support cache change
         if(wasNull&&(source!=null&&source.getItem()!=null)){
@@ -78,7 +85,8 @@ public class ItemSlotPusher extends ItemPusher {
         }
     }
 
-    public void syncData(){
+    @Override
+	public void syncData(){
         if(!wasNull){
             super.syncData();
         }else{
@@ -88,22 +96,26 @@ public class ItemSlotPusher extends ItemPusher {
             dirty=false;
         }
     }
-    public int transportFrom(ItemCounter source,int limit){
+    @Override
+	public int transportFrom(ItemCounter source,int limit){
         if(this.item==null){
             if(source!=null&&source.getItem()!=null){
                 setFrom(source);
-            }
-            else return limit;
+            } else {
+				return limit;
+			}
         }
         return super.transportFrom(source,limit);
     }
-    public void updateItemStack(){
+    @Override
+	public void updateItemStack(){
         if(getItem()!=null){
             super.updateItemStack();
         }
     }
     //sync data need blockmenu
-    public void updateMenu(@Nonnull BlockMenu menu){
+    @Override
+	public void updateMenu(@Nonnull BlockMenu menu){
         if(dirty&&getItem()!=null&&!getItem().getType().isAir()){
             if(wasNull){//空
                 //从数据源clone一个 正式转变为有实体的ItemStack 因为consumer那边可能是sfItem MultiItem

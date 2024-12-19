@@ -63,10 +63,12 @@ public class ChipReactor extends AbstractEnergyProcessor {
                 example
         ));
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         stack.setItemMeta(AddUtils.capacitorInfoAdd(stack,this.energybuffer).getItemMeta());
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len= border.length;
         for (int i=0;i<len;i++){
@@ -88,7 +90,8 @@ public class ChipReactor extends AbstractEnergyProcessor {
 
 
     }
-    public int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
+    @Override
+	public int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
         BlockMenu inv=data.getBlockMenu();
         //增加电力检测
         if(inv!=null&&conditionHandle(null,inv)){
@@ -137,12 +140,16 @@ public class ChipReactor extends AbstractEnergyProcessor {
             }
             return currentOperation.getEnergy();
 
-        }else return 0;
+        } else {
+			return 0;
+		}
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
 }

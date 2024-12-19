@@ -25,7 +25,8 @@ public abstract class MultiLevelBlockType implements AbstractMultiBlockType {
         this.SUBMULTIBLOCKS_LIST.add(type);
         return this;
     }
-    public MultiLevelBlockType build(){
+    @Override
+	public MultiLevelBlockType build(){
         init();
         this.SUB_NUM=this.SUBMULTIBLOCKS_LIST.size();
         this.SUBMULTIBLOCKS=this.SUBMULTIBLOCKS_LIST.toArray(new AbstractMultiBlockType[SUB_NUM]);
@@ -38,13 +39,16 @@ public abstract class MultiLevelBlockType implements AbstractMultiBlockType {
         }
         return this;
     }
-    public AbstractMultiBlock genMultiBlockFrom(Location loc, MultiBlockService.Direction dir, boolean hasPrevRecord, OutputStream errorOut){
+    @Override
+	public AbstractMultiBlock genMultiBlockFrom(Location loc, MultiBlockService.Direction dir, boolean hasPrevRecord, OutputStream errorOut){
         int level=0;
         List<AbstractMultiBlock> subparts=new ArrayList<>();
         AbstractMultiBlock part;
         for (;level<SUB_NUM;++level){
             part=SUBMULTIBLOCKS[level].genMultiBlockFrom(loc,dir,hasPrevRecord,errorOut);
-            if(part==null)break;
+            if(part==null) {
+				break;
+			}
             subparts.add(part);
         }
         if(level==0){
@@ -53,7 +57,8 @@ public abstract class MultiLevelBlockType implements AbstractMultiBlockType {
         }
         return new   MultiLevelBlock(this,level,dir,subparts);
     }
-    public Vector getSchemaPart(int index){
+    @Override
+	public Vector getSchemaPart(int index){
         for(int i=0;i<SUB_NUM;++i){
             if(index<INDEXS[i+1]){
                 return SUBMULTIBLOCKS[i].getSchemaPart(index-INDEXS[i]);
@@ -61,7 +66,8 @@ public abstract class MultiLevelBlockType implements AbstractMultiBlockType {
         }
         return null;
     }
-    public String getSchemaPartId(int index){
+    @Override
+	public String getSchemaPartId(int index){
         for(int i=0;i<SUB_NUM;++i){
             if(index<INDEXS[i+1]){
                 return SUBMULTIBLOCKS[i].getSchemaPartId(index-INDEXS[i]);
@@ -69,14 +75,16 @@ public abstract class MultiLevelBlockType implements AbstractMultiBlockType {
         }
         return null;
     }
-    public int getSchemaSize(){
+    @Override
+	public int getSchemaSize(){
         return INDEXS[SUB_NUM];
     }
     public AbstractMultiBlockType getSubParts(int index){
         return SUBMULTIBLOCKS[index];
     }
     public abstract void init();
-    public boolean isSymmetric(){
+    @Override
+	public boolean isSymmetric(){
         return  isSymm;
     }
 

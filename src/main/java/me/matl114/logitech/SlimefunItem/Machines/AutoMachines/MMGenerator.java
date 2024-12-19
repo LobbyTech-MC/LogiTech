@@ -42,12 +42,14 @@ public class MMGenerator extends AbstractTransformer {
                 );
         PROCESSOR_SLOT=13;
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         stack.setItemMeta( AddUtils.smgInfoAdd(stack,time).getItemMeta() );
         super.addInfo(stack);
     }
 
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         int[] border = BORDER;
         int len=border.length;
@@ -73,10 +75,12 @@ public class MMGenerator extends AbstractTransformer {
         preset.addItem(PROCESSOR_SLOT, MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
         preset.setSize(54);
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
 }

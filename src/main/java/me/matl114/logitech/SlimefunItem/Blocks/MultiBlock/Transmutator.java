@@ -112,7 +112,7 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
                 energyConsumption,energyBuffer,customRecipes);
 
         this.PROCESSOR_SLOT=31;
-        this.coolerProcessor=new MachineProcessor<MultiCraftingOperation>( this);
+        this.coolerProcessor=new MachineProcessor<>( this);
         this.coolerProcessor.setProgressBar(COOLER_INFO_ITEM);
 
     }
@@ -133,7 +133,9 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
                 it2.setAmount(it2.getAmount()-1);
                 op=new MultiCraftingOperation(new ItemGreedyConsumer[0],2);
                 coolerProcessor.startOperation(loc,op);
-            }else return false;
+            } else {
+				return false;
+			}
         }
         else if(op.isFinished()){
             if(inv.hasViewer()){
@@ -145,11 +147,13 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
             op.progress(1);
 
         }
-        if(inv.hasViewer())
-            this.coolerProcessor.updateProgressBar(inv,COOLER_INFO_SLOT,op);
+        if(inv.hasViewer()) {
+			this.coolerProcessor.updateProgressBar(inv,COOLER_INFO_SLOT,op);
+		}
         return true;
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border = BORDER;
         int len=border.length;
         for(int var4 = 0; var4 < len; ++var4) {
@@ -198,13 +202,16 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
             },0,true,0);
         }
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+    @Override
+	public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
         if(flow==ItemTransportFlow.WITHDRAW){
             return getOutputSlots();
         }
@@ -221,7 +228,8 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
         }
         return getInputSlots();
     }
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuOpeningHandler((player -> {
             updateMenu(inv,block,Settings.RUN);
         }));
@@ -268,10 +276,11 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
             MultiBlockService.removeHologramSync(loc);
             if(statusCode==0){
                 if(holoStatus!=4){
-                    if(holoStatus==0)
-                        AddUtils.sendMessage(player,"&a全息投影已开启!");
-                    else
-                        AddUtils.sendMessage(player,"&a全息投影已切换方向!");
+                    if(holoStatus==0) {
+						AddUtils.sendMessage(player,"&a全息投影已开启!");
+					} else {
+						AddUtils.sendMessage(player,"&a全息投影已切换方向!");
+					}
                     MultiBlockService.createHologram(loc,MBTYPE, MultiBlockService.Direction.fromInt(holoStatus), MBID_TO_ITEM);
                     DataCache.setCustomData(loc,MultiBlockService.getHologramKey(),holoStatus+1);
                 }
@@ -284,7 +293,8 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
         }));
 
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu){
         super.onBreak(e,menu);
         if(menu!=null){
             menu.dropItems(menu.getLocation(),COOLER_INPUT_SLOT);
@@ -328,7 +338,8 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
             RadiationRegion.addRadiation(loc,RADIATION_RANGE,RADIATION_PERIOD,RADIATION_SPEED,1);
         }
     }
-    public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
+    @Override
+	public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
         MultiCraftingOperation op=Transmutator.this.processor.getOperation(loc);
         if(op!=null&&(!op.isFinished())){//如果还在进行中就暂停
             onDestroyEffect(loc,handler,cause);
@@ -340,15 +351,18 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
         super.onMultiBlockDisable(loc,handler,cause);
     }
 
-    public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
+    @Override
+	public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
         super.onMultiBlockEnable(loc,handler);
         createEffect(loc,handler);
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
 
         super.preRegister();
     }
-    public void progressorCost(Block b, BlockMenu inv){
+    @Override
+	public void progressorCost(Block b, BlockMenu inv){
         //覆盖父类 让process中不扣电
         //转到我的ticker里扣
         if(!checkCooler(inv)){
@@ -378,7 +392,8 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
             },0,true,0);
         }
     }
-    public void tick(Block b, BlockMenu inv, SlimefunBlockData data, int tickCount){
+    @Override
+	public void tick(Block b, BlockMenu inv, SlimefunBlockData data, int tickCount){
         //in this case .blockMenu is null
         int statusCode=MultiBlockService.getStatus(data);
         Location loc=b.getLocation();
@@ -403,19 +418,20 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
                 updateMenu(inv,b,Settings.RUN);
                 ItemStack it=inv.getItemInSlot(INFO_SLOT);
                 if(it!=null){
-                    MultiCraftingOperation currentOperation = (MultiCraftingOperation)this.processor.getOperation(b);
+                    MultiCraftingOperation currentOperation = this.processor.getOperation(b);
                     AddUtils.setLore(it,"&7当前机器状态: %s".formatted((currentOperation==null)?"&7待机中":"&a进程中"),
                             "&7当前电量: %dJ/%dJ".formatted(charge,energybuffer),"&7当前耗电: %dJ/t".formatted(energyConsumption),
                             "&7当前并行处理数: %-3d".formatted(getCraftLimit(b,inv)));
-                }
-                else
-                    inv.replaceExistingItem(INFO_SLOT,INFO_ITEM);
+                } else {
+					inv.replaceExistingItem(INFO_SLOT,INFO_ITEM);
+				}
 
             }
             super.process(b,inv,data);
         }
     }
-    public void updateMenu(BlockMenu inv, Block block, Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv, Block block, Settings mod){
         Location loc=block.getLocation();
         int holoStatus=DataCache.getCustomData(loc,MultiBlockService.getHologramKey(),0);
         if(holoStatus==0){

@@ -21,11 +21,13 @@ public abstract class CustomProps extends ItemWithHandler<ItemUseHandler> {
     /**
      * used for clickAction items
      */
-    public ItemUseHandler[] getItemHandler(){
+    @Override
+	public ItemUseHandler[] getItemHandler(){
         return new ItemUseHandler[]{(ItemUseHandler) this::onClickAction};
     }
     public abstract void onClickAction(PlayerRightClickEvent event);
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
 
     }

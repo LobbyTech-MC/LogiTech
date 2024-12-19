@@ -191,7 +191,8 @@ public class SolarReactorCore extends MultiBlockProcessor {
         }),0,true,0);
         return true;
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border = BORDER;
         int len=border.length;
         for(int var4 = 0; var4 < len; ++var4) {
@@ -238,13 +239,16 @@ public class SolarReactorCore extends MultiBlockProcessor {
             EFFECT_CACHE.put(loc,enderCrystal);
         }
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuOpeningHandler((player -> {
             updateMenu(inv,block,Settings.RUN);
         }));
@@ -354,7 +358,8 @@ public class SolarReactorCore extends MultiBlockProcessor {
             loc.getWorld().createExplosion(center.clone().add(0,1,-6),90,true,true);
         }),100,true,0);
     }
-    public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
+    @Override
+	public void onMultiBlockDisable(Location loc, AbstractMultiBlockHandler handler, MultiBlockService.DeleteCause cause){
         removeEffect(loc);
         SimpleCraftingOperation op=SolarReactorCore.this.processor.getOperation(loc);
         if(cause.willExplode()&&(op!=null&&(!op.isFinished()))){//如果还在进行中就暂停
@@ -362,12 +367,14 @@ public class SolarReactorCore extends MultiBlockProcessor {
         }
         super.onMultiBlockDisable(loc,handler,cause);
     }
-    public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
+    @Override
+	public void onMultiBlockEnable(Location loc,AbstractMultiBlockHandler handler){
         super.onMultiBlockEnable(loc,handler);
         removeEffect(loc);
         createEffect(loc);
     }
-    public void progressorCost(Block b, BlockMenu inv){
+    @Override
+	public void progressorCost(Block b, BlockMenu inv){
         //覆盖父类 让process中不扣电
         //转到我的ticker里扣
     }
@@ -391,8 +398,9 @@ public class SolarReactorCore extends MultiBlockProcessor {
         EnderCrystal cry= EFFECT_CACHE.remove(loc);
         Location loc2=loc.clone().add(0.5,1,0.5);
         BukkitUtils.executeSync(()->{
-        if(cry!=null)
-            cry.remove();
+        if(cry!=null) {
+			cry.remove();
+		}
         Collection<Entity> allCrystal=loc2.getWorld().getNearbyEntities(loc2, REMOVE_EFFECT_OFFSET, REMOVE_EFFECT_OFFSET, REMOVE_EFFECT_OFFSET,(entity -> {
             return entity.getType()==EntityType.END_CRYSTAL&&checkBind(entity,loc);
         }));
@@ -401,7 +409,8 @@ public class SolarReactorCore extends MultiBlockProcessor {
             entity.remove();
         }});
     }
-    public void tick(Block b, BlockMenu inv, SlimefunBlockData data, int tickCount){
+    @Override
+	public void tick(Block b, BlockMenu inv, SlimefunBlockData data, int tickCount){
         //in this case .blockMenu is null
         int statusCode=MultiBlockService.getStatus(data);
         Location loc=b.getLocation();
@@ -427,19 +436,20 @@ public class SolarReactorCore extends MultiBlockProcessor {
                 updateMenu(inv,b,Settings.RUN);
                 ItemStack it=inv.getItemInSlot(INFO_SLOT);
                 if(it!=null){
-                    SimpleCraftingOperation currentOperation = (SimpleCraftingOperation)this.processor.getOperation(b);
+                    SimpleCraftingOperation currentOperation = this.processor.getOperation(b);
                     AddUtils.setLore(it,"&7当前机器状态: %s".formatted((currentOperation==null)?"&7待机中":"&a进程中"),
                             "&7当前电量: %dJ/%dJ".formatted(charge,energybuffer),"&7当前耗电: %dJ/t".formatted(energyConsumption));
-                }
-                else
-                    inv.replaceExistingItem(INFO_SLOT,INFO_ITEM);
+                } else {
+					inv.replaceExistingItem(INFO_SLOT,INFO_ITEM);
+				}
 
             }
             super.process(b,inv,data);
         }
     }
 
-    public void updateMenu(BlockMenu inv, Block block, Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv, Block block, Settings mod){
         Location loc=block.getLocation();
         int holoStatus=DataCache.getCustomData(loc,MultiBlockService.getHologramKey(),0);
         if(holoStatus==0){

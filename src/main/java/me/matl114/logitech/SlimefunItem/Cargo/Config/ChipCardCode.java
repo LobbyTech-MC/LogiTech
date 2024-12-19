@@ -44,7 +44,9 @@ public class ChipCardCode {
     }).get();
     public static boolean canConfig(ItemMeta meta) {
         String it= CraftUtils.parseSfId(meta);
-        if(it==null) return false;
+        if(it==null) {
+			return false;
+		}
         return SlimefunItem.getById(it) instanceof ChipCard;
     }
     public static boolean canConfig(SlimefunItem sfitem){

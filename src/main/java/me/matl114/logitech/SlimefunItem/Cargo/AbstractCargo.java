@@ -60,7 +60,8 @@ public abstract class AbstractCargo extends DistinctiveCustomItemStack implement
     public boolean conditionHandle(Block b,BlockMenu menu){
         return true;
     }
-    public abstract void constructMenu(BlockMenuPreset preset);
+    @Override
+	public abstract void constructMenu(BlockMenuPreset preset);
     public abstract int[] getBWListSlot();
     public int getConfigCode(SlimefunBlockData data){
         return DataCache.getCustomData(data,"config",-1);
@@ -69,8 +70,10 @@ public abstract class AbstractCargo extends DistinctiveCustomItemStack implement
     public int getDefaultConfig(){
         return defaultConfigCode;
     }
-    public abstract int[] getInputSlots();
-    public abstract int[] getOutputSlots();
+    @Override
+	public abstract int[] getInputSlots();
+    @Override
+	public abstract int[] getOutputSlots();
     public void loadConfig(BlockMenu inv,Block b){
         loadConfig(inv,b,DataCache.safeLoadBlock(inv.getLocation()));
     }
@@ -85,7 +88,8 @@ public abstract class AbstractCargo extends DistinctiveCustomItemStack implement
         }
         DataCache.setCustomData(data,"config",code);
     }
-    public void newMenuInstance(BlockMenu menu, Block b){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block b){
         menu.addMenuOpeningHandler(player -> {
             updateMenu(menu,b,Settings.RUN);
         });
@@ -94,7 +98,8 @@ public abstract class AbstractCargo extends DistinctiveCustomItemStack implement
         });
         updateMenu(menu,b, Settings.INIT);
     }
-    public void onBreak(BlockBreakEvent e, BlockMenu menu){
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu){
         MenuBlock.super.onBreak(e,menu);
         if(menu!=null){
             Location loc=menu.getLocation();
@@ -102,13 +107,15 @@ public abstract class AbstractCargo extends DistinctiveCustomItemStack implement
             menu.dropItems(loc,getBWListSlot());
         }
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         registerTick(this);
         registerBlockMenu(this);
         handleBlock(this);
     }
-    public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
+    @Override
+	public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
         if(menu.hasViewer()){
             updateMenu(menu,b,Settings.RUN);
         }

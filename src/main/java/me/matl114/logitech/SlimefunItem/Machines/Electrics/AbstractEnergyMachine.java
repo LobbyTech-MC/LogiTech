@@ -33,20 +33,24 @@ public abstract class AbstractEnergyMachine extends DistinctiveCustomItemStack i
         this.energyConsumption = energyConsumption;
         this.energyNetComponent = energyNetComponent;
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         stack.setItemMeta(AddUtils.capacitorInfoAdd(stack,this.energybuffer).getItemMeta());
     }
     /**
      * construct your menu here.called in constructor
      * @param preset
      */
-    public abstract void constructMenu(BlockMenuPreset preset);
-    public void disable() {
+    @Override
+	public abstract void constructMenu(BlockMenuPreset preset);
+    @Override
+	public void disable() {
         super.disable();
         //this.getMachineRecipes().clear();
     }
 
-    public void enable() {
+    @Override
+	public void enable() {
         super.enable();
         this.registerDefaultRecipes();
     }
@@ -54,7 +58,8 @@ public abstract class AbstractEnergyMachine extends DistinctiveCustomItemStack i
      * get capacity
      * @return
      */
-    public final int getCapacity(){
+    @Override
+	public final int getCapacity(){
         return this.energybuffer;
     }
     @Override
@@ -65,22 +70,26 @@ public abstract class AbstractEnergyMachine extends DistinctiveCustomItemStack i
      * cargo and IO
      * @return
      */
-    public abstract int[] getInputSlots();
+    @Override
+	public abstract int[] getInputSlots();
 
     /**
      * cargo and IO
      * @return
      */
-    public abstract int[] getOutputSlots();
+    @Override
+	public abstract int[] getOutputSlots();
 
-    public void postRegister() {
+    @Override
+	public void postRegister() {
         super.postRegister();
         if (this.getState() == ItemState.ENABLED) {
             this.registerDefaultRecipes();
         }
 
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         //
         registerTick(this);
@@ -90,15 +99,19 @@ public abstract class AbstractEnergyMachine extends DistinctiveCustomItemStack i
     protected void registerDefaultRecipes() {
     }
 
-    public void removeCharge(@Nonnull Location l, int charge){
+    @Override
+	public void removeCharge(@Nonnull Location l, int charge){
         if(charge>0){
             EnergyNetComponent.super.removeCharge(l,charge);
         }
     }
-    public void setCharge(@Nonnull Location l, int charge){
+    @Override
+	public void setCharge(@Nonnull Location l, int charge){
         EnergyNetComponent.super.setCharge(l,Math.max(0,charge));
     }
-    public final void tick(Block b, BlockMenu menu, int ticker) {
+    @Override
+	public final void tick(Block b, BlockMenu menu, int ticker) {
     }
-    public abstract void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) ;
+    @Override
+	public abstract void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) ;
 }

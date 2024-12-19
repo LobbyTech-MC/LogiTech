@@ -71,7 +71,8 @@ public class ChipCopier extends AbstractSyncTickCargo {
                 )
         );
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len= border.length;
         for (int i=0;i<len;i++){
@@ -100,34 +101,44 @@ public class ChipCopier extends AbstractSyncTickCargo {
         return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a信息"
                 , AddUtils.concat("&7当前读取编码位数: ",String.valueOf(ticks)));
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return SLOTS;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return SLOTS;
     }
-    public void newMenuInstance(BlockMenu inv,Block b ){
+    @Override
+	public void newMenuInstance(BlockMenu inv,Block b ){
 
     }
-    public void onBreak(BlockBreakEvent e,BlockMenu inv){
+    @Override
+	public void onBreak(BlockBreakEvent e,BlockMenu inv){
         super.onBreak(e,inv);
         if(inv!=null){
             inv.dropItems(inv.getLocation(),SAMPLE_SLOT);
         }
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         this.addItemHandler((BlockTicker) CHIP_SYNC);
     }
-    public void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount){
+    @Override
+	public void syncTick(Block b, BlockMenu inv, SlimefunBlockData data, int synTickCount){
         if(inv.hasViewer()){
             inv.replaceExistingItem(STATUS_SLOT,getInfoItem(synTickCount%32));
             updateMenu(inv,b,Settings.RUN);
         }
         ItemStack it1=inv.getItemInSlot(SAMPLE_SLOT[0]);
-        if(it1==null)return;
+        if(it1==null) {
+			return;
+		}
         ItemStack it2=inv.getItemInSlot(SLOTS[0]);
-        if(it2==null)return;
+        if(it2==null) {
+			return;
+		}
         ItemMeta meta1=it1.getItemMeta();
         if(meta1!=null&& ChipCardCode.isConfig(meta1)){
             ItemMeta meta2=it2.getItemMeta();
@@ -154,7 +165,8 @@ public class ChipCopier extends AbstractSyncTickCargo {
             }});
         }
     }
-    public void updateMenu(BlockMenu inv, Block b, Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv, Block b, Settings mod){
 
     }
 }

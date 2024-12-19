@@ -72,7 +72,8 @@ public class ItemOperator extends AbstractMachine {
                               int energybuffer, int energyConsumption){
         super(category, item, recipeType, recipe, energybuffer, energyConsumption);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER_OUTPUT;
         int len=border.length;
         for(int i=0;i<len;i++){
@@ -90,19 +91,24 @@ public class ItemOperator extends AbstractMachine {
         }
 
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
     private ItemStack getOperated(BlockMenu inv,boolean onlyOne){
         ItemStack stack=inv.getItemInSlot(OUTPUT_SLOTS[0]);
         if(!onlyOne||(stack!=null&&stack.getAmount()==1)){
             return stack;
-        }else return null;
+        } else {
+			return null;
+		}
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuClickHandler(FUNCTION_SLOT[0],((player, i, itemStack, clickAction) -> {
             player.closeInventory();
             AddUtils.sendMessage(player,"&e请输入物品名字(支持颜色符号)");
@@ -274,7 +280,8 @@ public class ItemOperator extends AbstractMachine {
             }
         }));
     }
-    public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
+    @Override
+	public void process(Block b, BlockMenu menu, SlimefunBlockData data){}
 
 
     @Override
@@ -282,5 +289,6 @@ public class ItemOperator extends AbstractMachine {
 
     }
 
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
+    @Override
+	public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 }

@@ -90,35 +90,39 @@ public class MachineRecipeUtils {
      */
     public static MachineRecipe FromRecipe(SlimefunItem item,int time){
         ItemStack[] input=item.getRecipe();
-        List<ItemStack> outputs=new ArrayList<ItemStack>(){{
+        List<ItemStack> outputs=new ArrayList<>(){{
             add(item.getRecipeOutput());
         } };
-        for(int i = 0; i < input.length; i++){
-            if(input[i]==null)continue;
-            if(NOCONSUME_MAP.containsKey(input[i].getType())){
-                if(CraftUtils.matchItemStack(new ItemStack(input[i].getType()),input[i],true)){
-                    outputs.add(NOCONSUME_MAP.get(input[i].getType()));
+        for (ItemStack element : input) {
+            if(element==null) {
+				continue;
+			}
+            if(NOCONSUME_MAP.containsKey(element.getType())){
+                if(CraftUtils.matchItemStack(new ItemStack(element.getType()),element,true)){
+                    outputs.add(NOCONSUME_MAP.get(element.getType()));
                 }
             }
         }
         return new MachineRecipe(time,in(item.getRecipe()),stackIn(outputs.toArray(ItemStack[]::new)));
     }
     public static <T extends MachineRecipe> T getNoComsumed(T recipe, RecipeConstructor<T> constructor){
-        List<ItemStack> outputs=new ArrayList<ItemStack>();
+        List<ItemStack> outputs=new ArrayList<>();
         ItemStack[] output=recipe.getOutput();
-        for(int i=0;i<output.length;i++){
-            outputs.add(output[i]);
+        for (ItemStack element : output) {
+            outputs.add(element);
         }
         ItemStack[] input=recipe.getInput();
          boolean hasChanged=false;
          HashMap<ItemStack,Integer> NOCONSUME_RETURN=new HashMap<>();
-        for(int i = 0; i < input.length; i++){
-            if(input[i]==null)continue;
-            if(NOCONSUME_MAP.containsKey(input[i].getType())){
-                ItemStack returned=NOCONSUME_MAP.get(input[i].getType());
-                if(CraftUtils.matchItemStack(new ItemStack(input[i].getType()),input[i],true)){
+        for (ItemStack element : input) {
+            if(element==null) {
+				continue;
+			}
+            if(NOCONSUME_MAP.containsKey(element.getType())){
+                ItemStack returned=NOCONSUME_MAP.get(element.getType());
+                if(CraftUtils.matchItemStack(new ItemStack(element.getType()),element,true)){
 
-                    NOCONSUME_RETURN.put(returned,NOCONSUME_RETURN.getOrDefault(returned,0)+input[i].getAmount());
+                    NOCONSUME_RETURN.put(returned,NOCONSUME_RETURN.getOrDefault(returned,0)+element.getAmount());
                     hasChanged=true;
                 }
             }
@@ -139,9 +143,11 @@ public class MachineRecipeUtils {
      * check if any NOT-TO-BE-CONSUMED Item
      */
     public static boolean hasNonConsumed(ItemStack[] input){
-        for(int i = 0; i < input.length; i++){
-            if(input[i]==null)continue;
-            if(NOCONSUME_MAP.containsKey(input[i].getType())){
+        for (ItemStack element : input) {
+            if(element==null) {
+				continue;
+			}
+            if(NOCONSUME_MAP.containsKey(element.getType())){
                 return true;
             }
         }
@@ -170,8 +176,7 @@ public class MachineRecipeUtils {
      */
     public static ItemStack[] in(ItemStack[] items){
         List<ItemStack> result = new ArrayList<>();
-        for(int i = 0; i < items.length; i++){
-            ItemStack a = items[i];
+        for (ItemStack a : items) {
             if(a!=null){
                 result.add(AddUtils.getCopy(a));
             }
@@ -208,10 +213,11 @@ public class MachineRecipeUtils {
     }
     public static ItemStack[] makeValidMGInput(ItemStack[] input){
         List<ItemStack> it=new ArrayList<>();
-        for(int i = 0; i < input.length; i++){
-            if(input[i]==null)continue;
-            if(input[i] instanceof DisplayItemStack)continue;
-            it.add(input[i]);
+        for (ItemStack element : input) {
+            if((element==null) || (element instanceof DisplayItemStack)) {
+				continue;
+			}
+            it.add(element);
         }
         return it.toArray(new ItemStack[it.size()]);
     }
@@ -227,12 +233,16 @@ public class MachineRecipeUtils {
         }
     }
     public static SequenceMachineRecipe sequenceFrom(int ticks,ItemStack[] input,ItemStack[] output){
-        List<ItemStack> inputSequence=new ArrayList<ItemStack>();
-        for(int i = 0; i < input.length; i++){
-            if(input[i]==null)continue;
-            int amount=input[i].getAmount();
+        List<ItemStack> inputSequence=new ArrayList<>();
+        for (ItemStack element : input) {
+            if(element==null) {
+				continue;
+			}
+            int amount=element.getAmount();
 
-            if(amount==0)continue;
+            if(amount==0) {
+				continue;
+			}
             //int maxSize=input[i].getMaxStackSize();
 //            if(amount>maxSize){
 //                while(amount>maxSize){
@@ -245,7 +255,7 @@ public class MachineRecipeUtils {
 //                it.setAmount(amount);
 //                inputSequence.add(it);
 //            }else {
-            inputSequence.add(input[i]);
+            inputSequence.add(element);
 //            }
         }
         return new SequenceMachineRecipe(ticks,in( inputSequence.toArray(ItemStack[]::new)),in(output));
@@ -303,14 +313,16 @@ public class MachineRecipeUtils {
      */
     public static ShapedMachineRecipe shapeFromRecipe(SlimefunItem item,int time){
         ItemStack[] input=item.getRecipe();
-        List<ItemStack> outputs=new ArrayList<ItemStack>(){{
+        List<ItemStack> outputs=new ArrayList<>(){{
             add(item.getRecipeOutput());
         } };
-        for(int i = 0; i < input.length; i++){
-            if(input[i]==null)continue;
-            if(NOCONSUME_MAP.containsKey(input[i].getType())){
-                if(CraftUtils.matchItemStack(new ItemStack(input[i].getType()),input[i],true)){
-                    outputs.add(NOCONSUME_MAP.get(input[i].getType()));
+        for (ItemStack element : input) {
+            if(element==null) {
+				continue;
+			}
+            if(NOCONSUME_MAP.containsKey(element.getType())){
+                if(CraftUtils.matchItemStack(new ItemStack(element.getType()),element,true)){
+                    outputs.add(NOCONSUME_MAP.get(element.getType()));
                 }
             }
         }
@@ -376,9 +388,10 @@ public class MachineRecipeUtils {
     public static ItemStack[] stackIn(ItemStack[] items){
         LinkedHashSet<ItemCounter> stacks = new LinkedHashSet<>();
         boolean __flag;
-        for(int i = 0; i < items.length; i++){
-            ItemStack a = items[i];
-            if(a==null)continue;
+        for (ItemStack a : items) {
+            if(a==null) {
+				continue;
+			}
             ItemCounter ac=ItemCounter.get(AddUtils.getCopy(a));
             if(ac.getItem() instanceof RandOutItem){
                 stacks.add(ac);

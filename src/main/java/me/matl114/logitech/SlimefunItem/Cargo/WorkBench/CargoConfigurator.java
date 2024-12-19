@@ -86,7 +86,8 @@ public class CargoConfigurator extends AbstractBlock {
     public CargoConfigurator(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] slot=BORDER;
         int len=slot.length;
         for (int i=0;i<len;i++){
@@ -167,7 +168,8 @@ public class CargoConfigurator extends AbstractBlock {
     public int[] getConfigureSlots(){
         return CONFIG_SLOTS;
     }
-    public void newMenuInstance(BlockMenu inv, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu inv, Block block){
         inv.addMenuOpeningHandler(player -> {
             inv.replaceExistingItem(TIPS_SLOT,TIPS_ITEM.clone());
         });
@@ -178,7 +180,8 @@ public class CargoConfigurator extends AbstractBlock {
             return false;
         }));
     }
-    public void onBreak(BlockBreakEvent event, BlockMenu menu) {
+    @Override
+	public void onBreak(BlockBreakEvent event, BlockMenu menu) {
         super.onBreak(event, menu);
         if(menu!=null){
             Location loc =menu.getLocation();
@@ -186,7 +189,8 @@ public class CargoConfigurator extends AbstractBlock {
             menu.dropItems(loc,getConfigCardSlot());
         }
     }
-    public void preRegister() {
+    @Override
+	public void preRegister() {
         super.preRegister();
         this.registerBlockMenu(this);
     }

@@ -32,17 +32,20 @@ public class MyVanillaItem extends VanillaItem implements RecipeDisplay {
         this.addItemHandler(handler);
         return this;
     }
-    public final List<ItemStack> getDisplayRecipes() {
+    @Override
+	public final List<ItemStack> getDisplayRecipes() {
         if(displayedMemory==null||displayedMemory.isEmpty()) {
             displayedMemory=_getDisplayRecipes(new ArrayList<>());
         }
         return displayedMemory;
     }
-    public void postRegister(){
+    @Override
+	public void postRegister(){
         super.postRegister();
         this.addWikiPage("");
     }
-    public List<MachineRecipe> provideDisplayRecipe(){
+    @Override
+	public List<MachineRecipe> provideDisplayRecipe(){
         return new ArrayList<>();
     }
     public MyVanillaItem register(){

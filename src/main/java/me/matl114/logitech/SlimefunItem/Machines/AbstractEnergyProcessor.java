@@ -67,7 +67,8 @@ public abstract class AbstractEnergyProcessor extends AbstractEnergyProvider imp
      *
      * @param preset
      */
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         int[] border = BORDER;
         int len=border.length;
@@ -96,12 +97,13 @@ public abstract class AbstractEnergyProcessor extends AbstractEnergyProvider imp
     }
 
 
-    public int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
+    @Override
+	public int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
 
         BlockMenu inv= DataCache.getMenu(l);
         //增加电力检测
         if(inv!=null&&conditionHandle(null,inv)){
-            EnergyProviderOperation currentOperation = (EnergyProviderOperation)this.processor.getOperation(l);
+            EnergyProviderOperation currentOperation = this.processor.getOperation(l);
             ItemConsumer[] fastCraft=null;
             if(currentOperation==null){
                 Pair<MachineRecipe, ItemConsumer[]> nextP = CraftUtils.findNextRecipe(inv,getInputSlots(),getOutputSlots(),
@@ -153,7 +155,8 @@ public abstract class AbstractEnergyProcessor extends AbstractEnergyProvider imp
     }
 
 
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return new int[]{19,20};
     }
 
@@ -161,10 +164,12 @@ public abstract class AbstractEnergyProcessor extends AbstractEnergyProvider imp
      * method from MachineProcessorHolder
      * @return
      */
-    public MachineProcessor<EnergyProviderOperation> getMachineProcessor() {
+    @Override
+	public MachineProcessor<EnergyProviderOperation> getMachineProcessor() {
         return this.processor;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return new int[]{24,25};
     }
 
@@ -180,11 +185,13 @@ public abstract class AbstractEnergyProcessor extends AbstractEnergyProvider imp
      * @param e
      * @param menu
      */
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu) {
         super.onBreak(e,menu);
         AbstractEnergyProcessor.this.processor.endOperation(menu.getLocation());
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
     }
 

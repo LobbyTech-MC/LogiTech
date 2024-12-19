@@ -54,7 +54,8 @@ public class SimulateTestGenerator extends AbstractMachine {
         );
         this.RANDOM_THREASHOLD= 2*this.ENERGY_ABSMAX+1;
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         stack.setItemMeta(AddUtils.addLore(stack,
                 new StringBuilder("&8⇨ &e⚡ &7").
                         append(AddUtils.formatDouble(-ENERGY_ABSMAX)).
@@ -62,26 +63,33 @@ public class SimulateTestGenerator extends AbstractMachine {
                         append(AddUtils.formatDouble(ENERGY_ABSMAX)).append(" J/t").toString()).getItemMeta());
 
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         preset.addItem(INFO_SLOT,ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler());
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
 
-    public void newMenuInstance(BlockMenu menu, Block block){
+    @Override
+	public void newMenuInstance(BlockMenu menu, Block block){
     }
-    public void onBreak(BlockBreakEvent event,BlockMenu nb){
+    @Override
+	public void onBreak(BlockBreakEvent event,BlockMenu nb){
         super.onBreak(event,nb);
         if(nb!=null){
             nb.dropItems(nb.getLocation(),MACHINE_SLOT);
         }
     }
-    public void process(Block b,BlockMenu inv,SlimefunBlockData data){}
-    public void tick(Block b, BlockMenu inv, SlimefunBlockData data,int tick){
+    @Override
+	public void process(Block b,BlockMenu inv,SlimefunBlockData data){}
+    @Override
+	public void tick(Block b, BlockMenu inv, SlimefunBlockData data,int tick){
         ItemStack stack=inv.getItemInSlot(MACHINE_SLOT);
         if(CraftUtils.matchItemStack(stack,MACHINE_COUNTER,false)){
             int amount=stack.getAmount();
@@ -114,5 +122,6 @@ public class SimulateTestGenerator extends AbstractMachine {
             }
         }
     }
-    public void updateMenu(BlockMenu menu, Block block, Settings mod){}
+    @Override
+	public void updateMenu(BlockMenu menu, Block block, Settings mod){}
 }

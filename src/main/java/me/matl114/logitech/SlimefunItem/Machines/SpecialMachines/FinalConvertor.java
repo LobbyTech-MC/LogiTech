@@ -113,7 +113,9 @@ public class FinalConvertor extends AbstractMachine implements FinalAltarCore.Fi
             int delta=start+(int)(sgn*x);
             if(delta>=0&&delta<LIST_LEN){
                 mat=ID_TO_MATERIAL[delta];
-                if(mat!=null)return mat;
+                if(mat!=null) {
+					return mat;
+				}
             }
         }
         return null;
@@ -172,7 +174,8 @@ public class FinalConvertor extends AbstractMachine implements FinalAltarCore.Fi
                 new ItemStack[]{AddUtils.getInfoShow("&f可能的输出","&7如下所示")},
                 new ItemStack[]{NULL_OUTPUT});
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         int[] border=BORDER;
         int len=border.length;
         for (int i=0;i<len;++i){
@@ -190,18 +193,22 @@ public class FinalConvertor extends AbstractMachine implements FinalAltarCore.Fi
         }
         preset.addItem(STATUS_SLOT,STATUS_OFF,ChestMenuUtils.getEmptyClickHandler());
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public List<MachineRecipe> getMachineRecipes(){
+    @Override
+	public List<MachineRecipe> getMachineRecipes(){
         List<MachineRecipe> recipes=new ArrayList<>();
         recipes.add(RECIPE_FOR_DISPLAY);
         return recipes;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data) {
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data) {
         int hasPutOutput=0;
         int hasPutInput=0;
         ItemStack input;
@@ -234,8 +241,11 @@ public class FinalConvertor extends AbstractMachine implements FinalAltarCore.Fi
         }
 
     }
-    public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
-        if(menu==null)return;
+    @Override
+	public void tick(Block b, @Nullable BlockMenu menu, SlimefunBlockData data, int tickCount){
+        if(menu==null) {
+			return;
+		}
         if(conditionHandle(b,menu)&& FinalFeature.isFinalAltarCharged(this,data)){
             if(menu.hasViewer()){
                 menu.replaceExistingItem(STATUS_SLOT,STATUS_ON);

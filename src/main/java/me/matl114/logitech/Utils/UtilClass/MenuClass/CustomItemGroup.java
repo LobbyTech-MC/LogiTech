@@ -80,7 +80,7 @@ public abstract class CustomItemGroup extends FlexItemGroup {
                 Class clazz= Class.forName("io.github.thebusybiscuit.slimefun4.api.items.ItemGroup");
                 Field _hasType=clazz.getDeclaredField("item");
                 _hasType.setAccessible(true);
-                ItemStack it=(ItemStack)_hasType.get((ItemGroup)itg);
+                ItemStack it=(ItemStack)_hasType.get(itg);
                 menuFactory.addInventory(i,it);
             }catch (Throwable e){
                 menuFactory.addInventory(i,AddUtils.renameItem(INVOKE_ERROR,itg.getUnlocalizedName()));
@@ -145,7 +145,7 @@ public abstract class CustomItemGroup extends FlexItemGroup {
                 Class clazz= Class.forName("io.github.thebusybiscuit.slimefun4.api.items.ItemGroup");
                 Field _hasType=clazz.getDeclaredField("item");
                 _hasType.setAccessible(true);
-                ItemStack it=(ItemStack)_hasType.get((ItemGroup)itg);
+                ItemStack it=(ItemStack)_hasType.get(itg);
                 menuFactory.addInventory(i,it);
             }catch (Throwable e){
                 menuFactory.addInventory(i,AddUtils.renameItem(INVOKE_ERROR,itg.getUnlocalizedName()));
@@ -158,7 +158,7 @@ public abstract class CustomItemGroup extends FlexItemGroup {
         Research research = sfitem.getResearch();
         if (SlimefunGuideMode.CHEAT_MODE!=mode && !Slimefun.getPermissionsService().hasPermission(p, sfitem)) {
             List<String> message = Slimefun.getPermissionsService().getLore(sfitem);
-            menu.addItem(index, new CustomItemStack(ChestMenuUtils.getNoPermissionItem(), sfitem.getItemName(), (String[])message.toArray(new String[0])));
+            menu.addItem(index, new CustomItemStack(ChestMenuUtils.getNoPermissionItem(), sfitem.getItemName(), message.toArray(new String[0])));
             menu.addMenuClickHandler(index, ChestMenuUtils.getEmptyClickHandler());
         } else if (SlimefunGuideMode.CHEAT_MODE!=mode&& research != null && !profile.hasUnlocked(research)) {
             String lore;
@@ -256,13 +256,16 @@ public abstract class CustomItemGroup extends FlexItemGroup {
      * @param menuFactory
      */
     protected abstract void init(MenuFactory menuFactory);
-    public boolean isHidden(Player p) {
+    @Override
+	public boolean isHidden(Player p) {
         return !isVisible;
     }
-    public boolean isVisible(Player var1, PlayerProfile var2, SlimefunGuideMode var3){
+    @Override
+	public boolean isVisible(Player var1, PlayerProfile var2, SlimefunGuideMode var3){
         return isVisible;
     }
-    public void open(Player var1, PlayerProfile var2, SlimefunGuideMode var3){
+    @Override
+	public void open(Player var1, PlayerProfile var2, SlimefunGuideMode var3){
         int page=getLastPage(var1,var2,var3);
         if(page<=0||page>this.pages){
             page=1;

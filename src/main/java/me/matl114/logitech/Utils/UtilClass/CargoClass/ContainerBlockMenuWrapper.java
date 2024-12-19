@@ -61,7 +61,9 @@ public class ContainerBlockMenuWrapper extends BlockMenu implements Cloneable{
     public ItemStack getItemInSlot(int slot) {
         if(slot<this.slotSize){
             return inventory.getItem(slot);
-        }else return null;
+        } else {
+			return null;
+		}
     }
     @Override
     public Location getLocation() {
@@ -88,7 +90,8 @@ public class ContainerBlockMenuWrapper extends BlockMenu implements Cloneable{
             //inventorySnapShot[slot]=inventory.getItem(inventory.getSize()-1);
         }
     }
-    public void replaceExistingItem(int slot, ItemStack item, boolean event) {
+    @Override
+	public void replaceExistingItem(int slot, ItemStack item, boolean event) {
 //        if (event) {
 //            ItemStack previous = this.getItemInSlot(slot);
 //            item = this.preset.onItemStackChange(this, slot, previous, item);

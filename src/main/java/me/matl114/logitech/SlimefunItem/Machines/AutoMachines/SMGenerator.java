@@ -44,11 +44,13 @@ public class SMGenerator extends AbstractTransformer  {
 
 
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
         stack.setItemMeta( AddUtils.smgInfoAdd(stack,time).getItemMeta() );
         super.addInfo(stack);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         preset.setSize(54);
         preset.addItem(INFO_SLOT,this.INFO_WORKING.clone(), ChestMenuUtils.getEmptyClickHandler());
         int[] border=BORDER;
@@ -57,20 +59,25 @@ public class SMGenerator extends AbstractTransformer  {
             preset.addItem(BORDER[i],ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
         }
     }
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
 
-    public boolean isSync(){
+    @Override
+	public boolean isSync(){
         return false;
     }
-    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
+    @Override
+	public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
         super.tick(b,menu,data,ticker);
     }
-    public void updateMenu(BlockMenu inv,Block b,Settings mod){
+    @Override
+	public void updateMenu(BlockMenu inv,Block b,Settings mod){
         if(mod==Settings.INIT){
             DataCache.setLastRecipe(inv.getLocation(),0);
         }

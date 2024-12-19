@@ -73,7 +73,8 @@ public abstract class AbstractAdvancedProcessor extends AbstractMachine implemen
 
     }
 
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
 
         stack.setItemMeta( AddUtils.machineInfoAdd(
                 AddUtils.addLore(stack,"&8⇨ &7并行处理机器"),
@@ -83,7 +84,8 @@ public abstract class AbstractAdvancedProcessor extends AbstractMachine implemen
      *
      * @param preset
      */
-    public void constructMenu(BlockMenuPreset preset) {
+    @Override
+	public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         int[] border = BORDER;
         int len=border.length;
@@ -106,18 +108,21 @@ public abstract class AbstractAdvancedProcessor extends AbstractMachine implemen
         return 64;
     }
 
-    public int[] getInputSlots(){
+    @Override
+	public int[] getInputSlots(){
         return INPUT_SLOT;
     }
     /**
      * method from MachineProcessorHolder
      * @return
      */
-    public MachineProcessor<MultiCraftingOperation> getMachineProcessor() {
+    @Override
+	public MachineProcessor<MultiCraftingOperation> getMachineProcessor() {
         return this.processor;
     }
 
-    public int[] getOutputSlots(){
+    @Override
+	public int[] getOutputSlots(){
         return OUTPUT_SLOT;
     }
 
@@ -135,19 +140,24 @@ public abstract class AbstractAdvancedProcessor extends AbstractMachine implemen
      * @param e
      * @param menu
      */
-    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+    @Override
+	public void onBreak(BlockBreakEvent e, BlockMenu menu) {
         super.onBreak(e,menu);
         AbstractAdvancedProcessor.this.processor.endOperation(menu.getLocation());
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
     }
-    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    @Override
+	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         MultiCraftingOperation currentOperation = this.processor.getOperation(b);
         ItemGreedyConsumer[] fastCraft=null;
         if(currentOperation==null){
             int maxCraftlimit=getCraftLimit(b,inv);
-            if(maxCraftlimit<=0)return;
+            if(maxCraftlimit<=0) {
+				return;
+			}
             Pair<MachineRecipe,ItemGreedyConsumer[]> nextQ=CraftUtils.matchNextMultiRecipe(inv,getInputSlots(),getMachineRecipes(data),
                     USE_HISTORY,maxCraftlimit, Settings.SEQUNTIAL,CRAFT_PROVIDER);
             if(nextQ==null){

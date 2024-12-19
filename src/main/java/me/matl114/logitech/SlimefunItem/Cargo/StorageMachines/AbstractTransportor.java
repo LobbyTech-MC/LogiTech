@@ -22,22 +22,29 @@ public abstract class AbstractTransportor extends DistinctiveCustomItemStack imp
     public AbstractTransportor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
         super(category,item , recipeType, recipe);
     }
-    public void addInfo(ItemStack stack){
+    @Override
+	public void addInfo(ItemStack stack){
     }
-    public abstract void constructMenu(BlockMenuPreset preset);
-    public abstract int[] getInputSlots();
-    public abstract int[] getOutputSlots();
-    public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
+    @Override
+	public abstract void constructMenu(BlockMenuPreset preset);
+    @Override
+	public abstract int[] getInputSlots();
+    @Override
+	public abstract int[] getOutputSlots();
+    @Override
+	public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
         updateMenu(blockMenu,block,Settings.INIT);
     }
-    public void preRegister(){
+    @Override
+	public void preRegister(){
         super.preRegister();
         //
         registerTick(this);
         //为menublock提供 需要
         registerBlockMenu(this);
     }
-    public abstract void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker);
+    @Override
+	public abstract void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker);
     public void updateMenu(BlockMenu blockMenu, Block block, Settings mod){
     }
 }

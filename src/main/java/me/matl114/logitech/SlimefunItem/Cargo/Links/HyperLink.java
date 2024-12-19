@@ -22,7 +22,9 @@ public class HyperLink {
     public final static NamespacedKey KEY_LOC = AddUtils.getNameKey("link_location");
     public static boolean canLink(ItemMeta meta) {
         String it=CraftUtils.parseSfId(meta);
-        if(it==null) return false;
+        if(it==null) {
+			return false;
+		}
         return SlimefunItem.getById(it) instanceof HypLink;
     }
     public static void clearLink(ItemMeta meta) {

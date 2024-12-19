@@ -29,7 +29,8 @@ public class MultiLevelBlock implements AbstractMultiBlock {
             this.INDEXS[i+1]=this.INDEXS[i]+this.SIZES[i];
         }
     }
-    public MultiBlockService.Direction getDirection() {
+    @Override
+	public MultiBlockService.Direction getDirection() {
         return direction;
     }
     public int getLevel(){
@@ -40,7 +41,8 @@ public class MultiLevelBlock implements AbstractMultiBlock {
      * @param index
      * @return
      */
-   public Vector getStructurePart(int index){
+   @Override
+public Vector getStructurePart(int index){
        for(int i=0;i<level;++i){
            if(index<INDEXS[i+1]){
                return SUBPARTS[i].getStructurePart(index-INDEXS[i]);
@@ -54,7 +56,8 @@ public class MultiLevelBlock implements AbstractMultiBlock {
      * @param index
      * @return
      */
-    public String getStructurePartId(int index){
+    @Override
+	public String getStructurePartId(int index){
         for(int i=0;i<level;++i){
             if(index<INDEXS[i+1]){
                 return SUBPARTS[i].getStructurePartId(index-INDEXS[i]);
@@ -67,11 +70,13 @@ public class MultiLevelBlock implements AbstractMultiBlock {
      * get structure size
      * @return
      */
-    public int getStructureSize(){
+    @Override
+	public int getStructureSize(){
         return INDEXS[level];
     }
 
-    public MultiLevelBlockType getType(){
+    @Override
+	public MultiLevelBlockType getType(){
         return this.schema;
     }
 }

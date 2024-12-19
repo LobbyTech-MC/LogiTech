@@ -6,7 +6,8 @@ public class TestSlotPusher extends TestPusher{
         super(stack);
         this.slot = slot;
     }
-    public TestSlotPusher clone(){
+    @Override
+	public TestSlotPusher clone(){
         return (TestSlotPusher) super.clone();
     }
     public void init(TestStack item,int slot){

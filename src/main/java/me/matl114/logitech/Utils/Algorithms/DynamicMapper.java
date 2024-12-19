@@ -15,7 +15,8 @@ public class DynamicMapper<T,W>  extends AbstractList<T> implements List<T>{
         this.result = result;
         this.mapper=mapper;
     }
-    public T get(int index){
+    @Override
+	public T get(int index){
         if(index<0 || index>=size){
             throw new IndexOutOfBoundsException();
         }else {
@@ -25,10 +26,12 @@ public class DynamicMapper<T,W>  extends AbstractList<T> implements List<T>{
             return result[index];
         }
     }
-    public boolean isEmpty(){
+    @Override
+	public boolean isEmpty(){
         return size==0;
     }
-    public int size(){
+    @Override
+	public int size(){
         return size;
     }
 

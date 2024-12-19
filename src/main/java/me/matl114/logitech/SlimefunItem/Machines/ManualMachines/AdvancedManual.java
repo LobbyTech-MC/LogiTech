@@ -254,8 +254,8 @@ public class AdvancedManual extends AbstractBlock {
                     //非法的值或者是null
                     //强制重置并情空recipe展示
                     this.selectedRecipeIndex=-1;
-                    for(int i=0;i<recipeDisplaySlot.length; ++i){
-                        this.replaceExistingItem(recipeDisplaySlot[i],nullIngredient);
+                    for (int element : recipeDisplaySlot) {
+                        this.replaceExistingItem(element,nullIngredient);
                     }
                     this.replaceExistingItem(outputSlot,nullIngredient);
                 }else {
@@ -309,7 +309,9 @@ public class AdvancedManual extends AbstractBlock {
         }
         //仅用于构造配方类型的icon列
         private void setTypeSlot(int index,RecipeType type) {
-            if(index>6)return;
+            if(index>6) {
+				return;
+			}
             if(type!=null){
                 this.replaceExistingItem(rTypeIconSlot[index], RecipeSupporter.RECIPETYPE_ICON.getOrDefault(type,nullRtype));
                 this.addMenuClickHandler(rTypeIconSlot[index],((player, i, itemStack, clickAction) -> {
@@ -368,7 +370,8 @@ public class AdvancedManual extends AbstractBlock {
             this.addMenuOpeningHandler(player -> {
                 executor=player;
                 BukkitRunnable newTask=new BukkitRunnable() {
-                    public void run() {
+                    @Override
+					public void run() {
                         if(getInventory().getViewers().contains(executor)){
                             onMenuRefreshByPlayerAsync(executor);
                         }else {
@@ -447,14 +450,16 @@ public class AdvancedManual extends AbstractBlock {
     public AdvancedManual(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
-    public void constructMenu(BlockMenuPreset preset){
+    @Override
+	public void constructMenu(BlockMenuPreset preset){
         preset.setSize(9);
     }
     @Override
     public void newMenuInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block){
         blockMenu.addMenuOpeningHandler(this::openManulGui);
     }
-    public void onPlace(BlockPlaceEvent e,Block b){
+    @Override
+	public void onPlace(BlockPlaceEvent e,Block b){
         if(b.getState() instanceof Lectern lt){
             if(lt.getInventory() instanceof LecternInventory ltiv){
                 ltiv.setItem(0,displayedBook);
@@ -464,7 +469,8 @@ public class AdvancedManual extends AbstractBlock {
     public void openManulGui(Player player){
         PLAYER_MANUALGUIS.computeIfAbsent(player.getUniqueId(),(uuid -> new ManualCrafterGui(getItemName()))).open(player);
     }
-    public void preRegister() {
+    @Override
+	public void preRegister() {
         super.preRegister();
         this.registerBlockMenu(this);
     }
