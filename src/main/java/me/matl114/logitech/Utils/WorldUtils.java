@@ -1,25 +1,20 @@
 package me.matl114.logitech.Utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
-import javax.annotation.Nonnull;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.BlockDataController;
+import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
+import me.matl114.logitech.Listeners.Events.AttackPermissionTestEvent;
+import me.matl114.logitech.MyAddon;
+import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusher;
+import me.matl114.matlib.Utils.Reflect.FieldAccess;
+import me.matl114.matlib.core.EnvironmentManager;
+import org.bukkit.*;
+import org.bukkit.block.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.ArmorStand;
@@ -33,19 +28,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTables;
 import org.bukkit.util.Vector;
 
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.BlockDataController;
-
-import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
-import me.matl114.logitech.MyAddon;
-import me.matl114.logitech.Listeners.Events.AttackPermissionTestEvent;
-import me.matl114.logitech.Schedule.Schedules;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusher;
-import me.matl114.matlib.Utils.Reflect.FieldAccess;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class WorldUtils {
     public static enum DustPreset{
@@ -61,7 +49,13 @@ public class WorldUtils {
     }
     public static SlimefunAddon INSTANCE= MyAddon.getInstance();
     public static final BlockDataController CONTROLLER=Slimefun.getDatabaseManager().getBlockDataController();
-    public static HashMap<Material,Integer> FOOD_LEVELS=new HashMap<>(){{
+    public static void setBlock(Location loc, Material material) {
+        loc.getBlock().setType(material);
+    }
+    public static void setAir(Location loc) {
+        loc.getBlock().setType(Material.AIR);
+    }
+    public static EnumMap<Material,Integer> FOOD_LEVELS=new EnumMap<>(Material.class){{
         put(Material.MUSHROOM_STEW,6);
         put(Material.BEEF,3);
         put(Material.ROTTEN_FLESH,4);
@@ -104,7 +98,7 @@ public class WorldUtils {
         put(Material.COOKED_BEEF,8);
         //till 1.20.4
     }};
-    public static HashMap<Material,Integer> FOOD_SATURATION_MUL_10=new HashMap<>(){{
+    public static EnumMap<Material,Integer> FOOD_SATURATION_MUL_10=new EnumMap<>(Material.class){{
         put(Material.MUSHROOM_STEW,192);
         put(Material.BEEF,78);
         put(Material.ROTTEN_FLESH,88);
@@ -147,70 +141,18 @@ public class WorldUtils {
         put(Material.COOKED_BEEF,288);
         //till 1.20.4
     }};
-    public static List<LootTables> OVERWORLD_STRUCTURE_CHESTS=new ArrayList<>(){{
-        add(LootTables.ABANDONED_MINESHAFT);
-        add(LootTables.BURIED_TREASURE);
-        add(LootTables.DESERT_PYRAMID);
-        add(LootTables.IGLOO_CHEST);
-        add(LootTables.JUNGLE_TEMPLE);
-        add(LootTables.JUNGLE_TEMPLE_DISPENSER);
-        add(LootTables.PILLAGER_OUTPOST);
-        add(LootTables.ANCIENT_CITY);
-        add(LootTables.ANCIENT_CITY_ICE_BOX);
-        add(LootTables.RUINED_PORTAL);
-        try{
-            add(LootTables.TRIAL_CHAMBERS_REWARD);
-            add(LootTables.TRIAL_CHAMBERS_SUPPLY);
-            add(LootTables.TRIAL_CHAMBERS_CORRIDOR);
-            add(LootTables.TRIAL_CHAMBERS_INTERSECTION);
-            add(LootTables.TRIAL_CHAMBERS_INTERSECTION_BARREL);
-            add(LootTables.TRIAL_CHAMBERS_ENTRANCE);
-            add(LootTables.TRIAL_CHAMBERS_CORRIDOR_DISPENSER);
-            add(LootTables.TRIAL_CHAMBERS_CHAMBER_DISPENSER);
-            add(LootTables.TRIAL_CHAMBERS_WATER_DISPENSER);
-            add(LootTables.TRIAL_CHAMBERS_CORRIDOR_POT);
-        }catch (Throwable e){
-            Debug.logger("1.21 LootTable not supported");
+    public static HashMap<String,HashSet<LootTables>> LOOTTABLES_TYPES =new HashMap<>(){{
+        for (LootTables loots:LootTables.values()){
+            String[] splitedPath=loots.getKey().getKey().split("/");
+            if(splitedPath.length!=0){
+                String type=splitedPath[0];
+                if(type!=null){
+                    computeIfAbsent(type,t->new HashSet<>()).add(loots);
+                }
+            }
         }
-        add(LootTables.SHIPWRECK_MAP);
-        add(LootTables.SHIPWRECK_SUPPLY);
-        add(LootTables.SHIPWRECK_TREASURE);
-        add(LootTables.SIMPLE_DUNGEON);
-        add(LootTables.SPAWN_BONUS_CHEST);
-        add(LootTables.STRONGHOLD_CORRIDOR);
-        add(LootTables.STRONGHOLD_CROSSING);
-        add(LootTables.STRONGHOLD_LIBRARY);
-        add(LootTables.UNDERWATER_RUIN_BIG);
-        add(LootTables.UNDERWATER_RUIN_SMALL);
-        add(LootTables.VILLAGE_ARMORER);
-        add(LootTables.VILLAGE_BUTCHER);
-        add(LootTables.VILLAGE_CARTOGRAPHER);
-        add(LootTables.VILLAGE_DESERT_HOUSE);
-        add(LootTables.VILLAGE_FISHER);
-        add(LootTables.VILLAGE_FLETCHER);
-        add(LootTables.VILLAGE_MASON);
-        add(LootTables.VILLAGE_PLAINS_HOUSE);
-        add(LootTables.VILLAGE_SAVANNA_HOUSE);
-        add(LootTables.VILLAGE_SHEPHERD);
-        add(LootTables.VILLAGE_SNOWY_HOUSE);
-        add(LootTables.VILLAGE_TAIGA_HOUSE);
-        add(LootTables.VILLAGE_TANNERY);
-        add(LootTables.VILLAGE_TEMPLE);
-        add(LootTables.VILLAGE_TOOLSMITH);
-        add(LootTables.VILLAGE_WEAPONSMITH);
-        add(LootTables.WOODLAND_MANSION);
-        //archaeology
-        add(LootTables.DESERT_WELL_ARCHAEOLOGY);
-        add(LootTables.DESERT_PYRAMID_ARCHAEOLOGY);
-        add(LootTables.TRAIL_RUINS_ARCHAEOLOGY_COMMON);
-        add(LootTables.TRAIL_RUINS_ARCHAEOLOGY_RARE);
-        add(LootTables.OCEAN_RUIN_WARM_ARCHAEOLOGY);
-        add(LootTables.OCEAN_RUIN_COLD_ARCHAEOLOGY);
-        //sniffer
-        add(LootTables.SNIFFER_DIGGING);
-        //till 1.21
-
     }};
+
     public static List<LootTables> NETHER_STRUCTURE_CHESTS=new ArrayList<>(){{
         add(LootTables.NETHER_BRIDGE);
         add(LootTables.BASTION_TREASURE);
@@ -218,7 +160,6 @@ public class WorldUtils {
         add(LootTables.BASTION_BRIDGE);
         add(LootTables.BASTION_HOGLIN_STABLE);
         //PIGLING
-        //this need piglin entity
         add(LootTables.PIGLIN_BARTERING);
 
     }};
@@ -226,7 +167,16 @@ public class WorldUtils {
         add(LootTables.END_CITY_TREASURE);
         //till 1.20.4
     }};
-    public static Set<Material> BLOCKTYPE_WITH_ENTITY=new HashSet<>(){{
+    public static List<LootTables> OVERWORLD_STRUCTURE_CHESTS=new ArrayList<>(){{
+        Set<LootTables> set=new HashSet<>();
+        set.addAll(LOOTTABLES_TYPES.getOrDefault("chests",new HashSet<>()));
+        set.addAll(LOOTTABLES_TYPES.getOrDefault("archaeology",new HashSet<>()));
+        set.addAll(LOOTTABLES_TYPES.getOrDefault("spawners",new HashSet<>()));
+        set.removeAll(NETHER_STRUCTURE_CHESTS);
+        set.removeAll(END_STRUCTURE_CHESTS);
+        addAll(set);
+    }};
+    public static EnumSet<Material> BLOCKTYPE_WITH_ENTITY=EnumSet.copyOf( new HashSet<Material>(){{
         add(Material.DROPPER);
         add(Material.SCULK_CATALYST);
         add(Material.DISPENSER);
@@ -391,8 +341,10 @@ public class WorldUtils {
         add(Material.BIRCH_WALL_SIGN);
         add(Material.LIME_SHULKER_BOX);
         //till 1.20.4
-    }};
-    public static Set<Material> BLOCKTYPE_WITH_NONNULL_TICKER=new HashSet<>(){{
+    }}
+    );
+    public static EnumSet<Material> BLOCKTYPE_WITH_NONNULL_TICKER=EnumSet.copyOf(
+            new HashSet<Material>(){{
         add(Material.DROPPER);
         add(Material.SCULK_CATALYST);
         add(Material.DISPENSER);
@@ -425,19 +377,14 @@ public class WorldUtils {
         add(Material.CAMPFIRE);
         add(Material.SCULK_SHRIEKER);
         //till 1.20.4
-    }};
-    public static Set<Material> WATER_VARIENT=new HashSet<>(){{
-        add(Material.WATER);
-        add(Material.BUBBLE_COLUMN);
-        //till 1.20.4
-    }};
-    public static Set<Material> BLOCK_MUST_WATERLOGGED=new HashSet<>(){{
-        add(Material.SEAGRASS);
-        add(Material.TALL_SEAGRASS);
-        add(Material.KELP);
-        //till 1.20.4
-    }};
-    public static Set<Material> BLOCK_WITH_RANDOMTICK=new HashSet<>(){{
+    }}
+    );
+    public static EnumSet<Material> WATER_VARIENT=EnumSet.of(Material.WATER,Material.BUBBLE_COLUMN);
+     //till 1.20.4
+    public static EnumSet<Material> BLOCK_MUST_WATERLOGGED=EnumSet.of(Material.SEAGRASS,Material.TALL_SEAGRASS,Material.KELP);
+    public static EnumSet<Material> BLOCK_WITH_RANDOMTICK=EnumSet.copyOf(
+
+      new HashSet<Material>(){{
         add(Material.GRASS_BLOCK);
         add(Material.CARROTS);
         add(Material.CUT_COPPER);
@@ -513,8 +460,10 @@ public class WorldUtils {
         add(Material.BAMBOO_SAPLING);
         //till 1.20.4
 
-    }};
-    public static Set<Material> BLOCK_WITH_MULTI_BLOCKSTATE=new HashSet<>(){{
+    }}
+    );
+    public static EnumSet<Material> BLOCK_WITH_MULTI_BLOCKSTATE=EnumSet.copyOf(
+     new HashSet<Material>(){{
         add(Material.TRIPWIRE_HOOK);
         add(Material.REPEATING_COMMAND_BLOCK);
         add(Material.COMPOSTER);
@@ -1159,7 +1108,33 @@ public class WorldUtils {
         add(Material.CHERRY_PRESSURE_PLATE);
 
         //till 1.20.4
+    }}
+    );
+
+    public static EnumMap<Material,Material> ITEM_HAS_DIFFERENT_ID_BLOCK=new EnumMap<>(Material.class){{
+        put(Material.STRING,Material.TRIPWIRE);
+        put(Material.MELON_SEEDS,Material.MELON_STEM);
+        put(Material.SWEET_BERRIES,Material.SWEET_BERRY_BUSH);
+        put(Material.TORCHFLOWER_SEEDS,Material.TORCHFLOWER_CROP);
+        put(Material.CARROT,Material.CARROTS);
+        put(Material.PUMPKIN_SEEDS,Material.PUMPKIN_STEM);
+        put(Material.BEETROOT_SEEDS,Material.BEETROOTS);
+        put(Material.POTATO,Material.POTATOES);
+        put(Material.PITCHER_POD,Material.PITCHER_CROP);
+        put(Material.COCOA_BEANS,Material.COCOA);
+        put(Material.REDSTONE,Material.REDSTONE_WIRE);
+        put(Material.GLOW_BERRIES,Material.CAVE_VINES);
+        put(Material.POWDER_SNOW_BUCKET,Material.POWDER_SNOW);
+        put(Material.WHEAT_SEEDS,Material.WHEAT);
     }};
+    @Nullable
+    public static Material getBlock(Material material){
+        return ITEM_HAS_DIFFERENT_ID_BLOCK.getOrDefault(material,(material.isBlock()?material:null));
+    }
+    public static boolean isBlock(Material material){
+        return material.isBlock()||ITEM_HAS_DIFFERENT_ID_BLOCK.containsKey(material);
+    }
+
     protected static Class CraftBlockStateClass;
 
     //    protected static Field IBlockDataField;
@@ -1199,9 +1174,10 @@ protected static FieldAccess iBlockDataFieldAccess;
     }
     public static HashSet<Material> WATER_LOGGABLE_TYPES=new HashSet<>(){{
         for (Material m : Material.values()) {
-            if(m.isBlock()){
+            if(isBlock(m)){
                 try{
-                    BlockData defaultData= m.createBlockData();
+
+                    BlockData defaultData= getBlock(m).createBlockData();
                     if(defaultData instanceof Waterlogged){
 
                         add(m);
@@ -1634,8 +1610,37 @@ public static void moveSlimefunBlock(Location loc, boolean force) {
             }
             event.setDropItems(false);
             return true;
-        } else {
-			return false;
-		}
+        }else return false;
+    }
+
+
+
+    public static void forceLoadChunk(Location loc,int tick){
+        int dx=loc.getBlockX()>>4;
+        int dz=loc.getBlockZ()>>4;
+        World world=loc.getWorld();
+        Chunk chunk=world.getChunkAt(dx,dz);
+        final boolean isForceload=chunk.isForceLoaded();
+        chunk.setForceLoaded(true);
+        Schedules.launchSchedules(()->{
+            chunk.setForceLoaded(isForceload);
+        },tick,true,0);
+    }
+    public static boolean isTargetableLivingEntity(Entity e){
+        if(e.isValid()&&!e.isDead()&&e instanceof LivingEntity le&&!le.isInvulnerable()){
+            if(e instanceof ArmorStand stand && (stand.isMarker()||stand.isSmall())){
+                return false;
+            }
+            return true;
+        }return false;
+    }
+    public static Location getHandLocation(LivingEntity p){
+        Location loc=p.getEyeLocation();
+        Location playerLocation=p.getLocation();
+        loc.add(playerLocation.subtract(loc).multiply(0.3).toVector());
+        return loc;
+    }
+    public static boolean copyBlockState(BlockState state,Block block2){
+        return EnvironmentManager.getManager().getVersioned().copyBlockStateTo(state,block2);
     }
 }

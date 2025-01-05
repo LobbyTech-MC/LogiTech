@@ -40,74 +40,67 @@ import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import me.matl114.logitech.SlimefunItem.CustomSlimefunItem;
 import me.matl114.logitech.Utils.Algorithms.DynamicArray;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemCounter;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemGreedyConsumer;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusher;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemPusherProvider;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemSlotPusher;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.MultiItemStack;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.RandOutItem;
+
+import me.matl114.logitech.Utils.UtilClass.ItemClass.*;
+import me.matl114.matlib.Utils.Reflect.FieldAccess;
+import me.matl114.matlib.core.EnvironmentManager;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.*;
+
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.IntFunction;
 
 public class CraftUtils {
-    private static final HashSet<Material> COMPLEX_MATERIALS = new HashSet<>(){{
-        add(Material.AXOLOTL_BUCKET);
-        add(Material.WRITABLE_BOOK);
-        add(Material.WRITTEN_BOOK);
-        add(Material.ENCHANTED_BOOK);
-        add(Material.BUNDLE);
-        add(Material.FIREWORK_STAR);
-        add(Material.FIREWORK_ROCKET);
-        add(Material.COMPASS);
-        add(Material.LEATHER_BOOTS);
-        add(Material.LEATHER_HELMET);
-        add(Material.LEATHER_LEGGINGS);
-        add(Material.LEATHER_CHESTPLATE);
-        add(Material.MAP);
-        add(Material.POTION);
-        add(Material.SPLASH_POTION);
-        add(Material.LINGERING_POTION);
-        add(Material.SUSPICIOUS_STEW);
-        add(Material.COD_BUCKET);
-        add(Material.SALMON_BUCKET);
-        add(Material.TADPOLE_BUCKET);
-        add(Material.PUFFERFISH_BUCKET);
-        add(Material.TROPICAL_FISH_BUCKET);
-        add(Material.PLAYER_HEAD);
-        add(Material.PLAYER_WALL_HEAD);
-    }};
-    private static final HashSet<Material> INDISTINGUISHABLE_MATERIALS = new HashSet<>() {{
+    public static final EnumSet<Material> COMPLEX_MATERIALS = EnumSet.noneOf(Material.class);
+    static{
+        ItemMeta sampleMeta=new ItemStack(Material.STONE).getItemMeta();
+        for(Material mat : Material.values()){
+            if(mat.isItem()&&!mat.isAir()){
+                ItemMeta testMeta=new ItemStack(mat).getItemMeta();
+                if(testMeta!=null&& testMeta.getClass()!=sampleMeta.getClass()){
+                    COMPLEX_MATERIALS.add(mat);
+                }
+            }
+        }
+    }
+    private static final HashSet<Material> INDISTINGUISHABLE_MATERIALS = new HashSet<Material>() {{
         //add(Material.SHULKER_BOX);
         add(Material.BUNDLE);
     }};
     public static final ItemStack DEFAULT_ITEMSTACK=new ItemStack(Material.STONE);
     public static final ItemMeta NULL_META=(DEFAULT_ITEMSTACK.getItemMeta());
     public static final Class CRAFTMETAITEMCLASS=NULL_META.getClass();
-    public static final Class ITEMSTACKCLASS=ItemStack.class;
+    // public static final Class ITEMSTACKCLASS=ItemStack.class;
     public static Class CRAFTITEMSTACKCLASS;
     public static ItemStack CRAFTITEMSTACK;
-    public static Field CRAFTLORE;
-    public static Field CRAFTDISPLAYNAME;
-    public static Field CRAFTHANDLER;
+    public static FieldAccess loreAccess;
+    public static FieldAccess displayNameAccess;
+    public static FieldAccess handledAccess;
+    // public static Field CRAFTHANDLER;
     public static Class NMSITEMCLASS;
     //public static Field ITEMSTACKMETA;
-    public static boolean INVOKE_SUCCESS;
-    public static boolean INVOKE_STACK_SUCCESS;
+
     static{
+        Debug.logger("Initializing CraftUtils...");
         try{
-            CRAFTLORE=CRAFTMETAITEMCLASS.getDeclaredField("lore");
-            CRAFTDISPLAYNAME=CRAFTMETAITEMCLASS.getDeclaredField("displayName");
+            var CRAFTLORE=CRAFTMETAITEMCLASS.getDeclaredField("lore");
             CRAFTLORE.setAccessible(true);
+            loreAccess= FieldAccess.of(CRAFTLORE);
+            var CRAFTDISPLAYNAME=CRAFTMETAITEMCLASS.getDeclaredField("displayName");
             CRAFTDISPLAYNAME.setAccessible(true);
-            INVOKE_SUCCESS=true;
+            displayNameAccess=FieldAccess.of(CRAFTDISPLAYNAME);
+
         }catch (Throwable e){
-            Debug.logger("INVOKE META FAILED,PLEASE CHECK LOGGER!!!!!!");
-            INVOKE_SUCCESS=false;
-            e.printStackTrace();
-            Debug.logger("DISABLING RELEVENT FEATURE");
+            Debug.logger("Stack reflection failed,please check the error");
+            Debug.logger(e);
+            Debug.logger("disabling the relavent features");
 
         }
         try{
@@ -115,11 +108,12 @@ public class CraftUtils {
             a.addItem(0,DEFAULT_ITEMSTACK);
             CRAFTITEMSTACK=a.getItemInSlot(0);
             CRAFTITEMSTACKCLASS=CRAFTITEMSTACK.getClass();
-            Debug.debug(CRAFTITEMSTACKCLASS.getName());
-            CRAFTHANDLER=CRAFTITEMSTACKCLASS.getDeclaredField("handle");
+            var CRAFTHANDLER=CRAFTITEMSTACKCLASS.getDeclaredField("handle");
             CRAFTHANDLER.setAccessible(true);
+            handledAccess=FieldAccess.of(CRAFTHANDLER);
+
             Object handle=CRAFTHANDLER.get(CRAFTITEMSTACK);
-            Debug.debug(handle.getClass());
+            //Debug.debug(handle.getClass());
             NMSITEMCLASS=handle.getClass();
             //CRAFTMETA=NMSITEMCLASS.getDeclaredField("meta");
 //            Field[] fields= NMSITEMCLASS.getDeclaredFields();
@@ -128,14 +122,93 @@ public class CraftUtils {
             //ITEMSTACKMETA=DEFAULT_ITEMSTACK.getClass().getDeclaredField("meta");
             //ITEMSTACKMETA.setAccessible(true);
             //INVOKE_STACK_SUCCESS=true;
-            INVOKE_STACK_SUCCESS=false;
+            // INVOKE_STACK_SUCCESS=false;
         }catch (Throwable e){
-            Debug.logger("INVOKE STACK FAILED,PLEASE CHECK LOGGER!!!!!!");
+            Debug.logger("Stack reflection failed,please check the error");
             Debug.logger(e);
-            Debug.logger("DISABLING RELEVENT FEATURE");
+            Debug.logger("disabling the relavent features");
 
         }
     }
+    public static void setup(){
+
+    }
+
+    /**
+     * if item a and item b both craftItemStack check if handled item match
+     * @param a
+     * @param b
+     * @return
+     */
+    public static boolean sameCraftItem(ItemStack a, ItemStack b){
+        if(CRAFTITEMSTACKCLASS.isInstance(a)&&CRAFTITEMSTACKCLASS.isInstance(b)){
+            try{
+                return  handledAccess.getValue(a)==handledAccess.getValue(b);
+            }catch (Throwable e){
+                return false;
+            }
+        }else return false;
+    }
+    @Nullable
+    public static String parseSfId(ItemStack item) {
+        Optional<String> itemID = Slimefun.getItemDataService().getItemData(item);
+        return  itemID.orElse(null) ;
+    }
+    public static String parseSfId(ItemMeta meta){
+        Optional<String> itemID = Slimefun.getItemDataService().getItemData(meta);
+        return itemID.orElse(null);
+    }
+    public static SlimefunItem parseSfItem(ItemMeta meta){
+        Optional<String> itemID = Slimefun.getItemDataService().getItemData(meta);
+        return itemID.map((id)->SlimefunItem.getById(id)).orElse(null);
+    }
+    public static SlimefunItem parseSfItem(ItemStack item){
+        Optional<String> itemID = Slimefun.getItemDataService().getItemData(item);
+        return itemID.map((id)->SlimefunItem.getById(id)).orElse(null);
+    }
+    /**
+     * get Consumer for recipe Item
+     * @param a
+     * @return
+     */
+    public static ItemConsumer getConsumer(ItemStack a){
+        if(a==null)return null;
+        if (a instanceof RandOutItem ro) {
+            // return new ItemConsumer(a.clone());
+            //当物品是随机输出物品时候,取其中的随机实例
+            return ItemConsumer.get(ro.getInstance());
+        }
+        return ItemConsumer.get(a);
+    }
+    public static ItemCounter getCounter(ItemStack a){
+        if(a==null)return null;
+        //用于比较和
+        return ItemCounter.get(a);
+    }
+
+    /**
+     * get greedy consumer for recipe Item
+     * @param a
+     * @return
+     */
+    public static ItemGreedyConsumer getGreedyConsumer(ItemStack a){
+        if(a==null)return null;
+        if (a instanceof RandOutItem ro) {
+            //当物品是随机输出物品时候,取其中的随机实例
+            // return new ItemConsumer(a.clone());
+            return ItemGreedyConsumer.get(ro.getInstance());
+        }
+        return ItemGreedyConsumer.get(a);
+    }
+    public static ItemGreedyConsumer getGreedyConsumerOnce(ItemStack a){
+        return getGreedyConsumerAsAmount(a,1);
+    }
+    public static ItemGreedyConsumer getGreedyConsumerAsAmount(ItemStack a,int multiply){
+        ItemGreedyConsumer greedyConsumer=getGreedyConsumer(a);
+        greedyConsumer.setStackNum(multiply);
+        return greedyConsumer;
+    }
+
     /**
      * a huge project to adapt sth...
      * use .get(mod,inv,slot) to get ItemPusher
@@ -1930,10 +2003,49 @@ public static MachineRecipe matchNextRecipe(BlockMenu inv ,int[] slots,List<Mach
         return max;
     }
 
-    public static boolean multiForcePush(ItemGreedyConsumer[] slotCounters, BlockMenu inv,int[] slots){
-        return multiForcePush(slotCounters,inv,slots,getpusher);
-    }
+        ItemStack stack1=counter1.getItem();
+        ItemStack stack2=counter2.getItem();
+        if (stack1 == null || stack2 == null) {
+            return stack1 == stack2;
+        }
+        if(stack1 instanceof MultiItemStack) {
+            return ((MultiItemStack) stack1).matchItem(stack2,strictCheck);
+        }else if (stack2 instanceof MultiItemStack) {
+            return ((MultiItemStack) stack2).matchItem(stack1,strictCheck);
+        }
+        //match material
+        Material material=stack1.getType();
+        if (material != stack2.getType()) {
+            return false;
+        }
+        ItemMeta meta1=   counter1.getMeta();
+        ItemMeta meta2=    counter2.getMeta();
+        if(meta1==null||meta2==null ) {
+            return meta2==meta1;
+        }
+        //if indistinguishable meta all return false
+        if(INDISTINGUISHABLE_MATERIALS.contains(material)){
+            return false;
+        }
+//        //match display name
+//        if(!(!meta1.hasDisplayName() || (meta1.getDisplayName().equals(meta2.getDisplayName())))) {
+//            return false;
+//        }
+        //match display name
 
+        //check important metas
+        if(canQuickEscapeMetaVariant(meta1,meta2)){
+            return false;
+        }
+        if(COMPLEX_MATERIALS.contains(material)){
+            if(EnvironmentManager.getManager().getVersioned().differentSpecialMeta(meta1,meta2)){
+                return false;
+            }
+        }
+        //check pdc
+        if (!meta1.getPersistentDataContainer().equals(meta2.getPersistentDataContainer())) {
+            return false;
+        }
 
     public static boolean multiForcePush(ItemGreedyConsumer[] slotCounters, BlockMenu inv,int[] slots,ItemPusherProvider pusher){
         DynamicArray<ItemPusher> slotCounters2=new DynamicArray<>(ItemPusher[]::new,slots.length,pusher.getMenuInstance(Settings.OUTPUT,inv,slots));
@@ -1990,80 +2102,99 @@ public static MachineRecipe matchNextRecipe(BlockMenu inv ,int[] slots,List<Mach
 				}
             }
         }
-        return hasChanged;
-    }
-    public static boolean multiPushItems(ItemStack[] items,BlockMenu inv,int[] slots,int multiple){
-        return multiPushItems(items,inv,slots,multiple,getpusher);
-    }
-    public static boolean multiPushItems(ItemStack[] items,BlockMenu inv,int[] slots,int multiple,ItemPusherProvider pusher){
-        if(multiple==1){
-            return pushItems(items,inv,slots,pusher);
-        }
-        ItemGreedyConsumer[] slotCounters=new ItemGreedyConsumer[items.length];
-        for(int i=0;i<items.length;++i) {
-            slotCounters[i]=CraftUtils.getGreedyConsumer(items[i]);
-            slotCounters[i].setMatchAmount(slotCounters[i].getAmount()*multiple);
-        }
-        return multiForcePush(slotCounters,inv,slots,pusher);
 
+        //粘液物品一般不可修改displayName和Lore
+        //不然则全非sf物品
 
-    }
-    public static void multiUpdateInputMenu(ItemGreedyConsumer[] recipeGreedyCounters,BlockMenu inv){
-        for (ItemGreedyConsumer recipeGreedyCounter : recipeGreedyCounters) {
-            recipeGreedyCounter.updateItemsPlus(inv,Settings.GRAB);
-        }
-    }
-    public static void multiUpdateOutputMenu(ItemGreedyConsumer[] recipeGreedyCounters,BlockMenu inv){
-        for (ItemGreedyConsumer recipeGreedyCounter : recipeGreedyCounters) {
-            recipeGreedyCounter.updateItemsPlus(inv,Settings.PUSH);
-        }
-    }
-    public static String parseSfId(ItemMeta meta){
-        Optional<String> itemID = Slimefun.getItemDataService().getItemData(meta);
-        return itemID.orElse(null);
-    }
-
-@Nullable
-    public static String parseSfId(ItemStack item) {
-        Optional<String> itemID = Slimefun.getItemDataService().getItemData(item);
-        return  itemID.orElse(null) ;
-    }
-    public static SlimefunItem parseSfItem(ItemMeta meta){
-        Optional<String> itemID = Slimefun.getItemDataService().getItemData(meta);
-        return itemID.map((id)->SlimefunItem.getById(id)).orElse(null);
-    }
-    public static SlimefunItem parseSfItem(ItemStack item){
-        Optional<String> itemID = Slimefun.getItemDataService().getItemData(item);
-        return itemID.map((id)->SlimefunItem.getById(id)).orElse(null);
-    }
-    /**
-     * remake version of pushItems
-     * @return
-     */
-    public static boolean pushItems(ItemStack[] items,BlockMenu inv,int[] slots){
-        return pushItems(items,inv,slots,getpusher);
-    }
-    public static boolean  pushItems(ItemStack[] items,BlockMenu inv,int[] slots,ItemPusherProvider pusher){
-        ItemConsumer[] consumers=new ItemConsumer[items.length];
-        for(int i=0;i<items.length;++i) {
-            consumers[i]=CraftUtils.getConsumer(items[i]);
-        }
-        return forcePush(consumers,inv,slots,pusher);
-    }
-    /**
-     * if item a and item b both craftItemStack check if handled item match
-     * @param a
-     * @param b
-     * @return
-     */
-    public static boolean sameCraftItem(ItemStack a, ItemStack b){
-        if(!INVOKE_SUCCESS){
+        //如果非严格且名字相同旧返回，反之则继续
+        if(!(!meta1.hasDisplayName() || matchDisplayNameField(meta1,meta2))) {
             return false;
         }
-        if(CRAFTITEMSTACKCLASS.isInstance(a)&&CRAFTITEMSTACKCLASS.isInstance(b)){
-            try{
-                return CRAFTHANDLER.get(a)==(CRAFTHANDLER.get(b));
-            }catch (Throwable e){
+
+        if(!meta1.hasLore()||!meta2.hasLore()){
+            return meta1.hasLore()==meta2.hasLore();
+        }
+        if ( !matchLoreField(meta1, meta2)) {
+            return false;
+            //对于普通物品 检查完lore就结束是正常的
+        }else if(!strictCheck){
+            return true;
+        }
+        // Make sure enchantments match
+        if (!meta1.getEnchants().equals(meta2.getEnchants())) {
+            return false;
+        }
+        //custommodeldata
+        final boolean hasCustomOne = meta1.hasCustomModelData();
+        final boolean hasCustomTwo = meta2.hasCustomModelData();
+        if (hasCustomOne) {
+            if (!hasCustomTwo || meta1.getCustomModelData() != meta2.getCustomModelData()) {
+                return false;
+            }
+        } else if (hasCustomTwo) {
+            return false;
+        }
+        final boolean hasAttributeOne = meta1.hasAttributeModifiers();
+        final boolean hasAttributeTwo = meta2.hasAttributeModifiers();
+        if (hasAttributeOne) {
+            if (!hasAttributeTwo || !Objects.equals(meta1.getAttributeModifiers(),meta2.getAttributeModifiers())) {
+                return false;
+            }
+        } else if (hasAttributeTwo) {
+            return false;
+        }
+        return true;
+    }
+    public static boolean matchLoreField(ItemMeta meta1, ItemMeta meta2){
+        return loreAccess.compareFieldOrDefault(meta1,meta2,()->matchLore(meta1.getLore(),meta2.getLore(),false));
+    }
+
+//    public static ItemMeta getItemMeta(ItemStack it){
+////        if(!INVOKE_STACK_SUCCESS)return it.getItemMeta();
+////        if(CRAFTITEMSTACKCLASS.isInstance(it)){
+////            return it.getItemMeta();
+////        }
+//        if(it.getClass()!=CRAFTITEMSTACKCLASS) {
+//            try{
+//            return (ItemMeta) ITEMSTACKMETA.get(it);
+//            }catch (Throwable e){
+//
+//            }
+//        }
+//        return it.getItemMeta();
+//
+//    }
+    public static boolean matchDisplayNameField(ItemMeta meta1, ItemMeta meta2){
+        return displayNameAccess.compareFieldOrDefault(meta1,meta2,()->Objects.equals(meta1.getDisplayName(),meta2.getDisplayName()));
+    }
+    private static Class CraftMetaBlockState;
+    private static FieldAccess blockEntityTagAccess=FieldAccess.ofName("blockEntityTag");
+    public static boolean matchBlockStateMetaField(BlockStateMeta meta1, BlockStateMeta meta2){
+        return blockEntityTagAccess.ofAccess(meta1).computeIf((b)->{
+            return Objects.equals(b, blockEntityTagAccess.ofAccess(meta2).getRawOrDefault(()->null));
+        },()->meta1.equals(meta2));
+    }
+
+    public static boolean matchItemStack(ItemStack stack1, ItemStack stack2,boolean strictCheck){
+        if(stack1==null || stack2==null){
+            return stack1 == stack2;
+        }else {
+            return matchItemCore(getCounter(stack1),getCounter(stack2),strictCheck);
+        }
+    }
+    public static boolean matchItemStack(ItemStack counter1,ItemCounter counter2,boolean strictCheck){
+        if(counter1==null ){
+            return counter2.getItem()==null;
+        }else {
+            return matchItemCore(getCounter(counter1),counter2,strictCheck);
+        }
+    }
+    public static boolean matchLore(List<String> lore1,List<String> lore2,boolean strictMod){
+        if(strictMod){
+            if(lore1==null || lore2==null){
+                return lore1 == lore2;
+            }
+            if(lore1.size()!=lore2.size()){
                 return false;
             }
         } else {
@@ -2083,11 +2214,6 @@ public static MachineRecipe matchNextRecipe(BlockMenu inv ,int[] slots,List<Mach
         }
     }
 
-    public static void updateOutputMenu(ItemConsumer[] itemCounters,BlockMenu inv){
-        for (ItemConsumer itemCounter : itemCounters) {
-            itemCounter.updateItems(inv,Settings.PUSH);
-        }
-    }
     /**
      * make pushItem
      * make sure itemCounters.size>=out
@@ -2095,18 +2221,35 @@ public static MachineRecipe matchNextRecipe(BlockMenu inv ,int[] slots,List<Mach
      * @param out
      * @param inv
      */
-    public static void updateOutputMenu(ItemPusher[] itemCounters,int[] out,BlockMenu inv){
-        int len=out.length;
-        for (int i=0;i<len;++i){
-            ItemPusher a=itemCounters[i];
-            if(a==null){
-                continue;
+    public static boolean canQuickEscapeMetaVariant(@Nonnull ItemMeta metaOne, @Nonnull ItemMeta metaTwo) {
+        if (metaOne instanceof Damageable instanceOne && metaTwo instanceof Damageable instanceTwo) {
+            if (instanceOne.hasDamage() != instanceTwo.hasDamage()) {
+                return true;
             }
-            if(a.isDirty()){
-                a.updateMenu(inv);
+
+            if (instanceOne.getDamage() != instanceTwo.getDamage()) {
+                return true;
             }
         }
+        if (metaOne instanceof Repairable instanceOne && metaTwo instanceof Repairable instanceTwo) {
+            if (instanceOne.hasRepairCost() != instanceTwo.hasRepairCost()) {
+                return true;
+            }
+
+            if (instanceOne.getRepairCost() != instanceTwo.getRepairCost()) {
+                return true;
+            }
+        }
+        if (metaOne instanceof BlockDataMeta instanceOne ) {
+            if(metaTwo instanceof BlockDataMeta instanceTwo){
+                if (instanceOne.hasBlockData() != instanceTwo.hasBlockData()) {
+                    return true;
+                }
+            }else return true;
+        }
+        return false;
     }
+
 
 
 }

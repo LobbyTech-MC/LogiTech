@@ -1,15 +1,6 @@
 package me.matl114.logitech.SlimefunItem.Machines.AutoMachines;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-
+import com.google.common.base.Preconditions;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
@@ -58,6 +49,15 @@ public class AdvanceRecipeCrafter extends AbstractAdvancedProcessor implements R
     protected final String KEY_CTIME="ct";
     protected final int CTIME_SLOT=5;
     protected final ItemStack CTIME_ITEM=new CustomItemStack(Material.CLOCK,"&6自定义进度时间","&7点击输入自定义进度时常");
+    public AdvanceRecipeCrafter(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
+                                Material processbar, int energyConsumption, int energyBuffer,
+                                List<Pair<Object,Integer>> customRecipes)  {
+        super(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,customRecipes);
+        this.craftType=null;
+        this.publicTime=0;
+        this.progressItem = new ItemStack(processbar);
+    }
+
     public AdvanceRecipeCrafter(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                                 Material processbar, int energyConsumption, int energyBuffer,int ticks,
                                 RecipeType... craftType)  {
@@ -280,17 +280,17 @@ public ItemStack getProgressBar(){
 
             }
             menu.addMenuClickHandler(CTIME_SLOT,((player, i, itemStack, clickAction) -> {
-                AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&a 请输入自定义的进度时长(单位:sf tick)&e(必须>%s)".formatted(String.valueOf(publicTime)));
+                AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&a 请输入自定义的进度时长(单位:sf tick)&e(必须>=%s)".formatted(String.valueOf(publicTime)));
                 player.closeInventory();
                 AddUtils.asyncWaitPlayerInput(player,(str)->{
                     try{
                         int a=Integer.parseInt(str);
-                        assert a>=this.publicTime;
+                        Preconditions.checkArgument(a>=this.publicTime);
                         DataCache.setCustomData(menu.getLocation(),KEY_CTIME,a);
                         menu.replaceExistingItem(CTIME_SLOT,AddUtils.addLore(CTIME_ITEM,"&c当前的自定义进度时长为: &f%s".formatted(String.valueOf(a))));
                         AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&a 成功设置!");
                     }catch (Throwable e){
-                        AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&c 这不是有效的进度时常&e(必须>%s)");
+                        AddUtils.sendMessage(player,"&6[&7自动无尽工作台&6]&c 这不是有效的进度时常&e(必须>=%s)".formatted(String.valueOf(this.publicTime)));
                     }
                 });
                 return false;
@@ -358,6 +358,10 @@ public ItemStack getProgressBar(){
                     int ticks=next.getTicks();
                     if(next.getTicks()<0){
                         ticks=DataCache.getCustomData(data,KEY_CTIME, this.publicTime) ;
+                        if(ticks<this.publicTime){
+                            ticks=this.publicTime;
+                            DataCache.setCustomData(data,KEY_CTIME,this.publicTime);
+                        }
                     }
                 if(ticks>0){
 

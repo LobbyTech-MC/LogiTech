@@ -1,18 +1,10 @@
 package me.matl114.logitech.SlimefunItem.Machines.AutoMachines;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.function.Supplier;
-
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.Language;
@@ -30,6 +22,17 @@ import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemCounter;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public class AEMachine extends AbstractAdvancedProcessor {
     protected final int[] BORDER={
@@ -70,7 +73,7 @@ public class AEMachine extends AbstractAdvancedProcessor {
 
     public AEMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                      Material processbar, int energyConsumption, int energyBuffer,
-                     LinkedHashMap<Object, Integer> customRecipes) {
+                     List<Pair<Object,Integer>> customRecipes) {
         super(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,customRecipes);
         this.machineRecipeSupplier=null;
     }
@@ -92,6 +95,12 @@ public class AEMachine extends AbstractAdvancedProcessor {
 	public boolean conditionHandle( Block b,BlockMenu menu){
         if(menu.hasViewer()){
             updateMenu(menu,b,Settings.RUN);
+        }else {
+            CompletableFuture.runAsync(()->{
+                if(!menu.hasViewer()){
+                    MenuUtils.syncSlot(menu,CORE_SLOT);
+                }
+            });
         }
         return super.conditionHandle(b,menu);
     }
@@ -113,8 +122,10 @@ public class AEMachine extends AbstractAdvancedProcessor {
         preset.addMenuClickHandler(INFO_SLOT,ChestMenuUtils.getEmptyClickHandler());
         preset.addItem(PROCESSOR_SLOT, MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
     }
-    @Override
-	public int getCraftLimit(Block b, BlockMenu inv){
+
+    protected final ItemCounter CORE_SAMPLE= CraftUtils.getConsumer(AddItem.CHIP_CORE);
+    protected final int CORE_SLOT=13;
+    public int getCraftLimit(Block b, BlockMenu inv){
         return DataCache.getCustomData(inv.getLocation(),MAXCRAFT_KEY,1);
     }
     @Override

@@ -1,6 +1,7 @@
 package me.matl114.logitech.Utils;
 
-import java.util.function.Supplier;
+import com.google.common.base.Preconditions;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.annotation.Nonnull;
 

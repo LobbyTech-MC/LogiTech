@@ -84,21 +84,19 @@ public class TntGenerator extends AbstractMachine {
                         int delay=dh.getInt(2);
                         if(delay<=tick){
                             dh.setInt(3,0);
-                            if(location.getBlock().getBlockData() instanceof NoteBlock nb){
-                                if(nb.isPowered()){
-                                    Location loc=location.clone().add(0.5,dh.getInt(0)/10.0,0.5);
-                                    final int fuse=dh.getInt(1);
-
-                                    Schedules.launchSchedules(()->{
-                                       Entity et= loc.getWorld().spawnEntity(loc, EntityType.TNT);
+                            Location loc=location.clone().add(0.5,dh.getInt(0)/10.0,0.5);
+                            final int fuse=dh.getInt(1);
+                            final Location blockLoc=location;
+                            Schedules.launchSchedules(()->{
+                                if(blockLoc.getBlock().getBlockData() instanceof NoteBlock nb){
+                                    if(nb.isPowered()){
+                                       Entity et= loc.getWorld().spawnEntity(loc, EntityType.PRIMED_TNT);
                                        if(et instanceof TNTPrimed tnt){
                                            tnt.setFuseTicks(fuse);
                                        }
-                                    },0,true,0);
+                                    }
                                 }
-                            }else{
-                                iterator.remove();
-                            }
+                            },0,true,0);
                         }else {
                             dh.setInt(3,tick);
                         }
@@ -191,12 +189,11 @@ public class TntGenerator extends AbstractMachine {
 	public int[] getInputSlots(){
         return INPUT_SLOTS;
     }
-    @Override
-	public int[] getOutputSlots(){
-        return OUTPUT_SLOTS;
-    }
-    @Override
-	public void newMenuInstance(BlockMenu menu, Block block){
+    public void newMenuInstance(BlockMenu menu, Block block){
+        if(block.getBlockData() instanceof NoteBlock b&& block.getBlockPower()>0){
+            b.setPowered(true);
+            block.setBlockData(b,true);
+        }
         SlimefunBlockData data= DataCache.safeLoadBlock(menu.getLocation());
         DataMenuClickHandler dh=getDataHolder(block,menu);
         int offset=DataCache.getCustomData(data,OFFSET_KEY,-10);

@@ -27,6 +27,21 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
+import java.util.function.Consumer;
 
 public interface MenuBlock extends InventoryBlock {
     public static abstract class AdvancedBlockMenuPreset extends BlockMenuPreset{
@@ -165,7 +180,7 @@ public interface MenuBlock extends InventoryBlock {
      * @param e
      * @param menu
      */
-    default void onBreak(BlockBreakEvent e, BlockMenu menu) {
+    default void onBreak(BlockBreakEvent e,@Nullable BlockMenu menu) {
         if(menu!=null){
             Location l = menu.getLocation();
             menu.dropItems(l, this.getInputSlots());

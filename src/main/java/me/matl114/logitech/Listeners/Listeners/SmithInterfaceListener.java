@@ -1,12 +1,18 @@
 package me.matl114.logitech.Listeners.Listeners;
 
-import java.util.HashMap;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.Supplier;
-
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
+import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SmithWorkShop.SmithInterfaceProcessor;
+import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SmithWorkShop.SmithingInterface;
+import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.UtilClass.CargoClass.ContainerBlockMenuWrapper;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemGreedyConsumer;
+import me.matl114.logitech.Utils.UtilClass.RecipeClass.MultiCraftingOperation;
+import me.matl114.matlib.Implements.Slimefun.core.CustomRecipeType;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -24,22 +30,10 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
-import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SmithWorkShop.SmithInterfaceProcessor;
-import me.matl114.logitech.SlimefunItem.Blocks.MultiBlock.SmithWorkShop.SmithingInterface;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.CraftUtils;
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.Settings;
-import me.matl114.logitech.Utils.WorldUtils;
-import me.matl114.logitech.Utils.UtilClass.CargoClass.ContainerBlockMenuWrapper;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemGreedyConsumer;
-import me.matl114.logitech.Utils.UtilClass.RecipeClass.MultiCraftingOperation;
-import me.matl114.matlib.Implements.Slimefun.core.CustomRecipeType;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.function.*;
 
 public class SmithInterfaceListener implements Listener {
     private CustomRecipeType craftTable;
@@ -67,6 +61,15 @@ public class SmithInterfaceListener implements Listener {
     public SmithInterfaceListener() {
         this.craftTable= SmithInterfaceProcessor.INTERFACED_CRAFTTABLE;
 
+    }
+    private final HashMap<Inventory, Location> openingCraftInventory= new HashMap<>();
+ //   private final HashMap<AnvilInventory,Location> openingAnvilTable= new HashMap<>();
+
+    private final ItemStack INTERFACED_NO_RECIPE=new CustomItemStack(Material.BARRIER,"&a点击进行合成","&7该工作方块已成功接入锻铸合成端口","&c暂无匹配的配方!");
+    private final ItemStack INTERFACED_CRAFTABLE=new CustomItemStack(Material.CRAFTING_TABLE,"&a点击进行合成","&7该工作方块已成功接入锻铸合成端口","&a成功寻找到可行的合成配方","&7点击后将于接口中输出合成结果");
+    private final ItemStack INTERFACED_ANVIL=new CustomItemStack(Material.ANVIL,"&a点击进行锻造","&7该工作方块已成功接入锻铸合成端口","&a成功寻找到可行的锻造操作","&7点击后将于接口中输出锻造结果");
+    public boolean isSupportType(Inventory inventory) {
+        return inventory instanceof CraftingInventory||inventory instanceof AnvilInventory; /*can add more types*/
     }
     public void addInventory(Inventory inventory,Location location) {
         openingCraftInventory.put(inventory,location);
@@ -197,18 +200,25 @@ public class SmithInterfaceListener implements Listener {
             return false;
         }
     }
-    @EventHandler(priority = EventPriority.MONITOR,ignoreCancelled = true)
-    public void onOpenInventory(InventoryOpenEvent e) {
-        //record inventory for quick match
-        Inventory inventory = e.getInventory();
-        if(isSupportType(inventory) ) {
-            Location craftTableLocation = inventory.getLocation();
-            if(craftTableLocation!=null&& WorldUtils.isBlockLocation(craftTableLocation)){
-                var re=SmithingInterface.getAdjacentInterface(craftTableLocation);
-                if(re!=null&&re.getSecondValue() instanceof SmithInterfaceProcessor outport) {
-                    addInventory(inventory,re.getFirstValue());
-                }
+    @EventHandler(priority = EventPriority.MONITOR,ignoreCancelled = false)
+    public void onAnvilLogicStop(PrepareAnvilEvent e) {
+        //Debug.logger("on Anvil Perpare");
+        //boolean failed=e.getResult()==null||e.getResult().getType().isAir();
+        if(openingCraftInventory.containsKey(e.getInventory())) {;
+            AnvilInventory inv=e.getInventory();
+            if(onAnvilPrepare(inv)){
+                e.setResult(INTERFACED_ANVIL);
+            }else {
+                e.setResult(INTERFACED_NO_RECIPE);
             }
+            //if(failed){
+                //尝试同步inventory
+                //当铁砧合成在内部被判定为不能的时候,不会向客户端发送inv变动，需要我们手动发送
+            List<HumanEntity> viewers=inv.getViewers();
+            Schedules.launchSchedules(()->{
+                viewers.forEach(p->{if(p instanceof Player player){ player.updateInventory();}});
+            },0,true,0);
+            //}
         }
     }
     public <T extends Inventory,W extends Object> void onPlayerCraftCommon(T inventory, HumanEntity player, Function<T,W> craftProcess, BiFunction<W,Location, MultiCraftingOperation> callBack, Consumer<T> failCallback){
@@ -239,8 +249,15 @@ public class SmithInterfaceListener implements Listener {
             onCraftTablePrepare(e.getInventory());
         }
     }
-    public void removeInventory(Inventory inventory) {
-        openingCraftInventory.remove(inventory);
+    public boolean onAnvilPrepare(AnvilInventory inventory) {
+        var result= ANVIL_PROCESSOR.apply(inventory);
+        if(inventory.getSize()>=3){
+            boolean re=result!=null;
+            ItemStack set=re?INTERFACED_ANVIL:INTERFACED_NO_RECIPE;
+            inventory.setItem(2,set);
+            return re;
+        }
+        return false;
     }
 
 }

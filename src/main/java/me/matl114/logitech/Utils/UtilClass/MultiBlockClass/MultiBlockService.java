@@ -25,18 +25,63 @@ import org.bukkit.util.Vector;
 
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import me.matl114.logitech.Schedule.ScheduleSave;
-import me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore.MultiBlockCore;
-import me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore.MultiBlockPart;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.BukkitUtils;
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.UtilClass.EntityClass.ItemDisplayBuilder;
-import me.matl114.logitech.Utils.UtilClass.EntityClass.TransformationBuilder;
-import me.matl114.logitech.Utils.UtilClass.FunctionalClass.OutputStream;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MultiBlockService {
+    //?
+    public static void setup(){
+        ScheduleSave.addFinalTask(()->{
+            Set<Location> locs=new HashSet<>(HOLOGRAM_CACHE.keySet());
+            for(Location loc:locs){
+                removeHologramSync(loc);
+            }
+        });
+    }
+
+    /**
+     * returned mbid when no sf block and not multipart
+     */
+    public static final String MBID_AIR ="nu";
+   // protected static final String MBID_COMMONSFBLOCK="sf";
+    public static String getAutoKey(){
+        return MB_AUTO_KEY;
+    }
+    protected static final String MB_AUTO_KEY="auto";
+    public static String getHologramKey(){
+        return MB_HOLOGRAM_KEY;
+    }
+    protected static final String MB_HOLOGRAM_KEY="holo";
+    //will be deprecated soon
+    //
+    @Deprecated
+    private static final String MB_STATUS_KEY="mb-sta";
+    @Deprecated
+    private static final String MB_UUID_KEY="uuid";
+    //move data key-value to cached status map
+    private static final ConcurrentHashMap<Location, AtomicInteger> MB_STATUS_MAP=new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Location, AtomicReference<String>> MB_UUID_MAP=new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<String,AbstractMultiBlockHandler> MULTIBLOCK_CACHE = new ConcurrentHashMap<>();
+    public static final HashMap<Location, DisplayGroup> HOLOGRAM_CACHE=new HashMap<>();
+    public static final Random rand=new Random();
+    public static final int MAX_MB_NUMBER=1_000_000;
+    public static boolean validHandler(String uid){
+        AbstractMultiBlockHandler handler=MULTIBLOCK_CACHE.get(uid);
+        if(handler==null){
+            return false;
+        }else {
+            String uuid=safeGetUUID(handler.getCore());
+            if(uid.equals(uuid)){//uid 核验,说明人没炸 uuid nullable
+                return true;
+            }
+            return false;
+        }
+    }
     public static class DeleteCause{
 
         String cause;
@@ -155,24 +200,125 @@ public class MultiBlockService {
     /**
      * returned mbid when no sf block and not multipart
      */
-    public static final String MBID_AIR ="nu";
-    protected static final String MB_AUTO_KEY="auto";
-    protected static final String MB_HOLOGRAM_KEY="holo";
-    //will be deprecated soon
-    //
-    @Deprecated
-    private static final String MB_STATUS_KEY="mb-sta";
-    @Deprecated
-    private static final String MB_UUID_KEY="uuid";
-    //move data key-value to cached status map
-    private static final ConcurrentHashMap<Location, AtomicInteger> MB_STATUS_MAP=new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<Location, AtomicReference<String>> MB_UUID_MAP=new ConcurrentHashMap<>();
-    public static final HashMap<String,AbstractMultiBlockHandler> MULTIBLOCK_CACHE = new LinkedHashMap<>();
-    public static final HashMap<Location, DisplayGroup> HOLOGRAM_CACHE=new HashMap<>();
-    public static final Random rand=new Random();
-    public static final int MAX_MB_NUMBER=1_000_000;
-    public static DeleteCause MANUALLY=new DeleteCause("手动关闭",true);
-    public static DeleteCause GENERIC=new DeleteCause("服务器重启",false);
+    public static AbstractMultiBlock tryCreateMultiBlock(Location loc, AbstractMultiBlockType type,OutputStream errorOut){
+        //may not be loaded ,use safe read
+        AbstractMultiBlock block=null;
+        for (MultiBlockService.Direction direction:MultiBlockService.Direction.values()){
+            //test this direction
+            errorOut.out(()->"&a尝试以朝向 &e%s&a 构建多方块".formatted(direction.name()));
+            block=type.genMultiBlockFrom(loc,direction,false,errorOut);
+
+            if(block!=null){
+                return block;
+            }
+
+            if(type.isSymmetric()){
+                errorOut.out(()->"&c本多方块结构为中心对称多方块结构,构建失败");
+                break;//only test one direction is Symmetric
+            }
+        }
+        return null;
+    }
+
+    private static String getRandomId(){
+        String nextValue;
+        do{
+            nextValue=String.valueOf(rand.nextInt(MAX_MB_NUMBER));
+        }while (MULTIBLOCK_CACHE.containsKey(nextValue));
+        return nextValue;
+    }
+//    private static boolean tryAddHandlerInternal(Location loc,AbstractMultiBlockHandler handler){
+//        if(handler==null){
+//            return false;
+//        }else {
+//            String uid=getRandomId();
+//
+//        }
+//    }
+
+    public static boolean createNewHandler(Location loc, MultiBlockBuilder builder, AbstractMultiBlockType type){
+        return createNewHandler(loc,builder,type,OutputStream.getNullStream());
+    }
+    public static boolean createNewHandler(Location loc, MultiBlockBuilder builder, AbstractMultiBlockType type, OutputStream errorOut){
+        int statusCode=safeGetStatus(loc);
+        if(statusCode==0){
+            AbstractMultiBlock block= tryCreateMultiBlock(loc,type,errorOut);
+            if(block!=null){
+                Direction.setDirection(loc,block.getDirection());
+                String uid=getRandomId();
+                AbstractMultiBlockHandler handler=builder.build(loc,block,uid);
+                if(handler!=null){
+                    MULTIBLOCK_CACHE.put(uid,handler);
+                    setStatus(loc,1);
+                    return true;
+                }else{
+                    //builder refused
+                    return false;
+                }
+            }else {
+                return false;
+            }
+        }else {
+            return true;
+        }
+    }
+    public static boolean checkIfAbsentRuntime(SlimefunBlockData data){
+        String uid=safeGetUUID(data.getLocation());
+        AbstractMultiBlockHandler handler=MULTIBLOCK_CACHE.get(uid);
+        if(handler==null){
+            return false;
+        }else {
+            int index=handler.checkIfCompleteRandom();
+            if( index<0){
+                return true;
+            }else {
+                //发出关闭信号,等待下一次coreRequest响应
+
+                handler.toggleOff(StructureBreakCause.get(handler,index));
+                return false;
+            }
+        }
+    }
+    public static void toggleOff(SlimefunBlockData data,DeleteCause cause){
+        if(data==null)return;
+        String uid=safeGetUUID(data.getLocation());
+        AbstractMultiBlockHandler handler=MULTIBLOCK_CACHE.get(uid);
+        if(handler!=null){
+            handler.toggleOff(cause);
+        }
+    }
+        //called in tickers
+    public static Location acceptPartRequest(Location loc){
+        int statusCode=getStatus(loc);
+        if(statusCode==0){
+            return null;
+        }
+        String uid=safeGetUUID(loc);
+        AbstractMultiBlockHandler handler=MULTIBLOCK_CACHE.get(uid);
+        if(statusCode==1){
+            if(handler==null){
+                setStatus(loc,-3);
+                return null;
+            }else {
+                handler.acceptPartRequest(loc);
+                return handler.getCore();
+            }
+        }else {
+            if(handler!=null){
+                //reconnect success ,set status to 1
+                handler.acceptPartRequest(loc);
+                setStatus(loc,1);
+                return handler.getCore();
+            }//quit
+            //no reconnect ,statusCode == -1 means 3tick reconnect time is end,toggleOff
+            if(statusCode==-1){
+                setUUID(loc,"null");
+            }
+            setStatus(loc,statusCode+1);
+            return null;
+        }
+    }
+
     /**
      * run on loaded ticker
      * @param loc
@@ -204,20 +350,24 @@ public class MultiBlockService {
             AbstractMultiBlockHandler handler=MULTIBLOCK_CACHE.get(uid);
             if(handler==null){
                 //找不到handler 但是code非0 说明是意外中断，尝试重建handler
-                AbstractMultiBlock block=type.genMultiBlockFrom(loc,Direction.getDirection(loc),true,OutputStream.getNullStream());
-                if(block!=null){
-                    String newuid=getRandomId();
-                    while(MULTIBLOCK_CACHE.containsKey(newuid)){
-                        newuid=getRandomId();
+                setStatus(loc,-20);
+                //尝试异步构建\
+                MultiBlockCore.runAsyncOrReturnBlocked(loc,()->{
+                    AbstractMultiBlock block=type.genMultiBlockFrom(loc,Direction.getDirection(loc),true,OutputStream.getNullStream());
+                    if(block!=null){
+                        String newuid=getRandomId();
+                        AbstractMultiBlockHandler handler2=reconnect.build(loc,block,newuid);
+                        if(handler2!=null){
+                            MULTIBLOCK_CACHE.put(newuid,handler2);
+                            setStatus(loc,1);
+                        }
                     }
-                    AbstractMultiBlockHandler handler2=reconnect.build(loc,block,newuid);
-                    MULTIBLOCK_CACHE.put(newuid,handler2);
-                    return true;
-                }else{
-                    //不进行倒计时,
-                    setStatus(loc,-20);
-                    return false;
-                }
+//                    else{
+//                        //不进行倒计时,
+//                        setStatus(loc,-20);
+//                    }
+                });
+                return false;
             }else {
                 if( handler.acceptCoreRequest()){
                     return true;

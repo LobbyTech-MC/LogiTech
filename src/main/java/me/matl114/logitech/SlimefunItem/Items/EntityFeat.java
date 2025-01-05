@@ -26,7 +26,61 @@ import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.CraftUtils;
 import me.matl114.logitech.Utils.Utils;
 
-public class EntityFeat extends ItemWithHandler<ItemDropHandler> {
+public class EntityFeat extends CustomItemWithHandler<ItemDropHandler> {
+    protected final  int MIDDLE_MERGE=3;
+    protected final  int SUPER_MERGE=9;
+    public  EntityFeat(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe){
+        super(itemGroup, item, recipeType, recipe);
+        ItemStack resultItemStack=generateSpawnerFrom(EntityType.ZOMBIE,8,60,64,6,10,true);
+        this.setDisplayRecipes(
+                Utils.list(
+                        AddUtils.getInfoShow("&f机制",
+                                "&7将该物品丢出以合成普通的刷怪笼",
+                                "&7当一次性丢出数量不足一组时,将会按%d:1合成普通刷怪笼".formatted(MIDDLE_MERGE),
+                                "&7当一次性丢出数量达到%d时,将会按%d:1合成&e超频刷怪笼&7,&a其生成速率等数据将被大幅提高".formatted(SUPER_MERGE,SUPER_MERGE)),
+                        resultItemStack
+                )
+        );
+    }
+    public static ItemStack getItemFromEntityType(EntityType entityType) {
+        ItemStack item = AddItem.ENTITY_FEAT.clone();
+        ItemMeta meta = item.getItemMeta();
+
+        // Fixes #2583 - Proper NBT handling of Spawners
+        if(entityType!=null&&entityType.isSpawnable())
+            if (meta instanceof BlockStateMeta stateMeta) {
+                BlockState state = stateMeta.getBlockState();
+
+                if (state instanceof CreatureSpawner spawner) {
+                    spawner.setSpawnedType(entityType);
+                }
+
+                stateMeta.setBlockState(state);
+            }
+
+        // Setting the lore to indicate the Type visually
+        List<String> lore = meta.getLore();
+        boolean hasTypeLore=false;
+        for (int i = 0; i < lore.size(); i++) {
+            String currentLine = lore.get(i);
+            if (currentLine.contains("<Type>") || currentLine.contains("<类型>")) {
+                String typeName = ChatUtils.humanize(entityType.name());
+                lore.set(i, currentLine.replace("<Type>", typeName).replace("<类型>", typeName));
+                hasTypeLore=true;
+                break;
+            }
+        }
+        if(!hasTypeLore){
+            lore.add("");
+            lore.add("&7类型: "+ AddUtils.color((entityType==null||entityType==EntityType.UNKNOWN||!entityType.isSpawnable())?"类型":ChatUtils.humanize(entityType.name())));
+        }
+
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+
+        return item;
+    }
+
     /**
      * delay=200 maxNearby=6 requirePlayerRange =16 spawnRange=4
      * @param type
@@ -194,14 +248,12 @@ public class EntityFeat extends ItemWithHandler<ItemDropHandler> {
                 (ItemDropHandler) this::onItemDrop
         };
     }
-    public boolean onItemDrop(PlayerDropItemEvent var1, Player var2, Item var3){
-        if(isItem(var3.getItemStack())){
-            if(canUse(var2,true)){
-                Schedules.launchSchedules(
-                        ()->craftToSpawmers(var2, var3)
-               ,30,true,0 );
-            }
-            return true;
+    public boolean canStack(ItemMeta meta1,ItemMeta meta2){
+        if(!super.canStack(meta1,meta2)){
+            return false;
+        }
+        if(meta1 instanceof BlockStateMeta bsm1 &&meta2 instanceof BlockStateMeta bsm2){
+            return CraftUtils.matchBlockStateMetaField(bsm1,bsm2);
         }
         return false;
     }

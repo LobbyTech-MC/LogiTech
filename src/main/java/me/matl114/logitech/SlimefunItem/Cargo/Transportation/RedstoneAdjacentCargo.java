@@ -40,17 +40,16 @@ public class RedstoneAdjacentCargo extends AdjacentCargo {
                 )
         );
     }
-    @Override
-	public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
-
-        if(DataCache.getCustomData(data,POWERED_KEY,0)!=0){
+    public String POWERED_KEY="po";
+    public void cargoTask(Block b, BlockMenu menu, SlimefunBlockData data, int configCode){
+        BlockData data1=b.getBlockData();
+        if(data1 instanceof Lightable la&&la.isLit()){
             super.cargoTask(b,menu,data,configCode);
+           // DataCache.setCustomData(data,POWERED_KEY,la.isLit()?1:0);
         }
-        CompletableFuture.runAsync(()->{
-            BlockData data1=b.getBlockData();
-            if(data1 instanceof Lightable la){
-                DataCache.setCustomData(data,POWERED_KEY,la.isLit()?1:0);
-            }
-        });
+    }
+    public boolean isSync(){
+        //run in sync thread can be faster
+        return true;
     }
 }

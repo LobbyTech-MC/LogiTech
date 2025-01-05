@@ -161,23 +161,15 @@ import me.matl114.logitech.SlimefunItem.Machines.SpecialMachines.VirtualExplorer
 import me.matl114.logitech.SlimefunItem.Machines.SpecialMachines.VirtualKiller;
 import me.matl114.logitech.SlimefunItem.Machines.WorkBenchs.BugCrafter;
 import me.matl114.logitech.SlimefunItem.Machines.WorkBenchs.EWorkBench;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.BukkitUtils;
-import me.matl114.logitech.Utils.CraftUtils;
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.MachineRecipeUtils;
-import me.matl114.logitech.Utils.MenuUtils;
-import me.matl114.logitech.Utils.RecipeSupporter;
-import me.matl114.logitech.Utils.Settings;
-import me.matl114.logitech.Utils.Utils;
-import me.matl114.logitech.Utils.WorldUtils;
+import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.Algorithms.PairList;
 import me.matl114.logitech.Utils.UtilClass.CommandClass.CommandShell;
 import me.matl114.logitech.Utils.UtilClass.FunctionalClass.AsyncResultRunnable;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemCounter;
 import me.matl114.logitech.Utils.UtilClass.MenuClass.MenuFactory;
 import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
+import me.matl114.matlib.Implements.Slimefun.core.CustomRecipeType;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
@@ -198,8 +190,40 @@ public class AddSlimefunItems {
 
     };
     protected static RecipeType COMMON_TYPE=TYPE?RecipeType.ENHANCED_CRAFTING_TABLE: BugCrafter.TYPE;
+    protected static <T extends Object> List<T> list(T ... input){
+        return Arrays.asList(input);
+    }
+    protected static <T extends Object,Z extends Object> Pair<T,Z> pair(T v1,Z v2){
+        return new Pair(v1,v2);
+    }
+    public static ItemStack setC(ItemStack it,int amount){
+        return new CustomItemStack(it,amount);
+    }
+    protected static ItemStack[] nullRecipe(){
+        return AddUtils.NULL_RECIPE.clone();
+    }
+//    private static HashMap<Object,Integer> mrecipe(Object ... v){
+//        int len=v.length;
+//        return new PairList<>((len+1)/2){{
+//            for(int i=0;i<len;i+=2){
+//                Object v1=v[i];
+//                Integer v2=(Integer)v[i+1];
+//                put(v1,v2);
+//            }
+//        }};
+//    }
+    private static PairList<Object,Integer> mkMp(Object ... v){
+        int len=v.length;
+        return new PairList<>(){{
+            for(int i=0;i<len;i+=2){
+                Object v1=v[i];
+                Integer v2=(Integer)v[i+1];
+                put(v1,v2);
+            }
+        }};
+    }
     //items
-    public static final RecipeType STARSMELTERY=new RecipeType(
+    public static final CustomRecipeType STARSMELTERY=new CustomRecipeType(
             AddUtils.getNameKey("star_smeltery"),
             new CustomItemStack(AddItem.STAR_SMELTERY, AddItem.STAR_SMELTERY.getDisplayName(),
                     "", "&c在%s中锻造!".formatted(Language.get("Machines.STAR_SMELTERY.Name")))
@@ -215,7 +239,7 @@ public class AddSlimefunItems {
     public static final SlimefunItem BUG= new MaterialItem(AddGroups.MATERIAL,AddItem.BUG,RecipeType.NULL,
             nullRecipe(),list(AddUtils.getInfoShow("&f获取方式","&7会出现在一些隐蔽地方...",
             "&7当你出现疑问,为什么这个物品找不到时",
-            "你可能需要多看看\"逻辑工艺 版本与说明\"分类(物理意义)")))
+            "&7你可能需要多看看\"逻辑工艺 版本与说明\"分类(物理意义)")))
             .register();
     public static final SlimefunItem TRUE=new MaterialItem(AddGroups.MATERIAL,AddItem.TRUE_,RecipeType.NULL,
             AddUtils.formatInfoRecipe(AddItem.BOOL_GENERATOR,Language.get("Machines.BOOL_GENERATOR.Name")))
@@ -679,7 +703,7 @@ public class AddSlimefunItems {
             new ItemStack(Material.LANTERN),1800,86400,
                 mkMp(
                         mkP(mkl("64COBBLESTONE"),mkl(AddUtils.randItemStackFactory(
-                                new LinkedHashMap<>(){{
+                                new PairList<>(){{
                                     put("64IRON_DUST",1);
                                     put("64GOLD_DUST",1);
                                     put("64COPPER_DUST",1);
@@ -998,10 +1022,16 @@ public class AddSlimefunItems {
                     AddItem.STAR_GOLD_INGOT,AddItem.LMOTOR,"CARBONADO_EDGED_FURNACE","CARBONADO_EDGED_FURNACE",AddItem.LMOTOR,AddItem.STAR_GOLD_INGOT,
                     AddItem.STAR_GOLD_INGOT,AddItem.LMOTOR,"CARBONADO_EDGED_FURNACE","CARBONADO_EDGED_FURNACE",AddItem.LMOTOR,AddItem.STAR_GOLD_INGOT,
                     AddItem.STAR_GOLD_INGOT,setC(AddItem.LPLATE,1),"ELECTRIC_SMELTERY_2","ELECTRIC_SMELTERY_2",setC(AddItem.LPLATE,1),AddItem.STAR_GOLD_INGOT,
-                    AddItem.LFIELD,AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.LFIELD), Material.STONE,18_000,180_000,
-           120,AddSlimefunItems.STARSMELTERY){
-        @Override
-		public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
+                    AddItem.LFIELD,AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.STAR_GOLD_INGOT,AddItem.LFIELD), Material.STONE,18_000,180_000, (List<Pair<Object, Integer>>) null ){
+        int recipetime=120;
+        {
+            STARSMELTERY.relatedTo((input,out)->{
+                this.machineRecipes.add(MachineRecipeUtils.stackFrom(recipetime,input,new ItemStack[]{out}));
+            },(input,out)->{
+                this.machineRecipes.removeIf(recipe->recipe.getOutput().length>=1&&CraftUtils.matchItemStack(recipe.getOutput()[0],out,true));
+            });
+        }
+        public int[] getSlotsAccessedByItemTransportPlus(DirtyChestMenu menu, ItemTransportFlow flow, ItemStack item){
             if(flow==ItemTransportFlow.WITHDRAW){
                 return this.getOutputSlots();
             }else {
@@ -1280,7 +1310,7 @@ public class AddSlimefunItems {
                     AddItem.LFIELD,AddItem.ABSTRACT_INGOT,setC(AddItem.LOGIGATE,1),setC(AddItem.LBOOLIZER,1),AddItem.ABSTRACT_INGOT,AddItem.LFIELD,
                     AddItem.TRUE_,AddItem.LFIELD,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.LFIELD,AddItem.TRUE_,
                     null,AddItem.FALSE_,AddItem.LFIELD,AddItem.LFIELD,AddItem.FALSE_,null), 6, 1919, 256,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl(AddItem.TRUE_),mkl(setC(AddItem.TRUE_,114514)));
                 put(mkl(AddItem.FALSE_),mkl(setC(AddItem.FALSE_,1919810)));
                 put(mkl(AddItem.LBOOLIZER),mkl(setC(AddItem.LBOOLIZER,1)));
@@ -1382,7 +1412,7 @@ public class AddSlimefunItems {
             recipe(Material.DIAMOND_HOE,"WATER_BUCKET",Material.DIAMOND_HOE,
                     "OBSERVER",AddItem.LOGIGATE,"OBSERVER",
                     Material.BONE_BLOCK,"PISTON",Material.BONE_BLOCK), 45, 1_000, 33,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl("WHEAT_SEEDS"),mkl("WHEAT","WHEAT_SEEDS"));
                 put(mkl("CARROT"),mkl("2CARROT"));
                 put(mkl("POTATO"),mkl("2POTATO"));
@@ -1396,7 +1426,7 @@ public class AddSlimefunItems {
                     "TREE_GROWTH_ACCELERATOR","CROP_GROWTH_ACCELERATOR","TREE_GROWTH_ACCELERATOR"
                     ,AddItem.WORLD_FEAT,AddItem.MAGIC_PLANT,AddItem.WORLD_FEAT
             ), 9, 2_500,400,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl("COCOA_BEANS"),mkl("6COCOA_BEANS"));
                 put(mkl("MELON_SEEDS"),mkl("3MELON","3MELON_SEEDS"));
                 put(mkl("PUMPKIN_SEEDS"),mkl("3PUMPKIN","3PUMPKIN_SEEDS"));
@@ -1447,7 +1477,7 @@ public class AddSlimefunItems {
                     null,AddItem.ABSTRACT_INGOT,AddItem.LOGIGATE,"TREE_GROWTH_ACCELERATOR",AddItem.ABSTRACT_INGOT,null,
                     null,AddItem.NETHER_FEAT,"MEDIUM_CAPACITOR","MEDIUM_CAPACITOR",AddItem.NETHER_FEAT,null
             ), 9,3_000,600,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl("NETHER_WART"),mkl("12NETHER_WART"));
                 put(mkl("WEEPING_VINES"),mkl("12WEEPING_VINES"));
                 put(mkl("TWISTING_VINES"),mkl("12TWISTING_VINES"));
@@ -1466,7 +1496,7 @@ public class AddSlimefunItems {
                     null,AddItem.ABSTRACT_INGOT,"ENERGIZED_CAPACITOR","ENERGIZED_CAPACITOR",AddItem.ABSTRACT_INGOT,null,
                     AddItem.END_FEAT,AddItem.LENGINE,AddItem.END_FEAT,AddItem.END_FEAT,AddItem.LENGINE,AddItem.END_FEAT
             ), 9,6_000,1000,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl("MELON_SEEDS"),mkl("3MELON","3MELON_SEEDS"));
                 put(mkl("PUMPKIN_SEEDS"),mkl("3PUMPKIN","3PUMPKIN_SEEDS"));
                 put(mkl("WHEAT_SEEDS"),mkl("9WHEAT","6WHEAT_SEEDS"));
@@ -1506,7 +1536,7 @@ public class AddSlimefunItems {
                     AddItem.LPLATE,AddItem.LIOPORT,setC(AddItem.OVERWORLD_MINER,4),setC(AddItem.OVERWORLD_MINER,4),AddItem.LIOPORT,AddItem.LPLATE,
                     AddItem.LPLATE,AddItem.LMOTOR,"4PROGRAMMABLE_ANDROID_3_BUTCHER","4PROGRAMMABLE_ANDROID_3_BUTCHER",AddItem.LMOTOR,AddItem.LPLATE,
                     setC(AddItem.PAGOLD,1),setC(AddItem.METAL_CORE,1),setC(AddItem.PAGOLD,1),setC(AddItem.PAGOLD,1),setC(AddItem.SMELERY_CORE,1),setC(AddItem.PAGOLD,1)), 1, 129_600, 2400,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl("COBBLESTONE"),mkl(   AddUtils.randAmountItemFactory(new ItemStack(Material.COBBLESTONE),514,1919)));
                 put(mkl("NETHERRACK"),mkl(AddUtils.randAmountItemFactory(new ItemStack(Material.NETHERRACK),514,1919)));
                 put(mkl("END_STONE"),mkl(AddUtils.randAmountItemFactory(new ItemStack(Material.END_STONE),514,1919)));
@@ -1546,7 +1576,7 @@ public class AddSlimefunItems {
                     "WHITE_CARPET",AddItem.REDSTONE_ENGINE,null,null,AddItem.REDSTONE_ENGINE,"WHITE_CARPET",
                     "WHITE_CARPET","STICKY_PISTON","OBSERVER","OBSERVER","STICKY_PISTON","WHITE_CARPET",
                     null,"WHITE_CARPET","WHITE_CARPET","WHITE_CARPET","WHITE_CARPET",null),1,1000,116,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl("STRING"),mkl("16STRING"));
                 put(mkl("RAIL"),mkl("16RAIL"));
                 put(mkl("POWERED_RAIL"),mkl("16POWERED_RAIL"));
@@ -1580,7 +1610,7 @@ public class AddSlimefunItems {
                     "OBSERVER",AddItem.DUPE_MG,"END_PORTAL_FRAME","END_PORTAL_FRAME",AddItem.DUPE_MG,"OBSERVER",
                     "END_STONE",AddItem.LFIELD,setC(AddItem.DIMENSIONAL_SHARD,2),setC(AddItem.DIMENSIONAL_SHARD,2),AddItem.LFIELD,"END_STONE",
                     null,"END_STONE",AddItem.LFIELD,AddItem.LFIELD,"END_STONE",null),3,1000,116,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl("SAND"),mkl("8SAND"));
                 put(mkl("RED_SAND"),mkl("8RED_SAND"));
                 put(mkl("ANVIL"),mkl("ANVIL"));
@@ -1609,6 +1639,15 @@ public class AddSlimefunItems {
 
             }})
             .register();
+    public static final SlimefunItem BNOISE_MAKER = new BNoiseMaker(AddGroups.VANILLA, AddItem.BNOISE_MAKER, RecipeType.ENHANCED_CRAFTING_TABLE,
+            recipe(
+                    "NOTE_BLOCK",  AddItem.BUG, AddItem.BUG,
+                    AddItem.BUG,  AddItem.BUG, "NOTE_BLOCK",
+                    AddItem.BUG, "NOTE_BLOCK",  AddItem.BUG
+            )).register();
+    public static final SlimefunItem BNOISE_HEAD = new BNoiseHead(AddGroups.VANILLA, AddItem.BNOISE_HEAD, RecipeType.NULL,
+            AddUtils.formatInfoRecipe(AddItem.BNOISE_MAKER,Language.get("Generators.BNOISE_MAKER.Name"))
+            ).register();
     public static final SlimefunItem REVERSE_GENERATOR = new MMGenerator(AddGroups.GENERATORS, AddItem.REVERSE_GENERATOR, COMMON_TYPE,
             recipe(null,AddItem.SPACE_PLATE,AddItem.ABSTRACT_INGOT,AddItem.ABSTRACT_INGOT,AddItem.SPACE_PLATE,null,
                     null,AddItem.SPACE_PLATE,AddItem.LOGIC_REACTOR,AddItem.LOGIC_REACTOR,AddItem.SPACE_PLATE,null,
@@ -1616,7 +1655,7 @@ public class AddSlimefunItems {
                     AddItem.PAGOLD,AddItem.SPACE_PLATE,AddItem.LSINGULARITY,AddItem.LSINGULARITY,AddItem.SPACE_PLATE,AddItem.PAGOLD,
                     AddItem.PAGOLD,AddItem.SPACE_PLATE,AddItem.LSINGULARITY,AddItem.LSINGULARITY,AddItem.SPACE_PLATE,AddItem.PAGOLD,
                     null,AddItem.PAGOLD,AddItem.LMOTOR,AddItem.LMOTOR,AddItem.PAGOLD,null), 1, 1_000_000, 24_000,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl(AddItem.LOGIGATE),mkl(setC(AddItem.LOGIGATE,64)));
                 put(mkl(AddItem.LOGIC),mkl(setC(AddItem.NOLOGIC,64)));
                 put(mkl(AddItem.NOLOGIC),mkl(setC(AddItem.LOGIC,64)));
@@ -1635,7 +1674,7 @@ public class AddSlimefunItems {
                     AddItem.BISILVER,AddItem.LENGINE,AddItem.DIMENSION_MINER,AddItem.VIRTUAL_SPACE,AddItem.LENGINE,AddItem.BISILVER,
                     AddItem.LIOPORT,AddItem.BISILVER,null,null,AddItem.BISILVER,AddItem.LIOPORT,
                     AddItem.BISILVER,setC(AddItem.MASS_CORE,1),AddItem.SPACE_PLATE,AddItem.SPACE_PLATE,setC(AddItem.METAL_CORE,1),AddItem.BISILVER), 1, 129_600, 5400,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl(AddItem.WORLD_FEAT),mkl(AddUtils.randItemStackFactory(
                         mkMp("128COAL",8,
                                 "128REDSTONE",8,
@@ -1671,7 +1710,7 @@ public class AddSlimefunItems {
                     AddItem.BISILVER,setC(AddItem.LENGINE,1),setC(AddItem.VIRTUAL_SPACE,1),setC(AddItem.CHIP_CORE,1),setC(AddItem.LENGINE,1),AddItem.BISILVER,
                     AddItem.LIOPORT,AddItem.BISILVER,null,null,AddItem.BISILVER,AddItem.LIOPORT,
                     AddItem.BISILVER,setC(AddItem.MASS_CORE,1),AddItem.SPACE_PLATE,AddItem.SPACE_PLATE,setC(AddItem.METAL_CORE,1),AddItem.BISILVER), 1, 129_600, 5400,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl("COCOA_BEANS"),mkl("9COCOA_BEANS"));
                 put(mkl("MELON_SEEDS"),mkl("3MELON","3MELON_SEEDS"));
                 put(mkl("PUMPKIN_SEEDS"),mkl("3PUMPKIN","3PUMPKIN_SEEDS"));
@@ -2483,7 +2522,7 @@ public class AddSlimefunItems {
             recipe(AddItem.LSINGULARITY,"EXPLOSIVE_BOW",AddItem.LSINGULARITY,"ENERGIZED_CAPACITOR",AddItem.ATOM_INGOT,"ENERGIZED_CAPACITOR",
                     AddItem.LSINGULARITY,"ICY_BOW",AddItem.LSINGULARITY))
             .register();
-    public static final SlimefunItem RTP_RUNE=new ItemWithHandler<ItemDropHandler>(AddGroups.SPACE,AddItem.RTP_RUNE,RecipeType.ANCIENT_ALTAR,
+    public static final SlimefunItem RTP_RUNE=new CustomItemWithHandler<ItemDropHandler>(AddGroups.SPACE,AddItem.RTP_RUNE,RecipeType.ANCIENT_ALTAR,
             recipe("ANCIENT_RUNE_EARTH","ANCIENT_RUNE_ENDER","ANCIENT_RUNE_FIRE",AddItem.HYPER_LINK,AddItem.DIMENSIONAL_SINGULARITY,AddItem.HYPER_LINK,
                     "ANCIENT_RUNE_WATER","ANCIENT_RUNE_ENDER","ANCIENT_RUNE_AIR"),null) {
         HashSet<String> BANNED_WORLD_NAME=new HashSet<>(){{
@@ -2789,7 +2828,7 @@ public class AddSlimefunItems {
                     AddItem.HGTLPBBI,setC(AddItem.SPACE_PLATE,4),AddItem.FINAL_FRAME,setC(AddItem.WORLD_FEAT,16),setC(AddItem.SPACE_PLATE,4),AddItem.PDCECDMD,
                     AddItem.HGTLPBBI,setC(AddItem.MASS_CORE,64),setC(AddItem.SPACE_PLATE,4),setC(AddItem.SPACE_PLATE,4),setC(AddItem.MASS_CORE,64),AddItem.PDCECDMD,
                     setC(AddItem.STACKFRAME,64),AddItem.HGTLPBBI,AddItem.HGTLPBBI,AddItem.PDCECDMD,AddItem.PDCECDMD,setC(AddItem.STACKFRAME,64)),1,1_440_000,57_600,
-            new LinkedHashMap<>(){{
+            new PairList<>(){{
                 put(mkl("COBBLESTONE"),mkl("114514COBBLESTONE"));
                 put(mkl("NETHERRACK"),mkl("114514NETHERRACK"));
                 put(mkl("END_STONE"),mkl("114514END_STONE"));
@@ -3026,14 +3065,14 @@ public class AddSlimefunItems {
 //                    "COPPER_INGOT","COPPER_INGOT","COPPER_INGOT","COPPER_INGOT","COPPER_INGOT","COPPER_INGOT")));
 
 //    public static  final  SlimefunItem SMG1=new SMGenerator(AddGroups.MATERIAL, AddItem.SMG1,RecipeType.NULL,AddUtils.NULL_RECIPE.clone(),3,114514,0,
-//               AddUtils.randItemStackFactory( new LinkedHashMap<>(){{
+//               AddUtils.randItemStackFactory( new PairList<>(){{
 //                    put(Material.DIAMOND,1);
 //                    put(new ItemStack(Material.BOOK,2),1);
 //                    put(CUSTOM1,1);
 //                    put("COPPER_DUST",1);
 //                    put("EMERALD_ORE",1);
 //                    put(
-//                            new EqProRandomStack(new LinkedHashMap<>(){{
+//                            new EqProRandomStack(new PairList<>(){{
 //                                put(new ItemStack(Material.LADDER),1);
 //                                put(new ItemStack(Material.BEDROCK),1);
 //
@@ -3044,10 +3083,10 @@ public class AddSlimefunItems {
 //
 //            ).register();
 //    public static final   SlimefunItem MMG1=register(new MMGenerator(AddGroups.MATERIAL, AddItem.MMG1,RecipeType.NULL,AddUtils.NULL_RECIPE.clone(),3,114514,0,
-//                new LinkedHashMap<>(){{
+//                new PairList<>(){{
 //                    put(new Object[]{"DIAMOND_BLOCK"},new Object[]{"114DIAMOND"}  );
 //                    put(new Object[]{"BEDROCK"},new Object[]{AddUtils.randItemStackFactory(
-//                            new LinkedHashMap<>(){{
+//                            new PairList<>(){{
 //                                put("2COPPER_DUST",1);
 //                                put("4SILVER_DUST",1);
 //                            }}
@@ -3062,7 +3101,7 @@ public class AddSlimefunItems {
 //            ));
 //    public static final  SlimefunItem MACHINE3=register(new EMachine(AddGroups.MATERIAL, AddItem.MACHINE3,RecipeType.NULL,AddUtils.NULL_RECIPE.clone(),
 //            Material.BOOK,1919,810,
-//            new LinkedHashMap<>(){{
+//            new PairList<>(){{
 //                put(new Object[]{new ItemStack(Material.BOOK),new ItemStack(Material.DIAMOND)
 //                        ,AddSlimefunItems.CUSTOM1             ,null},3);
 //                put(new Object[]{new ItemStack(Material.COMMAND_BLOCK),null
@@ -3078,7 +3117,7 @@ public class AddSlimefunItems {
 //            }}));
 //    public static final  SlimefunItem MACHINE4=register(new AEMachine(AddGroups.MATERIAL, AddItem.MACHINE4,RecipeType.NULL,AddUtils.NULL_RECIPE.clone(),
 //            Material.BOOK,1919,810,
-//            new LinkedHashMap<>(){{
+//            new PairList<>(){{
 //                put(new Object[]{new ItemStack(Material.BOOK),new ItemStack(Material.DIAMOND)
 //                        ,AddSlimefunItems.CUSTOM1             ,null},3);
 //                put(new Object[]{new ItemStack(Material.COMMAND_BLOCK),null
@@ -3116,7 +3155,7 @@ public class AddSlimefunItems {
 
 //    public static final SlimefunItem WORKBENCH1=register(new TestWorkBench(AddGroups.MATERIAL, AddItem.WORKBENCH1,RecipeType.NULL,AddUtils.NULL_RECIPE.clone(),
 //            0,0,
-//                new LinkedHashMap<>(){{
+//                new PairList<>(){{
 //                    put(mkP(
 //                            mkl(null,"2COPPER_DUST",null,AddSlimefunItems.MATL114,"4DIAMOND",AddSlimefunItems.CUSTOM1,null,"3IRON_DUST",null),
 //                            mkl("5COMMAND_BLOCK")

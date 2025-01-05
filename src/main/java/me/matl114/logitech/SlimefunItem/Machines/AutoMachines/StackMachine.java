@@ -45,6 +45,18 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecip
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class StackMachine extends AbstractAdvancedProcessor implements MultiCraftType, ImportRecipes {
     protected static final List<SlimefunItem> BW_LIST=new ArrayList<>();
@@ -338,9 +350,11 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
             return;
         }
         if(mod== Settings.INIT) {
-            //new CraftItemStack instance to trigger slimefun save thread
+            //new CraftItemStack instance to trigger slimefun save action
             ItemStack rawStack = inv.getItemInSlot(this.MACHINE_SLOT);
-            inv.replaceExistingItem(this.MACHINE_SLOT,rawStack);
+            if(rawStack!=null){
+                inv.replaceExistingItem(this.MACHINE_SLOT,rawStack);
+            }
         }
         ItemPusher it=this.MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,this.MACHINE_SLOT);
         int index=MultiCraftType.getRecipeTypeIndex(data);
@@ -400,6 +414,53 @@ public class StackMachine extends AbstractAdvancedProcessor implements MultiCraf
         //拿走机器,想逃?
         this.processor.endOperation(inv.getLocation());
         inv.replaceExistingItem(PROCESSOR_SLOT, MenuUtils.PROCESSOR_NULL);
+    }
+
+    public void tick(Block b, @Nullable BlockMenu inv, SlimefunBlockData data, int tickCount){
+        //首先 加载
+        if(inv.hasViewer()){
+            updateMenu(inv,b,Settings.RUN);
+        }else{
+            CompletableFuture.runAsync(()->{
+                if(!inv.hasViewer()){
+                    MenuUtils.syncSlot(inv,MACHINE_SLOT);
+                }
+            });
+        }
+        int index=MultiCraftType.getRecipeTypeIndex(data);
+        if(index>=0&&index<getListSize()){//有效机器
+            DataMenuClickHandler db=this.getDataHolder(b,inv);
+            int charge=db.getInt(1);
+            int craftLimit=db.getInt(0);
+            int consumption=Math.min(craftLimit*charge,this.energybuffer);
+            int energy=this.getCharge(inv.getLocation(),data);
+            if(energy>=consumption){
+                if(inv.hasViewer()){
+                    inv.replaceExistingItem(MINFO_SLOT,getInfoItem((int)(craftLimit*efficiency),consumption,energy,this.efficiency,
+                            ItemStackHelper.getDisplayName(this.MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,this.MACHINE_SLOT).getItem())));
+                }
+                process(b,inv,data);
+            }else {
+                //没电
+                if(inv.hasViewer()){
+                    inv.replaceExistingItem(MINFO_SLOT,getInfoOffItem((int)(craftLimit*efficiency),consumption,energy,
+                            ItemStackHelper.getDisplayName(this.MACHINE_PROVIDER.getPusher(Settings.INPUT,inv,this.MACHINE_SLOT).getItem())));
+                }
+            }
+
+        }else {
+            if(inv.hasViewer()){
+                inv.replaceExistingItem(MINFO_SLOT,MINFO_ITEM_OFF);
+            }
+        }
+    }
+    public void onBreak(BlockBreakEvent e,BlockMenu inv){
+        if(inv!=null){
+            Location loc=inv.getLocation();
+            inv.dropItems(loc,MACHINE_SLOT);
+        }
+        super.onBreak(e,inv);
+
     }
 
 }

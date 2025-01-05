@@ -1,27 +1,37 @@
 package me.matl114.logitech.SlimefunItem.Machines.AutoMachines;
 
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
+import me.matl114.logitech.Schedule.SchedulePostRegister;
+import me.matl114.logitech.SlimefunItem.Machines.AbstractMultiThreadProcessor;
+import me.matl114.logitech.Utils.RecipeSupporter;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.bukkit.inventory.ItemStack;
-
-import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import me.matl114.logitech.Schedule.SchedulePostRegister;
-import me.matl114.logitech.SlimefunItem.Machines.AbstractMultiThreadProcessor;
-import me.matl114.logitech.Utils.RecipeSupporter;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-
 public class MTMachine extends AbstractMultiThreadProcessor {
     public MTMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                                         ItemStack progressItem, int energyConsumption, int energyBuffer,
-                                        LinkedHashMap<Object, Integer> customRecipes){
+                                        List<Pair<Object, Integer>> customRecipes){
         super(category, item, recipeType, recipe, progressItem, energyConsumption, energyBuffer, customRecipes);
     }
 
+    public MTMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
+                     ItemStack processbar, int energyConsumption, int energyBuffer,
+                    Supplier<List<MachineRecipe>> machineRecipeSupplier) {
+        super(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,null);
+        this.machineRecipeSupplier=machineRecipeSupplier;
+        SchedulePostRegister.addPostRegisterTask(()->{
+            getMachineRecipes();
+        });
+    }
     public MTMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                      ItemStack processbar, int energyConsumption, int energyBuffer,
                     RecipeType... recipeTypes) {
@@ -33,23 +43,12 @@ public class MTMachine extends AbstractMultiThreadProcessor {
                 for(RecipeType rt : recipeTypes){
                     if(rt!=null){
                         List<MachineRecipe> rep= RecipeSupporter.PROVIDED_UNSHAPED_RECIPES.get(rt);
-                        if(rep==null) {
-							rep=new ArrayList<>();
-						}
+                        if(rep==null)rep=new ArrayList<>();
                         mr.addAll(rep);
                     }
                 }
                 return mr;
             }
-        });
-    }
-    public MTMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
-                     ItemStack processbar, int energyConsumption, int energyBuffer,
-                    Supplier<List<MachineRecipe>> machineRecipeSupplier) {
-        super(category,item,recipeType,recipe,processbar,energyConsumption,energyBuffer,null);
-        this.machineRecipeSupplier=machineRecipeSupplier;
-        SchedulePostRegister.addPostRegisterTask(()->{
-            getMachineRecipes();
         });
     }
 

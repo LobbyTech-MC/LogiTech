@@ -1,27 +1,40 @@
 package me.matl114.logitech.Utils.UtilClass;
 
+import com.google.common.base.Preconditions;
+import me.matl114.logitech.Utils.Debug;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
-import me.matl114.logitech.Utils.Debug;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class TestItemStack extends ItemStack {
-    public TestItemStack(ItemStack item) {
-        super(item);
-    }
+    int a=0;
     public TestItemStack( Material type, int amount, short damage,  Byte data) {
         super(type, amount, damage, data);
     }
-    @Override
-	public boolean equals(Object a){
+    public TestItemStack(ItemStack item) {
+        super(item);
+
+    }
+    public Material getType() {
+        Debug.logger("getType called");
+        return super.getType();
+    }
+    public ItemMeta getItemMeta() {
+        Debug.logger("getItemMeta called");
+        return super.getItemMeta();
+    }
+    public boolean equals(Object a){
         Debug.logger("equal called");
         Debug.logger("beyond");
         return super.equals(a);
     }
-    @Override
-	public int hashCode(){
+    public int hashCode(){
         Debug.logger("hash called");
         Debug.logger("beyond");
         return super.hashCode();
     }
+//    public TestItemStack clone(){
+//        Debug.logger("clone called");
+//        return new TestItemStack(this);
+//    }
 }

@@ -18,6 +18,7 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.machines.MachineProcessor;
 import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.Schedule.Schedules;
@@ -84,6 +85,11 @@ public class Transmutator extends MultiBlockAdvancedProcessor  {
     protected final MachineProcessor<MultiCraftingOperation> coolerProcessor;
     protected final int[] BORDER_IN = new int[]{9, 10, 11, 12, 19, 28, 37,45,46,47,48,21,30,39};
     protected final int[] BORDER_OUT = new int[]{14, 15, 16, 17, 26,35,44,50,51,52,53};
+    public Transmutator(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType,
+                        ItemStack[] recipe, String blockId, AbstractMultiBlockType type, int energyConsumption, int energyBuffer,
+                        List<Pair<Object, Integer>> customRecipes){
+        super(itemGroup, item, recipeType, recipe, blockId,type, AddUtils.addGlow(new ItemStack(Material.FIRE_CHARGE)),
+                energyConsumption,energyBuffer,customRecipes);
 
     //check if lava
     protected int[] lavadx=new int[]{

@@ -1,15 +1,7 @@
 package me.matl114.logitech.Utils.UtilClass.StorageClass;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Predicate;
-
-import javax.annotation.Nonnull;
-
-import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
+import com.google.common.base.Preconditions;
+import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import me.matl114.logitech.Schedule.ScheduleSave;
 import me.matl114.logitech.SlimefunItem.Cargo.Storages;
@@ -200,7 +192,7 @@ public class ItemStorageCache extends ItemSlotPusher {//extends ItemPusher
      */
     protected ItemStorageCache(ItemStack item, ItemStack source, ItemMeta sourceMeta, int saveslot,StorageType type) {
         super(item,saveslot);
-        assert source!=null;
+        Preconditions.checkArgument( source!=null,"Item Storage cache source should not be null!");
         this.source = source;
         this.sourceMeta = sourceMeta;
         this.storageType=type;

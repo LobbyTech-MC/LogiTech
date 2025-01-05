@@ -1,9 +1,23 @@
 package me.matl114.logitech.SlimefunItem.Machines;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.MachineProcessHolder;
+import io.github.thebusybiscuit.slimefun4.core.machines.MachineProcessor;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
+import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
+import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
+import me.matl114.logitech.Utils.UtilClass.RecipeClass.SimpleCraftingOperation;
+import me.matl114.logitech.Utils.MachineRecipeUtils;
+import me.matl114.matlib.Utils.Inventory.CleanItemStack;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -44,20 +58,20 @@ public abstract class AbstractProcessor extends AbstractMachine implements Machi
     protected boolean USE_HISTORY=true;
     public AbstractProcessor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                            ItemStack progressItem, int energyConsumption, int energyBuffer,
-                             LinkedHashMap<Object, Integer> customRecipes){
+                             List<Pair<Object,Integer>> customRecipes){
         super(category,item , recipeType, recipe,energyBuffer,energyConsumption);
 
-        this.progressbar=new ItemStack(progressItem);
+        this.progressbar=new CleanItemStack(progressItem);
         this.processor = new MachineProcessor(this);
         this.processor.setProgressBar(progressbar);
         if(customRecipes!=null) {
             this.machineRecipes = new ArrayList<>(customRecipes.size());
             var customRecipes2 = AddUtils.buildRecipeMap(customRecipes);
-            for (Map.Entry<Pair<ItemStack[], ItemStack[]>, Integer> recipePiece : customRecipes2.entrySet()) {
+            for(var recipePiece:customRecipes2){
                 //no need to stack and can not stack(maybe some shitmachine will stack
                 //but we stack it in order to format up
                 this.machineRecipes.add(MachineRecipeUtils.stackFromMachine(
-                        new MachineRecipe(recipePiece.getValue(), recipePiece.getKey().getFirstValue(), recipePiece.getKey().getSecondValue())
+                        new MachineRecipe(recipePiece.getSecondValue(),recipePiece.getFirstValue().getFirstValue(), recipePiece.getFirstValue().getSecondValue())
                 ));
             }
         }else
@@ -69,7 +83,7 @@ public abstract class AbstractProcessor extends AbstractMachine implements Machi
 
     public AbstractProcessor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                              Material progressItem, int energyConsumption, int energyBuffer,
-                             LinkedHashMap<Object, Integer> customRecipes){
+                             List<Pair<Object,Integer>> customRecipes){
         this(category,item,recipeType,recipe,new ItemStack(progressItem),energyConsumption,energyBuffer,customRecipes);
     }
 

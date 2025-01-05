@@ -57,6 +57,17 @@ public class SmithInterfaceProcessor extends SmithingInterface implements Machin
         }
     }
     @Getter
+    private static final List<MachineRecipe> interfacedCrafttableRecipes=new ArrayList<>();
+    public static final int CRAFT_TABLE_TICKS=0;
+    public static final int ANVIL_TICKS=8;
+    public static final CustomRecipeType INTERFACED_CRAFTTABLE=new CustomRecipeType(AddUtils.getNameKey("interfaced-craft-table"),AddUtils.addGlow( new  CustomItemStack(Material.CRAFTING_TABLE,"&a锻铸作坊配方","&7该配方需要在","&e\"锻造合成端口\"","&7邻接的工作台中合成"))).relatedTo((in,out)->{
+        interfacedCrafttableRecipes.add(MachineRecipeUtils.shapeFrom(CRAFT_TABLE_TICKS,in,new ItemStack[]{out}));
+    },(in,out)->{
+        interfacedCrafttableRecipes.removeIf(i->CraftUtils.matchItemStack(out,i.getOutput()[0],true));
+    });
+    public static final CustomRecipeType INTERFACED_ANVIL=new CustomRecipeType(AddUtils.getNameKey("interfaced-anvil-icon"),AddUtils.addGlow( new  CustomItemStack(Material.ANVIL,"&a锻铸作坊配方","&7该配方需要在","&e\"锻造合成端口\"","&7邻接的铁砧中操作")));
+    public static final CustomRecipeType INTERFACED_SMITH=new CustomRecipeType(AddUtils.getNameKey("interfaced-smith-icon"),AddUtils.addGlow( new  CustomItemStack(Material.SMITHING_TABLE,"&a锻铸作坊配方","&7该配方需要在","&e\"锻造合成端口\"","&7邻接的锻造台中操作")));
+    @Getter
     private static HashSet<Function<AnvilInventory, Supplier<MultiCraftingOperation>>> anvilLogics=new LinkedHashSet<>();
     static{
         //demo
@@ -64,12 +75,20 @@ public class SmithInterfaceProcessor extends SmithingInterface implements Machin
             if(anvilInventory.getSize()>=2){
                 ItemStack tool=anvilInventory.getItem(0);
                 if(tool!=null){
-                    short durability=tool.getDurability();
-                    if(durability>0){
+                    int durability=tool.getDurability();
+                    String fixName=anvilInventory.getRenameText();
+                    boolean hasName=false;
+                    if(fixName!=null&&!fixName.isEmpty()){
+                        hasName=true;
+                    }
+                    if(durability>0||hasName){
                         ItemStack fix=anvilInventory.getItem(1);
                         if(CraftUtils.matchItemStack(fix, AddItem.ABSTRACT_INGOT,false)){
-                            short cost=(short) Math.min( ( durability/250)+1,fix.getAmount());
+                            int supply=fix.getAmount();
+                            int cost= Math.min( ( (durability+249)/250)+(hasName?1:0),supply);
                             if(cost>0){
+                                final boolean applyName=hasName&&(supply>(( durability/250)+1));
+                                int fixCost=applyName?(cost-1):cost;
                                 //here we set repair cost for judgements
                                 anvilInventory.setRepairCost(-5*cost);
                                 return ()->{
@@ -78,12 +97,15 @@ public class SmithInterfaceProcessor extends SmithingInterface implements Machin
                                     fix.setAmount(fix.getAmount()-cost);
                                     ItemMeta meta=toolCopy.getItemMeta();
                                     if(meta instanceof Damageable dm){
-                                        dm.setDamage(Math.max(durability-cost*250,0));
+                                        dm.setDamage(Math.max(durability-fixCost*250,0));
                                     }
                                     if(meta instanceof Repairable rp){
                                         if(rp.hasRepairCost()){
                                             rp.setRepairCost(0);
                                         }
+                                    }
+                                    if(applyName){
+                                        meta.setDisplayName("§f"+fixName);
                                     }
                                     toolCopy.setItemMeta(meta);
                                     return new MultiCraftingOperation(new ItemGreedyConsumer[]{CraftUtils.getGreedyConsumerOnce(toolCopy)},8);
@@ -96,23 +118,15 @@ public class SmithInterfaceProcessor extends SmithingInterface implements Machin
             anvilInventory.setRepairCost(0);
             return null;
         }));
+        //INTERFACED_ANVIL.register();
     }
     @Getter
     private static HashMap<Operation,HashSet<Function<SmithingInventory, Supplier<MultiCraftingOperation>>>> smithLogics=new HashMap<>();
-    @Getter
-    private static final List<MachineRecipe> interfacedCrafttableRecipes=new ArrayList<>();
-    public static final int CRAFT_TABLE_TICKS=0;
-    public static final int ANVIL_TICKS=8;
-    public static final CustomRecipeType INTERFACED_CRAFTTABLE=new CustomRecipeType(AddUtils.getNameKey("interfaced-craft-table"),AddUtils.addGlow( new  CustomItemStack(Material.CRAFTING_TABLE,"&a锻铸作坊配方","&7该配方需要在","&e\"锻造合成端口\"","&7邻接的工作台中合成"))).relatedTo((in,out)->{
-        interfacedCrafttableRecipes.add(MachineRecipeUtils.shapeFrom(CRAFT_TABLE_TICKS,in,new ItemStack[]{out}));
-    },(in,out)->{
-        interfacedCrafttableRecipes.removeIf(i->CraftUtils.matchItemStack(out,i.getOutput()[0],true));
-    });
-    public static final CustomRecipeType INTERFACED_ANVIL=new CustomRecipeType(AddUtils.getNameKey("interfaced-anvil-icon"),AddUtils.addGlow( new  CustomItemStack(Material.ANVIL,"&a锻铸作坊配方","&7该配方需要在","&e\"锻造合成端口\"","&7邻接的铁砧中操作")));
-    public static final CustomRecipeType INTERFACED_SMITH=new CustomRecipeType(AddUtils.getNameKey("interfaced-smith-icon"),AddUtils.addGlow( new  CustomItemStack(Material.SMITHING_TABLE,"&a锻铸作坊配方","&7该配方需要在","&e\"锻造合成端口\"","&7邻接的锻造台中操作")));
-    public static void registerAnvilLogic(Function<AnvilInventory, Supplier<MultiCraftingOperation>> anvilCraft) {
-        anvilLogics.add(anvilCraft);
+    public static void registerSmithLogic(Function<SmithingInventory, Supplier<MultiCraftingOperation>> smithCraft, Operation operation) {
+        smithLogics.computeIfAbsent(operation,k->new LinkedHashSet<>()).add(smithCraft);
     }
+
+
 
     public static void registerSmithLogic(Function<SmithingInventory, Supplier<MultiCraftingOperation>> smithCraft, Operation operation) {
         smithLogics.computeIfAbsent(operation,k->new LinkedHashSet<>()).add(smithCraft);

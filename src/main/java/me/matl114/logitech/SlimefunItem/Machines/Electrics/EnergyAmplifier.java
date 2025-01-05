@@ -36,6 +36,18 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class EnergyAmplifier extends AbstractEnergyProvider implements MenuTogglableBlock {
     protected final int[] NULL_SLOT=new int[0];
@@ -117,8 +129,28 @@ public class EnergyAmplifier extends AbstractEnergyProvider implements MenuToggl
             return dh;
         }
     }
-    @Override
-	public  int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
+    public void registerTick(SlimefunItem item){
+        item.addItemHandler(
+            new BlockTicker() {
+                public boolean isSynchronized() {
+                    return false;
+                }
+
+                @ParametersAreNonnullByDefault
+                public void tick(Block b, SlimefunItem item, SlimefunBlockData data) {
+                    BlockMenu menu = data.getBlockMenu();
+                    if(menu!=null){
+                        if(menu.hasViewer()){
+                            updateMenu(menu,b,Settings.RUN);
+                        }else {
+                            MenuUtils.syncSlot(menu,MACHINE_SLOT);
+                        }
+                    }
+                }
+            }
+        );
+    }
+    public  int getGeneratedOutput(@Nonnull Location l, @Nonnull SlimefunBlockData data){
         BlockMenu inv=data.getBlockMenu();
         if(inv==null) {
 			return 0;

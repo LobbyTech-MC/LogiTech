@@ -1,8 +1,15 @@
 package me.matl114.logitech.SlimefunItem.Blocks;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemSetting;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import me.matl114.logitech.SlimefunItem.Items.EntityFeat;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.Debug;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -68,17 +75,41 @@ public class AbstractSpawner extends AbstractBlock{
             }
         }
     }
-   public void onSpawnerBreak(BlockBreakEvent event){
-    BlockState data =event.getBlock().getState();
-    if(data instanceof CreatureSpawner cs){
-        event.getBlock().getWorld().dropItemNaturally(
-                event.getBlock().getLocation(),
-                EntityFeat.generateSpawnerFrom(cs.getSpawnedType(),cs.getMinSpawnDelay(),
-                        cs.getMaxNearbyEntities(),cs.getRequiredPlayerRange(),cs.getSpawnRange(),cs.getSpawnCount(),true)
-        );
-        event.getBlock().setType(Material.AIR);
-        event.setDropItems(false);
-        event.setExpToDrop(0);
+    public void onBreak(BlockBreakEvent event, BlockMenu e) {
+        super.onBreak(event, e);
+        onSpawnerBreak(event);
+    }
+    public void onSpawnerBreak(BlockBreakEvent event){
+        BlockState data =event.getBlock().getState();
+        if(data instanceof CreatureSpawner cs){
+            event.getBlock().getWorld().dropItemNaturally(
+                    event.getBlock().getLocation(),
+                    EntityFeat.generateSpawnerFrom(cs.getSpawnedType(),cs.getMinSpawnDelay(),
+                            cs.getMaxNearbyEntities(),cs.getRequiredPlayerRange(),cs.getSpawnRange(),cs.getSpawnCount(),true)
+            );
+            event.getBlock().setType(Material.AIR);
+            event.setDropItems(false);
+            event.setExpToDrop(0);
+        }
+    }
+    public Collection<ItemStack> getDrops() {
+        /**
+         * There should be no drops by default since drops are handled by listener
+         */
+        return new ArrayList<>();
+    }
+   public void preRegister(){
+        super.preRegister();
+        this.handleBlock(this);
+   }
+    public boolean canStack(ItemMeta meta1, ItemMeta meta2){
+        if(!super.canStack(meta1,meta2)){
+            return false;
+        }
+        if(meta1 instanceof BlockStateMeta bsm1 &&meta2 instanceof BlockStateMeta bsm2){
+            return CraftUtils.matchBlockStateMetaField(bsm1,bsm2);
+        }
+        return false;
     }
 }
     @Override

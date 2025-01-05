@@ -1,6 +1,24 @@
 package me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore;
 
 
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler;
+import io.github.thebusybiscuit.slimefun4.core.handlers.BlockPlaceHandler;
+import me.matl114.logitech.SlimefunItem.Interface.MenuBlock;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.Debug;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.AbstractMultiBlockType;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockHandler;
+import me.matl114.logitech.Utils.UtilClass.TickerClass.Ticking;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.AbstractMultiBlockHandler;
+import me.matl114.logitech.Utils.UtilClass.MultiBlockClass.MultiBlockService;
+import org.bukkit.Location;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,24 +53,35 @@ public interface MultiBlockCore extends MultiBlockPart, Ticking , MenuBlock {
      * @param autoCode
      */
     static ConcurrentHashMap<Location, AtomicBoolean> locks=new ConcurrentHashMap<>();
+    static boolean runAsyncOrReturnBlocked(Location loc, Runnable r){
+        AtomicBoolean lock=locks.computeIfAbsent(loc,(i)->new AtomicBoolean(false));
+        if(lock.compareAndSet(false,true)){
+            CompletableFuture.runAsync(()->{
+                        try{
+                            r.run();
+                        }finally{//
+                            //secure lockers
+                            lock.set(false);
+                        }
+                    }
+            );
+            return true;
+        }
+        return false;
+    }
+    /**
+     * only called when in tickers to build multiblock from an offline MultiCore.if success,send to cache and set Active ,
+     * machine will start run at next tick
+     */
     default void autoBuild(Location loc, SlimefunBlockData data, int autoCode){
         if(autoCode<=0) {
 			return;
 		}
         if(autoCode==3){//3tick重连一次
             Location tarloc=loc.clone();
-            AtomicBoolean lock=locks.computeIfAbsent(tarloc,(i)->new AtomicBoolean(false));
-            if(lock.compareAndSet(false,true)){
-                CompletableFuture.runAsync(()->{
-                    try{
-                        MultiBlockService.createNewHandler(loc,getBuilder(),getMultiBlockType());
-                    }finally{//
-                        //secure lockers
-                        lock.set(false);
-                    }
-                }
-                );
-            }
+            runAsyncOrReturnBlocked(tarloc,()->{
+                MultiBlockService.createNewHandler(loc,getBuilder(),getMultiBlockType());
+            });
             autoCode=1;
         }else {
             autoCode+=1;
@@ -114,18 +143,7 @@ public interface MultiBlockCore extends MultiBlockPart, Ticking , MenuBlock {
         int sgn=autoCode>0?1:-1;
         if(autoCode*sgn==3){//3tick检测一次
             Location tarloc=loc.clone();
-            AtomicBoolean lock=locks.computeIfAbsent(tarloc,(i)->new AtomicBoolean(false));
-            if(lock.compareAndSet(false,true)){
-                CompletableFuture.runAsync(()->{
-                    try{
-                        MultiBlockService.checkIfAbsentRuntime(data);
-                    }finally{//
-                        //secure lockers
-                       lock.set(false);
-                    }
-                }
-                );
-            }
+            runAsyncOrReturnBlocked(tarloc,()->MultiBlockService.checkIfAbsentRuntime(data));
             autoCode=sgn;
         }else {
             autoCode+=sgn;

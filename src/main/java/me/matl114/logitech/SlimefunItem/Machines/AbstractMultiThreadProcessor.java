@@ -1,16 +1,6 @@
 package me.matl114.logitech.SlimefunItem.Machines;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -18,16 +8,22 @@ import io.github.thebusybiscuit.slimefun4.core.attributes.MachineProcessHolder;
 import io.github.thebusybiscuit.slimefun4.core.machines.MachineProcessor;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.CraftUtils;
-import me.matl114.logitech.Utils.MachineRecipeUtils;
-import me.matl114.logitech.Utils.MenuUtils;
-import me.matl114.logitech.Utils.Settings;
+import me.matl114.logitech.Utils.*;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.SimpleCraftingOperation;
+import me.matl114.matlib.Utils.Inventory.CleanItemStack;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AbstractMultiThreadProcessor extends AbstractMachine implements MachineProcessHolder<SimpleCraftingOperation> {
     protected final int[] BORDER_IN=new int[]{
@@ -67,15 +63,24 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
     protected final int[] PROCESSOR_SLOT=new int[]{
             18,19,20,21,22,23,24,25,26
     };
+    public int[] getInputSlots(){
+        return INPUT;
+    }
+    public int[] getOutputSlots(){
+        return OUTPUT;
+    }
+    public int[] getProcessorSlots(){
+        return PROCESSOR_SLOT;
+    }
     protected final ItemStack progressbar;
     protected final MachineProcessor<SimpleCraftingOperation>[] processor;
     protected int THREAD_NUM=9;
     public AbstractMultiThreadProcessor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                              ItemStack progressItem, int energyConsumption, int energyBuffer,
-                             LinkedHashMap<Object, Integer> customRecipes){
+                                        List<Pair<Object,Integer>> customRecipes){
         super(category,item , recipeType, recipe,energyBuffer,energyConsumption);
 
-        this.progressbar=new ItemStack(progressItem);
+        this.progressbar=new CleanItemStack(progressItem);
         this.processor=new MachineProcessor[THREAD_NUM];
         for(int i=0;i<THREAD_NUM;i++){
             this.processor[i]=new MachineProcessor(this);
@@ -84,11 +89,11 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
         if(customRecipes!=null) {
             this.machineRecipes = new ArrayList<>(customRecipes.size());
             var customRecipes2 = AddUtils.buildRecipeMap(customRecipes);
-            for (Map.Entry<Pair<ItemStack[], ItemStack[]>, Integer> recipePiece : customRecipes2.entrySet()) {
+            for(var recipePiece:customRecipes2){
                 //no need to stack and can not stack(maybe some shitmachine will stack
                 //but we stack it in order to format up
                 this.machineRecipes.add(MachineRecipeUtils.stackFromMachine(
-                        new MachineRecipe(recipePiece.getValue(), recipePiece.getKey().getFirstValue(), recipePiece.getKey().getSecondValue())
+                        new MachineRecipe(recipePiece.getSecondValue(),recipePiece.getFirstValue().getFirstValue(), recipePiece.getFirstValue().getSecondValue())
                 ));
             }
         }else
@@ -99,15 +104,45 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
     }
     public AbstractMultiThreadProcessor(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                              Material progressItem, int energyConsumption, int energyBuffer,
-                             LinkedHashMap<Object, Integer> customRecipes){
+                                        List<Pair<Object,Integer>> customRecipes){
         this(category,item,recipeType,recipe,new ItemStack(progressItem),energyConsumption,energyBuffer,customRecipes);
     }
+
+    /**
+     * method from MachineProcessorHolder
+     * @return
+     */
+    public MachineProcessor<SimpleCraftingOperation> getMachineProcessor() {
+        return this.processor[0];
+    }
+
+
+    /**
+     * need implement,  method from MachineProcessorHolder
+     * @return
+     */
+    public ItemStack getProgressBar(){
+        return this.progressbar;
+    }
+
+
+    /**
+     * cancel machineprocessor after break
+     * @param e
+     * @param menu
+     */
+    public void onBreak(BlockBreakEvent e, BlockMenu menu) {
+        super.onBreak(e,menu);
+        for (int i=0;i<THREAD_NUM;i++){
+            processor[i].endOperation(menu.getLocation());
+        }
+    }
+
     /**
      *
      * @param preset
      */
-    @Override
-	public void constructMenu(BlockMenuPreset preset) {
+    public void constructMenu(BlockMenuPreset preset) {
         //空白背景 禁止点击
         //输入槽边框
         int[] border = BORDER_IN;
@@ -130,61 +165,12 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
             preset.addItem(PROCESSOR_SLOT[var4], MenuUtils.PROCESSOR_NULL, ChestMenuUtils.getEmptyClickHandler());
         }
     }
-    @Override
-	public int[] getInputSlots(){
-        return INPUT;
-    }
-    /**
-     * method from MachineProcessorHolder
-     * @return
-     */
-    @Override
-	public MachineProcessor<SimpleCraftingOperation> getMachineProcessor() {
-        return this.processor[0];
-    }
 
-    @Override
-	public int[] getOutputSlots(){
-        return OUTPUT;
-    }
-
-
-    public int[] getProcessorSlots(){
-        return PROCESSOR_SLOT;
-    }
-
-
-    /**
-     * need implement,  method from MachineProcessorHolder
-     * @return
-     */
-    public ItemStack getProgressBar(){
-        return this.progressbar;
-    }
-
-    /**
-     * cancel machineprocessor after break
-     * @param e
-     * @param menu
-     */
-    @Override
-	public void onBreak(BlockBreakEvent e, BlockMenu menu) {
-        super.onBreak(e,menu);
-        for (int i=0;i<THREAD_NUM;i++){
-            processor[i].endOperation(menu.getLocation());
-        }
-    }
-
-    @Override
-	public void preRegister(){
-        super.preRegister();
-    }
-    @Override
-	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
+    public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         int run=0;
         boolean hasViewer=inv.hasViewer();
         for (int i=0;i<THREAD_NUM;i++){
-            SimpleCraftingOperation currentOperation = this.processor[i].getOperation(b);
+            SimpleCraftingOperation currentOperation = (SimpleCraftingOperation)this.processor[i].getOperation(b);
             ItemConsumer[] fastCraft=null;
             if(currentOperation==null){
                 Pair<MachineRecipe, ItemConsumer[]> nextP = CraftUtils.findNextRecipe(inv,
@@ -229,5 +215,8 @@ public class AbstractMultiThreadProcessor extends AbstractMachine implements Mac
             }
         }
         this.removeCharge(inv.getLocation(),this.energyConsumption*run);
+    }
+    public void preRegister(){
+        super.preRegister();
     }
 }

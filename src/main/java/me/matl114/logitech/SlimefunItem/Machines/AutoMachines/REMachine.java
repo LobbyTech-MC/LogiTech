@@ -8,12 +8,27 @@ import org.bukkit.inventory.ItemStack;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
+import me.matl114.logitech.Utils.CraftUtils;
+import me.matl114.logitech.Utils.MenuUtils;
+import me.matl114.logitech.Utils.Settings;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.ItemConsumer;
+import me.matl114.logitech.Utils.UtilClass.RecipeClass.RandomMachineOperation;
+import me.matl114.logitech.Utils.UtilClass.RecipeClass.SimpleCraftingOperation;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @Deprecated
 public class REMachine extends EMachine{
     public REMachine(ItemGroup category, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                      Material processbar, int energyConsumption, int energyBuffer,
-                     LinkedHashMap<Object, Integer> customRecipes) {
+                     List<Pair<Object, Integer>> customRecipes) {
         super(category, item, recipeType, recipe, processbar, energyConsumption, energyBuffer, customRecipes);
     }
 //    public void process(Block b, BlockMenu inv, SlimefunBlockData data){

@@ -6,16 +6,18 @@ import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import me.matl114.logitech.SlimefunItem.AddHandlers;
-import me.matl114.logitech.SlimefunItem.DistinctiveCustomItemStack;
+import me.matl114.logitech.SlimefunItem.DistinctiveCustomSlimefunItem;
+import me.matl114.logitech.Utils.WorldUtils;
+import org.bukkit.inventory.ItemStack;
 
-public class ItemNotPlaceable extends DistinctiveCustomItemStack {
-    public ItemNotPlaceable(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+public class CustomItemNotPlaceable extends DistinctiveCustomSlimefunItem {
+    public CustomItemNotPlaceable(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
     @Override
     public  void preRegister(){
         super.preRegister();
-        if(this.getItem().getType().isBlock()){
+        if(WorldUtils.isBlock(getItem().getType())){
             addItemHandler(AddHandlers.stopPlacementHandler);
             addItemHandler(AddHandlers.stopPlaceerHandler);
         }

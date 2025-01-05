@@ -40,6 +40,7 @@ import io.github.thebusybiscuit.slimefun4.implementation.items.altar.AltarRecipe
 import io.github.thebusybiscuit.slimefun4.implementation.items.blocks.Composter;
 import io.github.thebusybiscuit.slimefun4.implementation.items.blocks.Crucible;
 import io.github.thebusybiscuit.slimefun4.implementation.items.misc.BasicCircuitBoard;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
 import me.matl114.logitech.ConfigLoader;
 import me.matl114.logitech.MyAddon;
@@ -51,9 +52,13 @@ import me.matl114.logitech.SlimefunItem.Machines.AbstractTransformer;
 import me.matl114.logitech.SlimefunItem.Machines.AutoMachines.AEMachine;
 import me.matl114.logitech.SlimefunItem.Machines.AutoMachines.EMachine;
 import me.matl114.logitech.SlimefunItem.Machines.AutoMachines.MTMachine;
+import me.matl114.logitech.Utils.Algorithms.PairList;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.ProbItemStack;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.ImportRecipes;
 import me.matl114.logitech.Utils.UtilClass.RecipeClass.MGeneratorRecipe;
+import me.matl114.logitech.SlimefunItem.Machines.AbstractTransformer;
+import me.matl114.matlib.Implements.Slimefun.core.CustomRecipeType;
+import me.matl114.matlib.core.EnvironmentManager;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 
@@ -66,12 +71,13 @@ public class RecipeSupporter {
                 new ItemStack[] {new ItemStack(Material.GRAVEL)},
                 new ItemStack[] {
                         AddUtils.randItemStackFactory(
-                                new LinkedHashMap<>(){{
-                                    put("FLINT",40);
-                                    put("CLAY_BALL",20);
-                                    put("SIFTED_ORE",35);
-                                    put("IRON_NUGGET",5);
+                                new ArrayList<>(){{
+                                    add(new Pair<>("FLINT",40));
+                                    add(new Pair<>("CLAY_BALL",20));
+                                    add(new Pair<>("SIFTED_ORE",35));
+                                    add(new Pair<>("IRON_NUGGET",5));
                                 }}
+
                         )
                 }
         ));
@@ -84,13 +90,13 @@ public class RecipeSupporter {
                 },
                 new ItemStack[] {
                         AddUtils.randItemStackFactory(
-                                new LinkedHashMap<>(){{
-                                    put("QUARTZ",50);
-                                    put("GOLD_NUGGET",25);
-                                    put("NETHER_WART",10);
-                                    put("BLAZE_POWDER",8);
-                                    put("GLOWSTONE_DUST",5);
-                                    put("GHAST_TEAR",2);
+                                new ArrayList<>(){{
+                                    add(new Pair<>("QUARTZ",50));
+                                    add(new Pair<>("GOLD_NUGGET",25));
+                                    add(new Pair<>("NETHER_WART",10));
+                                    add(new Pair<>("BLAZE_POWDER",8));
+                                    add(new Pair<>("GLOWSTONE_DUST",5));
+                                    add(new Pair<>("GHAST_TEAR",2));
                                 }}
                         )
                 }
@@ -101,7 +107,7 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                 new ItemStack[]{SlimefunItems.SIFTED_ORE},
                 new ItemStack[] {
                         AddUtils.randItemStackFactory(
-                                new LinkedHashMap<>(){{
+                                new PairList<>(){{
                                     put("IRON_DUST",1);
                                     put("GOLD_DUST",1);
                                     put("COPPER_DUST",1);
@@ -479,6 +485,7 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                 BukkitUtils.sendRecipeToVanilla(item);
             }
         }
+        RECIPE_TYPES.addAll(CustomRecipeType.getCustomRecipeTypes());
         //先解析多方块机器的配方
         for(RecipeType recipeType :RECIPE_TYPES){
             if(!BLACKLIST_RECIPETYPES.contains(recipeType)) {//not in black list
@@ -501,10 +508,25 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                 }
             }
         }
+        for(RecipeType recipeType :RECIPE_TYPES){
+            if(!BLACKLIST_RECIPETYPES.contains(recipeType)) {//not in black list
+                if(recipeType instanceof CustomRecipeType crp){
+                    List<MachineRecipe> stackRecipes=new ArrayList<>();
+                    List<MachineRecipe> shapedRecipes=new ArrayList<>();
+                    crp.getRecipes().forEach((in,out)->{
+                        stackRecipes.add(MachineRecipeUtils.stackFrom(-1,in,new ItemStack[]{out}));
+                        shapedRecipes.add(MachineRecipeUtils.shapeFrom(-1,in,new ItemStack[]{out}));
+                    });
+                    PROVIDED_SHAPED_RECIPES.computeIfAbsent(recipeType,k->new ArrayList<>()).addAll(shapedRecipes);
+                    PROVIDED_UNSHAPED_RECIPES.computeIfAbsent(recipeType,k->new ArrayList<>()).addAll(stackRecipes);
+                }
+            }
+        }
         //非多方块的类型,基本上就是普通物品的配方注册，读取一遍
         for (SlimefunItem item : Slimefun.getRegistry().getEnabledSlimefunItems()){
             RecipeType recipeType = item.getRecipeType();
-            if((!BLACKLIST_RECIPETYPES.contains(recipeType))&&(!MULTIBLOCK_RECIPETYPES.containsKey(recipeType))){
+            //customRecipeType, 和 Multiblock type都被处理过了
+            if((!BLACKLIST_RECIPETYPES.contains(recipeType))&&(!MULTIBLOCK_RECIPETYPES.containsKey(recipeType))&& !(recipeType instanceof CustomRecipeType)){
                 PROVIDED_SHAPED_RECIPES.get(recipeType).add(MachineRecipeUtils.shapeFromRecipe(item));
                 PROVIDED_UNSHAPED_RECIPES.get(recipeType).add(MachineRecipeUtils.stackFromRecipe(item)) ;
             }
@@ -602,7 +624,7 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
             put(EntityType.VILLAGER, Utils.recipe("PAPER", "BREWING_STAND"));
             put(EntityType.PIG, Utils.recipe("PORKCHOP"));
             put(EntityType.COW, Utils.recipe("BEEF", "LEATHER"));
-            put(EntityType.MOOSHROOM, Utils.recipe("BEEF", "LEATHER",AddUtils.probItemStackFactory(  AddUtils.resolveItem("RED_MUSHROOM"),25)));
+            put(EnvironmentManager.getManager().getVersioned().getEntityType("mooshroom"), Utils.recipe("BEEF", "LEATHER",AddUtils.probItemStackFactory(  AddUtils.resolveItem("RED_MUSHROOM"),25)));
             put(EntityType.CAT, Utils.recipe("STRING"));
             put(EntityType.CHICKEN, Utils.recipe("CHICKEN", "FEATHER"));
             put(EntityType.COD, Utils.recipe("COD", AddUtils.probItemStackFactory( AddUtils.resolveItem( "BONE_MEAL"),5)));
@@ -625,7 +647,7 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
             put(EntityType.RABBIT, Utils.recipe("RABBIT", "RABBIT_HIDE", AddUtils.probItemStackFactory( AddUtils.resolveItem( "RABBIT_FOOT"),10)));
             put(EntityType.SALMON, Utils.recipe("SALMON", AddUtils.probItemStackFactory( AddUtils.resolveItem( "BONE_MEAL"),5)));
             put(EntityType.SKELETON_HORSE, Utils.recipe("BONE"));
-            put(EntityType.SNOW_GOLEM, Utils.recipe("SNOWBALL"));
+            put(EnvironmentManager.getManager().getVersioned().getEntityType("snowman"), Utils.recipe("SNOWBALL"));
             put(EntityType.SQUID, Utils.recipe("INK_SAC"));
             put(EntityType.STRIDER, Utils.recipe("STRING"));
             put(EntityType.TROPICAL_FISH, Utils.recipe("TROPICAL_FISH", AddUtils.probItemStackFactory( AddUtils.resolveItem( "BONE_MEAL"),5)));
@@ -637,7 +659,6 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
             World world=worldlist.get(0);
             Location loc=new Location(world,8,888,8);
             //load chunk
-            Chunk chunk=loc.getChunk();
             for(EntityType type:EntityType.values()){
                 if(!type.isSpawnable()){
                     continue;
@@ -1369,7 +1390,7 @@ private static final ArrayList<MachineRecipe> ORE_WASHER_RECIPE=new ArrayList<>(
                         double chance = (Double) ReflectUtils.invokeGetRecursively(oscillatorsInstance, Settings.FIELD, "chance");
                         ItemStack oscillatorsType=new ItemStack(oscillatorsInstance.getItem().getType(),amount);
                         int chanceToInt=(int)(chance*100);
-                        ItemStack randOut=AddUtils.randItemStackFactory(new LinkedHashMap<>(){{
+                        ItemStack randOut=AddUtils.randItemStackFactory(new PairList(){{
                             put(oscillatorsType,chanceToInt);
                             put(outputRandGroup,100-chanceToInt);
                         }});

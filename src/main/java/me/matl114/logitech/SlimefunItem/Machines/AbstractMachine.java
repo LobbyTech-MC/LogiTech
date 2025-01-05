@@ -21,7 +21,8 @@ import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.attributes.EnergyNetComponent;
 import io.github.thebusybiscuit.slimefun4.core.attributes.NotHopperable;
 import io.github.thebusybiscuit.slimefun4.core.networks.energy.EnergyNetComponentType;
-import me.matl114.logitech.SlimefunItem.DistinctiveCustomItemStack;
+
+import me.matl114.logitech.SlimefunItem.DistinctiveCustomSlimefunItem;
 import me.matl114.logitech.SlimefunItem.Interface.MenuBlock;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.CraftUtils;
@@ -32,7 +33,18 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecip
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
-public abstract  class AbstractMachine extends DistinctiveCustomItemStack implements Ticking, MenuBlock,  EnergyNetComponent, NotHopperable  {
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+public abstract  class AbstractMachine extends DistinctiveCustomSlimefunItem implements Ticking, MenuBlock,  EnergyNetComponent, NotHopperable  {
     //我们的目标是 最广的需求 最好的性能 最大的答辩(bushi
     public  List<MachineRecipe> machineRecipes ;
     protected Supplier<List<MachineRecipe>> machineRecipeSupplier=null;

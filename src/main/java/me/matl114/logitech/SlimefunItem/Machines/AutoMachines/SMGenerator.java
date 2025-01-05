@@ -1,24 +1,25 @@
 package me.matl114.logitech.SlimefunItem.Machines.AutoMachines;
 
 
-import java.util.LinkedHashMap;
-
-import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractTransformer;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.Settings;
+import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.Algorithms.PairList;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.DisplayItemStack;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.*;
 
 public class SMGenerator extends AbstractTransformer  {
 
@@ -34,7 +35,7 @@ public class SMGenerator extends AbstractTransformer  {
     public SMGenerator(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe,
                        int time, int energybuffer,int energyConsumption,Object... outputs_w) {
         super(itemGroup, item, recipeType, recipe,time,energybuffer,energyConsumption,
-                new LinkedHashMap<>(){{
+                new PairList<>(){{
                     this.put(new Pair<>(
                             new ItemStack[]{}, outputs_w
                     ),time-1) ;
@@ -44,13 +45,11 @@ public class SMGenerator extends AbstractTransformer  {
 
 
     }
-    @Override
-	public void addInfo(ItemStack stack){
+    public void addInfo(ItemStack stack){
         stack.setItemMeta( AddUtils.smgInfoAdd(stack,time).getItemMeta() );
         super.addInfo(stack);
     }
-    @Override
-	public void constructMenu(BlockMenuPreset preset){
+    public void constructMenu(BlockMenuPreset preset){
         preset.setSize(54);
         preset.addItem(INFO_SLOT,this.INFO_WORKING.clone(), ChestMenuUtils.getEmptyClickHandler());
         int[] border=BORDER;
@@ -59,28 +58,23 @@ public class SMGenerator extends AbstractTransformer  {
             preset.addItem(BORDER[i],ChestMenuUtils.getBackground(),ChestMenuUtils.getEmptyClickHandler());
         }
     }
-    @Override
-	public int[] getInputSlots(){
+    public int[] getInputSlots(){
         return INPUT_SLOT;
     }
-    @Override
-	public int[] getOutputSlots(){
+    public int[] getOutputSlots(){
         return OUTPUT_SLOTS;
     }
 
-    @Override
-	public boolean isSync(){
+    public boolean isSync(){
         return false;
     }
-    @Override
-	public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
-        super.tick(b,menu,data,ticker);
-    }
-    @Override
-	public void updateMenu(BlockMenu inv,Block b,Settings mod){
+    public void updateMenu(BlockMenu inv,Block b,Settings mod){
         if(mod==Settings.INIT){
             DataCache.setLastRecipe(inv.getLocation(),0);
         }
+    }
+    public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
+        super.tick(b,menu,data,ticker);
     }
 
 }

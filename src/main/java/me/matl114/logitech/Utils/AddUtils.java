@@ -46,15 +46,12 @@ import io.github.thebusybiscuit.slimefun4.utils.LoreBuilder;
 import me.matl114.logitech.Language;
 import me.matl114.logitech.MyAddon;
 import me.matl114.logitech.SlimefunItem.AddItem;
+import me.matl114.logitech.Utils.Algorithms.PairList;
+import me.matl114.logitech.Utils.UtilClass.ItemClass.*;
 import me.matl114.logitech.Utils.UtilClass.FunctionalClass.LoreDecorator;
 import me.matl114.logitech.Utils.UtilClass.FunctionalClass.StringDecorator;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.AbstractItemStack;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.DisplayItemStack;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.EqProRandomStack;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.EquivalItemStack;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ProbItemStack;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.RandAmountStack;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.RandomItemStack;
+import me.matl114.matlib.Utils.Inventory.CleanItemStack;
+import me.matl114.matlib.core.EnvironmentManager;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -63,6 +60,118 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class AddUtils {
+    public static final String ADDON_NAME=Language.getPlaceHolder("PLUGIN");
+    public static final String ADDON_ID="LOGITECH";
+    public static final String VERSION=Language.getPlaceHolder("VERSION");
+    public static final SlimefunAddon ADDON_INSTANCE=MyAddon.getInstance();
+    public static boolean USE_IDDECORATOR=true;
+    private static final double SF_TPS =
+            20.0 / (double) Slimefun.getTickerTask().getTickRate();
+    private static final DecimalFormat FORMAT = new DecimalFormat("###,###,###,###,###,###.#");
+    private static Random random=new Random();
+
+    public static String formatDouble(double s){
+        return FORMAT.format(s);
+    }
+    public static String idDecorator(String b){
+        if(USE_IDDECORATOR){
+            return ADDON_ID+"_"+b;
+        }
+        else return b;
+    }
+    public static NamespacedKey getNameKey(String str) {
+        return new NamespacedKey(MyAddon.getInstance(),str);
+    }
+    public static String desc(String str) {
+        return "&7" + str;
+    }
+    public static String addonTag(String str) {
+        return "&3"+ADDON_NAME+" " + str;
+    }
+    public static final String[] COLOR_MAP=new String[]{"&0","&1","&2","&3","&4","&5","&6","&7","&8","&9","&a","&b","&c","&d","&e","&f"};
+    public static final String C="§";
+    protected final HashMap<String, Color> STR2COLOR=new HashMap<>(){{
+        //put("",Color.AQUA)
+    }};
+    public static String resolveRGB(int rgb){
+        if(rgb>16777216){
+            rgb=16777216;
+        }
+        else if (rgb<0){
+            rgb=0;
+        }
+        String prefix="";
+        for(int i=0;i<6;i++){
+            int r=rgb%16;
+            rgb=rgb/16;
+            prefix=COLOR_MAP[r]+prefix;
+        }
+        prefix="&x"+prefix;
+        return prefix;
+    }
+
+    public static String resolveRGB(String rgb) throws IllegalArgumentException {
+        if(rgb.length()!=6){
+            throw new IllegalArgumentException("Invalid RGB String");
+        }
+        String prefix="&x";
+        for (int i=0;i<6;i++){
+            prefix=prefix+"&"+rgb.substring(i,i+1);
+        }
+        return prefix;
+    }
+    public static int rgb2int(String rgb) throws IllegalArgumentException{
+        if(rgb.length()!=6){
+            throw new IllegalArgumentException("Invalid RGB String");
+        }
+        int value=0;
+        for (int i=0;i<6;i++){
+            char c=rgb.charAt(i);
+            if(Character.isDigit(c)){
+                value=value*16+(c-'0');
+            }
+            else if(c>='a'&&c<='f'){
+                value=value*16+(c-'a'+10);
+            }
+            else if(c>='A'&&c<='F'){
+                value=value*16+(c-'A'+10);
+            }
+            else throw new IllegalArgumentException("Invalid RGB String");
+        }
+        return value;
+    }
+    public static final int START_CODE=rgb2int("eb33eb");
+            //15409899;
+    public static final int END_CODE=rgb2int("970097");
+    public static String color(String str){
+        return resolveRGB(START_CODE)+str;
+    }
+    public static String colorful(String str) {
+        int len=str.length()-1;
+        if(len<=0){
+            return resolveRGB(START_CODE)+str;
+        }
+        else{
+            int start=START_CODE;
+            int end=END_CODE;
+            int[] rgbs=new int[9];
+            for(int i=0;i<3;++i){
+                rgbs[i]=start%256;
+                rgbs[i+3]=end%256;
+                rgbs[i+6]=rgbs[i+3]-rgbs[i];
+                start=start/256;
+                end=end/256;
+            }
+            String str2="";
+            for(int i=0;i<=len;i++){
+                str2=str2+resolveRGB(START_CODE+65536*((rgbs[8]*i)/len)+256*((rgbs[7]*i)/len)+((rgbs[6]*i)/len))+str.substring(i,i+1);
+            }
+            return str2;
+
+        }
+    }
+    public static final ItemStack[] NULL_RECIPE=new ItemStack[]{null,null,null,null,null,null,null,null,null} ;
+    public static final ItemMeta NULL_META=null;
     public enum Theme{
         NONE(
                 ((a)->{return a;}),
@@ -263,7 +372,20 @@ public class AddUtils {
             return finallist;
         }
         })
-                )
+                ),
+        TOOL(
+                ((a)->{return a;}),
+                ((List<String> a)->{{
+            List<String> finallist=new ArrayList<>() ;
+            for(String i:a){
+                finallist.add(desc(i));
+            }
+            //finallist.add("");
+            finallist.add(addonTag(Language.get("Theme.TOOL.Name")));
+            return finallist;
+        }
+        })
+        )
         ;
         private final StringDecorator NAME_DEC;
         private final LoreDecorator  LORE_DEC;
@@ -534,19 +656,27 @@ public class AddUtils {
         }else if((result=resolveRandomizedItemStack(stack))!=null){
             return result;
         }else {
-            return new CustomItemStack(stack);
+            return getCleaned(stack);
         }
     }
-    public static String getDateString(){
-        return new SimpleDateFormat("yyyyMMdd").format(new Date());
+    public static ItemStack getCleaned(ItemStack stack){
+        return stack==null?new ItemStack(Material.AIR): new CleanItemStack(stack);
     }
-    public static ItemStack getGeneratorDisplay(boolean working,String type,int charge,int buffer){
-        if(working){
-            return new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE,"&a发电中",
-                    "&7类型:&6 %s".formatted(type),"&7&7电量: &6%s/%sJ".formatted(FORMAT.format((double)charge),FORMAT.format((double)buffer)));
-        }else {
-            return new CustomItemStack(Material.RED_STAINED_GLASS_PANE,"&a未发电",
-                    "&7类型:&6 %s".formatted(type),"&7&7电量: &6%s/%sJ".formatted(FORMAT.format((double)charge),FORMAT.format((double)buffer)));
+    public static ItemStack resolveRandomizedItemStack(ItemStack stack){
+        ItemStack result=null;
+        if(stack.getClass().getName().endsWith("RandomizedItemStack")){
+            try{
+                Object itemlist=ReflectUtils.invokeGetRecursively(stack,Settings.FIELD,"items");
+                if(itemlist!=null){
+                    ItemStack[] list1=(ItemStack[])itemlist;
+                    result=AddUtils.eqRandItemStackFactory(Arrays.stream(list1).toList());
+                }else if((itemlist=ReflectUtils.invokeGetRecursively(stack,Settings.FIELD,"itemStacks"))!=null){
+                    ItemStack[] list1=(ItemStack[])itemlist;
+                    result=AddUtils.eqRandItemStackFactory(Arrays.stream(list1).toList());
+                }
+            }catch (Throwable e){
+                e.printStackTrace();
+            }
         }
     }
     /**
@@ -749,14 +879,14 @@ public class AddUtils {
                 id=(String) a;
             }
             try{
-            ItemStack b=new ItemStack(SlimefunItem.getById(id).getItem());
+            ItemStack b=getCopy(SlimefunItem.getById(id).getItem());
             if(cnt>0&&cnt!=b.getAmount()){
                 b.setAmount(cnt);
             }
             return b;
             }catch (Exception e){
                 try{
-                    ItemStack b=new ItemStack( Material.getMaterial(id));
+                    ItemStack b=new ItemStack( EnvironmentManager.getManager().getVersioned().getMaterial(id));
                     if(cnt>0&&cnt!=b.getAmount()){
                         b=b.clone();
                         b.setAmount(cnt);
@@ -774,20 +904,92 @@ public class AddUtils {
 
     }
 
-    public static ItemStack resolveRandomizedItemStack(ItemStack stack){
-        ItemStack result=null;
-        if(stack.getClass().getName().endsWith("RandomizedItemStack")){
-            try{
-                Object itemlist=ReflectUtils.invokeGetRecursively(stack,Settings.FIELD,"items");
-                if(itemlist!=null){
-                    ItemStack[] list1=(ItemStack[])itemlist;
-                    result=AddUtils.eqRandItemStackFactory(Arrays.stream(list1).toList());
-                }else if((itemlist=ReflectUtils.invokeGetRecursively(stack,Settings.FIELD,"itemStacks"))!=null){
-                    ItemStack[] list1=(ItemStack[])itemlist;
-                    result=AddUtils.eqRandItemStackFactory(Arrays.stream(list1).toList());
+                Arrays.stream(input).forEach(
+                        (obj)->{
+                                ItemStack a__=resolveItem(obj);
+                                this.add(a__);
+                            }
+                );
+        }};
+        a=a_.toArray(new ItemStack[a_.size()]);
+        ItemStack[] b;
+        ArrayList<ItemStack> b_=new ArrayList<>(){{
+
+                Arrays.stream(output).forEach(
+                        (obj)->{
+
+
+                                ItemStack b__=resolveItem(obj);
+                                this.add(b__);
+                            }
+                );
+
+        }};
+        b=b_.toArray(new ItemStack[b_.size()]);
+        return new Pair<>(a,b);
+    }
+    public static MachineRecipe buildMachineRecipes(int time,Pair<Object[],Object[]> itemStacks){
+        Pair<ItemStack[],ItemStack[]> b=buildRecipes(itemStacks);
+        return new MachineRecipe(time,b.getFirstValue(),b.getSecondValue());
+    }
+    public static <T extends Object> List<Pair<Pair<ItemStack[],ItemStack[]>,Integer>> buildRecipeMap(List<Pair<T,Integer>> rawDataMap){
+        if(rawDataMap==null)return new ArrayList<>();
+        List<Pair<Pair<ItemStack[],ItemStack[]>,Integer>> map = new ArrayList<>();
+        rawDataMap.forEach((p)->{
+            var k=p.getFirstValue();
+            var v=p.getSecondValue();
+            if(k instanceof Object[]){
+
+                map.add(new Pair<>(AddUtils.buildRecipes(
+                        Arrays.copyOfRange((Object[])k,0,2),Arrays.copyOfRange((Object[])k,2,4)),v));
+            }
+            else if (k instanceof Pair){
+
+
+                Object[] input=(Object[])((Pair)k).getFirstValue();
+                if(input==null){
+                    input=new Object[]{};
                 }
-            }catch (Throwable e){
-                e.printStackTrace();
+                Object[] output=(Object[])((Pair)k).getSecondValue();
+                if(output==null){
+                    output=new Object[]{};
+                }
+                map.add(new Pair<>(AddUtils.buildRecipes(input,output),v));
+            }
+        });
+        return map;
+    }
+    public static ItemStack addLore(ItemStack item,String... lores){
+
+        ItemStack item2=item.clone();
+
+        ItemMeta meta=item2.getItemMeta();
+        List<String> finallist=meta.hasLore() ? meta.getLore() : new ArrayList<>();
+        for (String l:lores){
+            finallist.add(resolveColor(l));
+        }
+        meta.setLore(finallist);
+        item2.setItemMeta(meta);
+        return item2;
+    }
+    public static ItemStack renameItem(ItemStack item,String name){
+        ItemStack item2=item.clone();
+
+        ItemMeta meta=item2.getItemMeta();
+        meta.setDisplayName(resolveColor(name));
+        item2.setItemMeta(meta);
+        return item2;
+    }
+    public static String resolveColor(String s){
+        return translateAlternateColorCodes('&', s);
+    }
+    public static String translateAlternateColorCodes(char altColorChar,  String textToTranslate) {
+        Preconditions.checkArgument(textToTranslate != null, "Cannot translate null text");
+        char[] b = textToTranslate.toCharArray();
+
+        for(int i = 0; i < b.length - 1; ++i) {
+            if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx".indexOf(b[i + 1]) > -1) {
+                b[i] = 167;
             }
         }
         return result;
@@ -799,18 +1001,48 @@ public class AddUtils {
         else if (rgb<0){
             rgb=0;
         }
-        String prefix="";
-        for(int i=0;i<6;i++){
-            int r=rgb%16;
-            rgb=rgb/16;
-            prefix=COLOR_MAP[r]+prefix;
+        else return null;
+    }
+    public static ItemStack smgInfoAdd(ItemStack item,int time){
+        return  AddUtils.addLore( item, tickPerGen(time));
+    }
+    public static ItemStack advancedMachineShow(ItemStack stack,int limit){
+        return AddUtils.addLore(stack,"&7机器合成进程数: %s".formatted(limit));
+    }
+    public static String getPercentFormat(double b){
+        DecimalFormat df = new DecimalFormat("#.##");
+        NumberFormat nf = NumberFormat.getPercentInstance();
+        return nf.format(Double.parseDouble(df.format(b)));
+    }
+
+    /**
+     * return int values in [0,length)
+     * @param length
+     * @return
+     */
+    public static int random(int length){
+        return random.nextInt(length);
+    }
+    //generate rand in (0,1)
+    public static double standardRandom(){
+        return random.nextDouble();
+    }
+    //we supposed that u have checked these shits
+
+    public static RandomItemStack eqRandItemStackFactory(List<ItemStack> list){
+        List<Pair<Object,Integer>> map=new ArrayList<>();
+        int i=list.size();
+        for(int j=0;j<i;j++){
+            map.add(new Pair<>(list.get(j),1));
         }
         prefix="&x"+prefix;
         return prefix;
     }
-    public static String resolveRGB(String rgb) throws IllegalArgumentException {
-        if(rgb.length()!=6){
-            throw new IllegalArgumentException("Invalid RGB String");
+    public static RandomItemStack randItemStackFactory(List<ItemStack> st,List<Integer> it){
+        List<Pair<Object,Integer>> map=new ArrayList<>();
+        int len=st.size();
+        for(int i=0;i<len;i++){
+            map.add(new Pair<>(st.get(i),it.get(i)));
         }
         String prefix="&x";
         for (int i=0;i<6;i++){
@@ -818,15 +1050,27 @@ public class AddUtils {
         }
         return prefix;
     }
-    public static int rgb2int(String rgb) throws IllegalArgumentException{
-        if(rgb.length()!=6){
-            throw new IllegalArgumentException("Invalid RGB String");
-        }
-        int value=0;
-        for (int i=0;i<6;i++){
-            char c=rgb.charAt(i);
-            if(Character.isDigit(c)){
-                value=value*16+(c-'0');
+    public static RandomItemStack randItemStackFactory(List<Pair<Object,Integer>> list){
+            List<Pair<ItemStack,Integer>> c=new ArrayList<>();
+            boolean isEqPro=true;
+            int last_value=-1;
+            for(var s:list){
+                int value=s.getSecondValue();
+                Object o=s.getFirstValue();
+                if(o!=null){
+                    ItemStack o_=AddUtils.resolveItem(o);
+                    if(o_!=null){
+                        c.add(new Pair<>(o_,value));
+
+                    }
+                    else return null;
+                }else return null;
+                if(last_value>0){
+
+                    isEqPro=(last_value==value);
+                }
+                Preconditions.checkArgument( value>0,"Weight of choice in Random ItemStack should not be lesser than 0");
+                last_value=value;
             }
             else if(c>='a'&&c<='f'){
                 value=value*16+(c-'a'+10);
@@ -842,12 +1086,107 @@ public class AddUtils {
     public static void sendMessage(CommandSender p, String msg){
         p.sendMessage(ChatColors.color(msg));
     }
-    public static void sendTitle(Player p,String title,String subtitle){
-        p.sendTitle(ChatColors.color(title),ChatColors.color(subtitle),-1,-1,-1);
+    public static <T extends Object> ItemStack equalItemStackFactory(List<T> list,int t){
+        if(list.isEmpty())return null;
+        if(list.size()==1){
+           ItemStack it= AddUtils.resolveItem(list.get(0));
+           it.setAmount(t);
+           return it;
+        }
+        PairList<ItemStack,Integer> c=new PairList<>();
+        for(Object o:list){
+            if(o!=null){
+                ItemStack o_=AddUtils.resolveItem(o);
+                if(o_!=null){
+                    c.put(o_,1);
+                }
+                else return null;
+            }else return null;
+        }
+
+        EquivalItemStack it= new EquivalItemStack(c);
+        it.setEqualAmount(t);
+        return it;
     }
 
-    public static ItemStack setCount(ItemStack stack,int amount){
-        return new CustomItemStack(stack,amount);
+    /**
+     * like /give command
+     * @param p
+     * @param toGive
+     */
+    public static void forceGive(Player p, ItemStack toGive,int amount) {
+        ItemStack incoming = getCopy(toGive);;
+        int maxSize=toGive.getMaxStackSize();
+        while(amount>0) {
+
+            int amount2=Math.min(maxSize, amount);
+            incoming.setAmount(amount2);
+            amount-=amount2;
+            Collection<ItemStack> leftover = p.getInventory().addItem(incoming).values();
+            for (ItemStack itemStack : leftover) {
+                p.getWorld().dropItemNaturally(p.getLocation(), itemStack);
+            }
+        }
+    }
+
+    /**
+     * add glowing effect to itemstack
+     * no clone in this method
+     * @param stack
+     */
+    public static ItemStack removeGlow(ItemStack stack){
+        //stack.addEnchantment(Enchantment.ARROW_INFINITE, 1);
+        ItemMeta meta=stack.getItemMeta();
+        meta.removeEnchant(Enchantment.ARROW_INFINITE);
+        stack.setItemMeta(meta);
+        return stack;
+    }
+    public static ItemStack addGlow(ItemStack stack){
+        //stack.addEnchantment(Enchantment.ARROW_INFINITE, 1);
+        ItemMeta meta=stack.getItemMeta();
+        meta.addEnchant(Enchantment.ARROW_INFINITE, 1, true);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        stack.setItemMeta(meta);
+        return stack;
+    }
+    public static ItemStack hideAllFlags(ItemStack stack){
+        ItemMeta meta=stack.getItemMeta();
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.addItemFlags(ItemFlag.HIDE_ARMOR_TRIM);
+        meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
+        meta.addItemFlags(ItemFlag.HIDE_DYE);
+        meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
+        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        stack.setItemMeta(meta);
+        return stack;
+    }
+    public static ItemStack showAllFlags(ItemStack stack){
+        ItemMeta meta=stack.getItemMeta();
+        meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
+        meta.removeItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.removeItemFlags(ItemFlag.HIDE_ARMOR_TRIM);
+        meta.removeItemFlags(ItemFlag.HIDE_DESTROYS);
+        meta.removeItemFlags(ItemFlag.HIDE_DYE);
+        meta.removeItemFlags(ItemFlag.HIDE_PLACED_ON);
+        meta.removeItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        stack.setItemMeta(meta);
+        return stack;
+    }
+    public static ItemStack setUnbreakable(ItemStack stack,boolean unbreakable){
+        ItemMeta meta=stack.getItemMeta();
+        meta.setUnbreakable(unbreakable);
+        stack.setItemMeta(meta);
+        return stack;
+    }
+    /**
+     * get a info display item to present in SF machineRecipe display
+     * @param title
+     * @param name
+     * @return
+     */
+    public static ItemStack getInfoShow(String title,String... name){
+        return new DisplayItemStack(new CustomItemStack(Material.BOOK,title,name));
     }
 
     /**
@@ -889,109 +1228,21 @@ public class AddUtils {
         meta.setDisplayName(AddUtils.resolveColor(name));
         return meta;
     }
-    public static ItemStack setUnbreakable(ItemStack stack,boolean unbreakable){
-        ItemMeta meta=stack.getItemMeta();
-        meta.setUnbreakable(unbreakable);
-        stack.setItemMeta(meta);
-        return stack;
+    public static String getDateString(){
+        return new SimpleDateFormat("yyyyMMdd").format(new Date());
     }
-    public static ItemStack showAllFlags(ItemStack stack){
-        ItemMeta meta=stack.getItemMeta();
-        meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
-        meta.removeItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        meta.removeItemFlags(ItemFlag.HIDE_ARMOR_TRIM);
-        meta.removeItemFlags(ItemFlag.HIDE_DESTROYS);
-        meta.removeItemFlags(ItemFlag.HIDE_DYE);
-        meta.removeItemFlags(ItemFlag.HIDE_PLACED_ON);
-        meta.removeItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-        stack.setItemMeta(meta);
-        return stack;
-    }
-    public static SlimefunItemStack smgInfoAdd(ItemStack item,int time){
-        return (SlimefunItemStack) AddUtils.addLore( item, tickPerGen(time));
-    }
-
-    public static String speedDisplay(int multiply){
-        return "&8⇨ &e⚡ &7速度: &b"+ multiply + "x";
-    }
-    //generate rand in (0,1)
-    public static double standardRandom(){
-        return random.nextDouble();
-    }
-    //we supposed that u have checked these shits
-
-    public static ItemStack themed(ItemStack itemStack, String name, String... lore){
-        return themed(itemStack,Theme.DEFAULT,name,lore);
-    }
-    public static ItemStack themed(ItemStack itemStack, Theme themeType, String name, List<String>  lore){
-        List<String> finallist=themeType.LORE_DEC.decorator(lore);
-        return new CustomItemStack(
-                itemStack,
-                themeType.NAME_DEC.decorate(name),
-                finallist.toArray(String[]::new)
-        );
-    }
-    public static ItemStack themed(ItemStack itemStack, Theme themeType, String name, String... lore){
-        return themed(itemStack,themeType,name,Arrays.asList(lore));
-    }
-    public static ItemStack themed(Material material, String name, String... lore){
-        return themed(material,Theme.DEFAULT,name,lore);
-    }
-    public static ItemStack themed(Material material, Theme themeType, String name, List<String> lore){
-        return themed(new ItemStack(material),themeType,name,lore);
-    }
-    public static ItemStack themed(Material material, Theme themeType, String name, String... lore){
-        return themed(material,themeType,name,Arrays.asList(lore));
-    }
-    public static SlimefunItemStack themed(String id ,ItemStack itemstack ,String name,List<String> lore){
-        return themed(id,itemstack,Theme.DEFAULT,name,lore);
-    }
-    public static  SlimefunItemStack themed(String id, ItemStack itemStack, String name, String... lore){
-        return themed(id, itemStack, name, Arrays.asList(lore));
-    }
-    public static  SlimefunItemStack themed(String id, ItemStack itemStack, Theme themeType, String name, List<String> lore){
-        List<String> finallist=themeType.LORE_DEC.decorator(lore);
-        return new SlimefunItemStack(
-                idDecorator(id),
-                itemStack,
-                themeType.NAME_DEC.decorate(name),
-                finallist.toArray(String[]::new)
-        );
-    }
-    public static  SlimefunItemStack themed(String id, ItemStack itemStack, Theme themeType, String name, String... lore){
-        return themed(id,itemStack,themeType,name,Arrays.asList(lore));
-    }
-    public static SlimefunItemStack themed(String id ,Material itemStack ,String name,List<String> lore){
-        return themed(id,new ItemStack(itemStack),name,lore);
-    }
-    public static  SlimefunItemStack themed(String id, Material itemStack, String name, String... lore){
-        return themed(id,new ItemStack(itemStack),name,lore);
-    }
-    public static  SlimefunItemStack themed(String id, Material itemStack, Theme themeType, String name, List<String> lore){
-        return themed(id,new ItemStack(itemStack),themeType,name,lore);
-    }
-    public static  SlimefunItemStack themed(String id, Material itemStack, Theme themeType, String name, String... lore){
-        return themed(id,new ItemStack(itemStack),themeType,name,lore);
-    }
-    public static  String tickPerGen(int time){
-        return "&8⇨ &7速度: &b每 " + Integer.toString(time) + " 粘液刻生成一次";
-    }
-    public static String translateAlternateColorCodes(char altColorChar,  String textToTranslate) {
-        Preconditions.checkArgument(textToTranslate != null, "Cannot translate null text");
-        char[] b = textToTranslate.toCharArray();
-
-        for(int i = 0; i < b.length - 1; ++i) {
-            if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx".indexOf(b[i + 1]) > -1) {
-                b[i] = 167;
-            }
+    static NamespacedKey idkey=//new NamespacedKey("minecraft","beyond");
+    Slimefun.getItemDataService().getKey();
+    public static ItemStack getWithoutId(ItemStack stack){
+        stack=stack.clone();
+        ItemMeta meta = stack.getItemMeta();
+        if(meta.getPersistentDataContainer().has(idkey)){
+            meta.getPersistentDataContainer().remove(idkey);
         }
+        stack.setItemMeta(meta);
+        return stack;
+    }
+    static{
 
-        return new String(b);
     }
-    public static  ItemStack workBenchInfoAdd(ItemStack item,int energyBuffer,int energyConsumption){
-        return AddUtils.addLore(item, LoreBuilder.powerBuffer(energyBuffer), AddUtils.energyPerCraft(energyConsumption));
-    }
-    protected final HashMap<String, Color> STR2COLOR=new HashMap<>(){{
-        //put("",Color.AQUA)
-    }};
 }

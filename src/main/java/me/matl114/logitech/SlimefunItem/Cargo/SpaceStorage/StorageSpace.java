@@ -56,9 +56,29 @@ public class StorageSpace {
 
 
     }
-    public static byte[] COUNTER_LOCK=new byte[0];
-    public static int SYNC_THREAD_COUNTER=0;
-
+    public static void setup(){
+        if(ENABLED){
+            try{
+                WorldCreator worldCreator = new WorldCreator(WORLD_NAME);
+                worldCreator.generator(new StorageWorldGen());
+                worldCreator.generateStructures(false);
+                STORAGE_WORLD = worldCreator.createWorld();
+                STORAGE_WORLD.setGameRule(GameRule.DO_MOB_SPAWNING,false);
+                STORAGE_WORLD.setGameRule(GameRule.MOB_GRIEFING,false);
+                STORAGE_WORLD.setGameRule(GameRule.KEEP_INVENTORY,true);
+            }catch(Throwable e){
+                e.printStackTrace();
+                ENABLED=false;
+            }
+        }
+    }
+    public static class StorageWorldGen extends ChunkGenerator {
+        public ChunkData generateChunkData(World world, Random random, int chunkx, int chunkz, BiomeGrid biomeGrid){
+            ChunkData chunkData=createChunkData(world);
+            chunkData.setRegion(0, WORLD_MIN_Y,0,16, WORLD_MAX_Y,16, Material.BARRIER);
+            return chunkData;
+        }
+    }
     //about Configs and data storage
     public static Pair<Integer, Location> generateNewLocation(int sizeX, int sizeY, int sizeZ){
         int num=ConfigLoader.SPACE_STORAGE.getOrSetDefault("index",0)+1;

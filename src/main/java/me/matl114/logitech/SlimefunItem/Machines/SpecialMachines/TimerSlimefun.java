@@ -24,8 +24,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-
-import io.github.sefiraat.networks.slimefun.network.NetworkController;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -181,8 +179,18 @@ public class TimerSlimefun extends AbstractMachine implements ChunkLimit, MenuTo
     public void process(Block b, BlockMenu inv, SlimefunBlockData data) {
 
     }
-    @Override
-	public void registerTick(SlimefunItem item){
+    protected FieldAccess.AccessWithObject<Map<ChunkPosition, Set<Location>>> tickingLocationsAccess=FieldAccess.ofName("tickingLocations").ofAccess(Slimefun.getTickerTask());
+    protected MethodAccess reportError=MethodAccess.ofName(TickerTask.class,"reportErrors", Location.class,SlimefunItem.class, Throwable.class);
+    protected HashSet<Class> blacklistedMachines=new HashSet<>(){{
+        add(TimerSlimefun.class);
+        add(TimerBlockEntity.class);
+        try{
+            add(io.github.sefiraat.networks.slimefun.network.NetworkController.class);
+        }catch (NoClassDefFoundError ignored){
+        }
+    }};
+    protected HashSet<Location> RUNNING_MACHINES=new HashSet<>();
+    public void registerTick(SlimefunItem item){
         item.addItemHandler(
                 new BlockTicker() {
                     int tickCount=0;

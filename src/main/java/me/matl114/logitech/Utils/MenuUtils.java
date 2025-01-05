@@ -180,6 +180,73 @@ public class MenuUtils {
         }
         return a;
     }
+    private static String getAmountDisplay(ItemStack stack){
+        if(stack instanceof RandAmountStack rand){
+            return "%d~%d".formatted(rand.getMin(),rand.getMax());
+        }
+        else{
+            return "x"+stack.getAmount();
+        }
+
+    }
+
+    private static ItemStack getDisplayItem(ItemStack it){
+        if(it==null||it.getType().isAir())return null;
+        ItemStack finalStack;
+        if(it instanceof RandomItemStack||it instanceof ProbItemStack){
+            List<ItemStack> list=((MultiItemStack)it).getItemStacks();
+            List<String> namelist=new ArrayList<>(){{
+                add("");
+                add("&3随机物品输出~");
+
+                List<Double> wlist=((MultiItemStack)it).getWeight(1.0);
+                int len=list.size();
+                for(int i=0;i<len;i++){
+                    add(AddUtils.concat(  "&f",
+                            ItemStackHelper.getDisplayName(list.get(i)),
+                            " &e",getAmountDisplay(list.get(i)),
+                            " 概率: ",AddUtils.getPercentFormat(wlist.get(i))) );
+                }
+            }};
+            //如果是proItemStack就获得其实例 因为不能整一个air出来
+            ItemStack sample=list.get(0);
+            if(sample.getType().isAir())return null;
+            finalStack= AddUtils.addLore(sample,namelist.toArray(new String[namelist.size()]));
+        }else if(it instanceof EquivalItemStack){
+            List<ItemStack> list=((EquivalItemStack)it).getItemStacks();
+            List<String> namelist=new ArrayList<>(){{
+                add("");
+                add("&3等价物品输入~");
+                int len=list.size();
+                for(int i=0;i<len;i++){
+                    add(AddUtils.concat(  "&f",
+                            ItemStackHelper.getDisplayName(list.get(i)),
+                            " ",getAmountDisplay(list.get(i))) );
+                }
+            }};
+            ItemStack sample=list.get(0);
+            if(sample.getType().isAir())return null;
+            finalStack= AddUtils.addLore(sample,namelist.toArray(new String[namelist.size()]));
+        }
+        else if(it instanceof RandAmountStack){
+            finalStack=AddUtils.addLore(AddUtils.getCleaned(it),AddUtils.concat("&e随机数量: ",getAmountDisplay(it)));
+        }else{
+            finalStack=it;
+        }
+        //防止因为意外出现的air 指
+        if(finalStack.getType().isAir()){
+            ItemMeta meta=finalStack.getItemMeta();
+            finalStack=NO_ITEM.clone();
+            finalStack.setItemMeta(meta);
+        }
+        if(finalStack.getAmount()>64){
+            finalStack=AddUtils.addLore(finalStack, "&c数量: "+finalStack.getAmount());
+        }else if(finalStack.getAmount()<=0){
+            finalStack=AddUtils.addLore(finalStack, "&c数量: "+finalStack.getAmount());
+            finalStack.setAmount(1);
+        }
+        return finalStack;
+    }
     public static MenuFactory createMRecipeDisplay(ItemStack machine,MachineRecipe recipe,@Nullable CustomMenuHandler backHandler){
         return createMRecipeDisplay(machine,recipe,backHandler,null);
     }

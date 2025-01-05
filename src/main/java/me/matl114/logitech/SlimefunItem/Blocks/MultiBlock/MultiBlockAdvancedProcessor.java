@@ -15,6 +15,7 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.attributes.MachineProcessHolder;
 import io.github.thebusybiscuit.slimefun4.core.machines.MachineProcessor;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import me.matl114.logitech.SlimefunItem.Blocks.MultiBlockCore.MultiBlockCore;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractAdvancedProcessor;
 import me.matl114.logitech.Utils.DataCache;
@@ -34,7 +35,7 @@ public abstract class MultiBlockAdvancedProcessor extends AbstractAdvancedProces
     protected boolean endOperationWhenBreak=false;
     public MultiBlockAdvancedProcessor(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType,
                                ItemStack[] recipe, String blockId, AbstractMultiBlockType type, ItemStack processorItem, int energyConsumption, int energyBuffer,
-                               LinkedHashMap<Object, Integer> customRecipes){
+                                       List<Pair<Object,Integer>> customRecipes){
         super(itemGroup, item, recipeType, recipe, Material.STONE,energyConsumption,energyBuffer,customRecipes);
         this.processor.setProgressBar(processorItem);
         this.MBTYPE = type;

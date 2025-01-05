@@ -1,10 +1,22 @@
 package me.matl114.logitech.SlimefunItem.Cargo;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
+import me.matl114.logitech.SlimefunItem.Cargo.Config.CargoConfigCard;
+import me.matl114.logitech.SlimefunItem.DistinctiveCustomSlimefunItem;
+import me.matl114.logitech.SlimefunItem.Interface.DirectionalBlock;
+import me.matl114.logitech.SlimefunItem.Interface.MenuBlock;
+import me.matl114.logitech.SlimefunItem.Interface.RecipeDisplay;
+import me.matl114.logitech.Utils.UtilClass.TickerClass.Ticking;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.DataCache;
+import me.matl114.logitech.Utils.Settings;
+import me.matl114.logitech.Utils.UtilClass.CargoClass.CargoConfigs;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -31,7 +43,11 @@ import me.matl114.logitech.Utils.UtilClass.TickerClass.Ticking;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
-public abstract class AbstractCargo extends DistinctiveCustomItemStack implements RecipeDisplay , MenuBlock, Ticking, DirectionalBlock {
+public abstract class AbstractCargo extends DistinctiveCustomSlimefunItem implements RecipeDisplay , MenuBlock, Ticking, DirectionalBlock {
+    public abstract int[] getInputSlots();
+    public abstract int[] getOutputSlots();
+    public abstract int getConfigSlot();
+    public abstract int[] getBWListSlot();
     public int defaultConfigCode=CargoConfigs.getDefaultConfig();
     protected final ItemStack[] DIRECTION_ITEM=new ItemStack[]{
             new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,"&6点击切换方向","&3当前方向: 无"),

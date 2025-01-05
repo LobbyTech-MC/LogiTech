@@ -1,24 +1,16 @@
 package me.matl114.logitech.Utils.UtilClass.CommandClass;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Pattern;
-
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
-
+import com.google.common.base.Preconditions;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
+import me.matl114.logitech.Listeners.Listeners.PlayerQuiteListener;
+import me.matl114.logitech.MyAddon;
+import me.matl114.logitech.Schedule.Schedules;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.Debug;
+import me.matl114.logitech.Utils.ReflectUtils;
+import me.matl114.logitech.Utils.UtilClass.FunctionalClass.AsyncResultRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -1150,7 +1142,445 @@ public class CommandShell {
         synchronized(lock){
             outputStream.add(AddUtils.concat(PREFIX,"&e",message));
         }
-    }
+    }.register("setStatic");
+    public static ShellCommand get=new ShellCommand(){
+        public String[] help=new String[]{
+                "get 打印当前选中的类path信息",
+                "get <varName> 打印变量<varName>"
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            if(argv.length==0){
+
+                shell.printObject(getVariable(shell,getPathVarName()) );
+            }else {
+                shell.printObject( getVariable(shell,argv[0]));
+            }
+            return 1;
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("get");
+    public static ShellCommand set=new ShellCommand(){
+        public String[] help=new String[]{
+                "set <var1> 将当前类对象存储至<var1>",
+                "set <var1> <var2> 将变量<var2>存储至<var1>"
+        };
+
+        public int cmd(String[] argv,CommandShell shell){
+
+            Object obj=getVariable(shell, argv.length==1? getPathVarName():argv[1]);
+           return setVariable(shell,argv[0],obj);
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("set");
+    public static ShellCommand getField=new ShellCommand(){
+        public String[] help=new String[]{
+                "getField <var1> <arg1> 获取变量<var1>名称为<arg1>的成员 ",
+                "getField <var1> <arg1> <var2> 获取变量<var1>名称为<arg1>的成员,并赋值给var2 ",
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            Object obj=getVariable(shell,argv[0]);
+            if(obj==null){
+                return variableNotInit(shell,argv[0]);
+            }else {
+                Class clazz=obj.getClass();
+                Pair<Field,Class> result=ReflectUtils.getDeclaredFieldsRecursively(clazz,argv[1]);
+                if(result==null){
+                    return variableFieldNotFound(shell,argv[0]);
+                }else {
+                    Object res;
+                    try{
+                        res= result.getFirstValue().get(obj);
+                    }catch (Throwable err){
+                        classFieldNotFound(shell,clazz);
+                        return -1;
+                    }
+                    shell.send(AddUtils.concat( "位于Class ",result.getSecondValue().getName()));
+                    shell.printObject(res);
+                    if(argv.length==3){
+                        setVariable(shell,argv[2],res);
+                    }
+                    return 1;
+                }
+            }
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("getField");
+    public static ShellCommand getAllFields=new ShellCommand(){
+        public String[] help=new String[]{
+                "getAllFields <var1> 获取变量<var1>的所有成员 ",
+                "getAllFields 获取当前设置的Class的所有成员",
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            Class clazz;
+           if(argv.length==0){
+               Object obj=getVariable(shell,getPathVarName());
+               if(obj instanceof Class cls){
+                   clazz=cls;
+               }else {
+                   return pathNotInit(shell);
+               }
+           }else {
+               Object obj= getVariable(shell,argv[0]);
+               if(obj==null){
+                   return variableFieldNotFound(shell,argv[0]);
+               }
+               clazz=obj.getClass();
+           }
+           List<Field> fields=ReflectUtils.getAllDeclaredFieldsRecursively(clazz);
+           if(fields.isEmpty()){
+               shell.send("Empty List");
+           }else {
+               for(Field field:fields){
+                   shell.printObject(field);
+               }
+           }
+           return 1;
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("getAllFields");
+    public static ShellCommand setField=new ShellCommand(){
+        public String[] help=new String[]{
+                "setField <var1> <arg1> <var2> 将变量<var2>赋值给变量<var1>名称为<arg1>的成员 ",
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            Preconditions.checkArgument( argv.length==3,"argument length should be 3");
+            Object obj=getVariable(shell,argv[0]);
+            if(obj==null){
+                return variableNotInit(shell,argv[0]);
+            }else {
+                Class clazz=obj.getClass();
+                Pair<Field,Class> result=ReflectUtils.getDeclaredFieldsRecursively(clazz,argv[1]);
+                if(result==null){
+                    return variableFieldNotFound(shell,argv[0]);
+                }else {
+                    Object obj2=getVariable(shell,argv[2]);
+
+                    try{
+                        result.getFirstValue().set(obj,obj2);
+                    }catch (Throwable err){
+                        setFieldFailed(shell,argv[0],result.getFirstValue(),err.getMessage());
+                        return -1;
+                    }
+                    shell.send(AddUtils.concat( "位于Class ",result.getSecondValue().getName()," 的成员",result.getFirstValue().getName()));
+                    shell.send("设置成功!");
+                    return 1;
+                }
+            }
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("setField");
+
+    public static ShellCommand constant=new ShellCommand(){
+        public String[] help=new String[]{
+                "const <type> <val> <var2> 将字符串<val>转为支持的基类/字符串<type>并将变量<var2>设置为该值",
+                "const list <len> <var2> 将变量<var2>设置为创建的长度为<len>的数组"
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            Preconditions.checkArgument( argv.length==3,"argument length should be 3");
+            String val=argv[1];
+            Object obj=getBaseWarpper(argv[0],val);
+            setVariable(shell,argv[2],obj);
+            return 0;
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("const");
+    public static ShellCommand getSfItem=new ShellCommand(){
+        public String[] help=new String[]{
+                "getSfItem <ID> <var1> 获取id为<ID>的sf物品实例,并存储到",
+                "getSfitem <ID> 获取id为<ID>的sf物品实例"
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            SlimefunItem item=SlimefunItem.getById(argv[0]);
+            shell.printObject(item);
+            if(argv.length==2){
+                setVariable(shell,argv[1],item);
+            }
+            return 1;
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("getSfItem");
+    public static ShellCommand getNearbyPlayer=new ShellCommand(){
+        public String[] help=new String[]{
+                "getNearbyEntity <int> <var1> 获取当前范围<int>内的全部实体,并存储在<var1>中",
+                "getNearbyEntity <int> 获取当前范围<int>内的全部实体"
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            Collection<Entity> result;
+            int nearby=Integer.parseInt(argv[0]);
+            AsyncResultRunnable<Collection<Entity>> getNearby=new AsyncResultRunnable<Collection<Entity>>() {
+                public Collection<Entity> result(){
+                    return shell.user.getWorld().getNearbyEntities(shell.user.getLocation(),nearby,nearby,nearby);
+                }
+            };
+            result=getNearby.waitThreadDone(true);
+            Entity[] entities=new Entity[result.size()];
+            int index=0;
+            for (Entity  e:result){
+                entities[index]=e;
+                ++index;
+            }
+            shell.printObject(entities);
+            if(argv.length==2){
+                setVariable(shell,argv[1],entities);
+            }return 1;
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("getNearbyEntity");
+    public static ShellCommand getheld=new ShellCommand(){
+        public String[] help=new String[]{
+                "getHeldItem <var1> 获得玩家当前手持物品的对象并存入<var1>",
+                "getHeldItem 获得玩家当前手持物品的对象"
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            ItemStack stack=shell.user.getItemInHand();
+            shell.printObject(stack);
+            if(argv.length==1){
+                setVariable(shell,argv[0],stack);
+            }
+
+            return 1;
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("getHeldItem");
+    public static ShellCommand exec=new ShellCommand(){
+        public String[] help=new String[]{
+                "exec <argvs> 执行代码,按空格划分行"
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            String code=String.join(" ", argv);
+            String className = "ExecRunTime";
+            code = "public class " + className + " { " +
+                    "  public static void main(String[] args) { " +
+                    code +
+                    "  }" +
+                    "}";
+
+            // Create a file for the Java source code
+            try {
+                File sourceFile = new File(className + ".java");
+                FileWriter writer = new FileWriter(sourceFile);
+                writer.write(code);
+                writer.close();
+
+                // Compile the Java source file
+                JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+                int result = compiler.run(null, null, null, sourceFile.getPath());
+                if (result == 0) {
+                    // Execute the compiled class
+                    ProcessBuilder processBuilder = new ProcessBuilder("java", className);
+                    processBuilder.inheritIO();  // To inherit the input/output from the current process
+                    Process process = processBuilder.start();
+                    process.waitFor();
+                } else {
+                    System.out.println("Compilation failed.");
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+            return 0;
+
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("exec");
+    public static ShellCommand invoke=new ShellCommand(){
+        public String[] help=new String[]{
+                "invoke <var1> <method> <varlist>... 当<var1>为类时候,反射静态方法<method>,反之则反射对象<var1>的方法<method>",
+                "invoke set <result> <var1> <method> <varlist>... 当<var1>为类时候,反射静态方法<method>,反之则反射对象<var1>的方法<method>,并将结果存入<result>",
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            String result=null;
+            if("set".equals(argv[0])){
+                result=argv[1];
+                argv=Arrays.copyOfRange(argv,2,argv.length);
+            }
+            Object obj=getVariable(shell,argv[0]);
+            String methodName=argv[1];
+            Object[] parameters=new Object[argv.length-2];
+            Class[] parameterClass=new Class[argv.length-2];
+            for(int i=2;i<argv.length;i++){
+                parameters[i-2]=getVariableRaw(shell,argv[i]);
+                if(parameters[i-2] instanceof BaseWarpper bw){
+                    parameterClass[i-2]=bw.getClassType();
+                    parameters[i-2]=bw.getVal();
+                }else{
+                    if(parameters[i-2]!=null){
+                        parameterClass[i-2]=  parameters[i-2].getClass();
+                    }else {
+                        parameterClass[i-2]=Object.class;
+                    }
+                }
+                Debug.logger(parameterClass[i-2]);
+            }
+            if(obj instanceof Class cls){
+                Method method=ReflectUtils.getSuitableMethod(cls,methodName,parameterClass).getFirstValue() ;
+                try{
+                    Object e= method.invoke(null,parameters);
+                    shell.send("INVOKE SUCCESS, RETURN VAL");
+                    shell.printObject(e);
+                    if(result!=null){
+                        setVariable(shell,result,e);
+                    }
+                }catch(Exception e){
+
+                    shell.error(e.getMessage());
+                    Debug.debug(e);
+                }
+            }else {
+                Class cls=obj.getClass();
+                Method method=ReflectUtils.getSuitableMethod(cls,methodName,parameterClass).getFirstValue() ;
+                try{
+                    Object e= method.invoke(obj,parameters);
+                    shell.send("INVOKE SUCCESS, RETURN VAL");
+                    shell.printObject(e);
+                    if(result!=null){
+                        setVariable(shell,result,e);
+                    }
+                }catch(Exception e){
+                    shell.error(e.getMessage());
+                    Debug.debug(e);
+                }
+            }return 1;
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("invoke");
+    public static ShellCommand newInstance=new ShellCommand(){
+        public String[] help=new String[]{
+                "newInstance <classVar> <varlist>... 用<varlist>创建classVar的新实例",
+                "newInstance set <result> <classVar> <varlist>... 用<varlist>创建classVar的新实例,并保存至<result>",
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            String result=null;
+            ArrayList a=new ArrayList<String>();
+
+            if("set".equals(argv[0])){
+                result=argv[1];
+                argv=Arrays.copyOfRange(argv,2,argv.length);
+            }
+            Object obj=getVariable(shell,argv[0]);
+            Object[] parameters=new Object[argv.length-1];
+            Class[] parameterClass=new Class[argv.length-1];
+            for(int i=1;i<argv.length;i++){
+                parameters[i-1]=getVariableRaw(shell,argv[i]);
+                if(parameters[i-1] instanceof BaseWarpper bw){
+                    parameterClass[i-1]=bw.getClassType();
+                    parameters[i-1]=bw.getVal();
+                }else{
+                    if(parameters[i-1]!=null){
+                        parameterClass[i-1]=  parameters[i-1].getClass();
+                    }else {
+                        parameterClass[i-1]=Object.class;
+                    }
+                }
+                Debug.logger(parameterClass[i-1]);
+            }
+            if(obj instanceof Class cls){
+                try{
+
+                    Constructor ct=ReflectUtils.getSuitableConstructor(cls,parameterClass);
+                    Object e= ct.newInstance(parameters);
+                    shell.send("NEWINSTANCE SUCCESS, RETURN VAL");
+                    shell.printObject(e);
+                    if(result!=null){
+                        setVariable(shell,result,e);
+                    }
+                }catch(Exception e){
+                    shell.error(e.getMessage());
+                    Debug.debug(e);
+                }
+            }else {
+                Class cls=obj.getClass();
+                try{
+
+                    Constructor ct=ReflectUtils.getSuitableConstructor(cls,parameterClass);
+                    Object e= ct.newInstance(parameters);
+                    shell.send("NEWINSTANCE SUCCESS, RETURN VAL");
+                    shell.printObject(e);
+                    if(result!=null){
+                        setVariable(shell,result,e);
+                    }
+                }catch(Exception e){
+                    shell.error(e.getMessage());
+                    Debug.debug(e);
+                }
+            }return 1;
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("newInstance");
+    public static ShellCommand breakPoint=new ShellCommand(){
+        public String[] help=new String[]{
+                "break get <int> 获取<int>处的断点值,如果还未解除",
+                "break get <int> <var2> 获取<int>处的断点值,如果还未解除,并将断点Object存入<var2>",
+                "break <int> 启动<int>处的断点,当断点位于主线程时,将会跳过,再次输入将关闭断点",
+                "break <int> <var2> 启动<int>处的断点,当断点位于主线程时,将会跳过,再次输入将关闭断点,同时获得断点Object值存入<var2>"
+        };
+        public int cmd(String[] argv,CommandShell shell){
+            if(!MyAddon.testmode()){
+                shell.warn("附属并未在测试模式,无法启用断点功能");
+            }
+            if("get".equals(argv[0])){
+                int index=Integer.valueOf(argv[1]);
+                Object obj=Debug.getBreakValue(index);
+                shell.printObject(obj);
+                if(argv.length==3){
+                    setVariable(shell,argv[2],obj);
+                }
+                return 1;
+            }
+            int index=Integer.valueOf(argv[0]);
+            AtomicBoolean bo= Debug.getBreakPoint(index);
+            Object obj=null;
+            if(bo.get()){
+                obj=Debug.getBreakValue(index);
+                if(argv.length==2)
+                    Debug.setBreakPoint(index,false);
+            }else {
+                Debug.setBreakPoint(index,true);
+                if(argv.length==2)
+                    obj=new AsyncResultRunnable<Object>(){
+                        public Object result(){
+                            while(!Debug.getHasSetValue(index)){
+                                try {
+                                    Thread.sleep(10);
+                                }catch (InterruptedException e) {
+                                }
+                            }
+                            return Debug.getBreakValue(index);
+                        }
+                    };
+            }
+            if(argv.length==2){
+                setVariable(shell,argv[1],obj);
+            }
+            return 1;
+        }
+        public String[] getHelp(){
+            return this.help;
+        }
+    }.register("break");
 
     //TODO more commands
 }

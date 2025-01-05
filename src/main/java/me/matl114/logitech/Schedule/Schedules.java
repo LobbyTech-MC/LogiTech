@@ -1,9 +1,9 @@
 package me.matl114.logitech.Schedule;
 
 
-import java.util.concurrent.CountDownLatch;
-import java.util.function.Consumer;
-
+import com.google.common.base.Preconditions;
+import lombok.Getter;
+import me.matl114.logitech.Utils.Debug;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -18,7 +18,7 @@ public class Schedules {
     private static Plugin plugin;
     //this method should be called async
     public static void asyncWaithRepeatingSchedule(Consumer<Integer> thread , int delay, boolean isSync, int period,int repeatTime){
-        assert !Bukkit.isPrimaryThread();
+        Preconditions.checkArgument( !Bukkit.isPrimaryThread(),"This method should be called in async thread");
         CountDownLatch countDownLatch = new CountDownLatch(1);
         launchSchedules(new BukkitRunnable() {
             int runTime=0;

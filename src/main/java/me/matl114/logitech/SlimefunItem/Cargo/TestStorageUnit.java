@@ -14,11 +14,10 @@ import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import me.matl114.logitech.SlimefunItem.Machines.AbstractMachine;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.Debug;
-import me.matl114.logitech.Utils.MenuUtils;
-import me.matl114.logitech.Utils.WorldUtils;
+import me.matl114.logitech.Utils.*;
+import me.matl114.logitech.Utils.Algorithms.PairList;
 import me.matl114.logitech.Utils.UtilClass.MenuClass.MenuFactory;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
@@ -133,8 +132,24 @@ public class TestStorageUnit extends AbstractMachine {
             return false;
         }));
     }
-    @Override
-	public void process(Block b, BlockMenu menu, SlimefunBlockData data){
+    public  int[] getInputSlots(){
+        return INPUT_SLOT;
+    }
+
+    /**
+     * cargo and IO
+     * @return
+     */
+    public static ItemStack rand= AddUtils.randItemStackFactory(
+            new PairList<>(){{
+                put("COBBLESTONE",1);
+                put("DIAMOND",1);
+            }}
+    );
+    public int[] getOutputSlots(){
+        return OUTPUT_SLOT;
+    }
+    public void process(Block b, BlockMenu menu, SlimefunBlockData data){
         Block c=b.getRelative(BlockFace.UP);
         if (c!=null){
             Debug.logger(c.getType());

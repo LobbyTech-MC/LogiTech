@@ -46,6 +46,15 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class SpecialCrafter extends AbstractAdvancedProcessor implements  ImportRecipes {
     public List<ItemStack> displayedMemory;
@@ -356,6 +365,13 @@ public abstract class SpecialCrafter extends AbstractAdvancedProcessor implement
 	public void process(Block b, BlockMenu inv, SlimefunBlockData data){
         if(inv.hasViewer()){
             updateMenu(inv,b,Settings.RUN);
+        }else{
+            CompletableFuture.runAsync(()->{
+                if(!inv.hasViewer()){
+                    MenuUtils.syncSlot(inv,MACHINEITEM_SLOT);
+                    MenuUtils.syncSlot(inv,RECIPEITEM_SLOT);
+                }
+            });
         }
         MultiCraftingOperation currentOperation = this.processor.getOperation(b);
         ItemGreedyConsumer[] fastCraft=null;

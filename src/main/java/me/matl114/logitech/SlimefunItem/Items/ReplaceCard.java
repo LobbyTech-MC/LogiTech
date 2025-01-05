@@ -1,9 +1,17 @@
 package me.matl114.logitech.SlimefunItem.Items;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.function.Function;
-
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import me.matl114.logitech.SlimefunItem.AddHandlers;
+import me.matl114.logitech.SlimefunItem.DistinctiveCustomSlimefunItem;
+import me.matl114.logitech.Utils.AddUtils;
+import me.matl114.logitech.Utils.Utils;
+import me.matl114.logitech.Utils.WorldUtils;
+import me.matl114.matlib.Utils.Inventory.CleanItemStack;
+import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -21,10 +29,15 @@ import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.Utils;
 import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
 
-public class ReplaceCard extends DistinctiveCustomItemStack {
+public class ReplaceCard extends DistinctiveCustomSlimefunItem {
+    public final static String LOC_DISPLAY_PREFIX = AddUtils.resolveColor("&x&E&B&3&3&E&B替代的物品: &f");
+    public final static NamespacedKey KEY_LOC = AddUtils.getNameKey("rep_mat_id");
     public enum ReplaceType{
         MATERIAL(i->new ItemStack(Material.getMaterial(i)),i->i.getType().toString()),
-        SLIMEFUN(i-> new ItemStack(SlimefunItem.getById(i).getItem()),i->SlimefunItem.getByItem(i).getId()),
+        SLIMEFUN(i-> {
+            var sf=SlimefunItem.getById(i);
+            return sf==null?null:sf.getItem();
+        }, i-> Slimefun.getItemDataService().getItemData(i).orElse(null)),
         UNKNOWN((i)->null,(i)->null);
         public Function<String,ItemStack> deserializeFunc;
         public Function<ItemStack,String> serializeFunc;
@@ -54,7 +67,7 @@ public class ReplaceCard extends DistinctiveCustomItemStack {
                 Utils.list(
                         AddUtils.getInfoShow("&f机制",
                                 "&7可以在快捷机器中替代其中记录的不可堆叠物品",
-                                "&7桶类物品会在合成之后返还铁通")
+                                "&7桶类物品会在合成之后返还铁桶")
                 )
         );
         this.type=type;
@@ -105,7 +118,7 @@ public class ReplaceCard extends DistinctiveCustomItemStack {
     public  void preRegister(){
         super.preRegister();
         //addItemHandler(AddHandlers.stopAttackHandler);
-        if(this.getItem().getType().isBlock()){
+        if(WorldUtils.isBlock(getItem().getType())){
             addItemHandler(AddHandlers.stopPlacementHandler);
             addItemHandler(AddHandlers.stopPlaceerHandler);
         }
