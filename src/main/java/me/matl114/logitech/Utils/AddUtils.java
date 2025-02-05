@@ -633,12 +633,15 @@ public class AddUtils {
         ItemStack item2=item.clone();
 
         ItemMeta meta=item2.getItemMeta();
-        List<String> finallist=meta.hasLore() ? meta.getLore() : new ArrayList<>();
-        for (String l:lores){
-            finallist.add(resolveColor(l));
+        List<String> finallist = new ArrayList<>();
+        if (meta != null) {
+        	if (meta.hasLore()) {
+        		finallist = meta.getLore();
+        		meta.setLore(finallist);
+                item2.setItemMeta(meta);
+        	}
         }
-        meta.setLore(finallist);
-        item2.setItemMeta(meta);
+        
         return item2;
     }
     public static ItemStack renameItem(ItemStack item,String name){
