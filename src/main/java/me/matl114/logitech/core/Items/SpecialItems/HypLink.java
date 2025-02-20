@@ -7,21 +7,22 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.handlers.ItemUseHandler;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
+import me.matl114.logitech.Listeners.Listeners.HyperLinkListener;
+import me.matl114.logitech.Utils.Debug;
 import me.matl114.logitech.core.Cargo.Links.HyperLink;
 import me.matl114.logitech.core.DistinctiveCustomSlimefunItem;
 import me.matl114.logitech.Utils.AddUtils;
 import me.matl114.logitech.Utils.DataCache;
 import me.matl114.logitech.Utils.WorldUtils;
+import me.matl114.matlib.Utils.Inventory.InventoryRecords.InventoryRecord;
+import me.matl114.matlib.Utils.Inventory.InventoryRecords.SimpleInventoryRecord;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -69,21 +70,26 @@ public class HypLink extends DistinctiveCustomSlimefunItem {
                                 return;
                             }
                         }
-//                        Block b = loc.getBlock();
-//                        PlayerInteractEvent interactTarget=new PlayerInteractEvent(event.getPlayer(), Action.RIGHT_CLICK_BLOCK,null,b, BlockFace.UP);
-//                        try{
-//                            Bukkit.getPluginManager().callEvent(interactTarget);
-//                            if(interactTarget.isCancelled()){
-//                                AddUtils.sendMessage(event.getPlayer(), "&c点击该方块的行为被阻止!");
-//                                return;
-//                            }
-//                        }catch (Throwable ignored){
-//                        }
-//                        BlockState state = b.getState();
-//                        if(state instanceof  InventoryHolder ivHolder){
-//                            //todo do test
-//                            event.getPlayer().openInventory(ivHolder.getInventory());
-//                        }
+                        Block b = loc.getBlock();
+                        PlayerInteractEvent interactTarget=new PlayerInteractEvent(event.getPlayer(), Action.RIGHT_CLICK_BLOCK,null,b, BlockFace.UP);
+                        try{
+                            Bukkit.getPluginManager().callEvent(interactTarget);
+                            if(interactTarget.isCancelled()){
+                                AddUtils.sendMessage(event.getPlayer(), "&c点击该方块的行为被阻止!");
+                                return;
+                            }
+                        }catch (Throwable ignored){
+                            AddUtils.sendMessage(event.getPlayer(), "&c点击该方块时出现未知错误!");
+                            return;
+                        }
+                        //create only vanilla record
+                        InventoryRecord record = SimpleInventoryRecord.getInventoryRecord(loc,true);
+                        //BlockState state = b.getState(false);
+                        //
+                        if(record.inventory()!=null && record.stillValid()){
+                            //todo do test
+                            HyperLinkListener.openHypInv(event.getPlayer(),record);
+                        }
 
                     }else {
                         AddUtils.sendMessage(event.getPlayer(), "&c抱歉,但您似乎并没有访问该位置的权限.");

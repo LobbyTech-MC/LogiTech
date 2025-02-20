@@ -140,10 +140,16 @@ public abstract class AbstractWorkBench extends AbstractMachine {
             }
             CraftUtils.multiUpdateOutputMenu(outputResult.getSecondValue(),inv);
         }
+        if(inv.hasViewer()){
+            updateMenu(inv,b,Settings.RUN);
+        }
     }
+    public abstract void updateMenu(BlockMenu blockMenu, Block block, Settings mod);
 
     public void process(Block b, BlockMenu preset, SlimefunBlockData data){
-
+        if(preset.hasViewer()){
+            updateMenu(preset,b,Settings.RUN);
+        }
     }
     public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow){
         return flow==ItemTransportFlow.WITHDRAW?getOutputSlots():getInputSlots();
@@ -172,6 +178,7 @@ public abstract class AbstractWorkBench extends AbstractMachine {
         }
     }
     //modified from INFINITY EXPANSION
+    //todo add quick-place last recipe
     protected void moveRecipe(@Nonnull Player player, @Nonnull BlockMenu menu, MachineRecipe machinerecipe, boolean max) {
         ItemStack[] recipe =machinerecipe.getInput();
         PlayerInventory inv = player.getInventory();
@@ -245,6 +252,13 @@ public abstract class AbstractWorkBench extends AbstractMachine {
             if(itps[i]!=null){
                 itps[i].updateMenu(menu);
             }
+        }
+        //try set index
+        var recipeList = getMachineRecipes();
+        int index = recipeList.indexOf(machinerecipe);
+        if(index>=0){
+            DataCache.setLastRecipe(menu.getLocation(),index);
+            updateMenu(menu,menu.getBlock(),Settings.RUN);
         }
         menu.open(player);
     }

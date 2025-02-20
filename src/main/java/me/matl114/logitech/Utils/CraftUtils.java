@@ -61,64 +61,64 @@ public class CraftUtils {
         //add(Material.SHULKER_BOX);
         add(Material.BUNDLE);
     }};
-    public static final ItemStack DEFAULT_ITEMSTACK=new ItemStack(Material.STONE);
-    public static final ItemMeta NULL_META=(DEFAULT_ITEMSTACK.getItemMeta());
-    public static final Class CRAFTMETAITEMCLASS=NULL_META.getClass();
-    // public static final Class ITEMSTACKCLASS=ItemStack.class;
-    public static Class CRAFTITEMSTACKCLASS;
-    public static ItemStack CRAFTITEMSTACK;
-    public static FieldAccess loreAccess;
-    public static FieldAccess displayNameAccess;
-    public static FieldAccess handledAccess;
-    // public static Field CRAFTHANDLER;
-    public static Class NMSITEMCLASS;
+//    public static final ItemStack DEFAULT_ITEMSTACK=new ItemStack(Material.STONE);
+//    public static final ItemMeta NULL_META=(DEFAULT_ITEMSTACK.getItemMeta());
+//    public static final Class CRAFTMETAITEMCLASS=NULL_META.getClass();
+//    // public static final Class ITEMSTACKCLASS=ItemStack.class;
+//    public static Class CRAFTITEMSTACKCLASS;
+//    public static ItemStack CRAFTITEMSTACK;
+//    public static FieldAccess loreAccess;
+//    public static FieldAccess displayNameAccess;
+//    public static FieldAccess handledAccess;
+//    // public static Field CRAFTHANDLER;
+//    public static Class NMSITEMCLASS;
     //public static Field ITEMSTACKMETA;
 
-    static{
-        Debug.logger("初始化配方合成方法库");
-        try{
-            var CRAFTLORE=CRAFTMETAITEMCLASS.getDeclaredField("lore");
-            CRAFTLORE.setAccessible(true);
-            loreAccess= FieldAccess.of(CRAFTLORE);
-            var CRAFTDISPLAYNAME=CRAFTMETAITEMCLASS.getDeclaredField("displayName");
-            CRAFTDISPLAYNAME.setAccessible(true);
-            displayNameAccess=FieldAccess.of(CRAFTDISPLAYNAME);
-
-        }catch (Throwable e){
-            Debug.logger("Stack reflection failed,please check the error");
-            Debug.logger(e);
-            Debug.logger("disabling the relavent features");
-
-        }
-        try{
-            ChestMenu a=new ChestMenu("byd");
-            a.addItem(0,DEFAULT_ITEMSTACK);
-            CRAFTITEMSTACK=a.getItemInSlot(0);
-            CRAFTITEMSTACKCLASS=CRAFTITEMSTACK.getClass();
-            var CRAFTHANDLER=CRAFTITEMSTACKCLASS.getDeclaredField("handle");
-            CRAFTHANDLER.setAccessible(true);
-            handledAccess=FieldAccess.of(CRAFTHANDLER);
-
-            Object handle=CRAFTHANDLER.get(CRAFTITEMSTACK);
-            //Debug.debug(handle.getClass());
-            NMSITEMCLASS=handle.getClass();
-            //CRAFTMETA=NMSITEMCLASS.getDeclaredField("meta");
-//            Field[] fields= NMSITEMCLASS.getDeclaredFields();
-//            for(int i=0;i<fields.length;++i){
-//            }
-            //ITEMSTACKMETA=DEFAULT_ITEMSTACK.getClass().getDeclaredField("meta");
-            //ITEMSTACKMETA.setAccessible(true);
-            //INVOKE_STACK_SUCCESS=true;
-            // INVOKE_STACK_SUCCESS=false;
-        }catch (Throwable e){
-            Debug.logger("Stack reflection failed,please check the error");
-            Debug.logger(e);
-            Debug.logger("disabling the relavent features");
-
-        }
-    }
+//    static{
+//        Debug.logger("初始化配方合成方法库");
+//        try{
+//            var CRAFTLORE=CRAFTMETAITEMCLASS.getDeclaredField("lore");
+//            CRAFTLORE.setAccessible(true);
+//            loreAccess= FieldAccess.of(CRAFTLORE);
+//            var CRAFTDISPLAYNAME=CRAFTMETAITEMCLASS.getDeclaredField("displayName");
+//            CRAFTDISPLAYNAME.setAccessible(true);
+//            displayNameAccess=FieldAccess.of(CRAFTDISPLAYNAME);
+//
+//        }catch (Throwable e){
+//            Debug.logger("Stack reflection failed,please check the error");
+//            Debug.logger(e);
+//            Debug.logger("disabling the relavent features");
+//
+//        }
+//        try{
+//            ChestMenu a=new ChestMenu("byd");
+//            a.addItem(0,DEFAULT_ITEMSTACK);
+//            CRAFTITEMSTACK=a.getItemInSlot(0);
+//            CRAFTITEMSTACKCLASS=CRAFTITEMSTACK.getClass();
+//            var CRAFTHANDLER=CRAFTITEMSTACKCLASS.getDeclaredField("handle");
+//            CRAFTHANDLER.setAccessible(true);
+//            handledAccess=FieldAccess.of(CRAFTHANDLER);
+//
+//            Object handle=CRAFTHANDLER.get(CRAFTITEMSTACK);
+//            //Debug.debug(handle.getClass());
+//            NMSITEMCLASS=handle.getClass();
+//            //CRAFTMETA=NMSITEMCLASS.getDeclaredField("meta");
+////            Field[] fields= NMSITEMCLASS.getDeclaredFields();
+////            for(int i=0;i<fields.length;++i){
+////            }
+//            //ITEMSTACKMETA=DEFAULT_ITEMSTACK.getClass().getDeclaredField("meta");
+//            //ITEMSTACKMETA.setAccessible(true);
+//            //INVOKE_STACK_SUCCESS=true;
+//            // INVOKE_STACK_SUCCESS=false;
+//        }catch (Throwable e){
+//            Debug.logger("Stack reflection failed,please check the error");
+//            Debug.logger(e);
+//            Debug.logger("disabling the relavent features");
+//
+//        }
+//    }
     public static void setup(){
-
+        me.matl114.matlib.Utils.CraftUtils.setup();
     }
 
     /**
@@ -128,13 +128,14 @@ public class CraftUtils {
      * @return
      */
     public static boolean sameCraftItem(ItemStack a, ItemStack b){
-        if(CRAFTITEMSTACKCLASS.isInstance(a)&&CRAFTITEMSTACKCLASS.isInstance(b)){
-            try{
-                return  handledAccess.getValue(a)==handledAccess.getValue(b);
-            }catch (Throwable e){
-                return false;
-            }
-        }else return false;
+        return me.matl114.matlib.Utils.CraftUtils.sameCraftItem(a,b);
+//        if(CRAFTITEMSTACKCLASS.isInstance(a)&&CRAFTITEMSTACKCLASS.isInstance(b)){
+//            try{
+//                return  handledAccess.getValue(a)==handledAccess.getValue(b);
+//            }catch (Throwable e){
+//                return false;
+//            }
+//        }else return false;
     }
     @Nullable
     public static String parseSfId(ItemStack item) {
@@ -768,7 +769,6 @@ public class CraftUtils {
                     itemCounter=slotCounters2.get(j);
                     if(!itemCounter.isDirty()){
                         //可能是存储里的 或者是被覆写的maxCNT
-                        //FIXME 检测存储中是否可能存在空物品
                         if(itemCounter.getItem()==null){
                             //我们决定将这个分类留在这,为了安全性 毕竟谁也不知到之后会开发啥，不过显然 这玩意大概率是不会被调用的.
                             itemCounter.setFrom(outputItem);
@@ -856,10 +856,9 @@ public class CraftUtils {
                 }else if(previewItem.getAmount()>=previewItem.getMaxStackSize()){
                     continue;
                 }else{
-                    //fixme wrong behaivor when pushing to negative item
+
                     itp=slotCounters2.get(j);
                     if(!itp.isDirty()){
-                        //FIXME 检查cachemap中的空存储是不是可能被读取进入?
                         if(itp.getItem()==null){
                             itp.setFrom(outputItem);
                             //needs this push ,because the source of outputItem
@@ -1685,10 +1684,16 @@ public class CraftUtils {
         ItemMeta meta2=    counter2.getMeta();
         if(meta1==null||meta2==null ) {
             return meta2==meta1;
+        }else if(meta1.getClass()!=meta2.getClass()){
+            return false;
         }
 
         //if indistinguishable meta all return false
         if(INDISTINGUISHABLE_MATERIALS.contains(material)){
+            return false;
+        }
+        //我们使用这个
+        if( !me.matl114.matlib.Utils.CraftUtils. matchDisplayNameField(meta1,meta2)) {
             return false;
         }
         final boolean hasCustomOne = meta1.hasCustomModelData();
@@ -1740,15 +1745,12 @@ public class CraftUtils {
         //粘液物品一般不可修改displayName和Lore
         //不然则全非sf物品
 
-        //如果非严格且名字相同旧返回，反之则继续
-        if(!(!meta1.hasDisplayName() || matchDisplayNameField(meta1,meta2))) {
-            return false;
-        }
+
 
         if(!meta1.hasLore()||!meta2.hasLore()){
             return meta1.hasLore()==meta2.hasLore();
         }
-        if ( !matchLoreField(meta1, meta2)) {
+        if ( !me.matl114.matlib.Utils.CraftUtils. matchLoreField(meta1, meta2)) {
             return false;
             //对于普通物品 检查完lore就结束是正常的
         }else if(!strictCheck){
@@ -1771,9 +1773,9 @@ public class CraftUtils {
         }
         return true;
     }
-    public static boolean matchLoreField(ItemMeta meta1, ItemMeta meta2){
-        return loreAccess.compareFieldOrDefault(meta1,meta2,()->matchLore(meta1.getLore(),meta2.getLore(),false));
-    }
+//    public static boolean matchLoreField(ItemMeta meta1, ItemMeta meta2){
+//        return loreAccess.compareFieldOrDefault(meta1,meta2,()->matchLore(meta1.getLore(),meta2.getLore(),false));
+//    }
 
 //    public static ItemMeta getItemMeta(ItemStack it){
 ////        if(!INVOKE_STACK_SUCCESS)return it.getItemMeta();
@@ -1790,10 +1792,10 @@ public class CraftUtils {
 //        return it.getItemMeta();
 //
 //    }
-    public static boolean matchDisplayNameField(ItemMeta meta1, ItemMeta meta2){
-        return displayNameAccess.compareFieldOrDefault(meta1,meta2,()->Objects.equals(meta1.getDisplayName(),meta2.getDisplayName()));
-    }
-    private static Class CraftMetaBlockState;
+//    public static boolean matchDisplayNameField(ItemMeta meta1, ItemMeta meta2){
+//        return displayNameAccess//displayNameAccess.compareFieldOrDefault(meta1,meta2,()->Objects.equals(meta1.getDisplayName(),meta2.getDisplayName()));
+//    }
+//    private static Class CraftMetaBlockState;
 
     public static boolean matchBlockStateMetaField(BlockStateMeta meta1, BlockStateMeta meta2){
         return EnvironmentManager.getManager().getVersioned().matchBlockStateMeta(meta1,meta2);
@@ -1818,15 +1820,24 @@ public class CraftUtils {
             thatItem.setAmount(thatItem.getAmount()-amount);
         }
     }
-    public static String getItemName(ItemStack item){
+    public static String getItemName(@Nonnull ItemStack item){
         if(item.hasItemMeta()){
-            return item.getItemMeta().getDisplayName();
-        }else{
-            try{
-                return ItemStackHelper.getName(item);
-            }catch (Throwable noGuizhanLib){}
-            return item.getType().toString();
+            ItemMeta meta = item.getItemMeta();
+            if(meta !=null && meta.hasDisplayName()){
+                return meta.getDisplayName();
+            }
         }
+        try{
+            return ItemStackHelper.getName(item);
+        }catch (Throwable guizhanLibVersionNotSupport){
+            try{
+                return item.getI18NDisplayName();
+            }catch (Throwable paperVersionNotSupport){
+                return item.getType().getKey().getKey();
+            }
+        }
+
+
     }
     public static String getEffectName(PotionEffectType effect){
         try{

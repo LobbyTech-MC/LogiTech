@@ -5,6 +5,7 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import me.matl114.logitech.Utils.CraftUtils;
 import me.matl114.logitech.core.Registries.AddHandlers;
 import me.matl114.logitech.core.DistinctiveCustomSlimefunItem;
 import me.matl114.logitech.Utils.AddUtils;
@@ -56,11 +57,11 @@ public class ReplaceCard extends DistinctiveCustomSlimefunItem {
 
     public  ItemStack getReplaceCard(Material item) {
         String id=item.toString();
-        return getReplaceCard(id,ItemStackHelper.getDisplayName(new ItemStack(item)));
+        return getReplaceCard(id, CraftUtils.getItemName(new ItemStack(item)));
     }
     public ItemStack getReplaceCard(SlimefunItem item){
         String id=item.getId();
-        return getReplaceCard(id,ItemStackHelper.getDisplayName(item.getItem()));
+        return getReplaceCard(id,CraftUtils.getItemName(item.getItem()));
     }
     public ItemStack getReplaceCard(String id,String displayName){
         String loreDisplay=AddUtils.concat(LOC_DISPLAY_PREFIX, displayName);
@@ -77,19 +78,18 @@ public class ReplaceCard extends DistinctiveCustomSlimefunItem {
         stack.setItemMeta(meta);
         return stack;
     }
-    public static ItemStack getAllCardReplacement(ItemStack item){
+    public static ItemStack getAllCardReplacement(ItemStack item,ItemMeta meta){
         ItemStack result;
         for(ReplaceCard replaceCard:instances){
-            result=replaceCard.getCardReplacement(item);
+            result=replaceCard.getCardReplacement(item,meta);
             if(result!=item){
                 return result;
             }
         }
         return item;
     }
-    public ItemStack getCardReplacement(ItemStack item) {
-        if(item!=null&&item.getType()==this.getItem().getType()&&item.hasItemMeta()){
-            ItemMeta meta=item.getItemMeta();
+    public ItemStack getCardReplacement(ItemStack item,ItemMeta meta) {
+        if(item!=null&&item.getType()==this.getItem().getType()){
             PersistentDataContainer container=meta.getPersistentDataContainer();
             if(container.has(KEY_LOC)){
                 try {

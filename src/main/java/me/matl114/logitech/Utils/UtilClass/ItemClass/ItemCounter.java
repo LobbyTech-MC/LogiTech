@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemCounter implements Cloneable{
-    //todo fix the unfreshed item dupe bug
     protected int cnt;
     protected boolean dirty;
     protected ItemStack item;
@@ -29,9 +28,8 @@ public class ItemCounter implements Cloneable{
         meta=null;
         cnt=0;
         dirty=false;
-        cachedItemAmount=0;
-        //
         itemChange();
+        //
     }
     protected void fromSource(ItemCounter source,boolean overrideMaxSize){
         item=source.getItem();
@@ -44,7 +42,7 @@ public class ItemCounter implements Cloneable{
         //
     }
     protected void itemChange(){
-        cachedItemAmount=item.getAmount();
+        cachedItemAmount=item!=null? item.getAmount():0;
     }
     public ItemCounter() {
         dirty=false;

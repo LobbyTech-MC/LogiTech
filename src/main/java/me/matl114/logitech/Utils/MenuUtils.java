@@ -11,7 +11,7 @@ import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.matl114.logitech.Utils.UtilClass.ItemClass.*;
 import me.matl114.logitech.Utils.UtilClass.MenuClass.*;
 import me.matl114.logitech.core.Registries.RecipeSupporter;
-import me.matl114.matlib.Utils.Inventory.CleanItemStack;
+import me.matl114.matlib.Utils.Inventory.ItemStacks.CleanItemStack;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
@@ -197,7 +197,7 @@ public class MenuUtils {
         }else{
             displayMachine=NO_ITEM;
         }
-        MenuFactory a=new MenuFactory(SIMPLE_MENU,ItemStackHelper.getDisplayName(machine),pageNum){
+        MenuFactory a=new MenuFactory(SIMPLE_MENU,CraftUtils.getItemName(machine),pageNum){
             public void init(){
                 setDefaultNPSlots();
             }
@@ -293,7 +293,7 @@ public class MenuUtils {
                 int len=list.size();
                 for(int i=0;i<len;i++){
                     add(AddUtils.concat(  "&f",
-                            ItemStackHelper.getDisplayName(list.get(i)),
+                            CraftUtils.getItemName(list.get(i)),
                             " &e",getAmountDisplay(list.get(i)),
                             " 概率: ",AddUtils.getPercentFormat(wlist.get(i))) );
                 }
@@ -310,7 +310,7 @@ public class MenuUtils {
                 int len=list.size();
                 for(int i=0;i<len;i++){
                     add(AddUtils.concat(  "&f",
-                            ItemStackHelper.getDisplayName(list.get(i)),
+                            CraftUtils.getItemName(list.get(i)),
                             " ",getAmountDisplay(list.get(i))) );
                 }
             }};
@@ -486,7 +486,7 @@ public class MenuUtils {
                         AddUtils.sendMessage(player,"&c该物品并无展示的配方");
                         return false;
                     }
-                    var recipeMenu = new MenuFactory(RECIPE_DISPLAY_SINGLE,ItemStackHelper.getDisplayName( optionalItem.getItem()),(displayedDown.size()+17)/18) {
+                    var recipeMenu = new MenuFactory(RECIPE_DISPLAY_SINGLE,CraftUtils.getItemName( optionalItem.getItem()),(displayedDown.size()+17)/18) {
                         @Override
                         public void init() {
                         }
