@@ -7,8 +7,8 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import me.matl114.logitech.core.Registries.AddHandlers;
 import me.matl114.logitech.core.AddSlimefunItems;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.Debug;
+import me.matl114.logitech.utils.AddUtils;
+import me.matl114.logitech.utils.Debug;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -37,20 +37,20 @@ public class AbstractGeoResource extends SlimefunItem implements GEOResource {
         this(itemGroup,item,recipe,maxDeviation,biomeMap,null);
     }
     public int getDefaultSupply(@Nonnull World.Environment var1, @Nonnull Biome var2){
-        if(var1!=World.Environment.CUSTOM){
+        if(var1 != World.Environment.CUSTOM){
             if(BIOME_MAP.containsKey(var2)){
                 return BIOME_MAP.get(var2);
             }else if (CUSTOMWORLD_MAP.containsKey(var1)){
                 Integer a=CUSTOMWORLD_MAP.get(var1).get(var2);
-                if(a!=null){
+                if(a != null){
                     return a;
                 }
             }
             return 0;
         }else {
-            Integer a=CUSTOMWORLD_MAP.get(var1).get(var2);
-            if(a!=null){
-                return a;
+            var a=CUSTOMWORLD_MAP.get(var1);//.get(var2);
+            if(a != null){
+                return a.getOrDefault(var2, 0);
             }
             return 0;
         }

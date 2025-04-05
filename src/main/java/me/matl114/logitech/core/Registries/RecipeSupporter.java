@@ -17,20 +17,21 @@ import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
 import me.matl114.logitech.ConfigLoader;
 import me.matl114.logitech.MyAddon;
-import me.matl114.logitech.Utils.*;
 import me.matl114.logitech.core.AddItem;
 import me.matl114.logitech.core.AddSlimefunItems;
+import me.matl114.logitech.core.Items.SpecialItems.EntityFeat;
 import me.matl114.logitech.core.Machines.Abstracts.AbstractMachine;
+import me.matl114.logitech.core.Machines.Abstracts.AbstractTransformer;
 import me.matl114.logitech.core.Machines.AutoMachines.AEMachine;
 import me.matl114.logitech.core.Machines.AutoMachines.EMachine;
 import me.matl114.logitech.core.Machines.AutoMachines.MTMachine;
-import me.matl114.logitech.Utils.Algorithms.PairList;
-import me.matl114.logitech.Utils.UtilClass.ItemClass.ProbItemStack;
-import me.matl114.logitech.Utils.UtilClass.RecipeClass.ImportRecipes;
-import me.matl114.logitech.Utils.UtilClass.RecipeClass.MGeneratorRecipe;
-import me.matl114.logitech.core.Machines.Abstracts.AbstractTransformer;
-import me.matl114.matlib.Implements.Slimefun.core.CustomRecipeType;
+import me.matl114.logitech.utils.*;
+import me.matl114.logitech.utils.Algorithms.PairList;
+import me.matl114.logitech.utils.UtilClass.ItemClass.ProbItemStack;
+import me.matl114.logitech.utils.UtilClass.RecipeClass.ImportRecipes;
+import me.matl114.logitech.utils.UtilClass.RecipeClass.MGeneratorRecipe;
 import me.matl114.matlib.core.EnvironmentManager;
+import me.matl114.matlib.implement.slimefun.core.CustomRecipeType;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import org.bukkit.*;
@@ -398,28 +399,44 @@ public class RecipeSupporter {
             List<MachineRecipe> recipes=new ArrayList<>(12);
             if(recipeType!=null){
                 try{
-                    RecipeType type=null;
-                    for(RecipeType rp:RECIPE_TYPES){
-                        if(recipeType.equalsIgnoreCase(rp.getKey().toString())){
-                            type=rp;
-                            break;
+                    find_possible_recipe:
+                    {
+                        RecipeType type=null;
+                        for(RecipeType rp:RECIPE_TYPES){
+                            if(recipeType.equalsIgnoreCase(rp.getKey().toString())){
+                                type=rp;
+                                break;
+                            }
                         }
-                    }
-                    if(type==null){
+                        if(type!=null){
+                            try {
+                                List<MachineRecipe> rplist = PROVIDED_UNSHAPED_RECIPES.get(type);
+                                for(MachineRecipe mr:rplist){
+                                    recipes.add(MachineRecipeUtils.stackFrom(commonTick,mr.getInput(),mr.getOutput()));
+                                }
+                            }catch (Throwable e){
+                                if(withWarning){
+                                    Debug.logger("ERROR WHILE LOADING RECIPETYPE RECIPE LIST: RecipeType %s".formatted(recipeType));
+                                }
+                            }
+                            break find_possible_recipe;
+                        }
+                        SlimefunItem item=SlimefunItem.getById(recipeType);
+                        if(item!=null){
+                            try{
+                                List<MachineRecipe> rplist =item instanceof MultiBlockMachine mb? MULTIBLOCK_RECIPES.get(mb):  MACHINE_RECIPELIST.get(item);
+                                for(MachineRecipe mr:rplist){
+                                    recipes.add(MachineRecipeUtils.stackFrom(commonTick,mr.getInput(),mr.getOutput()));
+                                }
+                            }catch (Throwable e){
+                                if(withWarning){
+                                    Debug.logger("ERROR WHILE LOADING MACHINE RECIPE LIST: RecipeType %s".formatted(recipeType));
+                                }
+                            }
+                            break find_possible_recipe;
+                        }
                         if(withWarning)
                             Debug.logger("ERROR WHILE LOADING MACHINE CONFIG: RecipeType %s not found".formatted(recipeType));
-                        continue;
-                    }
-                    try {
-                        List<MachineRecipe> rplist = PROVIDED_UNSHAPED_RECIPES.get(type);
-                        for(MachineRecipe mr:rplist){
-                            recipes.add(MachineRecipeUtils.stackFrom(commonTick,mr.getInput(),mr.getOutput()));
-                        }
-                    }catch (Throwable e){
-                        if(withWarning){
-
-                            Debug.logger("ERROR WHILE LOADING RECIPETYPE MACHINELIST: RecipeType %s".formatted(recipeType));
-                        }
                     }
                 }catch(Throwable e){}
             }else{
@@ -1032,7 +1049,7 @@ public class RecipeSupporter {
             Location loc=new Location(world,8,888,8);
             //load chunk
             for(EntityType type:EntityType.values()){
-                if(!type.isSpawnable()){
+                if(!EntityFeat.isAvailableEntityType(type)){
                     continue;
                 }
                 Set<ItemStack> drops=Slimefun.getRegistry().getMobDrops().get(type);
@@ -1052,7 +1069,7 @@ public class RecipeSupporter {
                 if(preDatas!=null){
                     stackList.addAll(Arrays.asList(preDatas));
                 }
-                ENTITY_DROPLIST.put(type,stackList.toArray(new ItemStack[stackList.size()]));
+                ENTITY_DROPLIST.put(type,stackList.toArray(ItemStack[]::new));
             }
         }
 

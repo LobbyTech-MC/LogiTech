@@ -1,11 +1,10 @@
 package me.matl114.logitech.core.Registries;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import me.matl114.logitech.Utils.CraftUtils;
-import me.matl114.logitech.Utils.UtilClass.EquipClass.EquipmentFU;
-import me.matl114.matlib.Algorithms.DataStructures.Struct.Triplet;
+import me.matl114.logitech.utils.CraftUtils;
+import me.matl114.logitech.utils.UtilClass.EquipClass.EquipmentFU;
+import me.matl114.matlib.algorithms.dataStructures.struct.Triplet;
 import me.matl114.matlib.core.EnvironmentManager;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static me.matl114.logitech.Utils.AddUtils.*;
+import static me.matl114.logitech.utils.AddUtils.*;
 import static me.matl114.logitech.core.AddItem.*;
 import static org.bukkit.inventory.EquipmentSlot.*;
 
@@ -70,7 +69,7 @@ public class EFUImplements {
         int maxLevel;
         int maxTotalLevel;
         //A*X+B 级别
-        public SimplePotionEffectEquipmentFU(String name,NamespacedKey key, FURarity rarity,int maxLevel ,int maxTotalLevel ,List<Triplet<String,Integer,Float>> potionEffectList, EquipmentSlot... slot) {
+        public SimplePotionEffectEquipmentFU(String name, NamespacedKey key, FURarity rarity, int maxLevel , int maxTotalLevel , List<Triplet<String,Integer,Float>> potionEffectList, EquipmentSlot... slot) {
             super(key, rarity, slot);
             effects = potionEffectList.stream().map(LevelPotionEffectProvider::of).toList();
             setDisplayName(name);

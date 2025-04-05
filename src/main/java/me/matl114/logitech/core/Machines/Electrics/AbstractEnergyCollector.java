@@ -1,26 +1,24 @@
 package me.matl114.logitech.core.Machines.Electrics;
 
-import city.norain.slimefun4.utils.MathUtil;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import io.github.thebusybiscuit.slimefun4.api.ErrorReport;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun4.core.attributes.EnergyNetComponent;
 import io.github.thebusybiscuit.slimefun4.core.attributes.EnergyNetProvider;
 import io.github.thebusybiscuit.slimefun4.core.networks.energy.EnergyNetComponentType;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.Algorithms.AtomicCounter;
-import me.matl114.logitech.Utils.DataCache;
-import me.matl114.logitech.Utils.MathUtils;
+import me.matl114.logitech.utils.AddUtils;
+import me.matl114.logitech.utils.Algorithms.AtomicCounter;
+import me.matl114.logitech.utils.DataCache;
+import me.matl114.logitech.utils.Debug;
+import me.matl114.logitech.utils.MathUtils;
 import me.matl114.logitech.core.Interface.EnergyProvider;
 import me.matl114.logitech.core.Interface.MenuTogglableBlock;
-import me.matl114.logitech.core.Machines.Electrics.AbstractEnergyMachine;
+import me.matl114.logitech.core.Machines.Abstracts.AbstractEnergyMachine;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import org.bukkit.Location;
@@ -31,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractEnergyCollector extends AbstractEnergyMachine implements EnergyProvider, MenuTogglableBlock {
@@ -125,7 +124,7 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
         }else return null;
     }
     public abstract int getMaxCollectAmount();
-
+    protected ConcurrentHashMap<Location,SlimefunBlockData> ERROR_MACHINES = new ConcurrentHashMap<Location,SlimefunBlockData>();
     @Override
     public void tick(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {
         Location loc=menu.getLocation();
@@ -134,8 +133,8 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
         AtomicInteger errorMachine=new AtomicInteger(0);
         boolean lazymod= getStatus(menu)[0];
         Collection<SlimefunBlockData> allDatas= getCollectRange(menu,b,data);
+        List< CompletableFuture<Boolean>> gens=new ArrayList<>();
         if(allDatas!=null&&!allDatas.isEmpty()){
-            List< CompletableFuture<Boolean>> gens=new ArrayList<>();
             for (SlimefunBlockData sf : allDatas) {
                 SlimefunItem item=SlimefunItem.getById(sf.getSfId());
                 EnergyNetProvider ec= getEnergyProvider(item);
@@ -174,7 +173,16 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
                         return tickGenerator;
                     }).exceptionally(ex->{
                         errorMachine.getAndIncrement();
-                        new ErrorReport<>(ex, testLocation, item);return null;
+                        ERROR_MACHINES.compute(testLocation,(loc1,data1)->{
+                            if(data1 != sf){
+                                Debug.logger("Error while Ticking Generator at:",DataCache.locationToDisplayString(loc1));
+                                //remove duplicate errors: only throw same machine once
+                                new ErrorReport<>(ex, loc1, item);
+                            }
+                            return sf;
+                        });
+                        return null;
+                        //new ErrorReport<>(ex, testLocation, item);return null;
                     });
                     gens.add(future1);
                     future1.thenApply((more)->{
@@ -188,28 +196,30 @@ public abstract class AbstractEnergyCollector extends AbstractEnergyMachine impl
                         }
                         return null;
                     }).exceptionally(ex->{
-                        new ErrorReport<>(ex, testLocation, item);return null;
+                        ERROR_MACHINES.compute(testLocation,(loc1,data1)->{
+                            if(data1 != sf){
+                                Debug.logger("Error while Ticking Generator at:",DataCache.locationToDisplayString(loc1));
+                                new ErrorReport<>(ex, loc1, item);
+                            }
+                            return sf;
+                        });return null;
                     });
                     if(energyProvider.incrementAndGet() >= getMaxCollectAmount()){
                         break;
                     }
                 }
             }
-            if(!gens.isEmpty()){
-                CompletableFuture.allOf(gens.toArray(CompletableFuture[]::new)).thenRun(()->{
-                    this.setCharge(loc, charge.get());
 
-                    if(menu.hasViewer()){
-                        menu.replaceExistingItem(getInfoSlot(),getInfoShow(charge.get(),energyProvider.get(), errorMachine.get()));
-                    }
-                });
-            }else{
-                if(menu.hasViewer()){
-                    menu.replaceExistingItem(getInfoSlot(),getInfoShow(charge.get(),energyProvider.get(), errorMachine.get()));
-                }
-            }
         }
-
+        //move out, menu still need update when no data in range
+        if(menu.hasViewer()){
+            menu.replaceExistingItem(getInfoSlot(),getInfoShow(charge.get(),energyProvider.get(), errorMachine.get()));
+        }
+        if(!gens.isEmpty()){
+            CompletableFuture.allOf(gens.toArray(CompletableFuture[]::new)).thenRun(()->{
+                this.setCharge(loc, charge.get());
+            });
+        }
     }
 
     public void tickAsync(Block b, BlockMenu menu, SlimefunBlockData data, int ticker) {

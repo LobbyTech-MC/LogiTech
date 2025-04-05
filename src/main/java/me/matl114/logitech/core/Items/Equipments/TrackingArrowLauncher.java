@@ -6,11 +6,11 @@ import io.github.thebusybiscuit.slimefun4.api.items.ItemSetting;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
-import me.matl114.logitech.Manager.Schedules;
+import me.matl114.logitech.manager.Schedules;
 import me.matl114.logitech.core.Items.Abstracts.ChargableProps;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.logitech.Utils.BukkitUtils;
-import me.matl114.logitech.Utils.WorldUtils;
+import me.matl114.logitech.utils.AddUtils;
+import me.matl114.logitech.utils.BukkitUtils;
+import me.matl114.logitech.utils.WorldUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
@@ -59,11 +59,11 @@ public class TrackingArrowLauncher extends ChargableProps {
             if(charge<ENERGYCONSUMPTION){
                 AddUtils.sendMessage(p,AddUtils.concat("&c电力不足! ",String.valueOf(charge),"J/",String.valueOf(ENERGYCONSUMPTION),"J"));
             }else {
-                if(canUse(p,false)&&WorldUtils.hasPermission(p,p.getEyeLocation(), Interaction.ATTACK_ENTITY)){
+                if(canUse(p,false)){
                     this.setItemCharge(item,charge-ENERGYCONSUMPTION);
                     onArrowLaunched(p,item);
                 }else{
-                    AddUtils.sendMessage(p,"&c你没有权限在这里攻击生物!");
+                    AddUtils.sendMessage(p,"&c你没有权限使用该道具!");
                 }
             }
         }
@@ -185,7 +185,7 @@ public class TrackingArrowLauncher extends ChargableProps {
                         for(Arrow arrow:arrows){
                             arrow.getWorld().spawnParticle(Particle.CHERRY_LEAVES,arrow.getLocation(),3,0.0,0.0,0.0,1,null,true);
                             if(runTime%2==0&&runTime>5)
-                                arrow.getWorld().spawnParticle(Particle.FLAME,arrow.getLocation(),0,0.0,0.0,0.0,1,null,true);
+                                arrow.getWorld().spawnParticle(Particle.FLAME,arrow.getLocation(),0,0.0,0.0,0.0,1,null,false);
 
                         }
                     }finally {

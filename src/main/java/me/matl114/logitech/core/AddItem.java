@@ -5,23 +5,23 @@ import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
-import me.matl114.logitech.Utils.UtilClass.SpecialItemClass.CustomFireworkStar;
-import me.matl114.logitech.Utils.UtilClass.SpecialItemClass.CustomHead;
-import me.matl114.logitech.Language;
-import me.matl114.logitech.Utils.AddUtils;
-import me.matl114.matlib.Algorithms.DataStructures.Frames.InitializeProvider;
-import me.matl114.matlib.Algorithms.DataStructures.Frames.InitializeSafeProvider;
-import me.matl114.matlib.Utils.Reflect.FieldAccess;
+import me.matl114.logitech.utils.UtilClass.SpecialItemClass.CustomFireworkStar;
+import me.matl114.logitech.utils.UtilClass.SpecialItemClass.CustomHead;
+import me.matl114.matlib.algorithms.dataStructures.frames.InitializeProvider;
+import me.matl114.matlib.algorithms.dataStructures.frames.InitializeSafeProvider;
 import me.matl114.matlib.core.EnvironmentManager;
+import me.matl114.matlib.utils.reflect.FieldAccess;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import static me.matl114.logitech.Utils.AddUtils.*;
-import static me.matl114.logitech.Language.*;
 
 import java.util.HashSet;
 import java.util.List;
+
+import static me.matl114.logitech.Language.get;
+import static me.matl114.logitech.Language.getList;
+import static me.matl114.logitech.utils.AddUtils.*;
 
 public class AddItem {
 
@@ -617,6 +617,8 @@ public class AddItem {
             get("Cargo.OCTASORTER.Name"),getList("Cargo.OCTASORTER.Lore"));
     public static final SlimefunItemStack ADV_TRASH=themed("ADV_TRASH",CustomHead.FIRE_GENERATOR.getItem(), Theme.CARGO1,
             get("Cargo.ADV_TRASH.Name"),getList("Cargo.ADV_TRASH.Lore"));
+    public static final SlimefunItemStack QUANTUM_TRASH=themed("QUANTUM_TRASH",CustomHead.TRASHCAN_RECYCLE.getItem(), Theme.CARGO1,
+            get("Cargo.QUANTUM_TRASH.Name"),getList("Cargo.QUANTUM_TRASH.Lore"));
     public static final SlimefunItemStack STORAGE_OPERATOR=themed("STORAGE_OPERATOR",Material.CARTOGRAPHY_TABLE,Theme.CARGO1,
             get("Cargo.STORAGE_OPERATOR.Name"),getList("Cargo.STORAGE_OPERATOR.Lore"));
     public static final SlimefunItemStack ADV_ADJACENT_CARGO=themed("ADV_ADJACENT_CARGO",Material.TARGET,Theme.CARGO1,
@@ -747,16 +749,11 @@ public class AddItem {
     public static final SlimefunItemStack FINAL_STONE_MG=themed("FINAL_STONE_MG",Material.DEEPSLATE_TILES,Theme.MACHINE2,
             get("Generators.FINAL_STONE_MG.Name"),getList("Generators.FINAL_STONE_MG.Lore"));
 
-    public static final SlimefunItemStack TESTPART=themed("TEST_MPART",Material.OBSIDIAN,Theme.MACHINE1,"测试多方块部件","测试测试");
-    public static final SlimefunItemStack TESTCORE=themed("TEST_MCORE",Material.IRON_BLOCK,Theme.MACHINE1,"测试多方块核心","测试测试");
-    public static final SlimefunItemStack TEST_SEQ=themed("TEST_SEQ",Material.LOOM,Theme.MACHINE1,
-            get("Items.TEST_SEQ.Name"),getList("Items.TEST_SEQ.Lore"));
-
     //tmp占位符
     public static final SlimefunItemStack TMP1= new SlimefunItemStack("TMP1",Material.STONE,"&b占位符","&7暂未开发");
-    public static final SlimefunItemStack RESOLVE_FAILED=themed("RESOLVE_FAILED",Material.STRUCTURE_VOID,Theme.NONE,
+    public static final SlimefunItemStack RESOLVE_FAILED=themed("RESOLVE_FAILED0",Material.STRUCTURE_VOID,Theme.NONE,
             get("Items.RESOLVE_FAILED.Name"),getList("Items.RESOLVE_FAILED.Lore"));
-    public static final SlimefunItemStack SHELL=themed("SHELL",Material.BOOK,Theme.ITEM1,
+    public static final SlimefunItemStack SHELL=themed("调试终端",Material.BOOK,Theme.ITEM1,
             get("Items.SHELL.Name"),getList("Items.SHELL.Lore"));
     public static final HashSet<ItemStack> ADDGLOW=new HashSet<>(){{
         add(RESOLVE_FAILED);
