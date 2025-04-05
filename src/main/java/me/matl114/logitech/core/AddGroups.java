@@ -764,7 +764,7 @@ public class AddGroups {
         final ItemStack head=new CustomItemStack(Material.PLAYER_HEAD,AddUtils.color("逝者的头颅"));
         final ItemMeta s7=new CustomItemStack(CustomHead.TOURUYA.getItem(),AddUtils.color("TouRuya"),"&7人机服腐竹","&7纯人迹","&3\"堆叠开局 怎么输?\uD83D\uDE0B\"").getItemMeta();
         final ItemMeta s8=new CustomItemStack(CustomHead.BIG_SNAKE.getItem(),AddUtils.color("taitaia"),"&7刷物?你在想屁吃\uD83D\uDE0B").getItemMeta();
-        final ItemMeta s9 =new CustomItemStack(Material.CHORUS_PLANT,AddUtils.color("xiaoUI1"),"&7知名服务器-&b魔芋&7 的腐竹","&7感谢UI对本项目的支持").getItemMeta();
+        final ItemMeta s9 =new CustomItemStack(Material.CHORUS_PLANT,AddUtils.color("xiaoUI1"),"&7一个我的世界服务器-&b魔芋粘液科技服&7 的腐竹","&7感谢UI对本项目的支持").getItemMeta();
         ItemMeta[] smetas;
         final HashMap<UUID,String> LASTLY_CALCUATED_DATE=new HashMap<>();
         //used to set GUIDE based handlers,an interface to adapt CustomMenu menus
