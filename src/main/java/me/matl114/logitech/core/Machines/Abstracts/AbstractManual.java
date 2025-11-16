@@ -22,10 +22,13 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@EnableAsync
 public abstract class AbstractManual extends AbstractMachine implements RecipeLock {
 
     protected static final int[] INPUT_SLOT = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 33, 34, 35, 36, 37, 38, 42, 43, 44, 45, 46, 47, 51, 52, 53};
@@ -123,6 +126,7 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
         this.considerPermission = create("check-recipe-permission", false);
 
     }
+    @Async
     public void addInfo(ItemStack item){
         if(this.energyConsumption > 0){
             item.setItemMeta(AddUtils.workBenchInfoAdd(item,this.energybuffer,this.energyConsumption).getItemMeta());
@@ -266,6 +270,7 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
         if(inv == null)return-1;
         return orderSearchRecipeFrom(inv, order, DataCache.getLastRecipe(inv.getLocation()), setHistory);
     }
+    @Async
     public int orderSearchRecipeFrom(BlockMenu inv, Settings order, int index, boolean setHistory){
         if(inv!=null){
             if(index < 0){
@@ -298,6 +303,7 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
     }
 
 
+    @Async
     public void craft(Player player,BlockMenu inv,int limit){
         if(preCraft(inv,player,true)){
             Location  loc=inv.getLocation();
@@ -316,6 +322,7 @@ public abstract class AbstractManual extends AbstractMachine implements RecipeLo
         }
     }
 
+    @Async
     public void doCraft(BlockMenu inv, int limit, MachineRecipe recordRecipe){
         //计算电力
         Pair<ItemGreedyConsumer[],ItemGreedyConsumer[]> results=
