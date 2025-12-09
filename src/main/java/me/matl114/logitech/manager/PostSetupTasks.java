@@ -6,10 +6,6 @@ import me.matl114.logitech.core.Registries.RecipeSupporter;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
-
-@EnableAsync
 public class PostSetupTasks {
     //在服务器启动之后执行的初始化
     public static boolean startPostRegister=false;
@@ -18,7 +14,6 @@ public class PostSetupTasks {
     public static void addPostRegisterTask(Runnable t) {
         registerTasks.add(t);
     }
-    @Async
     public static void schedulePostRegister(){
         startPostRegister=true;
         Debug.logger("START ADDON POSTREGISTER TASKS");

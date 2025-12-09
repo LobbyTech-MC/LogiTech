@@ -171,11 +171,6 @@
             <version>1.5.23</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>5.3.27</version>
-        </dependency>
         <!-- Support Stacker -->
     </dependencies>
 </project>
