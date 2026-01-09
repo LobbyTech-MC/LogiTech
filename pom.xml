@@ -15,6 +15,10 @@
     </properties>
 
     <repositories>
+        <repository>
+            <id>papermc-repo</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
 
         <repository>
             <id>paper-repo</id>
@@ -90,6 +94,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <java>
+                        <palantirJavaFormat>
+                            <version>2.38.0</version>
+                            <style>PALANTIR</style>
+                        </palantirJavaFormat>
+
+                        <removeUnusedImports />
+                        <formatAnnotations />
+                    </java>
+                </configuration>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -101,6 +121,7 @@
                 </includes>
             </resource>
         </resources>
+
     </build>
 
     <dependencies>
@@ -147,9 +168,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.m1919810</groupId>
-            <artifactId>matlib</artifactId>
-            <version>8c55cc7</version>
+            <groupId>com.github.m1919810.matlib</groupId>
+            <artifactId>matlib-all</artifactId>
+            <version>344aa5f</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.m1919810.matlib</groupId>
+            <artifactId>matlib-slimefun</artifactId>
+            <version>344aa5f</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
