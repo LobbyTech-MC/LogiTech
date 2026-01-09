@@ -881,7 +881,7 @@ public class AddUtils {
     public static ItemStack removeGlow(ItemStack stack) {
         // stack.addEnchantment(Enchantment.INFINITE, 1);
         ItemMeta meta = stack.getItemMeta();
-        meta.removeEnchant(Enchantment.INFINITE);
+        meta.removeEnchant(Enchantment.INFINITY);
         stack.setItemMeta(meta);
         return stack;
     }
@@ -889,7 +889,7 @@ public class AddUtils {
     public static ItemStack addGlow(ItemStack stack) {
         // stack.addEnchantment(Enchantment.INFINITE, 1);
         ItemMeta meta = stack.getItemMeta();
-        meta.addEnchant(Enchantment.INFINITE, 1, true);
+        meta.addEnchant(Enchantment.INFINITY, 1, true);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         stack.setItemMeta(meta);
         return stack;
@@ -903,7 +903,7 @@ public class AddUtils {
         meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
         meta.addItemFlags(ItemFlag.HIDE_DYE);
         meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
-        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         stack.setItemMeta(meta);
         return stack;
     }
@@ -916,7 +916,7 @@ public class AddUtils {
         meta.removeItemFlags(ItemFlag.HIDE_DESTROYS);
         meta.removeItemFlags(ItemFlag.HIDE_DYE);
         meta.removeItemFlags(ItemFlag.HIDE_PLACED_ON);
-        meta.removeItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        meta.removeItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         stack.setItemMeta(meta);
         return stack;
     }
